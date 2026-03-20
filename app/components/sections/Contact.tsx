@@ -51,14 +51,17 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
       // Ripple burst on the card
       const el = cardRef.current;
       if (el) {
-        gsap.fromTo(el, { scale: 1 }, { 
-          scale: 1.03, 
-          duration: 0.15, 
-          ease: 'power2.out',
-          onComplete: () => { 
-            gsap.to(el, { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.4)' }); 
-          } 
-        });
+        gsap.fromTo(el, 
+          { scale: 1 }, 
+          { 
+            scale: 1.03, 
+            duration: 0.15, 
+            ease: 'power2.out',
+            onComplete: () => { 
+              gsap.to(el, { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.4)' }); 
+            } 
+          }
+        ); // <--- Este cierre es CRÍTICO. Cierra el gsap.fromTo
       }
       setTimeout(() => setCopied(false), 2500);
     } catch {
