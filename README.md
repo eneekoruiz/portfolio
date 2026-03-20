@@ -1,99 +1,64 @@
-# Portfolio Modular - Refactorización SPL
-## Fase 1 Completada: Arquitectura Base + Fixes Críticos
+# ENEKO RUIZ | FULL STACK & SYSTEMS
 
-**Status**: ✅ FASE 1 COMPLETA (30%)  
-**Arquitectura**: SPL (Single Purpose Layer)  
-**Next.js**: 15.1.6 (Security patched)  
+This portfolio is a technical space designed to demonstrate the intersection between low-level systems engineering and high-performance frontend development. No templates or UI kits were used—everything is built from scratch with a focus on physics-based interaction and modular architecture.
 
 ---
 
-## 🎯 QUÉ SE HA HECHO
+## TECH STACK
 
-### **1. Estructura Modular Creada**
-```
-app/
-├── components/
-│   ├── ui/InfallibleCursor.tsx
-│   └── features/TheLab.tsx
-├── hooks/
-│   ├── usePreferredMotion.ts
-│   ├── useGreeting.ts
-│   ├── useLenis.ts
-│   └── useGitHub.ts
-└── lib/
-    ├── types.ts
-    ├── constants.ts
-    └── translations.ts
-```
-
-### **2. Cursor Infalible (BUG CRÍTICO CORREGIDO)**
-- ✅ Raw DOM manipulation (144fps)
-- ✅ requestAnimationFrame
-- ✅ Shake detection (50px threshold)
-- ✅ Zero re-renders
-- ✅ Integrado en layout.tsx
-
-### **3. The Lab - Matter.js**
-- ✅ Física interactiva
-- ✅ Drag & drop
-- ✅ Zero Gravity mode
-- ✅ Ruta /lab creada
-
-### **4. Hooks Extraídos**
-- ✅ 4 custom hooks modulares
-- ✅ TypeScript strict
-- ✅ Barrel exports
-
-### **5. Datos Centralizados**
-- ✅ Tipos en types.ts
-- ✅ Constantes en constants.ts
-- ✅ Traducciones en translations.ts
+| LAYER | TECHNOLOGY |
+| :--- | :--- |
+| **Framework** | Next.js 14 (App Router) |
+| **Logic** | TypeScript |
+| **Animation** | GSAP (GreenSock) |
+| **Styling** | Tailwind CSS |
+| **API** | GitHub REST API |
+| **Infrastructure** | Vercel |
 
 ---
 
-## 🔄 PENDIENTE (Fase 2)
+## CORE ENGINEERING
 
-- [ ] Extraer componentes UI restantes
-- [ ] Extraer secciones de página
-- [ ] Implementar Modal fixes (scroll lock)
-- [ ] Aplicar OLED dark mode
-- [ ] Actualizar imports en page.tsx
+### Magnetic UI Engine
+I developed a custom proximity-based interaction system using GSAP. The primary Call-to-Action (CTA) acts as a gravitational body that attracts the cursor within a 500px radius. To ensure usability, the engine includes "repel" logic that releases the element when the cursor targets neighboring buttons, preventing interaction conflicts.
 
----
-
-## 🚀 INSTALACIÓN
-
-```bash
-npm install
-npm run dev
-```
-
-**Rutas**:
-- Portfolio: `http://localhost:3000`
-- The Lab: `http://localhost:3000/lab`
+### Dynamic Data & Fallbacks
+The project integrates directly with the GitHub API to pull live repository metrics. To handle API rate limits or connectivity issues, I implemented a custom caching layer and a "headless" state that displays local project data (Selected Works) as a fallback, ensuring the UI never breaks.
 
 ---
 
-## 📖 DOCUMENTACIÓN
+## FEATURED PROJECTS
 
-Ver **REFACTORING-GUIDE.md** para:
-- Arquitectura completa
-- Código de cada componente
-- Correcciones UX detalladas
-- Plan de Fase 2
+**PL/0 Compiler (C)**
+A functional compiler built from the ground up in C. Handles lexical analysis, syntax parsing, and code generation for the PL/0 language.
 
----
+**GestDB (Java)**
+A database management layer designed for PostgreSQL. Focused on optimizing JDBC connections and handling complex relational schemas.
 
-## ✅ GARANTÍAS
-
-- ✅ Cursor funciona (144fps)
-- ✅ The Lab funciona
-- ✅ TypeScript strict
-- ✅ Zero errores compilación
-- ✅ Arquitectura SPL base
+**NetSim (Python)**
+A network protocol simulator. Uses Python threading and socket programming to model data transmission and collision handling.
 
 ---
 
-**Fase 1**: ✅ COMPLETA  
-**Progreso**: 30% de refactorización total  
-**Siguiente**: Fase 2 - Componentes restantes
+## LOCAL SETUP
+
+To run this project locally:
+
+1. Clone the repository:
+   `git clone https://github.com/eneekoruiz/portfolio.git`
+
+2. Install dependencies:
+   `npm install`
+
+3. Start the development server:
+   `npm run dev`
+
+*Note: A GitHub Personal Access Token (GITHUB_TOKEN) is recommended in your .env.local to avoid API rate-limiting during development.*
+
+---
+
+## CONTACT
+
+**Eneko Ruiz** Software Developer  
+[eneekoruiz@gmail.com](mailto:eneekoruiz@gmail.com)  
+[linkedin.com/in/eneekoruiz](https://linkedin.com/in/eneekoruiz)
