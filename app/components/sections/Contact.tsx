@@ -52,7 +52,9 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
       const el = cardRef.current;
       if (el) {
         gsap.fromTo(el, { scale: 1 }, { scale: 1.03, duration: .15, ease: 'power2.out',
-          onComplete: () => gsap.to(el, { scale: 1, duration: .4, ease: 'elastic.out(1,.4)' }) });
+          onComplete: () => { 
+			  gsap.to(el, { scale: 1, duration: .4, ease: 'elastic.out(1,.4)' }); 
+			}
       }
       setTimeout(() => setCopied(false), 2500);
     } catch {
