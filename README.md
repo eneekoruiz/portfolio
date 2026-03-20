@@ -61,4 +61,3 @@ To run this project locally:
 
 **Eneko Ruiz** Software Developer  
 [eneekoruiz@gmail.com](mailto:eneekoruiz@gmail.com)  
-[linkedin.com/in/eneekoruiz](https://linkedin.com/in/eneekoruiz)
