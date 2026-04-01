@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { EasterEgg } from './components/ui/EasterEgg';
 import { SmoothScroll } from './components/ui/SmoothScroll';
@@ -91,6 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SmoothScroll />
           <EasterEgg />
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
