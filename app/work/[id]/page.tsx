@@ -4,46 +4,16 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * WORK/[ID] PAGE — Detalle de proyecto con auditoría de ingeniería
  * ─────────────────────────────────────────────────────────────────────────────
- *
- * FIXES vs. versión anterior:
- *
- * 1. RETORNO SIN PRELOADER (fix crítico) ─────────────────────────────────────
- *    ANTES: `window.location.href = '/#work'` causaba full-page reload.
- *    El overlay creado en handleReturn desaparecía con el reload, dejando
- *    una ventana de ~100-200ms donde el Hero era visible antes de que
- *    page.tsx creara un nuevo overlay.
- *
- *    AHORA: `router.push('/')` hace navegación client-side. El overlay
- *    (appended al document.body, fuera del root de React) SOBREVIVE la
- *    navegación. page.tsx lo encuentra con getElementById y lo desvanece
- *    suavemente, sin crear uno nuevo. Cero flashes.
- *
- * 2. TerrainMesh — throttle a 30fps + pausa con visibilitychange ───────────
- *    El canvas antes corría a 60fps siempre, incluyendo cuando la pestaña
- *    no tenía foco. Ahora se pausa automáticamente y corre a ~30fps.
- *
- * 3. FloatingArtifacts — IntersectionObserver para pausar off-screen ───────
- *    Las 5 animaciones infinitas se pausan cuando el componente sale del
- *    viewport, reduciendo carga de CPU.
- *
- * 4. Duraciones de animación reducidas para sensación más snappy ──────────
- *    heroMonitor: 1.6s → 1.0s
- *    reveal-sec:  1.2s → 0.7s
- *    scrub helix: 2.5  → 1.5
- *
- * 5. GSAP memory leaks — useGSAP scope en todo ────────────────────────────
- *    Todas las animaciones usan useGSAP con scope=main para cleanup
- *    automático al desmontar el componente.
- * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import { useRef, useState, useEffect, useMemo } from 'react';
-import { notFound, useParams, useRouter } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import {
-  ArrowUpRight, Database, Terminal,
+  Github, ArrowUpRight, Database, Terminal,
   Cpu, ShieldCheck, Zap, Activity, Server,
   Layers, ChevronLeft, CheckCircle2, Radar,
 } from 'lucide-react';
@@ -59,11 +29,8 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-// ── Constantes compartidas con page.tsx ──────────────────────────────────────
-const RETURN_OVERLAY_ID = 'return-overlay';
-const RETURN_COLOR_KEY  = 'returnColor';
-
 // ── Themes ────────────────────────────────────────────────────────────────────
+
 const THEMES: Record<string, {
   helixA: string; helixB: string; accent: string; label: string;
 }> = {
@@ -76,7 +43,7 @@ const THEMES: Record<string, {
 
 const DEFAULT_THEME = { helixA: '#888', helixB: '#aaa', accent: '#888', label: 'MODULE' };
 
-// ── DNAHelix — sin cambios funcionales ───────────────────────────────────────
+// ── DNA Helix ───────────────────────────────────────
 
 function DNAHelix({ accent, secondary, darkMode }: {
   accent: string; secondary: string; darkMode: boolean;
@@ -89,7 +56,7 @@ function DNAHelix({ accent, secondary, darkMode }: {
   for (let i = 0; i <= steps; i++) {
     const t  = (i / steps) * Math.PI * 6;
     const y  = (i / steps) * H;
-    const xA = W / 2 + Math.sin(t)           * (W * 0.38);
+    const xA = W / 2 + Math.sin(t)          * (W * 0.38);
     const xB = W / 2 + Math.sin(t + Math.PI) * (W * 0.38);
     strandA.push(`${i === 0 ? 'M' : 'L'} ${xA.toFixed(2)} ${y.toFixed(2)}`);
     strandB.push(`${i === 0 ? 'M' : 'L'} ${xB.toFixed(2)} ${y.toFixed(2)}`);
@@ -126,13 +93,12 @@ function DNAHelix({ accent, secondary, darkMode }: {
   );
 }
 
-// ── TerrainMesh — FIX: throttle 30fps + pausa con visibilitychange ───────────
+// ── TerrainMesh ─────────────────────────────────────────────────
 
 function TerrainMesh({ accent }: { accent: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef   = useRef<number>();
   const tRef      = useRef(0);
-  const lastTimeRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -145,30 +111,12 @@ function TerrainMesh({ accent }: { accent: string }) {
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     };
     resize();
+    window.addEventListener('resize', resize);
 
-    const onResize = () => resize();
-    window.addEventListener('resize', onResize, { passive: true });
-
-    /**
-     * FIX RENDIMIENTO: throttle a ~30fps (33ms entre frames).
-     * Antes corría a 60fps siempre, consumiendo el doble de GPU/CPU.
-     *
-     * También pausamos cuando la pestaña no tiene foco (document.hidden).
-     * El canvas es fixed/decorativo, no necesita correr en background.
-     */
-    const draw = (timestamp: number) => {
-      animRef.current = requestAnimationFrame(draw);
-
-      // Pausar si pestaña oculta
-      if (document.hidden) return;
-
-      // Throttle a ~30fps
-      if (timestamp - lastTimeRef.current < 33) return;
-      lastTimeRef.current = timestamp;
-
+    const draw = () => {
       const W = canvas.offsetWidth, H = canvas.offsetHeight;
       ctx.clearRect(0, 0, W, H);
-      tRef.current += 0.003; // ligeramente más lento para suavidad
+      tRef.current += 0.004;
       ctx.strokeStyle = accent;
       ctx.lineWidth   = 0.4;
       for (let row = 0; row <= 10; row++) {
@@ -184,12 +132,12 @@ function TerrainMesh({ accent }: { accent: string }) {
         ctx.globalAlpha = 0.04;
         ctx.stroke();
       }
+      animRef.current = requestAnimationFrame(draw);
     };
-
-    animRef.current = requestAnimationFrame(draw);
+    draw();
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', resize);
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
   }, [accent]);
@@ -203,58 +151,40 @@ function TerrainMesh({ accent }: { accent: string }) {
   );
 }
 
-// ── FloatingArtifact — FIX: IntersectionObserver + gsap.context cleanup ──────
+// ── FloatingArtifact ──────────────────────
 
 function FloatingArtifact({ accent, idx }: { accent: string; idx: number }) {
   const ref    = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context>();
-  const tweenRef = useRef<gsap.core.Tween>();
 
   useEffect(() => {
     if (!ref.current) return;
 
-    /**
-     * FIX RENDIMIENTO: IntersectionObserver para pausar/reanudar la animación
-     * cuando el elemento entra/sale del viewport. Los FloatingArtifacts son
-     * fixed, así que siempre están en viewport, pero esto protege por si
-     * se mueven a otro contexto en el futuro.
-     */
     ctxRef.current = gsap.context(() => {
-      tweenRef.current = gsap.to(ref.current, {
-        y:        -20 - idx * 5,
-        x:        Math.sin(idx) * 15,
+      gsap.to(ref.current, {
+        y:        `${-20 - idx * 5}`,
+        x:        `${Math.sin(idx) * 15}`,
         rotate:   idx % 2 === 0 ? 360 : -360,
-        duration: 4 + idx,    // ← era 5 + idx
+        duration: 5 + idx,
         repeat:   -1,
         yoyo:     true,
         ease:     'sine.inOut',
-        paused:   false,
       });
     });
 
-    // Pausar cuando la pestaña pierde foco
-    const onVisChange = () => {
-      if (document.hidden) tweenRef.current?.pause();
-      else tweenRef.current?.resume();
-    };
-    document.addEventListener('visibilitychange', onVisChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisChange);
-      ctxRef.current?.revert();
-    };
+    return () => ctxRef.current?.revert();
   }, [idx]);
 
   const shapes = [
-    <div key="1" className="w-2 h-2 rounded-full"      style={{ background: accent, opacity: 0.4 }} />,
+    <div key="1" className="w-2 h-2 rounded-full"  style={{ background: accent, opacity: 0.4 }} />,
     <div key="2" className="w-4 h-4 border rotate-45" style={{ borderColor: accent, opacity: 0.3 }} />,
-    <div key="3" className="w-6 h-[1px]"               style={{ background: accent, opacity: 0.2 }} />,
+    <div key="3" className="w-6 h-[1px]"           style={{ background: accent, opacity: 0.2 }} />,
   ];
 
   return (
     <div
       ref={ref}
-      className="absolute pointer-events-none will-change-transform"
+      className="absolute pointer-events-none"
       style={{ top: `${20 + idx * 12}%`, left: idx % 2 === 0 ? '10%' : '85%' }}
     >
       {shapes[idx % 3]}
@@ -262,7 +192,7 @@ function FloatingArtifact({ accent, idx }: { accent: string; idx: number }) {
   );
 }
 
-// ── Visualizadores — sin cambios ──────────────────────────────────────────────
+// ── Visualizadores ───────────────────────────────────────────────
 
 function SandwichDiagram({ accent }: { accent: string }) {
   return (
@@ -307,9 +237,8 @@ function DistributedNodes({ accent }: { accent: string }) {
         <Server size={24} style={{ color: accent }} />
       </div>
       {[0, 120, 240].map((deg, i) => (
-        <div key={i}
-          className="absolute w-10 h-10 rounded-full bg-page border border-black/10 dark:border-white/10 flex items-center justify-center shadow-lg transition-all hover:scale-110"
-          style={{ transform: `rotate(${deg}deg) translateY(-65px) rotate(-${deg}deg)` }}>
+        <div key={i} className="absolute w-10 h-10 rounded-full bg-page border border-black/10 dark:border-white/10 flex items-center justify-center shadow-lg transition-all hover:scale-110"
+             style={{ transform: `rotate(${deg}deg) translateY(-65px) rotate(-${deg}deg)` }}>
           <Database size={14} style={{ color: accent }} />
         </div>
       ))}
@@ -350,7 +279,7 @@ function SpotshareHeatmap({ accent }: { accent: string }) {
   );
 }
 
-// ── GlareCard — sin cambios ───────────────────────────────────────────────────
+// ── GlareCard ───────────────────────────────────────────────────
 
 function GlareCard({ children, accent, className = '', style }: {
   children: React.ReactNode; accent: string; className?: string; style?: React.CSSProperties;
@@ -388,13 +317,15 @@ function GlareCard({ children, accent, className = '', style }: {
 
 export default function ProjectPage() {
   const { id }   = useParams();
-  const router   = useRouter();
   const main     = useRef<HTMLDivElement>(null);
   const heroMonitorRef = useRef<HTMLDivElement>(null);
 
   const [lang]     = useState<Lang>('es');
   const [darkMode, setDarkMode] = useState(false);
   const { top3 }   = useGitHub(TX[lang]);
+  
+  // 💎 ESTADO CLAVE: Retrasa la carga pesada hasta que la página respire
+  const [isReadyToAnimate, setIsReadyToAnimate] = useState(false);
 
   const safeId  = id as string;
   const theme   = THEMES[safeId] ?? DEFAULT_THEME;
@@ -407,8 +338,9 @@ export default function ProjectPage() {
   const proj    = useMemo(() => top3?.find(p => p.name.toLowerCase().replace(/[\s_]+/g, '-') === safeId) ?? null, [top3, safeId]);
   const content = PROJECTS_CONTENT[safeId]?.[lang] ?? PROJECTS_CONTENT[safeId]?.['en'] ?? PROJECTS_CONTENT[safeId]?.['es'];
   const snippet = CODE_SNIPPETS[safeId];
-  const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com/' : isJava ? null : 'https://ana-peluquera.lovable.app/';
+  const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com/login' : isJava ? null : 'https://ana-peluquera.lovable.app/';
 
+  // Detectar dark mode
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark')
                 || window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -416,92 +348,81 @@ export default function ProjectPage() {
   }, []);
 
   /**
-   * handleReturn — FIX CRÍTICO: usa router.push() en lugar de window.location.href
-   * ──────────────────────────────────────────────────────────────────────────────
-   *
-   * PROBLEMA ANTERIOR: window.location.href causaba full-page reload.
-   *   1. Overlay cubría la pantalla ✓
-   *   2. Reload del navegador → overlay destruido ✗
-   *   3. Navegador muestra pantalla en blanco ~50-100ms ✗
-   *   4. page.tsx monta → Hero visible un instante ✗
-   *   5. page.tsx crea nuevo overlay → cubre el Hero → scroll a #work
-   *
-   * SOLUCIÓN: router.push('/') hace navegación client-side.
-   *   1. Overlay cubre la pantalla ✓
-   *   2. router.push('/') → React renderiza page.tsx en background ✓
-   *   3. Overlay sobrevive (está en document.body, fuera del root React) ✓
-   *   4. page.tsx useLayoutEffect: scroll instantáneo (cubierto por overlay) ✓
-   *   5. page.tsx useEffect: desvanece el overlay → revela #work ✓
-   *
-   * El resultado: el usuario nunca ve el Hero. Transición perfecta.
+   * 💎 FIX UX PREMIUM: Desvanecer la cortina suavemente + Trigger de animación
    */
+  useEffect(() => {
+    const overlay = document.getElementById('project-transition-layer');
+    if (overlay) {
+      gsap.to(overlay, {
+        opacity: 0,
+        duration: 0.8,
+        delay: 0.3, // Dejamos que Next.js "respire"
+        ease: 'power2.inOut',
+        onComplete: () => {
+          overlay.remove();
+          setIsReadyToAnimate(true); // ¡Lanzamos los gráficos pesados AHORA!
+        }
+      });
+    } else {
+      setIsReadyToAnimate(true); // Fallback por si entran por enlace directo
+    }
+  }, []);
+
+  // 💎 LA MAGIA: Cortina de salida para el FOUC de la página principal
   const handleReturn = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    // Guardar estado antes de navegar
-    sessionStorage.setItem('hasSeenIntro', 'true');
-    sessionStorage.setItem(RETURN_COLOR_KEY, theme.accent);
-
-    // Limpiar overlay previo si existe (doble click protection)
-    document.getElementById(RETURN_OVERLAY_ID)?.remove();
-
+    
     const overlay = document.createElement('div');
-    overlay.id = RETURN_OVERLAY_ID;
     Object.assign(overlay.style, {
-      position:        'fixed',
-      inset:           '0',
-      backgroundColor: theme.accent,
-      zIndex:          '99999',
-      transform:       'scaleY(0)',
-      transformOrigin: 'top',   // baja desde arriba
-      pointerEvents:   'all',
+      position: 'fixed', inset: 0, backgroundColor: theme.accent, zIndex: 99999,
+      transform: 'scaleY(0)', transformOrigin: 'top'
     });
     document.body.appendChild(overlay);
 
     gsap.to(overlay, {
-      scaleY:   1,
-      duration: 0.42,             // ← era 0.5, más snappy
-      ease:     'expo.inOut',
+      scaleY: 1, duration: 0.5, ease: 'expo.inOut',
       onComplete: () => {
-        // Navegación client-side — el overlay sobrevive
-        router.push('/');
-      },
+        sessionStorage.setItem('hasSeenIntro', 'true');
+        sessionStorage.setItem('returnColor', theme.accent); 
+        window.location.href = '/#work';
+      }
     });
   };
 
-  // ── Animaciones de entrada ────────────────────────────────────────────────
+  // ── Animaciones de entrada (scope = main, cleanup automático) ────────────
   useGSAP(() => {
     if (!main.current || !proj) return;
 
-    // Monitor del hero — DURACIÓN REDUCIDA (1.6→1.0)
     gsap.fromTo(heroMonitorRef.current,
-      { scale: 0.92, opacity: 0, y: 35 },
-      { scale: 1, opacity: 1, y: 0, duration: 1.0, ease: 'power4.out', delay: 0.15 }
+      { scale: 0.9, opacity: 0, y: 40 },
+      { scale: 1, opacity: 1, y: 0, duration: 1.6, ease: 'power4.out', delay: 0.2 }
     );
 
-    // Rotación del helix — scrub REDUCIDO (2.5→1.5, más responsivo)
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: main.current,
-        start: 'top top', end: 'bottom bottom',
-        scrub: 1.5,
-      },
-    }).to('.helix-group', { rotateY: 360, ease: 'none' }, 0);
-
-    // Reveal de secciones — DURACIÓN REDUCIDA (1.2→0.7)
+    // Reveal de secciones
     gsap.utils.toArray<HTMLElement>('.reveal-sec').forEach(el => {
       gsap.fromTo(el,
-        { opacity: 0, y: 30 },    // ← era y:40
+        { opacity: 0, y: 40 },
         {
-          opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', // ← era 1.2
+          opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
           scrollTrigger: { trigger: el, start: 'top 85%', once: true },
         }
       );
     });
 
-  }, { scope: main, dependencies: [safeId, proj] });
+    // Solo activamos la rotación del SVG Helix si ya existe en el DOM
+    if (isReadyToAnimate) {
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: main.current,
+          start: 'top top', end: 'bottom bottom',
+          scrub: 2.5,
+        },
+      }).to('.helix-group', { rotateY: 360, ease: 'none' }, 0);
+    }
 
-  // Estados de carga
+  }, { scope: main, dependencies: [safeId, proj, isReadyToAnimate] }); // ¡Dependencia clave!
+
+  // ── Estados de carga ───────────────────────────────────────────────────────
   if (!proj && top3 && top3.length > 0) return notFound();
   if (!proj) return (
     <div className="min-h-screen flex items-center justify-center bg-page text-ink">
@@ -519,28 +440,32 @@ export default function ProjectPage() {
     >
       <InfallibleCursor />
 
-      {/* ── 3D BACKGROUND ── */}
-      <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" style={{ perspective: '900px' }}>
-        <div
-          className="helix-group will-change-transform"
-          style={{
-            width: 'clamp(180px, 30vw, 420px)', height: '210vh',
-            opacity: darkMode ? 0.2 : 0.1,
-            filter: `drop-shadow(0 0 30px ${theme.helixA}60)`,
-            transformStyle: 'preserve-3d',
-          }}
-        >
-          <DNAHelix accent={theme.helixA} secondary={theme.helixB} darkMode={darkMode} />
-        </div>
-      </div>
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-60">
-        <TerrainMesh accent={theme.helixA} />
-      </div>
-      <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-        {[1, 2, 3, 4, 5].map(i => (
-          <FloatingArtifact key={i} accent={theme.accent} idx={i} />
-        ))}
-      </div>
+      {/* ── 3D BACKGROUND (CARGA RETRASADA PARA EVITAR LAG) ── */}
+      {isReadyToAnimate && (
+        <>
+          <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" style={{ perspective: '900px' }}>
+            <div
+              className="helix-group will-change-transform"
+              style={{
+                width: 'clamp(180px, 30vw, 420px)', height: '210vh',
+                opacity: darkMode ? 0.2 : 0.1,
+                filter: `drop-shadow(0 0 30px ${theme.helixA}60)`,
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <DNAHelix accent={theme.helixA} secondary={theme.helixB} darkMode={darkMode} />
+            </div>
+          </div>
+          <div className="fixed inset-0 pointer-events-none z-0 opacity-60">
+            <TerrainMesh accent={theme.helixA} />
+          </div>
+          <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+            {[1, 2, 3, 4, 5].map(i => (
+              <FloatingArtifact key={i} accent={theme.accent} idx={i} />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* ── HEADER ── */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-3rem)] max-w-[1200px]">
