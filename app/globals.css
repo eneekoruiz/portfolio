@@ -169,9 +169,9 @@ canvas.terrain-mesh { will-change: contents; }
 }
 .bento-glare:hover::before { opacity: 1; }
 
-/* ── 14. PRINT / PDF CV (Dossier Edition - 1 Sección por página) ── */
+/* ── 14. PRINT / PDF CV (Dossier Edition) ── */
 @media print {
-  /* 1. Ajustes base: Colores exactos y sin animaciones */
+  /* Ajustes base */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -179,14 +179,14 @@ canvas.terrain-mesh { will-change: contents; }
     animation: none !important;
   }
 
-  /* 2. Ocultar interfaz interactiva y "DESPLAZA" */
+  /* Ocultar interfaz y multimedia */
   .cur-dot, .cur-ring, nav, header, button, .no-print, 
   video, canvas, iframe, .helix-group, .helix-svg,
   [data-scroll], .animate-bounce { 
     display: none !important; 
   }
 
-  /* 3. RESET DE ALTURAS Y OVERFLOWS (Crucial para que nada se recorte) */
+  /* RESET DE ALTURAS */
   body, main, section, div, article {
     height: auto !important;
     min-height: 0 !important;
@@ -195,7 +195,7 @@ canvas.terrain-mesh { will-change: contents; }
     position: static !important; 
   }
 
-  /* 4. 🔥 FORZAR VISIBILIDAD DE TODO LO OCULTO POR GSAP O TAILWIND */
+  /* FORZAR VISIBILIDAD (GSAP bypass) */
   .sr, .reveal-sec, .work-row-anim, .glare-card, 
   [style*="opacity"], [class*="opacity-0"], 
   .opacity-0, .translate-y-full, .scale-0 {
@@ -204,32 +204,41 @@ canvas.terrain-mesh { will-change: contents; }
     visibility: visible !important;
   }
 
-  /* 5. ACORDEONES SIEMPRE ABIERTOS Y VISIBLES */
+  /* ACORDEONES ABIERTOS */
   [style*="grid-template-rows: 0fr"], [style*="grid-template-rows"] {
     grid-template-rows: 1fr !important;
     opacity: 1 !important;
   }
 
-  /* 6. 🔥 CADA SECCIÓN EN UNA PÁGINA NUEVA */
+  /* 🔥 LA MAGIA: DESENROLLAR EL CILINDRO 3D DE SKILLS */
+  .cyl-item, .cylinder-wrapper {
+    position: relative !important;
+    transform: none !important;
+    display: inline-block !important;
+    margin-bottom: 1.5rem !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    width: 100% !important;
+  }
+
+  /* CADA SECCIÓN EN PÁGINA NUEVA */
   section {
     page-break-before: always !important;
     break-before: page !important;
     padding-top: 2rem !important;
     padding-bottom: 2rem !important;
   }
-  /* Excepto la primera (Hero) para no dejar la página 1 en blanco */
   section:first-of-type {
     page-break-before: avoid !important;
     break-before: auto !important;
   }
 
-  /* 7. EVITAR QUE LAS TARJETAS O PROYECTOS SE CORTEN POR LA MITAD */
+  /* EVITAR CORTES POR LA MITAD */
   .glare-card, .work-row-anim, h1, h2, h3, h4, p, img, .border-b {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  /* 8. CONFIGURACIÓN DEL FOLIO A4 */
   @page { 
     margin: 1.5cm; 
     size: A4; 
@@ -240,21 +249,17 @@ canvas.terrain-mesh { will-change: contents; }
     background: var(--page) !important; 
     color: var(--ink) !important;
   }
-  body::after { display: none !important; } /* Quitamos el ruido de fondo */
+  body::after { display: none !important; }
 }
 
 /* ── 15. RESPONSIVE: Mobile performance ── */
 @media (max-width: 768px) {
-  /* Reduce helix complexity on mobile */
   .helix-group {
     opacity: 0.07 !important;
     filter: none !important;
   }
-  /* Disable terrain mesh on mobile */
   canvas.terrain-mesh { display: none !important; }
-  /* Cylinder: static on mobile */
   .cylinder-wrapper { pointer-events: none; }
-  /* Safe font clamping — prevent title overflow */
   h1, h2, h3 {
     overflow-wrap: break-word;
     word-break: break-word;

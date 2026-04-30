@@ -7,11 +7,13 @@ import type { Tx } from '../../lib/types';
 export function SiteFooter({ t }: { t: Tx }) {
   return (
     <footer
-      className="border-t border-black/7 dark:border-white/10 py-7 px-8 max-w-[1200px] mx-auto flex flex-wrap items-center justify-between gap-4"
+      className="border-t border-black/10 dark:border-white/10 py-8 px-6 md:px-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4"
       data-noprint
     >
-      {/* Izquierda — Status */}
-      <LiveStatus label={t.status} />
+      {/* Izquierda — Status (Centrado en móvil, a la izquierda en PC) */}
+      <div className="w-full md:w-auto flex justify-center md:justify-start">
+        <LiveStatus label={t.status} />
+      </div>
 
       {/* Centro — Tech + Source (Oculto en móvil, visible en PC) */}
       <a
@@ -26,8 +28,8 @@ export function SiteFooter({ t }: { t: Tx }) {
         <span className="text-[10px] underline opacity-50">{t.footerSrc}</span>
       </a>
 
-      {/* Derecha — LAB */}
-      <div className="flex items-center gap-2.5">
+      {/* Derecha — LAB (Centrado en móvil, a la derecha en PC) */}
+      <div className="w-full md:w-auto flex justify-center md:justify-end items-center gap-2.5">
         <PortalWarpBtn />
       </div>
     </footer>

@@ -146,8 +146,8 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
         </div>
       </div>
 
-      {/* Scroll Hint */}
-      <div className="h-fd border-t border-black/7 dark:border-white/10 py-4 px-8 text-[10px] font-bold tracking-widest uppercase text-lead/30 flex items-center gap-2 max-w-[1200px] mx-auto w-full">
+      {/* Scroll Hint (CON CLASE no-print AÑADIDA) */}
+      <div className="h-fd border-t border-black/7 dark:border-white/10 py-4 px-8 text-[10px] font-bold tracking-widest uppercase text-lead/30 flex items-center gap-2 max-w-[1200px] mx-auto w-full no-print">
         {t.scroll}
         <svg width="18" height="5" viewBox="0 0 18 5" fill="none"><path d="M0 2.5h16M12.5 1l4 1.5-4 1.5" stroke="currentColor" strokeWidth=".8" /></svg>
       </div>

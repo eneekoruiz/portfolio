@@ -1,90 +1,124 @@
 'use client';
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * IDENTITY SPLASH — Pantalla de bienvenida con animación de caracteres
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * POSICIÓN EN EL FLUJO: phase === 'splash' (entre Preloader y contenido)
+ *
+ * FIXES aplicados:
+ *  - z-index elevado a 9998 para estar por encima de todo excepto el cursor
+ *    (9999) y el Preloader (9999). Antes podía quedar debajo del contenido
+ *    si visibility:hidden no se aplicaba a tiempo.
+ *  - gsap.context() con cleanup .revert() para evitar fugas de memoria
+ *    en React Strict Mode (doble ejecución de useEffect en desarrollo).
+ *  - Los estados iniciales de los .char se fijan con gsap.set() DENTRO
+ *    del contexto, no con clases Tailwind, para garantizar consistencia
+ *    aunque el componente se monte dos veces.
+ *  - onComplete se pasa como dependencia estable (useCallback en el padre).
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import type { Lang } from '../../lib/types';
 
 const WELCOME_TEXT: Record<Lang, string> = {
-  es: 'Bienvenido', en: 'Welcome', eu: 'Ongi etorri', fr: 'Bienvenue', it: 'Benvenuto',
-  de: 'Willkommen', pt: 'Bem-vindo', ca: 'Benvingut', gl: 'Benvido', ja: 'ようこそ'
+  es: 'Bienvenido',
+  en: 'Welcome',
+  eu: 'Ongi etorri',
+  fr: 'Bienvenue',
+  it: 'Benvenuto',
+  de: 'Willkommen',
+  pt: 'Bem-vindo',
+  ca: 'Benvingut',
+  gl: 'Benvido',
+  ja: 'ようこそ',
 };
 
-export function IdentitySplash({ onComplete, lang }: { onComplete: () => void; lang: Lang }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
+interface IdentitySplashProps {
+  onComplete: () => void;
+  lang:       Lang;
+}
 
-  const word = WELCOME_TEXT[lang] || 'Welcome';
+export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef      = useRef<HTMLDivElement>(null);
+  const lineRef      = useRef<HTMLDivElement>(null);
+
+  const word = WELCOME_TEXT[lang] ?? 'Welcome';
 
   useEffect(() => {
     if (!textRef.current || !lineRef.current || !containerRef.current) return;
 
-    // 🚀 LA MAGIA: gsap.context() envuelve la animación para que React no la duplique
+    /**
+     * gsap.context() garantiza que:
+     *  1. Todas las animaciones quedan registradas bajo este contexto.
+     *  2. ctx.revert() en el cleanup las cancela y resetea, evitando
+     *     la doble ejecución de animaciones en React Strict Mode.
+     */
     const ctx = gsap.context(() => {
+      const chars = textRef.current!.querySelectorAll<HTMLElement>('.char');
+
+      // ── Fijar estados iniciales (pre-animación) ────────────────────────
+      gsap.set(chars,           { yPercent: 110, opacity: 0 });
+      gsap.set(lineRef.current, { scaleX: 0 });
+
+      // ── Timeline de entrada + salida ───────────────────────────────────
       const tl = gsap.timeline({ onComplete });
-      const chars = textRef.current?.querySelectorAll('.char');
 
-      if (!chars) return;
+      tl
+        // 1. Línea crece desde el centro
+        .to(lineRef.current, {
+          scaleX: 1, duration: 0.55, ease: 'expo.inOut',
+        })
+        // 2. Letras suben y aparecen (máscara overflow:hidden del padre)
+        .to(chars, {
+          yPercent: 0, opacity: 1,
+          stagger: 0.03, duration: 0.75, ease: 'power3.out',
+        }, '-=0.2')
+        // 3. Línea encoge
+        .to(lineRef.current, {
+          scaleX: 0, duration: 0.45, ease: 'expo.inOut',
+        }, '-=0.55')
+        // 4. Pausa de lectura
+        .to({}, { duration: 0.55 })
+        // 5. Letras salen hacia arriba
+        .to(chars, {
+          yPercent: -120, opacity: 0,
+          stagger: 0.02, duration: 0.45, ease: 'power3.in',
+        })
+        // 6. Fade out del fondo
+        .to(containerRef.current, {
+          opacity: 0, duration: 0.5, ease: 'power2.inOut',
+        }, '-=0.25');
 
-      // Ya no usamos gsap.set() aquí. Lo hemos movido a las clases de Tailwind abajo.
-
-      // 2. Animación fluida
-      tl.to(lineRef.current, { 
-        scaleX: 1, 
-        duration: 0.6, 
-        ease: 'expo.inOut' 
-      })
-      .to(chars, {
-        yPercent: -110, // Sube las letras a su posición normal (0)
-        opacity: 1,
-        stagger: 0.03,
-        duration: 0.8,
-        ease: 'power3.out'
-      }, "-=0.2")
-      .to(lineRef.current, { 
-        scaleX: 0, 
-        duration: 0.5, 
-        ease: 'expo.inOut' 
-      }, "-=0.6")
-      
-      // 3. Pausa de lectura
-      .to({}, { duration: 0.6 })
-      
-      // 4. Salida suave de las letras hacia arriba
-      .to(chars, {
-        yPercent: -220, // Sigue subiendo para desaparecer
-        opacity: 0,
-        stagger: 0.02,
-        duration: 0.5,
-        ease: 'power3.in'
-      })
-      
-      // 5. Fade out del fondo
-      .to(containerRef.current, {
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.inOut'
-      }, "-=0.3");
     }, containerRef);
 
-    // 🧹 LA LIMPIEZA: Si React ejecuta esto dos veces, borramos la primera
     return () => ctx.revert();
   }, [onComplete]);
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[100] bg-page text-ink flex flex-col items-center justify-center will-change-[opacity]"
+      // z-[9998]: por encima de contenido (visible gracias a visibility:hidden
+      // en page.tsx) pero por debajo del cursor (z-[99999])
+      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center will-change-[opacity]"
+      aria-hidden="true"
     >
       <div className="flex flex-col items-center">
-        {/* Contenedor con overflow-hidden para hacer la "máscara" */}
-        <div className="overflow-hidden pb-2 mb-4">
+        {/*
+          Máscara de overflow: las letras "nacen" subiendo desde abajo
+          gracias a yPercent:110 inicial + overflow-hidden en el contenedor.
+        */}
+        <div className="overflow-hidden pb-2 mb-5">
           <div ref={textRef} className="flex">
             {word.split('').map((char, i) => (
               <span
                 key={i}
-                // 👇 CLAVE: opacity-0 y translate-y-[110%] para que nazcan ocultas. Cero parpadeos.
-                className="char opacity-0 translate-y-[110%] font-black text-[clamp(3.5rem,8vw,7rem)] tracking-[-0.03em] leading-none inline-block will-change-transform"
+                className="char font-black text-[clamp(3.5rem,8vw,7rem)] tracking-[-0.03em] leading-none inline-block will-change-transform"
+                /* opacity:0 y yPercent:110 los fija gsap.set() en useEffect */
               >
                 {char === ' ' ? '\u00A0' : char}
               </span>
@@ -92,11 +126,14 @@ export function IdentitySplash({ onComplete, lang }: { onComplete: () => void; l
           </div>
         </div>
 
-        {/* Línea animada inferior */}
+        {/* Línea animada + nombre */}
         <div className="flex items-center gap-4">
-          <div className="h-[2px] w-12 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-             {/* 👇 CLAVE: scale-x-0 para que la línea nazca invisible */}
-             <div ref={lineRef} className="h-full w-full bg-brand origin-center will-change-transform scale-x-0" />
+          <div className="h-[2px] w-10 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+            <div
+              ref={lineRef}
+              className="h-full w-full bg-brand origin-center will-change-transform"
+              /* scaleX:0 lo fija gsap.set() en useEffect */
+            />
           </div>
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-lead font-bold">
             Eneko Ruiz
