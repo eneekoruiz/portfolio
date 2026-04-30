@@ -471,12 +471,14 @@ export default function Home() {
       </div>
 
       {/* ── CONTENIDO PRINCIPAL ── */}
-      <div
+     <div
         ref={main}
         style={{
-          height:       (phase === 'loading' || phase === 'checking') ? 0 : undefined,
-          overflow:     (phase === 'loading' || phase === 'checking') ? 'hidden' : undefined,
-          visibility:   ready ? 'visible' : 'hidden',
+          // Durante loading: contraemos la altura para no afectar el layout
+          height: phase === 'loading' ? 0 : undefined,
+          overflow: phase === 'loading' ? 'hidden' : undefined,
+          // Durante splash: invisible pero con layout correcto (GSAP puede medir)
+          visibility: ready ? 'visible' : 'hidden',
           pointerEvents: ready ? 'auto' : 'none',
         }}
       >
