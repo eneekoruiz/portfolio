@@ -10,6 +10,21 @@ export function useGitHub(t: Tx) {
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
+    let idleHandle: number | null = null;
+    let timeoutHandle: NodeJS.Timeout | null = null;
+    const win = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
+    const scheduleFetch = (fn: () => void) => {
+      if (win.requestIdleCallback) {
+        idleHandle = win.requestIdleCallback(() => fn(), { timeout: 1200 });
+      } else {
+        timeoutHandle = globalThis.setTimeout(fn, 650);
+      }
+    };
+
     // 1. Identificadores únicos de los 5 proyectos (deben coincidir con projects-data.ts)
     const PROJECT_IDS = [
       'ana-peluquera',
@@ -99,7 +114,9 @@ export function useGitHub(t: Tx) {
         setTop3(mappedProjects);
 
       } catch (err) {
-        console.warn("GitHub offline o error, cargando fallback de 5 proyectos.");
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('GitHub offline o error, cargando fallback de 5 proyectos.', err);
+        }
         setTop3(staticFallback);
         setOffline(true);
       } finally {
@@ -108,8 +125,18 @@ export function useGitHub(t: Tx) {
       }
     };
 
-    fetchData();
-    return () => { controller.abort(); clearTimeout(timeoutId); };
+    scheduleFetch(fetchData);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+      if (idleHandle !== null && win.cancelIdleCallback) {
+        win.cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle !== null) {
+        clearTimeout(timeoutHandle);
+      }
+    };
   }, [t]);
 
   return { repos, top3, load, offline };
