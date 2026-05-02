@@ -4,25 +4,25 @@ import type { Lang } from './types';
 export const PROJECTS_CONTENT: any = {
   'ana-peluquera': {
     es: {
-      title: 'AG Beauty Salon', subtitle: 'Reservas & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Digitalización total de un negocio de alta gama. Objetivo: reserva "Cero Fricción" y control "God-Mode" para la dueña.',
-      algorithmH: 'Algoritmo Sandwich: Optimización O(n)',
-      algorithmP: 'Divide servicios en Active-Wait-Active. Al detectar tiempo de exposición, libera el calendario permitiendo reservas paralelas sin colisiones.',
+      title: 'AG Beauty Salon', subtitle: 'Booking Orchestration & CMS', role: 'Full-Stack Lead Architect',
+      objective: 'Digitalizar un negocio premium sin perder sensaciones de lujo: reserva sin fricción, control total para la propietaria y una interfaz que transmite confianza desde el primer segundo.',
+      algorithmH: 'Algoritmo Sandwich: Scheduling Inteligente',
+      algorithmP: 'La disponibilidad se divide en fases Active-Wait-Active para liberar huecos con precisión y permitir reservas paralelas sin colisiones.',
       supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Arquitectura NoSQL con sincronización bidireccional atómica mediante Service Accounts y Firestore.',
-      outcomeH: 'Impacto Real', outcomeP: 'Facturación +30% y carga inicial < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
+      supabaseP: 'Arquitectura NoSQL con sincronización atómica bidireccional, Service Accounts y Firestore para mantener calendario y reservas siempre alineados.',
+      outcomeH: 'Impacto Real', outcomeP: 'Facturación +30%, carga inicial < 300ms y un flujo de reserva que se siente instantáneo.',
+      codeSpotlight: 'useCreateBooking.ts — Booking Core',
       techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
     },
     en: {
-      title: 'AG Beauty Salon', subtitle: 'Booking & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Total digitalization. Goal: "Zero Friction" booking and "God-Mode" control for the owner.',
-      algorithmH: 'Sandwich Algorithm: O(n) Optimization',
-      algorithmP: 'Splits services into Active-Wait-Active. Frees slots automatically for parallel bookings without collisions.',
+      title: 'AG Beauty Salon', subtitle: 'Booking Orchestration & CMS', role: 'Full-Stack Lead Architect',
+      objective: 'Digitize a premium business without losing the luxury feel: zero-friction booking, full-owner control, and an interface that builds trust instantly.',
+      algorithmH: 'Sandwich Algorithm: Smart Scheduling',
+      algorithmP: 'Availability is split into Active-Wait-Active phases to release slots with precision and enable parallel bookings without collisions.',
       supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'NoSQL architecture with atomic dual-sync via Service Accounts and Firestore.',
-      outcomeH: 'Real Impact', outcomeP: 'Revenue +30% and initial load < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
+      supabaseP: 'Atomic bidirectional sync across Service Accounts and Firestore keeps the calendar and reservations perfectly aligned.',
+      outcomeH: 'Real Impact', outcomeP: 'Revenue +30%, initial load < 300ms and a booking flow that feels immediate.',
+      codeSpotlight: 'useCreateBooking.ts — Booking Core',
       techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
     },
     eu: {
@@ -117,24 +117,24 @@ export const PROJECTS_CONTENT: any = {
 
   'who-are-ya-backend': {
     es: {
-      title: 'Who Are Ya?', subtitle: 'Football Game Backend', role: 'Backend Architect',
-      objective: 'Clon del famoso juego de fútbol. El reto: filtrar miles de jugadores y ligas en milisegundos.',
-      algorithmH: 'Arquitectura MVC & MongoDB',
-      algorithmP: 'Estructuración de relaciones complejas mediante ObjectIds y Mongoose "populate" para cruce de datos veloz.',
-      supabaseH: 'Seguridad JWT & Bcrypt',
-      supabaseP: 'Autenticación de administrador blindada y sesiones protegidas en el servidor para el panel CMS.',
-      outcomeH: 'Producción Real', outcomeP: 'API REST desplegada en Render con MongoDB Atlas.',
+      title: 'Who Are Ya?', subtitle: 'Football Identity Engine', role: 'Backend Architect',
+      objective: 'Construir el backend de un juego con ritmo de producto real: búsquedas rápidas, datos consistentes y una base preparada para escalar sin perder control.',
+      algorithmH: 'MVC & MongoDB Intelligence',
+      algorithmP: 'ObjectIds, populate y filtros compuestos se combinan para cruzar miles de jugadores con latencia mínima.',
+      supabaseH: 'JWT + Bcrypt Security Layer',
+      supabaseP: 'Autenticación blindada para el panel CMS con sesiones protegidas y control estricto de acceso al servidor.',
+      outcomeH: 'Producción Real', outcomeP: 'API REST desplegada en Render con MongoDB Atlas y preparada para operar como producto estable.',
       codeSpotlight: 'players.controller.js — Filter Engine',
       techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
     },
     en: {
-      title: 'Who Are Ya?', subtitle: 'Football Game Backend', role: 'Backend Architect',
-      objective: 'Clone of the famous game. Challenge: filter thousands of players and leagues in milliseconds.',
-      algorithmH: 'MVC Architecture & MongoDB',
-      algorithmP: 'Structuring complex relationships using ObjectIds and Mongoose "populate" for high-speed data lookup.',
-      supabaseH: 'JWT & Bcrypt Security',
-      supabaseP: 'Hardened admin authentication and protected server sessions for the CMS dashboard.',
-      outcomeH: 'Real Production', outcomeP: 'REST API deployed on Render with MongoDB Atlas.',
+      title: 'Who Are Ya?', subtitle: 'Football Identity Engine', role: 'Backend Architect',
+      objective: 'Build the backend of a game with the feel of a real product: fast search, consistent data, and a foundation that can scale without losing control.',
+      algorithmH: 'MVC & MongoDB Intelligence',
+      algorithmP: 'ObjectIds, populate and compound filters work together to cross-match thousands of players with minimal latency.',
+      supabaseH: 'JWT + Bcrypt Security Layer',
+      supabaseP: 'Hardened CMS authentication with protected sessions and strict server-side access control.',
+      outcomeH: 'Real Production', outcomeP: 'REST API deployed on Render with MongoDB Atlas and ready to operate as a stable product.',
       codeSpotlight: 'players.controller.js — Filter Engine',
       techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
     },
@@ -343,26 +343,26 @@ export const PROJECTS_CONTENT: any = {
 
   'spotshare-parking': {
     es: {
-      title: 'SpotShare', subtitle: 'Cloud Parking Manager', role: 'Cloud Quality Engineer',
-      objective: 'Gestión Cloud de aparcamientos. Foco: Calidad del código y escalabilidad.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'Rating "A" en SonarCloud: 0 Bugs y Vulnerabilidades. Deuda técnica inferior al 2%.',
-      supabaseH: 'Cloud Concurrency',
-      supabaseP: 'Uso de Optimistic Locking para gestionar el estado de las plazas en tiempo real.',
-      outcomeH: 'Código Empresarial', outcomeP: 'Arquitectura escalable auditada automáticamente en cada PR.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: 'SpotShare', subtitle: 'Cloud Parking Intelligence', role: 'Cloud Quality Engineer',
+      objective: 'Convertir el parking en una experiencia de alta densidad y baja fricción: disponibilidad en tiempo real, confianza visual y cero ambigüedad operativa.',
+      algorithmH: 'Quality Gate de Precisión',
+      algorithmP: 'Pipelines con SonarCloud, validaciones de cobertura y disciplina técnica para mantener una base de código que escala sin perder control.',
+      supabaseH: 'Estado en Tiempo Real',
+      supabaseP: 'Optimistic Locking para reservar plazas sin colisiones, con cambios atómicos y reflejo inmediato en el panel operativo.',
+      outcomeH: 'Escala con Elegancia', outcomeP: 'Sistema preparado para crecer con auditorías automáticas, métricas claras y una experiencia limpia en cada interacción.',
+      codeSpotlight: 'parking.service.ts — Reservation Core',
+      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
     },
     en: {
-      title: 'SpotShare', subtitle: 'Cloud Parking Manager', role: 'Cloud Quality Engineer',
-      objective: 'Cloud parking management. Focus: Code quality and scalability.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'SonarCloud "A" Rating: 0 Bugs and Vulnerabilities. Technical debt under 2%.',
-      supabaseH: 'Cloud Concurrency',
-      supabaseP: 'Using Optimistic Locking to manage parking spot states in real-time.',
-      outcomeH: 'Enterprise Code', outcomeP: 'Scalable architecture automatically audited in every PR.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: 'SpotShare', subtitle: 'Cloud Parking Intelligence', role: 'Cloud Quality Engineer',
+      objective: 'Turn parking into a high-density, low-friction experience: real-time availability, visual trust, and zero operational ambiguity.',
+      algorithmH: 'Precision Quality Gate',
+      algorithmP: 'SonarCloud pipelines, coverage checks and technical discipline keep the codebase scalable without losing control.',
+      supabaseH: 'Real-Time State',
+      supabaseP: 'Optimistic Locking prevents reservation collisions, with atomic updates and instant reflection in the operator dashboard.',
+      outcomeH: 'Scale with Elegance', outcomeP: 'A system built for growth, with automatic audits, clear metrics, and a clean experience at every interaction.',
+      codeSpotlight: 'parking.service.ts — Reservation Core',
+      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
     },
     eu: {
       title: 'SpotShare', subtitle: 'Cloud Aparkaleku Kudeatzailea', role: 'Cloud Quality Engineer',
@@ -456,25 +456,25 @@ export const PROJECTS_CONTENT: any = {
 
   'pke_web': {
     es: {
-      title: 'PKE Web', subtitle: 'Accesibilidad & Semántica', role: 'UX/A11Y Developer',
-      objective: 'Plataforma web donde la accesibilidad es la base. Cumplimiento WCAG 2.1 AA.',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'Gestión impecable del DOM para navegación por teclado y lectores de pantalla.',
+      title: 'PKE Web', subtitle: 'Accessible Semantics by Default', role: 'UX/A11Y Developer',
+      objective: 'Construir una interfaz donde la accesibilidad no sea una capa extra sino la propia arquitectura: teclado, lector de pantalla, contraste y movimiento reducido.',
+      algorithmH: 'Focus Architecture & ARIA',
+      algorithmP: 'Gestión rigurosa del DOM para crear una navegación predecible, silenciosa y completamente controlable por teclado.',
       supabaseH: 'Diseño Inclusivo',
-      supabaseP: 'Análisis de contraste real y soporte nativo para prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interfaz utilizable por cualquier persona sin excepciones.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
+      supabaseP: 'Contrastes auditados, estados visibles y respeto total por prefers-reduced-motion para una experiencia que no excluye a nadie.',
+      outcomeH: 'A11Y sin Compromisos', outcomeP: 'Una base semántica preparada para crecer con componentes accesibles y una puntuación Lighthouse consistente.',
+      codeSpotlight: 'useFocusTrap.ts — Accessibility Core',
       techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     en: {
-      title: 'PKE Web', subtitle: 'Accessibility & Semantics', role: 'UX/A11Y Developer',
-      objective: 'Web platform where accessibility is the foundation. WCAG 2.1 AA compliance.',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'Flawless DOM management for keyboard navigation and screen readers.',
+      title: 'PKE Web', subtitle: 'Accessible Semantics by Default', role: 'UX/A11Y Developer',
+      objective: 'Build an interface where accessibility is not a layer on top but the actual architecture: keyboard, screen readers, contrast, and reduced motion.',
+      algorithmH: 'Focus Architecture & ARIA',
+      algorithmP: 'Strict DOM control creates a navigation model that feels predictable, quiet, and fully keyboard-driven.',
       supabaseH: 'Inclusive Design',
-      supabaseP: 'Real contrast analysis and native support for prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interface usable by everyone without exceptions.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
+      supabaseP: 'Audited contrast, visible states, and full respect for prefers-reduced-motion to avoid excluding anyone.',
+      outcomeH: 'A11Y without Compromise', outcomeP: 'A semantic base ready to scale with accessible components and a consistently strong Lighthouse score.',
+      codeSpotlight: 'useFocusTrap.ts — Accessibility Core',
       techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     eu: {
@@ -621,10 +621,10 @@ export class ParkingService {
   async reserveSpot(spotId: string, userId: string, currentVersion: number) {
     const result = await this.db.spots.updateOne(
       { _id: spotId, version: currentVersion, status: 'AVAILABLE' },
-      { $set: { status: 'OCCUPIED', reservedBy: userId }, $inc: { version: 1 } }
+      { $set: { status: 'OCCUPIED', reservedBy: userId, reservedAt: new Date() }, $inc: { version: 1 } }
     );
-    if (result.modifiedCount === 0) throw new ConcurrencyException('State mutated');
-    return true;
+    if (result.modifiedCount === 0) throw new ConcurrencyException('Spot already updated');
+    return { ok: true, spotId, reservedBy: userId };
   }
 }`,
 
@@ -637,8 +637,13 @@ export const useFocusTrap = (ref: RefObject<HTMLElement>, isActive: boolean) => 
     const last = focusable[focusable.length - 1] as HTMLElement;
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', handleTab);
     return () => document.removeEventListener('keydown', handleTab);

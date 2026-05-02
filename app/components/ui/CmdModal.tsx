@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, KeyboardEvent as RKE } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, KeyboardEvent as RKE } from 'react';
 import { Search, Check } from 'lucide-react';
 import { LANG_LABELS } from '../../lib/constants';
 import type { Lang, Tx } from '../../lib/types';
@@ -13,6 +13,9 @@ export function CmdModal({
   const [q,   setQ]   = useState('');
   const [sel, setSel] = useState(0);
   const inp = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const lastFocusRef = useRef<HTMLElement | null>(null);
+  const listRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   // Robust body scroll lock — no layout jump from scrollbar width
   useEffect(() => {
@@ -51,16 +54,49 @@ export function CmdModal({
   const flatFiltered = q
     ? flatAll.filter(i => i.label.toLowerCase().includes(q.toLowerCase()))
     : [];
+  const activeList = q ? flatFiltered : flatAll;
 
+  useLayoutEffect(() => {
+    lastFocusRef.current = document.activeElement as HTMLElement | null;
+    return () => { lastFocusRef.current?.focus?.(); };
+  }, []);
   useEffect(() => { inp.current?.focus(); setSel(0); }, []);
   useEffect(() => setSel(0), [q]);
+  useEffect(() => {
+    const active = activeList[sel];
+    if (!active) return;
+    listRefs.current[active.id]?.scrollIntoView({ block: 'nearest' });
+  }, [activeList, sel]);
 
   const onKey = (e: RKE) => {
     if (e.key === 'Escape') { onClose(); return; }
-    const list = q ? flatFiltered : flatAll;
+    if (e.key === 'Tab') {
+      const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables || focusables.length === 0) return;
+      const items = Array.from(focusables);
+      const first = items[0];
+      const last = items[items.length - 1];
+      const current = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && current === first) {
+        e.preventDefault();
+        last.focus();
+        return;
+      }
+      if (!e.shiftKey && current === last) {
+        e.preventDefault();
+        first.focus();
+      }
+      return;
+    }
+    const list = activeList;
     if (e.key === 'ArrowDown') { e.preventDefault(); setSel(s => Math.min(s + 1, list.length - 1)); }
     if (e.key === 'ArrowUp')   { e.preventDefault(); setSel(s => Math.max(s - 1, 0)); }
-    if (e.key === 'Enter' && list[sel]) list[sel].action();
+    if (e.key === 'Enter' && list[sel]) {
+      e.preventDefault();
+      list[sel].action();
+    }
   };
 
   return (
@@ -72,6 +108,7 @@ export function CmdModal({
       aria-label="Buscador"
     >
       <div
+        ref={dialogRef}
         className="cmd-box flex flex-col"
         style={{ maxHeight: 'min(78vh, 560px)' }}
         onClick={e => e.stopPropagation()}
@@ -79,10 +116,11 @@ export function CmdModal({
         tabIndex={-1}
       >
         {/* ── Input row ── */}
-        <div className="flex items-center gap-3 px-5 border-b border-black/7 dark:border-white/10 shrink-0">
+        <div className="flex items-center gap-3 px-5 border-b border-black/7 dark:border-white/10 shrink-0 bg-white/70 dark:bg-white/[0.02]">
           <Search size={16} className="text-lead shrink-0" />
           <input
             ref={inp}
+            type="search"
             className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 font-sans text-[16px] text-ink py-[1.1rem] caret-brand"
             placeholder={t.cmdPh}
             value={q}
@@ -94,18 +132,28 @@ export function CmdModal({
 
         {/* ── Results ── */}
         <div className="overflow-y-auto overscroll-contain flex-1 pb-3">
+          {!q && (
+            <div className="px-5 pt-4 pb-2 flex items-center justify-between text-[11px] text-lead/70">
+              <span>Usa ↑ ↓ y Enter para navegar</span>
+              <span>{flatAll.length} opciones</span>
+            </div>
+          )}
 
           {/* Search mode */}
           {q && (
             <div className="p-2">
               {flatFiltered.length === 0 && (
-                <p className="py-8 text-center text-[13px] text-lead">Sin resultados</p>
+                <div className="py-10 text-center text-[13px] text-lead">
+                  <p className="mb-1 font-medium text-ink">Sin resultados</p>
+                  <p className="text-lead/70">Prueba con otro texto o usa Esc para cerrar.</p>
+                </div>
               )}
-              {flatFiltered.map(item => {
-                const idx = flatFiltered.indexOf(item);
+              {flatFiltered.map((item, idx) => {
                 return (
                   <button
                     key={item.id}
+                    type="button"
+                    ref={el => { listRefs.current[item.id] = el; }}
                     className={`w-full flex items-center gap-[.7rem] px-5 py-[.55rem] rounded-[11px] mx-1 text-[13px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? 'bg-brand/7 text-brand' : 'text-lead hover:bg-brand/7 hover:text-brand'}`}
                     onClick={item.action}
                     onMouseEnter={() => setSel(idx)}
@@ -130,6 +178,8 @@ export function CmdModal({
                   return (
                     <button
                       key={item.id}
+                      type="button"
+                      ref={el => { listRefs.current[item.id] = el; }}
                       className={`w-full flex items-center gap-[.7rem] px-3 py-[.52rem] rounded-[10px] text-[13px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? 'bg-brand/7 text-brand' : 'text-lead hover:bg-brand/7 hover:text-brand'}`}
                       onClick={item.action}
                       onMouseEnter={() => setSel(idx)}
@@ -152,6 +202,8 @@ export function CmdModal({
                     return (
                       <button
                         key={item.id}
+                        type="button"
+                        ref={el => { listRefs.current[item.id] = el; }}
                         className={`flex items-center justify-between px-3 py-[.48rem] rounded-[9px] text-[12px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? 'bg-brand/7 text-brand' : 'text-lead hover:bg-brand/7 hover:text-brand'}`}
                         onClick={item.action}
                         onMouseEnter={() => setSel(idx)}

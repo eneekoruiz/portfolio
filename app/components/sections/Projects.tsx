@@ -58,8 +58,6 @@ const LIFECYCLE = [
 ] as const;
 
 const SESSION_KEY      = 'projects_nav_state';
-const RETURN_COLOR_KEY = 'returnColor';
-
 /**
  * Temas por proyecto — paleta refinada
  *
@@ -145,10 +143,10 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef }: RepoRowProps) {
   return (
     <div
       ref={lineRef}
-      className="border-b border-black/7 dark:border-white/10 transition-colors duration-200 hover:bg-black/[0.018] dark:hover:bg-white/[0.025]"
+      className="border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-200 hover:bg-black/[0.012] dark:hover:bg-white/[0.02]"
     >
       <div
-        className="py-4 cursor-pointer relative z-10"
+        className="py-[18px] md:py-5 cursor-pointer relative z-10"
         onMouseEnter={() => window.innerWidth > 768 && setActiveRepo(idx)}
         onMouseLeave={() => window.innerWidth > 768 && setActiveRepo(null)}
         onClick={() => window.innerWidth <= 768 && setActiveRepo(isActive ? null : idx)}
@@ -159,12 +157,12 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef }: RepoRowProps) {
           </span>
           <div className="flex-1 min-w-0">
             <div className="flex flex-col md:flex-row md:items-center gap-y-2 gap-x-3">
-              <span className={`font-mono text-[13px] font-bold md:font-medium transition-colors duration-200 ${isActive ? 'text-brand' : 'text-ink'}`}>
+              <span className={`font-mono text-[13px] font-bold md:font-medium tracking-[-0.01em] transition-colors duration-200 ${isActive ? 'text-brand' : 'text-ink'}`}>
                 {r.name}
               </span>
               <div className="flex flex-wrap gap-[0.3rem]">
                 {r.langs?.map(l => (
-                  <span key={l} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-medium bg-black/5 dark:bg-white/[0.04] border border-black/8 dark:border-white/10 text-lead whitespace-nowrap">
+                  <span key={l} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-medium bg-black/[0.035] dark:bg-white/[0.035] border border-black/8 dark:border-white/10 text-lead whitespace-nowrap">
                     <span
                       className="w-[5px] h-[5px] rounded-full shrink-0"
                       style={{
@@ -180,12 +178,12 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef }: RepoRowProps) {
             </div>
             <div className={`overflow-hidden transition-[max-height,opacity] duration-300 ${isActive ? 'max-h-40 opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
               {r.description && (
-                <p className="text-[11px] text-lead leading-[1.6] mb-3 pr-4">{r.description}</p>
+                <p className="text-[11px] text-lead/80 leading-[1.7] mb-3 pr-4">{r.description}</p>
               )}
               <a
                 href={r.html_url} target="_blank" rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-page text-[9px] font-bold uppercase tracking-widest hover:scale-105 transition-transform"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-page text-[9px] font-bold uppercase tracking-[0.22em] hover:scale-105 transition-transform"
               >
                 Visitar Repo <ArrowUpRight size={12} />
               </a>
@@ -221,6 +219,7 @@ interface WorkRowProps {
 
 function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isPrefetched, setIsPrefetched] = useState(false);
   const rowRef   = useRef<HTMLDivElement>(null);
   const bodyRef  = useRef<HTMLDivElement>(null);
   const ctxRef   = useRef<gsap.Context>();
@@ -228,6 +227,12 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
 
   const safeId = proj.name.toLowerCase().replace(/[\s_]+/g, '-');
   const theme  = PROJ_THEMES[safeId] ?? DEFAULT_THEME;
+
+  useEffect(() => {
+    if (!theme.hasAudit || isPrefetched) return;
+    router.prefetch(`/work/${safeId}`);
+    setIsPrefetched(true);
+  }, [isPrefetched, router, safeId, theme.hasAudit]);
 
   /**
    * FIX: Usar gsap.context() para que el tween del acordeón se limpie
@@ -243,8 +248,8 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
       gsap.to(body, {
         height:   isExpanded ? 'auto' : 0,
         opacity:  isExpanded ? 1 : 0,
-        duration: 0.35,                               // ← era 0.5
-        ease:     isExpanded ? 'expo.out' : 'power2.inOut', // ← más rápido al cerrar
+        duration: 0.22,
+        ease:     isExpanded ? 'expo.out' : 'power2.inOut',
       });
     });
 
@@ -283,28 +288,40 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
     });
     document.body.appendChild(overlay);
 
+    const targetRoute = `/work/${safeId}`;
+    // Warm-up extra: en dev ayuda a disparar compilación antes del push real.
+    router.prefetch(targetRoute);
+
+    let hasNavigated = false;
+
     gsap.to(overlay, {
       scaleY:   1,
-      duration: 0.4,       // ← era 0.5
+      duration: 0.28,
       ease:     'expo.inOut',
+      onUpdate: () => {
+        // Arrancamos navegación antes de terminar la subida para solapar tiempos de carga.
+        const currentScale = Number(gsap.getProperty(overlay, 'scaleY'));
+        if (!hasNavigated && currentScale >= 0.78) {
+          hasNavigated = true;
+          router.push(targetRoute);
+          // El botón deja estado de carga en cuanto la cortina ya cubre prácticamente todo.
+          setIsNavigating(false);
+        }
+      },
       onComplete: () => {
-        router.push(`/work/${safeId}`);
-        gsap.to(overlay, {
-          opacity:  0,
-          duration: 0.5,   // ← era 0.6
-          delay:    0.25,  // ← era 0.35
-          onComplete: () => overlay.remove(),
-        });
+        if (!hasNavigated) {
+          hasNavigated = true;
+          router.push(targetRoute);
+          setIsNavigating(false);
+        }
       },
     });
-
-    setTimeout(() => setIsNavigating(false), 2200);
   };
 
   return (
     <div
       ref={rowRef}
-      className="group/row relative border-b border-black/10 dark:border-white/10 transition-colors duration-300"
+      className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-colors duration-300"
       style={isExpanded ? { background: theme.gradient } : undefined}
     >
       {/*
@@ -313,7 +330,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
        * Más sutil y elegante, especialmente en dark mode.
        */}
       <div
-        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-600 pointer-events-none hidden md:block"
+        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 pointer-events-none hidden md:block"
         style={{ background: theme.img }}
       />
 
@@ -321,7 +338,19 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
       <button
         onClick={onToggle}
         aria-expanded={isExpanded}
-        className="relative z-10 w-full text-left py-[14px] md:py-5 px-0 md:px-6 flex items-center justify-between gap-4 cursor-pointer group/btn"
+        onMouseEnter={() => {
+          if (theme.hasAudit && !isPrefetched) {
+            router.prefetch(`/work/${safeId}`);
+            setIsPrefetched(true);
+          }
+        }}
+        onFocus={() => {
+          if (theme.hasAudit && !isPrefetched) {
+            router.prefetch(`/work/${safeId}`);
+            setIsPrefetched(true);
+          }
+        }}
+        className="relative z-10 w-full text-left py-[16px] md:py-[22px] px-0 md:px-6 flex items-center justify-between gap-4 cursor-pointer group/btn"
       >
         {/*
          * VISUAL CHANGE: Número de orden — transición de escala + color
@@ -347,9 +376,9 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
           <h3
             className="font-bold leading-tight tracking-tight min-w-0 transition-colors duration-300"
             style={{
-              fontSize: 'clamp(0.88rem, 2.2vw, 1.42rem)',
+              fontSize: 'clamp(0.92rem, 2.2vw, 1.42rem)',
               color:    isExpanded ? theme.color : 'var(--ink)',
-              opacity:  isExpanded ? 1 : 0.88,
+              opacity:  isExpanded ? 1 : 0.9,
               // Evitar truncado en móvil para que el texto se vea completo
               overflow: 'hidden',
               display: '-webkit-box',
@@ -365,8 +394,8 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
            * Más elegante y menos agresivo visualmente en mobile
            */}
           <span
-            className="hidden sm:block font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] md:tracking-[0.25em] opacity-0 group-hover/btn:opacity-60 transition-opacity duration-300 whitespace-nowrap shrink-0"
-            style={{ color: theme.color }}
+            className="hidden sm:block font-mono text-[8px] md:text-[9px] uppercase tracking-[0.28em] md:tracking-[0.3em] opacity-0 group-hover/btn:opacity-55 transition-opacity duration-300 whitespace-nowrap shrink-0"
+            style={{ color: theme.color, letterSpacing: '0.28em' }}
           >
             {proj.tag}
           </span>
@@ -406,9 +435,9 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
           <div
             className="p-5 md:p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden group/card"
             style={{
-              backgroundColor: `${theme.color}0a`,
-              border:          `1px solid ${theme.color}35`,
-              boxShadow:       `inset 0 1px 0 ${theme.color}15`,
+              backgroundColor: `${theme.color}08`,
+              border:          `1px solid ${theme.color}28`,
+              boxShadow:       `inset 0 1px 0 ${theme.color}12`,
             }}
           >
             {/* Glow ambiental */}
@@ -418,7 +447,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
             />
 
             <div className="relative z-10">
-              <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.3em] opacity-50">
+              <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.34em] opacity-45">
                 Project Lifecycle
               </span>
 
@@ -450,7 +479,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
                         )}
                       </div>
                       <div
-                        className={`pb-4 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.18em] ${completed ? 'opacity-75' : 'opacity-20'} ${active ? 'font-bold' : ''}`}
+                        className={`pb-4 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.24em] ${completed ? 'opacity-70' : 'opacity-20'} ${active ? 'font-bold' : ''}`}
                         style={{ color: active ? theme.color : 'inherit' }}
                       >
                         {stage}
@@ -466,12 +495,24 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
               <a
                 href={`/work/${safeId}`}
                 onClick={handleNavigate}
+                onMouseEnter={() => {
+                  if (!isPrefetched) {
+                    router.prefetch(`/work/${safeId}`);
+                    setIsPrefetched(true);
+                  }
+                }}
+                onFocus={() => {
+                  if (!isPrefetched) {
+                    router.prefetch(`/work/${safeId}`);
+                    setIsPrefetched(true);
+                  }
+                }}
                 className={`relative z-10 mt-4 flex items-center justify-between px-5 py-[11px] rounded-full shadow-md transition-all duration-200 text-white ${
                   isNavigating ? 'cursor-wait opacity-80' : 'hover:scale-[1.025] active:scale-95'
                 }`}
                 style={{ backgroundColor: theme.color }}
               >
-                <span className="font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
+                <span className="font-bold text-[10px] uppercase tracking-[0.24em] flex items-center gap-2">
                   <Activity size={12} className={isNavigating ? '' : 'animate-pulse'} />
                   {isNavigating ? 'CARGANDO...' : theme.btnText}
                 </span>
@@ -491,7 +532,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
                   color:       theme.color,
                 }}
               >
-                <span className="font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
+                <span className="font-bold text-[10px] uppercase tracking-[0.24em] flex items-center gap-2">
                   <Code2 size={12} /> {theme.btnText}
                 </span>
                 <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
@@ -508,33 +549,33 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
           <div
             className="p-5 md:p-6 rounded-2xl border flex flex-col justify-between gap-4"
             style={{
-              borderColor:     'rgba(0,0,0,0.06)',
-              backgroundColor: 'rgba(0,0,0,0.015)',
+              borderColor:     'rgba(0,0,0,0.05)',
+              backgroundColor: 'rgba(0,0,0,0.012)',
             }}
           >
-            <p className="text-sm md:text-[15px] font-light leading-relaxed text-ink/80">
+            <p className="text-sm md:text-[15px] font-light leading-relaxed text-ink/78">
               {proj.desc}
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-black/5 dark:border-white/5">
               {/* Año */}
               <div className="space-y-1">
-                <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-lead/40">Año</span>
+                <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.34em] text-lead/40">Año</span>
                 <span className="block font-semibold text-[13px] text-ink">{proj.year}</span>
               </div>
               {/* Tamaño */}
               <div className="space-y-1">
-                <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-lead/40">Tamaño</span>
+                <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.34em] text-lead/40">Tamaño</span>
                 <span className="block font-semibold text-[13px] text-ink">{proj.size}</span>
               </div>
               {/* Stack — ocupa full en mobile, 1 col en sm */}
               <div className="col-span-2 sm:col-span-1 space-y-2">
-                <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.3em] text-lead/40">Stack</span>
+                <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.34em] text-lead/40">Stack</span>
                 <div className="flex flex-wrap gap-1">
                   {proj.langs.map(l => (
                     <span
                       key={l}
-                      className="px-2 py-0.5 rounded-full border border-black/10 dark:border-white/10 text-[8px] md:text-[9px] font-medium tracking-wide bg-black/[0.02] dark:bg-white/[0.02] text-ink"
+                      className="px-2 py-0.5 rounded-full border border-black/10 dark:border-white/10 text-[8px] md:text-[9px] font-medium tracking-wide bg-black/[0.018] dark:bg-white/[0.018] text-ink"
                     >
                       {l}
                     </span>
@@ -591,12 +632,10 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
    * con page.tsx que también intentaba scrollear (efecto: scroll doble/rebote).
    *
    * AHORA:
-   * - Si hay returnColor en sessionStorage → page.tsx ya scrolleó con
-   *   useLayoutEffect síncrono. Aquí SOLO restauramos el acordeón.
-   * - Si NO hay returnColor → navegación normal (ej. clic en #work desde otra
-   *   sección). Scrolleamos nosotros con el retardo mínimo.
+   * - page.tsx restaura el scroll del contexto compartido antes del paint.
+   * - aquí solo restauramos el acordeón y limpiamos el estado de navegación.
    *
-   * En ambos casos, clearNavState() se llama DESPUÉS de restaurar el acordeón.
+   * clearNavState() se llama DESPUÉS de restaurar el acordeón.
    */
   useLayoutEffect(() => {
     if (load || top3.length === 0) return;
@@ -606,21 +645,12 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
 
     // Restaurar acordeón abierto siempre
     setExpandedIdx(saved.openIdx);
+    const id = setTimeout(() => {
+      window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
+      clearNavState();
+    }, 0);
 
-    const isReturn = !!sessionStorage.getItem(RETURN_COLOR_KEY);
-
-    if (!isReturn) {
-      // No es retorno desde /work — scrolleamos nosotros
-      const id = setTimeout(() => {
-        window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
-        clearNavState();
-      }, 80);
-      return () => clearTimeout(id);
-    }
-
-    // Es retorno desde /work — page.tsx ya scrolleó. Limpiamos navState.
-    // El returnColor lo limpiará page.tsx cuando desvanezca el overlay.
-    clearNavState();
+    return () => clearTimeout(id);
   }, [load, top3.length]);
 
   // ── Animaciones de entrada — DURACIÓN REDUCIDA ────────────────────────────
@@ -630,14 +660,14 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
       gsap.fromTo('.projects-header',
         { opacity: 0, y: 32 },          // ← era y:40
         {
-          opacity: 1, y: 0, duration: 0.55, ease: 'expo.out',  // ← era 0.8
+          opacity: 1, y: 0, duration: 0.26, ease: 'power3.out',
           scrollTrigger: { trigger: sectionRef.current, start: 'top 85%', once: true },
         }
       );
       gsap.fromTo('.work-row-anim',
         { opacity: 0, y: 16 },           // ← era y:20
         {
-          opacity: 1, y: 0, duration: 0.4, stagger: 0.03, ease: 'power3.out',  // ← era 0.5, stagger 0.04
+          opacity: 1, y: 0, duration: 0.18, stagger: 0.015, ease: 'power2.out',
           scrollTrigger: { trigger: '.projects-list', start: 'top 90%', once: true },
         }
       );
@@ -663,13 +693,13 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
       <section
         ref={sectionRef}
         id="work"
-        className="py-14 md:py-28 px-5 md:px-8 max-w-[1300px] mx-auto relative z-20"
+        className="py-16 md:py-28 px-5 md:px-8 max-w-[1300px] mx-auto relative z-20"
       >
         {/* Encabezado */}
-        <div className="projects-header mb-8 md:mb-16">
+        <div className="projects-header mb-10 md:mb-16">
           <div className="flex items-center gap-4 mb-4">
-            <div className="h-[1px] w-8 md:w-10 bg-ink opacity-15" />
-            <p className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.28em] uppercase text-lead/55">
+            <div className="h-[1px] w-8 md:w-10 bg-ink opacity-12" />
+            <p className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.32em] uppercase text-lead/50">
               {t.woLb || 'PORTFOLIO DE INGENIERÍA'}
             </p>
           </div>
@@ -681,7 +711,7 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
             <h2 className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.88] text-ink uppercase italic">
               Selected<br/>Works.
             </h2>
-            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.18em] text-lead/30 mb-1">
+            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.22em] text-lead/30 mb-1">
               Click to expand ↓
             </span>
           </div>
@@ -720,11 +750,36 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
             {t.ghLb || 'ACTIVIDAD'}
           </p>
           <span className="font-mono text-[9px] text-lead/40">
-            {repos?.length || 0}_repos
+            {offline ? 'offline' : `${repos?.length || 0}_repos`}
           </span>
         </div>
 
         <div className="min-h-[200px]">
+          {offline && (
+            <div className="my-6 px-4 py-5 rounded-lg border border-amber-500/30 dark:border-amber-500/20 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20 dark:to-transparent backdrop-blur-sm">
+              <div className="flex items-start gap-3">
+                <div className="mt-1 flex-shrink-0">
+                  <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-lead mb-1">
+                    Conexión con GitHub limitada
+                  </h3>
+                  <p className="text-[12px] leading-relaxed text-lead/70 mb-3">
+                    Los datos en vivo no están disponibles en este momento. Estoy mostrando una copia local de mis proyectos destacados para que puedas explorar mi trabajo. Los datos reales se sincronizarán cuando se restaure la conexión.
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="text-[11px] font-medium px-3 py-1.5 rounded border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 transition-colors duration-200"
+                  >
+                    Reintentar conexión
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {load ? (
             <div className="py-4">
               {[0, 1, 2, 3].map(i => (

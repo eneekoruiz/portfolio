@@ -71,27 +71,27 @@ export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
       tl
         // 1. Línea crece desde el centro
         .to(lineRef.current, {
-          scaleX: 1, duration: 0.55, ease: 'expo.inOut',
+          scaleX: 1, duration: 0.34, ease: 'expo.inOut',
         })
         // 2. Letras suben y aparecen (máscara overflow:hidden del padre)
         .to(chars, {
           yPercent: 0, opacity: 1,
-          stagger: 0.03, duration: 0.75, ease: 'power3.out',
+          stagger: 0.02, duration: 0.44, ease: 'power3.out',
         }, '-=0.2')
         // 3. Línea encoge
         .to(lineRef.current, {
-          scaleX: 0, duration: 0.45, ease: 'expo.inOut',
+          scaleX: 0, duration: 0.28, ease: 'expo.inOut',
         }, '-=0.55')
         // 4. Pausa de lectura
-        .to({}, { duration: 0.55 })
+        .to({}, { duration: 0.32 })
         // 5. Letras salen hacia arriba
         .to(chars, {
           yPercent: -120, opacity: 0,
-          stagger: 0.02, duration: 0.45, ease: 'power3.in',
+          stagger: 0.015, duration: 0.28, ease: 'power3.in',
         })
         // 6. Fade out del fondo
         .to(containerRef.current, {
-          opacity: 0, duration: 0.5, ease: 'power2.inOut',
+          opacity: 0, duration: 0.28, ease: 'power2.inOut',
         }, '-=0.25');
 
     }, containerRef);

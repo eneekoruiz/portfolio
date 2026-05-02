@@ -114,7 +114,7 @@ export function Skills({ t }: SkillsProps) {
       // 1. Animación del Título (Igual para todos)
       gsap.fromTo('.skills-header',
         { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 1, ease: 'power3.out',
+        { opacity: 1, y: 0, duration: 0.58, ease: 'power3.out',
           scrollTrigger: { trigger: containerRef.current, start: 'top 75%', once: true } }
       );
 
@@ -133,8 +133,8 @@ export function Skills({ t }: SkillsProps) {
             opacity: 1, 
             x: 0, 
             y: 0, 
-            duration: 1.2, 
-            stagger: 0.1, 
+            duration: 0.72, 
+            stagger: 0.05, 
             ease: 'back.out(1.2)', 
             scrollTrigger: { trigger: '.skill-cards-grid', start: 'top 80%', once: true } 
           }
@@ -155,8 +155,8 @@ export function Skills({ t }: SkillsProps) {
             scale: 1, 
             opacity: 1, 
             y: 0, 
-            duration: 0.8, 
-            stagger: 0.15, // Aparecen una tras otra
+            duration: 0.46, 
+            stagger: 0.08,
             ease: 'power3.out', 
             scrollTrigger: { trigger: '.skill-cards-grid', start: 'top 85%', once: true } 
           }

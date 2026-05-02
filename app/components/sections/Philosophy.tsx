@@ -59,8 +59,8 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index, isMo
     };
 
     // 3. Físicas orgánicas en el Hover
-    const onEnter = () => gsap.to(el, { y: -4, scale: 1.01, duration: 0.4, ease: 'back.out(1.5)' });
-    const onLeave = () => gsap.to(el, { y: 0, scale: 1, duration: 0.5, ease: 'power3.out' });
+    const onEnter = () => gsap.to(el, { y: -4, scale: 1.01, duration: 0.22, ease: 'back.out(1.5)' });
+    const onLeave = () => gsap.to(el, { y: 0, scale: 1, duration: 0.288, ease: 'power3.out' });
 
     // Solo aplicamos los listeners si no estamos en un dispositivo móvil (touch)
     if (window.matchMedia('(hover: hover)').matches) {

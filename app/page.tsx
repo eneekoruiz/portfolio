@@ -40,8 +40,8 @@ import type { Lang } from './lib/types';
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { usePreferredMotion } from './hooks/usePreferredMotion';
 import { useGreeting }        from './hooks/useGreeting';
-import { useLenis }           from './hooks/useLenis';
 import { useGitHub }          from './hooks/useGitHub';
+import { useIntro }           from './components/IntroProvider';
 
 // ── UI components ──────────────────────────────────────────────────────────
 import { InfallibleCursor } from './components/ui/InfallibleCursor';
@@ -69,8 +69,6 @@ if (typeof window !== 'undefined') {
 // ── Constantes ─────────────────────────────────────────────────────────────
 /** sessionStorage key compartida con Projects.tsx para restaurar scroll/acordeón */
 const PROJECTS_NAV_KEY = 'projects_nav_state';
-/** sessionStorage key que /work/[id] escribe para señalar retorno */
-const RETURN_COLOR_KEY = 'returnColor';
 /** id del overlay DOM creado por /work/[id] que sobrevive la navegación client-side */
 const RETURN_OVERLAY_ID = 'return-overlay';
 
@@ -85,7 +83,7 @@ export default function Home() {
   const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   // ── Estado ──────────────────────────────────────────────────────────────
-  const [phase, setPhase] = useState<Phase>('checking');
+  const { phase, setPhase, markSeen } = useIntro();
   const [lang,  setLang]  = useState<Lang>('es');
   const [menu,  setMenu]  = useState(false);
   const [cmd,   setCmd]   = useState(false);
@@ -95,15 +93,6 @@ export default function Home() {
   const reduced = usePreferredMotion();
   const greeting = useGreeting(t.times, t.greetingFn);
   const { repos, top3, load, offline } = useGitHub(t);
-
-  useLenis(ready, reduced);
-
-  // ── INICIO DEL FLUJO ──────────────────────────────────────────────────
-  useEffect(() => {
-    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
-    // Si ya vio la intro (incluyendo retorno desde /work), salta directo
-    setPhase(hasSeenIntro ? 'ready' : 'loading');
-  }, []);
 
   // ── Tab title dinámico ────────────────────────────────────────────────
   useEffect(() => {
@@ -184,103 +173,34 @@ export default function Home() {
       if (!el || reduced) return;
       gsap.to(el, {
         y: menu ? 0 : '112%',
-        duration: 0.5,            // ← era 0.6, más snappy
-        delay: menu ? i * 0.06 : 0, // ← era 0.07
+        duration: 0.34,
+        delay: menu ? i * 0.04 : 0,
         ease: 'power4.out',
       });
     });
   }, [menu, reduced]);
 
-  // ────────────────────────────────────────────────────────────────────────
-  // FIX RETORNO SIN PARPADEO — useLayoutEffect (SÍNCRONO antes del paint)
-  // ────────────────────────────────────────────────────────────────────────
-  /**
-   * Este hook corre ANTES de que el navegador pinte el nuevo frame.
-   * Si venimos de /work/[id]:
-   *   1. El overlay (id='return-overlay') ya está en el DOM, creado por
-   *      handleReturn antes de router.push('/') y sobreviviente de la
-   *      navegación client-side (vive en document.body, fuera del root React).
-   *   2. Leemos la posición guardada en sessionStorage y scrolleamos
-   *      INSTANTÁNEAMENTE, mientras el overlay cubre todo.
-   *   3. El resultado: el usuario nunca ve el Hero. El overlay cubre el scroll.
-   *
-   * Si NO venimos de retorno, this is a no-op.
-   */
   useLayoutEffect(() => {
     if (!ready) return;
 
-    const returnColor = sessionStorage.getItem(RETURN_COLOR_KEY);
-    if (!returnColor) return;
-
-    // Leer posición de scroll guardada por Projects.tsx al navegar a /work
     try {
       const raw = sessionStorage.getItem(PROJECTS_NAV_KEY);
       const saved = raw ? JSON.parse(raw) : null;
-      const targetY = saved?.scrollY ?? 0;
-
-      // scrollTo con behavior:'instant' es síncrono → ocurre antes del paint
-      window.scrollTo({ top: targetY, behavior: 'instant' as ScrollBehavior });
+      if (saved?.scrollY != null) {
+        const lenis = (window as any).__lenis;
+        lenis?.stop?.();
+        lenis?.scrollTo?.(saved.scrollY, { immediate: true, force: true });
+        window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
+      }
     } catch (_) {
-      // Fallback: ir al top de #work
-      document.getElementById('work')?.scrollIntoView();
+      // Ignorar errores de sessionStorage y seguir con el render normal.
     }
   }, [ready]);
 
-  // ────────────────────────────────────────────────────────────────────────
-  // FIX RETORNO — useEffect (async): desvanece el overlay de retorno
-  // ────────────────────────────────────────────────────────────────────────
-  /**
-   * Corre DESPUÉS del paint. El scroll ya ocurrió (useLayoutEffect).
-   * Ahora solo necesitamos desvanecer el overlay para revelar #work.
-   *
-   * Si el overlay no existe (ej. usuario navegó directamente por URL),
-   * limpiamos sessionStorage sin hacer nada más.
-   */
   useEffect(() => {
     if (!ready) return;
 
-    const returnColor = sessionStorage.getItem(RETURN_COLOR_KEY);
-
-    if (returnColor) {
-      const overlay = document.getElementById(RETURN_OVERLAY_ID);
-
-      if (overlay) {
-        // El overlay está listo. Lo desvancemos con animación de persiana.
-        gsap.to(overlay, {
-          scaleY: 0,
-          transformOrigin: 'bottom',
-          duration: 0.6,
-          ease: 'expo.inOut',
-          onComplete: () => {
-            overlay.remove();
-            sessionStorage.removeItem(RETURN_COLOR_KEY);
-          },
-        });
-      } else {
-        // Overlay no encontrado (caso edge: full-reload manual).
-        // Fallback: creamos uno opaco para cubrir el flash y lo quitamos rápido.
-        const fallback = document.createElement('div');
-        Object.assign(fallback.style, {
-          position: 'fixed', inset: '0',
-          backgroundColor: returnColor,
-          zIndex: '99999',
-          pointerEvents: 'none',
-        });
-        document.body.appendChild(fallback);
-
-        gsap.to(fallback, {
-          scaleY: 0,
-          transformOrigin: 'bottom',
-          duration: 0.5,
-          ease: 'expo.inOut',
-          delay: 0.05,
-          onComplete: () => {
-            fallback.remove();
-            sessionStorage.removeItem(RETURN_COLOR_KEY);
-          },
-        });
-      }
-    } else if (window.location.hash) {
+    if (window.location.hash) {
       // Navegación directa por URL con hash (sin retorno)
       const el = document.querySelector(window.location.hash);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -289,6 +209,42 @@ export default function Home() {
     // Refrescar ScrollTrigger después de que el contenido sea visible
     const id = setTimeout(() => ScrollTrigger.refresh(), 100);
     return () => clearTimeout(id);
+  }, [ready]);
+
+  // ────────────────────────────────────────────────────────────────────────
+  // RETURN CURTAIN — la home revela la cortina cuando ya montó
+  // ────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!ready) return;
+
+    const overlay = document.getElementById(RETURN_OVERLAY_ID);
+    if (!overlay) return;
+
+    let cancelled = false;
+    const reveal = () => {
+      if (cancelled) return;
+      gsap.to(overlay, {
+        opacity: 0,
+        duration: 0.34,
+        ease: 'power3.out',
+        onComplete: () => {
+          overlay.remove();
+          (window as any).__lenis?.start?.();
+        },
+      });
+    };
+
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(reveal);
+      overlay.setAttribute('data-raf2', String(raf2));
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf1);
+      const raf2 = Number(overlay.getAttribute('data-raf2'));
+      if (raf2) cancelAnimationFrame(raf2);
+    };
   }, [ready]);
 
   // ────────────────────────────────────────────────────────────────────────
@@ -304,8 +260,6 @@ export default function Home() {
    */
   useLayoutEffect(() => {
     if (!ready || reduced) return;
-    // Si hay overlay de retorno, no hace falta ocultar el hero
-    if (sessionStorage.getItem(RETURN_COLOR_KEY)) return;
 
     gsap.set('.n-el',   { opacity: 0, y: -14 });
     gsap.set('.h-ln',   { yPercent: 115 });
@@ -320,38 +274,33 @@ export default function Home() {
     // Parallax del hero (siempre activo)
     gsap.to('.h-txt', {
       yPercent: -6, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
     });
     gsap.to('.memoji', {
       yPercent: -10, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
     });
 
     // Reveal de títulos de sección — DURACIÓN REDUCIDA (0.75→0.5)
     document.querySelectorAll<HTMLElement>('.sec-h').forEach(el => {
       gsap.fromTo(el,
         { opacity: 0, y: 24 },   // ← era y: 30
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',  // ← era 0.75
+        { opacity: 1, y: 0, duration: 0.24, ease: 'power2.out',
           scrollTrigger: { trigger: el, start: 'top 83%', once: true } }
       );
     });
 
     // Entrada orquestada del Hero — sólo en primera carga (sin retorno)
-    if (ready && !sessionStorage.getItem(RETURN_COLOR_KEY)) {
-      const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-      tl
-        // Nav items — DURACIÓN REDUCIDA (0.45→0.3)
-        .to('.n-el', { opacity: 1, y: 0, duration: 0.3, stagger: 0.04 })
-        // Líneas de texto del hero — DURACIÓN REDUCIDA (1.2→0.8)
-        .to('.h-ln', { yPercent: 0, duration: 0.8, stagger: 0.07 }, '-=0.25')
-        // Subtítulo — DURACIÓN REDUCIDA (0.85→0.55)
-        .to('.h-fd', { opacity: 1, y: 0, duration: 0.55, stagger: 0.05 }, '-=0.5')
-        // Memoji — DURACIÓN REDUCIDA (1.4→0.9)
-        .to('.memoji', { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out' }, '-=0.75');
-    } else if (ready) {
-      // En retorno: revelar nav sin animación (el usuario ya está en #work)
-      gsap.set('.n-el', { opacity: 1, y: 0 });
-    }
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl
+      // Nav items — DURACIÓN REDUCIDA (0.45→0.3)
+      .to('.n-el', { opacity: 1, y: 0, duration: 0.16, stagger: 0.02 })
+      // Líneas de texto del hero — DURACIÓN REDUCIDA (1.2→0.8)
+      .to('.h-ln', { yPercent: 0, duration: 0.38, stagger: 0.03 }, '-=0.12')
+      // Subtítulo — DURACIÓN REDUCIDA (0.85→0.55)
+      .to('.h-fd', { opacity: 1, y: 0, duration: 0.24, stagger: 0.025 }, '-=0.18')
+      // Memoji — DURACIÓN REDUCIDA (1.4→0.9)
+      .to('.memoji', { opacity: 1, x: 0, duration: 0.42, ease: 'power3.out' }, '-=0.3');
   }, { scope: main, dependencies: [ready, reduced] });
 
   // ── Indicador deslizante de la nav ─────────────────────────────────────
@@ -362,7 +311,7 @@ export default function Home() {
     const nr = navInner.current.getBoundingClientRect();
     gsap.to(indRef.current, {
       x: r.left - nr.left, width: r.width, height: r.height,
-      duration: 0.32, ease: 'power3.out', opacity: 1, // ← era 0.38
+      duration: 0.2, ease: 'power3.out', opacity: 1,
     });
     el.style.color = 'var(--ink)';
   }, []);
@@ -378,10 +327,10 @@ export default function Home() {
       const r = active.getBoundingClientRect();
       gsap.to(indRef.current, {
         x: r.left - nr.left, width: r.width, height: r.height,
-        opacity: 0.65, duration: 0.38, ease: 'power3.out', // ← era 0.45
+        opacity: 0.65, duration: 0.24, ease: 'power3.out',
       });
     } else {
-      gsap.to(indRef.current, { opacity: 0, duration: 0.2 }); // ← era 0.25
+      gsap.to(indRef.current, { opacity: 0, duration: 0.12 });
     }
   }, []);
 
@@ -400,8 +349,7 @@ export default function Home() {
         <IdentitySplash
           lang={lang}
           onComplete={() => {
-            sessionStorage.setItem('hasSeenIntro', 'true');
-            setPhase('ready');
+              markSeen();
           }}
         />
       )}

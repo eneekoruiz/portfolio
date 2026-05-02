@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
+import { IntroProvider } from './components/IntroProvider';
 import { EasterEgg } from './components/ui/EasterEgg';
 import { SmoothScroll } from './components/ui/SmoothScroll';
 
@@ -90,7 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <SmoothScroll />
           <EasterEgg />
-          {children}
+          <IntroProvider>{children}</IntroProvider>
         </ThemeProvider>
       </body>
     </html>

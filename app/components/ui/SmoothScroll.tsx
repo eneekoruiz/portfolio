@@ -1,39 +1,44 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export function SmoothScroll() {
+  const tickerFnRef = useRef<((time: number) => void) | null>(null);
+
   useEffect(() => {
-    // 1. Inicializamos Lenis con una configuración premium
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) return;
+
     const lenis = new Lenis({
-      duration: 1.2, // El tiempo que tarda en frenar (mantequilla pura)
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Curva de inercia
+      duration: 0.68,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
       orientation: 'vertical',
-      gestureOrientation: 'vertical',
+      gestureOrientation: 'both',
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 2, // En táctil/móvil responde un poco más rápido
+      touchMultiplier: 1.35,
+      autoRaf: false,
     });
 
-    // 2. Sincronizamos Lenis con GSAP ScrollTrigger (¡Crucial para tus animaciones!)
+    (window as any).__lenis = lenis;
     lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-
-    // Desactiva el lag smoothing de GSAP para evitar conflictos de inercia
+    tickerFnRef.current = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tickerFnRef.current);
     gsap.ticker.lagSmoothing(0);
 
-    // 3. Limpieza al desmontar
     return () => {
+      if (tickerFnRef.current) {
+        gsap.ticker.remove(tickerFnRef.current);
+        tickerFnRef.current = null;
+      }
       lenis.destroy();
-      gsap.ticker.remove((time) => lenis.raf(time * 1000));
+      delete (window as any).__lenis;
     };
   }, []);
 
-  return null; // Este componente no pinta nada, solo hace la magia por detrás
+  return null;
 }

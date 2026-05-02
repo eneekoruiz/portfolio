@@ -7,7 +7,8 @@
  */
 
 import { useRef, useState, useEffect, useMemo } from 'react';
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -23,7 +24,21 @@ import { PROJECTS_CONTENT, CODE_SNIPPETS } from '../../lib/projects-data';
 import { LANG_COLORS }     from '../../lib/constants';
 import type { Lang }       from '../../lib/types';
 import { InfallibleCursor } from '../../components/ui/InfallibleCursor';
-import { useGitHub }        from '../../hooks/useGitHub';
+
+// ── DYNAMIC IMPORTS: Defer heavy components until after route transition ──
+type DNAHelixProps = { accent: string; secondary: string; darkMode: boolean };
+type TerrainMeshProps = { accent: string };
+type FloatingArtifactProps = { accent: string; idx: number };
+type AccentProps = { accent: string };
+
+const DNAHelix = dynamic<DNAHelixProps>(() => import('@/app/work/visualizers').then(m => m.DNAHelix), { ssr: false });
+const TerrainMesh = dynamic<TerrainMeshProps>(() => import('@/app/work/visualizers').then(m => m.TerrainMesh), { ssr: false });
+const FloatingArtifact = dynamic<FloatingArtifactProps>(() => import('@/app/work/visualizers').then(m => m.FloatingArtifact), { ssr: false });
+const SandwichDiagram = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.SandwichDiagram), { ssr: false });
+const MVCTerminal = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.MVCTerminal), { ssr: false });
+const DistributedNodes = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.DistributedNodes), { ssr: false });
+const WCAGVisualizer = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.WCAGVisualizer), { ssr: false });
+const SpotshareHeatmap = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.SpotshareHeatmap), { ssr: false });
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -43,243 +58,15 @@ const THEMES: Record<string, {
 
 const DEFAULT_THEME = { helixA: '#888', helixB: '#aaa', accent: '#888', label: 'MODULE' };
 
-// ── DNA Helix ───────────────────────────────────────
+const PROJECT_SUMMARIES: Record<string, { name: string; langs: string[] }> = {
+  'ana-peluquera': { name: 'AG Beauty Salon', langs: ['React', 'Firebase', 'Node.js', 'Google Calendar API'] },
+  'who-are-ya-backend': { name: 'Who Are Ya Backend', langs: ['Node.js', 'Express', 'MongoDB', 'JWT'] },
+  'rides24ofiziala': { name: 'Rides24 Ofiziala', langs: ['Java', 'JAX-WS', 'ObjectDB', 'Swing'] },
+  'spotshare-parking': { name: 'Spotshare Parking', langs: ['TypeScript', 'SonarCloud', 'NestJS', 'Docker'] },
+  'pke_web': { name: 'PKE Web', langs: ['React', 'WCAG 2.1', 'Tailwind', 'A11y'] },
+};
 
-function DNAHelix({ accent, secondary, darkMode }: {
-  accent: string; secondary: string; darkMode: boolean;
-}) {
-  const W = 120, H = 1200, steps = 80;
-  const strandA: string[] = [];
-  const strandB: string[] = [];
-  const rungs: { x1: number; y1: number; x2: number; y2: number }[] = [];
-
-  for (let i = 0; i <= steps; i++) {
-    const t  = (i / steps) * Math.PI * 6;
-    const y  = (i / steps) * H;
-    const xA = W / 2 + Math.sin(t)          * (W * 0.38);
-    const xB = W / 2 + Math.sin(t + Math.PI) * (W * 0.38);
-    strandA.push(`${i === 0 ? 'M' : 'L'} ${xA.toFixed(2)} ${y.toFixed(2)}`);
-    strandB.push(`${i === 0 ? 'M' : 'L'} ${xB.toFixed(2)} ${y.toFixed(2)}`);
-    if (i % 4 === 0 && i > 0 && i < steps) rungs.push({ x1: xA, y1: y, x2: xB, y2: y });
-  }
-
-  return (
-    <svg className="helix-svg w-full h-full" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-      <defs>
-        <filter id="helix-glow" x="-50%" y="-5%" width="200%" height="110%">
-          <feGaussianBlur stdDeviation={darkMode ? '3' : '1.5'} result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        <linearGradient id="strand-grad-a" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={accent}    stopOpacity="0.1" />
-          <stop offset="40%"  stopColor={accent}    stopOpacity="0.9" />
-          <stop offset="100%" stopColor={accent}    stopOpacity="0.1" />
-        </linearGradient>
-        <linearGradient id="strand-grad-b" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={secondary} stopOpacity="0.05" />
-          <stop offset="50%"  stopColor={secondary} stopOpacity="0.5" />
-          <stop offset="100%" stopColor={secondary} stopOpacity="0.05" />
-        </linearGradient>
-      </defs>
-      <path className="helix-strand-a" d={strandA.join(' ')} fill="none" stroke="url(#strand-grad-a)" strokeWidth="1.4" strokeLinecap="round" filter="url(#helix-glow)" />
-      <path className="helix-strand-b" d={strandB.join(' ')} fill="none" stroke="url(#strand-grad-b)" strokeWidth="0.7" strokeLinecap="round" />
-      {rungs.map((r, i) => (
-        <g key={i}>
-          <line className="helix-rung" x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2} stroke={accent} strokeWidth="0.35" opacity="0.25" strokeDasharray="1.5 1.5" />
-          <circle cx={(r.x1 + r.x2) / 2} cy={r.y1} r="0.8" fill={i % 3 === 0 ? accent : secondary} opacity="0.35" />
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-// ── TerrainMesh ─────────────────────────────────────────────────
-
-function TerrainMesh({ accent }: { accent: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef   = useRef<number>();
-  const tRef      = useRef(0);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
-
-    const resize = () => {
-      canvas.width  = canvas.offsetWidth  * window.devicePixelRatio;
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const draw = () => {
-      const W = canvas.offsetWidth, H = canvas.offsetHeight;
-      ctx.clearRect(0, 0, W, H);
-      tRef.current += 0.004;
-      ctx.strokeStyle = accent;
-      ctx.lineWidth   = 0.4;
-      for (let row = 0; row <= 10; row++) {
-        ctx.beginPath();
-        for (let col = 0; col <= 18; col++) {
-          const x    = col * (W / 18);
-          const wave = Math.sin(col * 0.4 + tRef.current * 2.1) * 12
-                     + Math.sin(col * 0.15 + row * 0.5 + tRef.current) * 8;
-          const y    = row * (H / 10) + wave;
-          if (col === 0) ctx.moveTo(x, y);
-          else           ctx.lineTo(x, y);
-        }
-        ctx.globalAlpha = 0.04;
-        ctx.stroke();
-      }
-      animRef.current = requestAnimationFrame(draw);
-    };
-    draw();
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-    };
-  }, [accent]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none opacity-40"
-      style={{ mixBlendMode: 'screen' }}
-    />
-  );
-}
-
-// ── FloatingArtifact ──────────────────────
-
-function FloatingArtifact({ accent, idx }: { accent: string; idx: number }) {
-  const ref    = useRef<HTMLDivElement>(null);
-  const ctxRef = useRef<gsap.Context>();
-
-  useEffect(() => {
-    if (!ref.current) return;
-
-    ctxRef.current = gsap.context(() => {
-      gsap.to(ref.current, {
-        y:        `${-20 - idx * 5}`,
-        x:        `${Math.sin(idx) * 15}`,
-        rotate:   idx % 2 === 0 ? 360 : -360,
-        duration: 5 + idx,
-        repeat:   -1,
-        yoyo:     true,
-        ease:     'sine.inOut',
-      });
-    });
-
-    return () => ctxRef.current?.revert();
-  }, [idx]);
-
-  const shapes = [
-    <div key="1" className="w-2 h-2 rounded-full"  style={{ background: accent, opacity: 0.4 }} />,
-    <div key="2" className="w-4 h-4 border rotate-45" style={{ borderColor: accent, opacity: 0.3 }} />,
-    <div key="3" className="w-6 h-[1px]"           style={{ background: accent, opacity: 0.2 }} />,
-  ];
-
-  return (
-    <div
-      ref={ref}
-      className="absolute pointer-events-none"
-      style={{ top: `${20 + idx * 12}%`, left: idx % 2 === 0 ? '10%' : '85%' }}
-    >
-      {shapes[idx % 3]}
-    </div>
-  );
-}
-
-// ── Visualizadores ───────────────────────────────────────────────
-
-function SandwichDiagram({ accent }: { accent: string }) {
-  return (
-    <div className="w-full space-y-4 font-mono text-[10px]">
-      <div className="flex items-stretch gap-2 h-14">
-        <div className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]" style={{ background: accent }}>ACTIVE_01</div>
-        <div className="w-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden" style={{ borderColor: `${accent}50`, color: accent }}>
-          <span className="opacity-50">WAIT</span>
-          <div className="absolute bottom-0 left-0 h-1 bg-current animate-pulse" style={{ width: '100%', animationDuration: '2s' }} />
-        </div>
-        <div className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]" style={{ background: accent }}>ACTIVE_02</div>
-      </div>
-      <div className="h-10 rounded-xl flex items-center justify-center font-bold tracking-widest bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10" style={{ color: accent }}>
-        ✨ PARALLEL SLOT INJECTED
-      </div>
-    </div>
-  );
-}
-
-function MVCTerminal({ accent }: { accent: string }) {
-  return (
-    <div className="bg-black/5 dark:bg-[#0a0a0a] rounded-xl border border-black/10 dark:border-white/10 font-mono text-[11px] h-44 flex flex-col overflow-hidden shadow-2xl">
-      <div className="h-8 bg-black/5 dark:bg-white/5 border-b border-black/10 dark:border-white/10 flex items-center px-4 gap-2">
-        <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-        <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-      </div>
-      <div className="p-5 flex-1 flex flex-col justify-center space-y-2 text-ink">
-        <div className="flex items-center gap-2"><span style={{ color: accent }}>❯</span><span className="opacity-70">GET /api/v1/players</span></div>
-        <div className="flex items-center gap-2 opacity-40"><span>[Router]</span><span>Executing aggregation pipeline...</span></div>
-        <div className="flex items-center gap-2 font-bold" style={{ color: '#27c93f' }}><span>✔</span><span>200 OK (Latency: 12ms)</span></div>
-      </div>
-    </div>
-  );
-}
-
-function DistributedNodes({ accent }: { accent: string }) {
-  return (
-    <div className="relative h-44 flex items-center justify-center">
-      <div className="absolute w-32 h-32 rounded-full border border-dashed animate-spin-slow" style={{ borderColor: `${accent}40` }} />
-      <div className="absolute w-20 h-20 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center backdrop-blur-md shadow-xl z-10">
-        <Server size={24} style={{ color: accent }} />
-      </div>
-      {[0, 120, 240].map((deg, i) => (
-        <div key={i} className="absolute w-10 h-10 rounded-full bg-page border border-black/10 dark:border-white/10 flex items-center justify-center shadow-lg transition-all hover:scale-110"
-             style={{ transform: `rotate(${deg}deg) translateY(-65px) rotate(-${deg}deg)` }}>
-          <Database size={14} style={{ color: accent }} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function WCAGVisualizer({ accent }: { accent: string }) {
-  return (
-    <div className="h-44 flex flex-col justify-between">
-      <div className="flex-1 rounded-xl flex items-center justify-center mb-4 bg-black/5 dark:bg-white text-ink dark:text-black">
-        <span className="font-black text-4xl tracking-tighter">Aa</span>
-      </div>
-      <div className="flex items-center justify-between px-2">
-        <div className="space-y-1">
-          <div className="text-[10px] font-mono opacity-40 uppercase tracking-widest text-ink">Contrast</div>
-          <div className="text-xl font-bold font-mono" style={{ color: accent }}>21.0:1</div>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 text-green-500 font-mono text-[10px] font-bold">
-          <CheckCircle2 size={14} /> AAA PASS
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SpotshareHeatmap({ accent }: { accent: string }) {
-  return (
-    <div className="relative h-44 rounded-xl bg-black/5 dark:bg-[#050505] border border-black/10 dark:border-white/10 overflow-hidden flex items-center justify-center group shadow-inner">
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at center, ${accent} 1px, transparent 1px)`, backgroundSize: '15px 15px' }} />
-      <div className="absolute w-[200%] h-[200%] origin-center animate-spin" style={{ background: `conic-gradient(from 0deg, transparent 70%, ${accent}40 100%)`, animationDuration: '3s', animationTimingFunction: 'linear' }} />
-      <div className="relative z-10 w-16 h-16 rounded-full bg-page/80 backdrop-blur-xl border border-black/10 dark:border-white/20 flex items-center justify-center shadow-xl">
-        <Radar size={24} style={{ color: accent }} className="animate-pulse" />
-      </div>
-      <div className="absolute top-10 left-10 w-2 h-2 rounded-full animate-ping" style={{ background: accent }} />
-      <div className="absolute bottom-12 right-16 w-2 h-2 rounded-full animate-ping" style={{ background: accent, animationDelay: '1s' }} />
-    </div>
-  );
-}
-
-// ── GlareCard ───────────────────────────────────────────────────
+// ── GlareCard (Local Component) ───────────────────────────────────
 
 function GlareCard({ children, accent, className = '', style }: {
   children: React.ReactNode; accent: string; className?: string; style?: React.CSSProperties;
@@ -317,30 +104,30 @@ function GlareCard({ children, accent, className = '', style }: {
 
 export default function ProjectPage() {
   const { id }   = useParams();
+  const router   = useRouter();
   const main     = useRef<HTMLDivElement>(null);
   const heroMonitorRef = useRef<HTMLDivElement>(null);
 
   const [lang]     = useState<Lang>('es');
   const [darkMode, setDarkMode] = useState(false);
-  const { top3 }   = useGitHub(TX[lang]);
   
-  // 💎 ESTADO CLAVE: Retrasa la carga pesada hasta que la página respire
+  // 💎 KEY STATE: Defers heavy animation loading until after route transition completes
   const [isReadyToAnimate, setIsReadyToAnimate] = useState(false);
 
   const safeId  = id as string;
   const theme   = THEMES[safeId] ?? DEFAULT_THEME;
+  const summary = PROJECT_SUMMARIES[safeId];
 
   const isBackend = safeId === 'who-are-ya-backend';
   const isJava    = safeId === 'rides24ofiziala';
   const isSpot    = safeId === 'spotshare-parking';
   const isA11y    = safeId === 'pke_web';
 
-  const proj    = useMemo(() => top3?.find(p => p.name.toLowerCase().replace(/[\s_]+/g, '-') === safeId) ?? null, [top3, safeId]);
   const content = PROJECTS_CONTENT[safeId]?.[lang] ?? PROJECTS_CONTENT[safeId]?.['en'] ?? PROJECTS_CONTENT[safeId]?.['es'];
   const snippet = CODE_SNIPPETS[safeId];
   const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com/login' : isJava ? null : 'https://ana-peluquera.lovable.app/';
 
-  // Detectar dark mode
+  // Detect dark mode
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark')
                 || window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -348,90 +135,110 @@ export default function ProjectPage() {
   }, []);
 
   /**
-   * 💎 FIX UX PREMIUM: Desvanecer la cortina suavemente + Trigger de animación
+   * 💎 FADE OUT TRANSITION LAYER + Trigger animation boot
    */
   useEffect(() => {
     const overlay = document.getElementById('project-transition-layer');
     if (overlay) {
-      gsap.to(overlay, {
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.3, // Dejamos que Next.js "respire"
-        ease: 'power2.inOut',
-        onComplete: () => {
-          overlay.remove();
-          setIsReadyToAnimate(true); // ¡Lanzamos los gráficos pesados AHORA!
-        }
-      });
+      let done = false;
+      const reveal = () => {
+        if (done) return;
+        done = true;
+        gsap.to(overlay, {
+          opacity: 0,
+          duration: 0.32,
+          ease: 'power3.out',
+          onComplete: () => {
+            overlay.remove();
+            setIsReadyToAnimate(true); // NOW load all 3D backgrounds!
+          }
+        });
+      };
+
+      // Esperar al menos dos paints para asegurar que el nuevo árbol ya montó.
+      requestAnimationFrame(() => requestAnimationFrame(reveal));
+
+      // Fallback defensivo por si el scheduler retrasa frames.
+      const fallback = window.setTimeout(reveal, 360);
+      return () => window.clearTimeout(fallback);
     } else {
-      setIsReadyToAnimate(true); // Fallback por si entran por enlace directo
+      setIsReadyToAnimate(true); // Fallback for direct links
     }
   }, []);
 
-  // 💎 LA MAGIA: Cortina de salida para el FOUC de la página principal
+  // 💎 TRANSITION: Exit curtain to prevent FOUC on home page
   const handleReturn = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
+    router.prefetch('/');
+
+    (window as any).__lenis?.stop?.();
+
     const overlay = document.createElement('div');
+    overlay.id = 'return-overlay';
     Object.assign(overlay.style, {
       position: 'fixed', inset: 0, backgroundColor: theme.accent, zIndex: 99999,
       transform: 'scaleY(0)', transformOrigin: 'top'
     });
     document.body.appendChild(overlay);
 
+    let hasNavigated = false;
+
     gsap.to(overlay, {
-      scaleY: 1, duration: 0.5, ease: 'expo.inOut',
+      scaleY: 1, duration: 0.32, ease: 'expo.inOut',
+      onUpdate: () => {
+        const currentScale = Number(gsap.getProperty(overlay, 'scaleY'));
+        if (!hasNavigated && currentScale >= 0.78) {
+          hasNavigated = true;
+          sessionStorage.setItem('hasSeenIntro', 'true');
+          router.replace('/');
+        }
+      },
       onComplete: () => {
-        sessionStorage.setItem('hasSeenIntro', 'true');
-        sessionStorage.setItem('returnColor', theme.accent); 
-        window.location.href = '/#work';
+        if (!hasNavigated) {
+          hasNavigated = true;
+          sessionStorage.setItem('hasSeenIntro', 'true');
+          router.replace('/');
+        }
       }
     });
   };
 
-  // ── Animaciones de entrada (scope = main, cleanup automático) ────────────
+  // ── Entry animations (scope = main, auto cleanup) ────────────
   useGSAP(() => {
-    if (!main.current || !proj) return;
+    if (!main.current || !content) return;
 
     gsap.fromTo(heroMonitorRef.current,
       { scale: 0.9, opacity: 0, y: 40 },
-      { scale: 1, opacity: 1, y: 0, duration: 1.6, ease: 'power4.out', delay: 0.2 }
+      { scale: 1, opacity: 1, y: 0, duration: 0.72, ease: 'power3.out', delay: 0.06 }
     );
 
-    // Reveal de secciones
+    // Section reveals
     gsap.utils.toArray<HTMLElement>('.reveal-sec').forEach(el => {
       gsap.fromTo(el,
         { opacity: 0, y: 40 },
         {
-          opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
+          opacity: 1, y: 0, duration: 0.42, ease: 'power2.out',
           scrollTrigger: { trigger: el, start: 'top 85%', once: true },
         }
       );
     });
 
-    // Solo activamos la rotación del SVG Helix si ya existe en el DOM
+    // Only rotate helix SVG if components are loaded
     if (isReadyToAnimate) {
       gsap.timeline({
         scrollTrigger: {
           trigger: main.current,
           start: 'top top', end: 'bottom bottom',
-          scrub: 2.5,
+          scrub: 0.7,
         },
       }).to('.helix-group', { rotateY: 360, ease: 'none' }, 0);
     }
 
-  }, { scope: main, dependencies: [safeId, proj, isReadyToAnimate] }); // ¡Dependencia clave!
+  }, { scope: main, dependencies: [safeId, content, isReadyToAnimate] }); // KEY dependency!
 
-  // ── Estados de carga ───────────────────────────────────────────────────────
-  if (!proj && top3 && top3.length > 0) return notFound();
-  if (!proj) return (
-    <div className="min-h-screen flex items-center justify-center bg-page text-ink">
-      <div
-        className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
-        style={{ borderColor: theme.accent, borderTopColor: 'transparent' }}
-      />
-    </div>
-  );
+  // ── Loading states ───────────────────────────────────────────────────────
+  if (!content || !summary) return notFound();
 
   return (
     <div
@@ -440,7 +247,7 @@ export default function ProjectPage() {
     >
       <InfallibleCursor />
 
-      {/* ── 3D BACKGROUND (CARGA RETRASADA PARA EVITAR LAG) ── */}
+      {/* ── 3D BACKGROUND (DEFERRED LOADING) ── */}
       {isReadyToAnimate && (
         <>
           <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" style={{ perspective: '900px' }}>
@@ -491,7 +298,7 @@ export default function ProjectPage() {
             className="font-black uppercase italic tracking-tighter leading-[0.85] mb-6"
             style={{ fontSize: 'clamp(3rem, 8vw, 6.5rem)', color: theme.accent }}
           >
-            {content?.title ?? proj?.name}
+            {content?.title ?? summary.name}
           </h1>
           <p className="text-xl md:text-2xl font-light opacity-50 tracking-tight max-w-2xl mb-16 text-ink">
             {content?.subtitle}
@@ -535,7 +342,7 @@ export default function ProjectPage() {
           </div>
         </section>
 
-        {/* ── OBJETIVO & STACK ── */}
+        {/* ── OBJECTIVE & STACK ── */}
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-16 mb-40 items-start">
           <div className="space-y-6">
             <h2 className="text-xs font-mono uppercase tracking-[0.3em] opacity-40 border-b border-black/10 dark:border-white/10 pb-4 text-ink">
@@ -548,7 +355,7 @@ export default function ProjectPage() {
           <GlareCard accent={theme.accent} className="p-8 group">
             <h3 className="text-xs font-mono uppercase tracking-[0.3em] opacity-40 mb-8 text-ink">Stack Tecnológico</h3>
             <div className="flex flex-col gap-4 text-ink">
-              {proj?.langs.map((l, i) => (
+              {summary.langs.map((l, i) => (
                 <div key={l} className="flex items-center gap-4">
                   <div className="w-1.5 h-1.5 rounded-full" style={{ background: LANG_COLORS[l] ?? theme.accent }} />
                   <span className="font-medium text-lg tracking-tight">{l}</span>
@@ -560,7 +367,7 @@ export default function ProjectPage() {
           </GlareCard>
         </section>
 
-        {/* ── ARQUITECTURA & VISUALIZADOR ── */}
+        {/* ── ARCHITECTURE & VISUALIZER ── */}
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-2 gap-16 mb-40 items-center">
           <div className="order-2 md:order-1">
             <GlareCard accent={theme.accent} className="p-10">
@@ -590,7 +397,7 @@ export default function ProjectPage() {
           </div>
         </section>
 
-        {/* ── CÓDIGO ── */}
+        {/* ── CODE ── */}
         {snippet && (
           <section className="reveal-sec mb-40">
             <div className="mb-10 space-y-4 max-w-2xl text-ink">

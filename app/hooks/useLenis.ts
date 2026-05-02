@@ -34,11 +34,11 @@ export function useLenis(ready: boolean, reduced: boolean): void {
     import('lenis')
       .then(({ default: Lenis }) => {
         lenis = new Lenis({
-          // Duración ligeramente reducida (1.25→1.05) para sensación más snappy
-          duration:           1.05,
-          easing:             (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          // Duración más corta para una sensación más directa
+          duration:           0.92,
+          easing:             (t: number) => 1 - Math.pow(1 - t, 3),
           smoothWheel:        true,
-          gestureOrientation: 'vertical',
+          gestureOrientation: 'both',
           // Syncronizar con GSAP ticker para evitar doble tick
           autoRaf: false,
         });

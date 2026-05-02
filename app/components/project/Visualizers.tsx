@@ -19,10 +19,10 @@ export function SandwichDiagram({ accent }: { accent: string }) {
         start: 'top 72%',
         onEnter: () => {
           const tl = gsap.timeline();
-          tl.from('.s-block-1', { x: -80, opacity: 0, duration: 0.9, ease: 'expo.out' })
-            .from('.s-wait', { scale: 0, opacity: 0, duration: 0.65, ease: 'back.out(2)' }, '-=0.4')
-            .from('.s-block-2', { x: 80, opacity: 0, duration: 0.9, ease: 'expo.out' }, '-=0.6')
-            .from('.s-slot', { opacity: 0, y: 20, duration: 0.7, ease: 'expo.out' }, '-=0.3');
+          tl.from('.s-block-1', { x: -80, opacity: 0, duration: 0.56, ease: 'expo.out' })
+            .from('.s-wait', { scale: 0, opacity: 0, duration: 0.4, ease: 'back.out(2)' }, '-=0.26')
+            .from('.s-block-2', { x: 80, opacity: 0, duration: 0.56, ease: 'expo.out' }, '-=0.36')
+            .from('.s-slot', { opacity: 0, y: 20, duration: 0.42, ease: 'expo.out' }, '-=0.18');
         },
       });
     });

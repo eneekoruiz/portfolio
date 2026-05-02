@@ -43,7 +43,9 @@ body {
   background: var(--page);
   color: var(--ink);
   overflow-x: hidden;
-  transition: background .4s cubic-bezier(0.4, 0, 0.2, 1), color .4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              color 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 ::-webkit-scrollbar { width: 4px; }
@@ -292,4 +294,45 @@ canvas.terrain-mesh { will-change: contents; }
   position: fixed; inset: 0; z-index: 9997;
   pointer-events: none;
   transition: opacity 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── 20. CMD MODAL ── */
+.cmd-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 8vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  animation: cmd-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cmd-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cmd-box {
+  width: 90%;
+  max-width: 520px;
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: cmd-pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+@keyframes cmd-pop-in {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95) translateY(-20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dark .cmd-box {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }

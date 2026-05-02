@@ -71,9 +71,9 @@ export function WorkRow({ proj, idx }: { proj: ProjectCard; idx: number }) {
 
   useEffect(() => {
     if (!followerRef.current) return;
-    xTo.current = gsap.quickTo(followerRef.current, 'x', { duration: 0.55, ease: 'power3' });
-    yTo.current = gsap.quickTo(followerRef.current, 'y', { duration: 0.55, ease: 'power3' });
-    rotateTo.current = gsap.quickTo(followerRef.current, 'rotate', { duration: 0.4, ease: 'power2' });
+    xTo.current = gsap.quickTo(followerRef.current, 'x', { duration: 0.32, ease: 'power3' });
+    yTo.current = gsap.quickTo(followerRef.current, 'y', { duration: 0.32, ease: 'power3' });
+    rotateTo.current = gsap.quickTo(followerRef.current, 'rotate', { duration: 0.22, ease: 'power2' });
   }, [mounted]);
 
   const toggle = useCallback((e: React.MouseEvent) => {
@@ -85,13 +85,13 @@ export function WorkRow({ proj, idx }: { proj: ProjectCard; idx: number }) {
         const h = innerRef.current.scrollHeight;
         gsap.to(accordRef.current, {
           height: next ? h : 0,
-          duration: 0.7,
+          duration: 0.42,
           ease: next ? 'expo.out' : 'expo.inOut',
         });
         if (next) {
           gsap.fromTo(`.accordion-col-${idx}`,
             { opacity: 0, y: 15 },
-            { opacity: 1, y: 0, stagger: 0.1, duration: 0.6, ease: 'power3.out', delay: 0.1 }
+            { opacity: 1, y: 0, stagger: 0.05, duration: 0.36, ease: 'power3.out', delay: 0.05 }
           );
         }
       }
@@ -109,14 +109,14 @@ export function WorkRow({ proj, idx }: { proj: ProjectCard; idx: number }) {
 
   const onEnter = () => {
     if (window.matchMedia('(pointer: coarse)').matches) return;
-    gsap.to(followerRef.current, { scale: 1, opacity: 1, duration: 0.5, ease: 'expo.out' });
-    gsap.to(titleRef.current, { x: 16, duration: 0.4, ease: 'power2.out' });
+    gsap.to(followerRef.current, { scale: 1, opacity: 1, duration: 0.28, ease: 'expo.out' });
+    gsap.to(titleRef.current, { x: 16, duration: 0.24, ease: 'power2.out' });
     videoRef.current?.play().catch(() => {});
   };
 
   const onLeave = () => {
-    gsap.to(followerRef.current, { scale: 0, opacity: 0, duration: 0.35 });
-    gsap.to(titleRef.current, { x: 0, duration: 0.4, ease: 'power2.out' });
+    gsap.to(followerRef.current, { scale: 0, opacity: 0, duration: 0.22 });
+    gsap.to(titleRef.current, { x: 0, duration: 0.24, ease: 'power2.out' });
     videoRef.current?.pause();
   };
 

@@ -16,7 +16,7 @@ export function About({ t }: { t: Tx }) {
       
       // 1. Entrada de títulos y métricas
       gsap.from('.about-reveal', {
-        y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: 'power3.out',
+        y: 30, opacity: 0, stagger: 0.06, duration: 0.48, ease: 'power3.out',
         scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' }
       });
 
@@ -27,8 +27,8 @@ export function About({ t }: { t: Tx }) {
           { 
             y: '0%', 
             opacity: 1,
-            duration: 0.5, 
-            stagger: 0.02, // Velocidad de la cascada
+            duration: 0.3, 
+            stagger: 0.012,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: textContainerRef.current,

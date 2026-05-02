@@ -1,0 +1,276 @@
+'use client';
+
+import { useRef, useState, useEffect, useMemo } from 'react';
+import gsap from 'gsap';
+import { Database, Server, Radar, CheckCircle2, Layers } from 'lucide-react';
+
+// ── DNAHelix ──────────────────────────────────────────────────────────────────
+
+export const DNAHelix = ({ accent, secondary, darkMode }: {
+  accent: string; secondary: string; darkMode: boolean;
+}) => {
+  const W = 120, H = 1200, steps = 80;
+  const { strandA, strandB, rungs } = useMemo(() => {
+    const strandA: string[] = [];
+    const strandB: string[] = [];
+    const rungs: { x1: number; y1: number; x2: number; y2: number }[] = [];
+
+    for (let i = 0; i <= steps; i++) {
+      const t  = (i / steps) * Math.PI * 6;
+      const y  = (i / steps) * H;
+      const xA = W / 2 + Math.sin(t) * (W * 0.38);
+      const xB = W / 2 + Math.sin(t + Math.PI) * (W * 0.38);
+      strandA.push(`${i === 0 ? 'M' : 'L'} ${xA.toFixed(2)} ${y.toFixed(2)}`);
+      strandB.push(`${i === 0 ? 'M' : 'L'} ${xB.toFixed(2)} ${y.toFixed(2)}`);
+      if (i % 4 === 0 && i > 0 && i < steps) rungs.push({ x1: xA, y1: y, x2: xB, y2: y });
+    }
+
+    return { strandA, strandB, rungs };
+  }, []);
+
+  return (
+    <svg className="helix-svg w-full h-full will-change-transform" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" shapeRendering="geometricPrecision">
+      <defs>
+        <filter id="helix-glow" x="-50%" y="-5%" width="200%" height="110%">
+          <feGaussianBlur stdDeviation={darkMode ? '3' : '1.5'} result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <linearGradient id="strand-grad-a" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor={accent}    stopOpacity="0.1" />
+          <stop offset="40%"  stopColor={accent}    stopOpacity="0.9" />
+          <stop offset="100%" stopColor={accent}    stopOpacity="0.1" />
+        </linearGradient>
+        <linearGradient id="strand-grad-b" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor={secondary} stopOpacity="0.05" />
+          <stop offset="50%"  stopColor={secondary} stopOpacity="0.5" />
+          <stop offset="100%" stopColor={secondary} stopOpacity="0.05" />
+        </linearGradient>
+      </defs>
+      <path className="helix-strand-a" d={strandA.join(' ')} fill="none" stroke="url(#strand-grad-a)" strokeWidth="1.4" strokeLinecap="round" filter="url(#helix-glow)" />
+      <path className="helix-strand-b" d={strandB.join(' ')} fill="none" stroke="url(#strand-grad-b)" strokeWidth="0.7" strokeLinecap="round" />
+      {rungs.map((r, i) => (
+        <g key={i}>
+          <line className="helix-rung" x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2} stroke={accent} strokeWidth="0.35" opacity="0.25" strokeDasharray="1.5 1.5" />
+          <circle cx={(r.x1 + r.x2) / 2} cy={r.y1} r="0.8" fill={i % 3 === 0 ? accent : secondary} opacity="0.35" />
+        </g>
+      ))}
+    </svg>
+  );
+};
+
+// ── TerrainMesh ───────────────────────────────────────────────────────────────
+
+export const TerrainMesh = ({ accent }: { accent: string }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef   = useRef<number>();
+  const tRef      = useRef(0);
+  const activeRef = useRef(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+
+    const resize = () => {
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(canvas.offsetWidth * ratio);
+      canvas.height = Math.floor(canvas.offsetHeight * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    const draw = () => {
+      if (!activeRef.current || document.visibilityState !== 'visible') {
+        if (animRef.current) cancelAnimationFrame(animRef.current);
+        animRef.current = undefined;
+        return;
+      }
+
+      const W = canvas.offsetWidth, H = canvas.offsetHeight;
+      ctx.clearRect(0, 0, W, H);
+      tRef.current += 0.0032;
+      ctx.strokeStyle = accent;
+      ctx.lineWidth   = 0.35;
+      ctx.globalAlpha = 0.025;
+      for (let row = 0; row <= 10; row++) {
+        ctx.beginPath();
+        for (let col = 0; col <= 18; col++) {
+          const x    = col * (W / 18);
+          const wave = Math.sin(col * 0.4 + tRef.current * 2.1) * 12
+                     + Math.sin(col * 0.15 + row * 0.5 + tRef.current) * 8;
+          const y    = row * (H / 10) + wave;
+          if (col === 0) ctx.moveTo(x, y);
+          else           ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        activeRef.current = entry.isIntersecting;
+        if (entry.isIntersecting && !animRef.current) {
+          animRef.current = requestAnimationFrame(draw);
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    const visibilityHandler = () => {
+      if (document.visibilityState === 'visible' && activeRef.current && !animRef.current) {
+        animRef.current = requestAnimationFrame(draw);
+      }
+    };
+
+    resize();
+    observer.observe(canvas);
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', visibilityHandler);
+    activeRef.current = true;
+    animRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      observer.disconnect();
+      window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', visibilityHandler);
+    };
+  }, [accent]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none opacity-40 will-change-transform"
+      style={{ mixBlendMode: 'screen', contain: 'paint' }}
+    />
+  );
+};
+
+// ── FloatingArtifact ──────────────────────────────────────────────────────────
+
+export const FloatingArtifact = ({ accent, idx }: { accent: string; idx: number }) => {
+  const ref    = useRef<HTMLDivElement>(null);
+  const ctxRef = useRef<gsap.Context>();
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    ctxRef.current = gsap.context(() => {
+      gsap.to(ref.current, {
+        y:        `${-16 - idx * 4}`,
+        x:        `${Math.sin(idx) * 12}`,
+        rotate:   idx % 2 === 0 ? 360 : -360,
+        duration: 3.6 + idx * 0.45,
+        repeat:   -1,
+        yoyo:     true,
+        ease:     'power1.inOut',
+        force3D:  true,
+      });
+    });
+
+    return () => ctxRef.current?.revert();
+  }, [idx]);
+
+  const shapes = [
+    <div key="1" className="w-2 h-2 rounded-full"  style={{ background: accent, opacity: 0.4 }} />,
+    <div key="2" className="w-4 h-4 border rotate-45" style={{ borderColor: accent, opacity: 0.3 }} />,
+    <div key="3" className="w-6 h-[1px]"           style={{ background: accent, opacity: 0.2 }} />,
+  ];
+
+  return (
+    <div
+      ref={ref}
+      className="absolute pointer-events-none will-change-transform"
+      style={{ top: `${20 + idx * 12}%`, left: idx % 2 === 0 ? '10%' : '85%', transform: 'translate3d(0, 0, 0)' }}
+    >
+      {shapes[idx % 3]}
+    </div>
+  );
+};
+
+// ── Visualizers ───────────────────────────────────────────────────────────────
+
+export const SandwichDiagram = ({ accent }: { accent: string }) => {
+  return (
+    <div className="w-full space-y-4 font-mono text-[10px]">
+      <div className="flex items-stretch gap-2 h-14">
+        <div className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]" style={{ background: accent }}>ACTIVE_01</div>
+        <div className="w-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden" style={{ borderColor: `${accent}50`, color: accent }}>
+          <span className="opacity-50">WAIT</span>
+          <div className="absolute bottom-0 left-0 h-1 bg-current animate-pulse" style={{ width: '100%', animationDuration: '2s' }} />
+        </div>
+        <div className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]" style={{ background: accent }}>ACTIVE_02</div>
+      </div>
+      <div className="h-10 rounded-xl flex items-center justify-center font-bold tracking-widest bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10" style={{ color: accent }}>
+        ✨ PARALLEL SLOT INJECTED
+      </div>
+    </div>
+  );
+};
+
+export const MVCTerminal = ({ accent }: { accent: string }) => {
+  return (
+    <div className="bg-black/5 dark:bg-[#0a0a0a] rounded-xl border border-black/10 dark:border-white/10 font-mono text-[11px] h-44 flex flex-col overflow-hidden shadow-2xl">
+      <div className="h-8 bg-black/5 dark:bg-white/5 border-b border-black/10 dark:border-white/10 flex items-center px-4 gap-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+        <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+      </div>
+      <div className="p-5 flex-1 flex flex-col justify-center space-y-2 text-ink">
+        <div className="flex items-center gap-2"><span style={{ color: accent }}>❯</span><span className="opacity-70">GET /api/v1/players</span></div>
+        <div className="flex items-center gap-2 opacity-40"><span>[Router]</span><span>Executing aggregation pipeline...</span></div>
+        <div className="flex items-center gap-2 font-bold" style={{ color: '#27c93f' }}><span>✔</span><span>200 OK (Latency: 12ms)</span></div>
+      </div>
+    </div>
+  );
+};
+
+export const DistributedNodes = ({ accent }: { accent: string }) => {
+  return (
+    <div className="relative h-44 flex items-center justify-center">
+      <div className="absolute w-32 h-32 rounded-full border border-dashed animate-spin-slow" style={{ borderColor: `${accent}40` }} />
+      <div className="absolute w-20 h-20 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center backdrop-blur-md shadow-xl z-10">
+        <Server size={24} style={{ color: accent }} />
+      </div>
+      {[0, 120, 240].map((deg, i) => (
+        <div key={i} className="absolute w-10 h-10 rounded-full bg-page border border-black/10 dark:border-white/10 flex items-center justify-center shadow-lg transition-all hover:scale-110"
+             style={{ transform: `rotate(${deg}deg) translateY(-65px) rotate(-${deg}deg)` }}>
+          <Database size={14} style={{ color: accent }} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const WCAGVisualizer = ({ accent }: { accent: string }) => {
+  return (
+    <div className="h-44 flex flex-col justify-between">
+      <div className="flex-1 rounded-xl flex items-center justify-center mb-4 bg-black/5 dark:bg-white text-ink dark:text-black">
+        <span className="font-black text-4xl tracking-tighter">Aa</span>
+      </div>
+      <div className="flex items-center justify-between px-2">
+        <div className="space-y-1">
+          <div className="text-[10px] font-mono opacity-40 uppercase tracking-widest text-ink">Contrast</div>
+          <div className="text-xl font-bold font-mono" style={{ color: accent }}>21.0:1</div>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 text-green-500 font-mono text-[10px] font-bold">
+          <CheckCircle2 size={14} /> AAA PASS
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SpotshareHeatmap = ({ accent }: { accent: string }) => {
+  return (
+    <div className="relative h-44 rounded-xl bg-black/5 dark:bg-[#050505] border border-black/10 dark:border-white/10 overflow-hidden flex items-center justify-center group shadow-inner">
+      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at center, ${accent} 1px, transparent 1px)`, backgroundSize: '15px 15px' }} />
+      <div className="absolute w-[200%] h-[200%] origin-center animate-spin" style={{ background: `conic-gradient(from 0deg, transparent 70%, ${accent}40 100%)`, animationDuration: '3s', animationTimingFunction: 'linear' }} />
+      <div className="relative z-10 w-16 h-16 rounded-full bg-page/80 backdrop-blur-xl border border-black/10 dark:border-white/20 flex items-center justify-center shadow-xl">
+        <Radar size={24} style={{ color: accent }} className="animate-pulse" />
+      </div>
+      <div className="absolute top-10 left-10 w-2 h-2 rounded-full animate-ping" style={{ background: accent }} />
+      <div className="absolute bottom-12 right-16 w-2 h-2 rounded-full animate-ping" style={{ background: accent, animationDelay: '1s' }} />
+    </div>
+  );
+};

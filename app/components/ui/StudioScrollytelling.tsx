@@ -45,7 +45,7 @@ export function StudioScrollytelling({ children, mainRef }: StudioScrollytelling
           trigger: container,
           start: "top top",
           end: "bottom bottom",
-          scrub: 1.2,
+          scrub: 0.6,
         }
       });
 
@@ -60,8 +60,8 @@ export function StudioScrollytelling({ children, mainRef }: StudioScrollytelling
         const els = gsap.utils.toArray<HTMLElement>(target, container);
         if (els.length > 0) {
           gsap.fromTo(els, { opacity: 1, y: 0 }, {
-            opacity: 0, y: -40, stagger: 0.05, ease: 'power2.in',
-            scrollTrigger: { trigger: els[0], start: 'top 30%', end: 'top top', scrub: 1 }
+            opacity: 0, y: -40, stagger: 0.03, ease: 'power2.in',
+            scrollTrigger: { trigger: els[0], start: 'top 30%', end: 'top top', scrub: 0.6 }
           });
         }
       });
@@ -74,7 +74,7 @@ export function StudioScrollytelling({ children, mainRef }: StudioScrollytelling
           scale: CONFIG.tunnel.scaleStart, opacity: 0,
           webkitFilter: `blur(${CONFIG.tunnel.blurStart}px)`,
           ease: 'power2.in',
-          scrollTrigger: { trigger: sec, start: 'center center', end: 'bottom center', scrub: 1, pin: true, pinSpacing: false }
+          scrollTrigger: { trigger: sec, start: 'center center', end: 'bottom center', scrub: 0.6, pin: true, pinSpacing: false }
         }, "-=0.5");
 
         if (nextSec) {
@@ -85,7 +85,7 @@ export function StudioScrollytelling({ children, mainRef }: StudioScrollytelling
             scale: 1, opacity: 1, z: 0,
             webkitFilter: `blur(0px)`,
             ease: 'expo.out',
-            scrollTrigger: { trigger: sec, start: 'center center', end: 'bottom center', scrub: 1 }
+            scrollTrigger: { trigger: sec, start: 'center center', end: 'bottom center', scrub: 0.6 }
           });
         }
       });

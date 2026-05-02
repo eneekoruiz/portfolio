@@ -20,8 +20,11 @@ export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => vo
   return (
     <div ref={ref} className="relative">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         aria-label={`Idioma: ${LANG_LABELS[lang]}`}
+        aria-haspopup="menu"
+        aria-expanded={open}
         data-h
         className="flex items-center gap-[.3rem] px-[.75rem] py-[.38rem] rounded-[10px] border border-black/9 dark:border-white/10 bg-white/65 dark:bg-white/[0.06] backdrop-blur-[18px] text-[12px] font-bold text-lead tracking-[.04em] transition-all duration-200"
       >
@@ -36,9 +39,10 @@ export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => vo
           {/* Scroll interno seguro para móviles */}
           <div className="max-h-[40vh] overflow-y-auto scrollbar-hide flex flex-col gap-1">
             {(Object.entries(LANG_LABELS) as [Lang, string][]).map(([k, label]) => (
-              <div
+              <button
                 key={k}
-                className={`flex items-center justify-between px-[.9rem] py-[.55rem] rounded-[11px] text-[13px] cursor-pointer transition-all duration-100 ${
+                type="button"
+                className={`flex items-center justify-between px-[.9rem] py-[.55rem] rounded-[11px] text-[13px] text-left transition-all duration-100 ${
                   lang === k 
                     ? 'font-bold text-brand bg-brand/10 dark:bg-brand/20' 
                     : 'font-medium text-ink hover:bg-black/5 dark:hover:bg-white/5'
@@ -47,7 +51,7 @@ export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => vo
               >
                 <span>{label}</span>
                 {lang === k && <Check size={13} className="text-brand" />}
-              </div>
+              </button>
             ))}
           </div>
           
