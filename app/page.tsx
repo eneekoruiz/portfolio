@@ -40,26 +40,25 @@ import type { Lang } from './lib/types';
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { usePreferredMotion } from './hooks/usePreferredMotion';
-import { useGreeting }        from './hooks/useGreeting';
-import { useGitHub }          from './hooks/useGitHub';
-import { useIntro }           from './components/IntroProvider';
+import { useGreeting } from './hooks/useGreeting';
+import { useGitHub } from './hooks/useGitHub';
+import { useIntro } from './components/IntroProvider';
 
 // ── UI components ──────────────────────────────────────────────────────────
 import { InfallibleCursor } from './components/ui/InfallibleCursor';
-import { Preloader }        from './components/ui/Preloader';
-import { LangDD }           from './components/ui/LangDD';
-import { ThemeToggle }      from './components/ui/ThemeToggle';
-import { CmdModal }         from './components/ui/CmdModal';
-import { BranchMergeBtn }   from './components/ui/Buttons';
-import { IdentitySplash }   from './components/ui/IdentitySplash';
+import { LangDD } from './components/ui/LangDD';
+import { ThemeToggle } from './components/ui/ThemeToggle';
+import { CmdModal } from './components/ui/CmdModal';
+import { BranchMergeBtn } from './components/ui/Buttons';
+import { IdentitySplash } from './components/ui/IdentitySplash';
 
 // ── Section components ─────────────────────────────────────────────────────
-import { Hero }       from './components/sections/Hero';
-import { About }      from './components/sections/About';
-import { Skills }     from './components/sections/Skills';
-import { Projects }   from './components/sections/Projects';
+import { Hero } from './components/sections/Hero';
+import { About } from './components/sections/About';
+import { Skills } from './components/sections/Skills';
+import { Projects } from './components/sections/Projects';
 import { Philosophy } from './components/sections/Philosophy';
-import { Contact }    from './components/sections/Contact';
+import { Contact } from './components/sections/Contact';
 import { SiteFooter } from './components/sections/SiteFooter';
 
 // Registrar plugins GSAP una sola vez en cliente
@@ -77,20 +76,20 @@ type Phase = 'checking' | 'loading' | 'splash' | 'ready';
 
 export default function Home() {
   // ── Refs ────────────────────────────────────────────────────────────────
-  const main          = useRef<HTMLDivElement>(null);
-  const navInner      = useRef<HTMLDivElement>(null);
-  const indRef        = useRef<HTMLDivElement>(null);
-  const menuRefs      = useRef<(HTMLAnchorElement | null)[]>([]);
+  const main = useRef<HTMLDivElement>(null);
+  const navInner = useRef<HTMLDivElement>(null);
+  const indRef = useRef<HTMLDivElement>(null);
+  const menuRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   // ── Estado ──────────────────────────────────────────────────────────────
   const { phase, setPhase, markSeen } = useIntro();
-  const [lang,  setLang]  = useState<Lang>('es');
-  const [menu,  setMenu]  = useState(false);
-  const [cmd,   setCmd]   = useState(false);
+  const [lang, setLang] = useState<Lang>('es');
+  const [menu, setMenu] = useState(false);
+  const [cmd, setCmd] = useState(false);
 
-  const ready   = phase === 'ready';
-  const t       = TX[lang];
+  const ready = phase === 'ready';
+  const t = TX[lang];
   const reduced = usePreferredMotion();
   const greeting = useGreeting(t.times, t.greetingFn);
   const { repos, top3, load, offline, errorMsg } = useGitHub(t);
@@ -134,12 +133,12 @@ export default function Home() {
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
     if (!meta) return;
     const map = [
-      { id: 'hero',    c: '#f5f5f7' },
-      { id: 'skills',  c: '#ffffff' },
-      { id: 'work',    c: '#f5f5f7' },
-      { id: 'github',  c: '#ffffff' },
-      { id: 'about',   c: '#f5f5f7' },
-      { id: 'values',  c: '#ffffff' },
+      { id: 'hero', c: '#f5f5f7' },
+      { id: 'skills', c: '#ffffff' },
+      { id: 'work', c: '#f5f5f7' },
+      { id: 'github', c: '#ffffff' },
+      { id: 'about', c: '#f5f5f7' },
+      { id: 'values', c: '#ffffff' },
       { id: 'contact', c: '#f5f5f7' },
     ];
     const observers = map.map(({ id, c }) => {
@@ -203,7 +202,7 @@ export default function Home() {
           onEnterBack: () => setActive(idx),
         });
       });
-      
+
       // Initialize with the first section if we are at the top
       if (window.scrollY < 100) setActive(0);
     });
@@ -274,7 +273,7 @@ export default function Home() {
       // FIX CRÍTICO: Si no hay overlay (ej: navegación atrás del navegador directa),
       // asegurarnos de reiniciar Lenis de todas formas y limpiar el state.
       (window as any).__lenis?.start?.();
-      try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) {}
+      try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
       return;
     }
 
@@ -291,7 +290,7 @@ export default function Home() {
         animateLiquidCurtainOut(overlay as unknown as SVGSVGElement, {
           duration: 0.45,
           onComplete: () => {
-            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) {}
+            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
             (window as any).__lenis?.start?.();
             ScrollTrigger.refresh();
           },
@@ -304,7 +303,7 @@ export default function Home() {
           ease: 'power3.out',
           onComplete: () => {
             overlay.remove();
-            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) {}
+            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
             (window as any).__lenis?.start?.();
             ScrollTrigger.refresh();
           },
@@ -348,9 +347,9 @@ export default function Home() {
   useLayoutEffect(() => {
     if (!ready || reduced) return;
 
-    gsap.set('.n-el',   { opacity: 0, y: -14 });
-    gsap.set('.h-ln',   { yPercent: 115 });
-    gsap.set('.h-fd',   { opacity: 0, y: 16 });
+    gsap.set('.n-el', { opacity: 0, y: -14 });
+    gsap.set('.h-ln', { yPercent: 115 });
+    gsap.set('.h-fd', { opacity: 0, y: 16 });
     gsap.set('.memoji', { opacity: 0, x: 60 });
   }, [ready, reduced]);
 
@@ -372,8 +371,10 @@ export default function Home() {
     document.querySelectorAll<HTMLElement>('.sec-h').forEach(el => {
       gsap.fromTo(el,
         { opacity: 0, y: 24 },   // ← era y: 30
-        { opacity: 1, y: 0, duration: 0.24, ease: 'power2.out',
-          scrollTrigger: { trigger: el, start: 'top 83%', once: true } }
+        {
+          opacity: 1, y: 0, duration: 0.24, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 83%', once: true }
+        }
       );
     });
 
@@ -394,7 +395,7 @@ export default function Home() {
   const onNavEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     const el = e.currentTarget;
     if (!indRef.current || !navInner.current) return;
-    const r  = el.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
     const nr = navInner.current.getBoundingClientRect();
     gsap.to(indRef.current, {
       x: r.left - nr.left, width: r.width, height: r.height,
@@ -424,17 +425,13 @@ export default function Home() {
 
   return (
     <>
-      {/* ── PRELOADER ── */}
-      {phase === 'loading' && (
-        <Preloader onDone={() => setPhase('splash')} />
-      )}
-
-      {/* ── IDENTITY SPLASH ── */}
+      {/* ── SPLASH SCREEN / LOADING ── */}
       {phase === 'splash' && (
         <IdentitySplash
           lang={lang}
           onComplete={() => {
-              markSeen();
+            setPhase('ready');
+            markSeen();
           }}
         />
       )}
@@ -461,7 +458,7 @@ export default function Home() {
           aria-label="Cerrar menú"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
         <div className="h-full flex flex-col justify-center px-14">
@@ -486,11 +483,10 @@ export default function Home() {
                 onClick={() => setLang(l)}
                 data-h
                 aria-label={`Idioma ${l}`}
-                className={`font-mono text-[11px] tracking-[.15em] border-none rounded-[7px] px-2.5 py-1 transition-all duration-200 ${
-                  lang === l
+                className={`font-mono text-[11px] tracking-[.15em] border-none rounded-[7px] px-2.5 py-1 transition-all duration-200 ${lang === l
                     ? 'bg-ink text-page'
                     : 'bg-black/6 dark:bg-white/[0.06] text-lead hover:bg-black/10 dark:hover:bg-white/10'
-                }`}
+                  }`}
               >
                 {l.toUpperCase()}
               </button>
@@ -504,14 +500,10 @@ export default function Home() {
       </div>
 
       {/* ── CONTENIDO PRINCIPAL ── */}
-     <div
+      <div
         ref={main}
         style={{
-          // Durante loading: contraemos la altura para no afectar el layout
-          height: phase === 'loading' ? 0 : undefined,
-          overflow: phase === 'loading' ? 'hidden' : undefined,
-          // Durante splash: invisible pero con layout correcto (GSAP puede medir)
-          visibility: ready ? 'visible' : 'hidden',
+          // Evitar interacciones hasta que termine el splash
           pointerEvents: ready ? 'auto' : 'none',
         }}
       >
@@ -578,12 +570,12 @@ export default function Home() {
         </header>
 
         {/* ════ SECCIONES ════ */}
-        <Hero       t={t} greeting={greeting} reduced={reduced} setMag={() => {}} />
-        <Skills     t={t} />
-        <Projects   t={t} top3={top3} repos={repos} load={load} offline={offline} errorMsg={errorMsg} BranchMergeBtn={BranchMergeBtn} />
-        <About      t={t} />
+        <Hero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} />
+        <Skills t={t} />
+        <Projects t={t} top3={top3} repos={repos} load={load} offline={offline} errorMsg={errorMsg} BranchMergeBtn={BranchMergeBtn} />
+        <About t={t} />
         <Philosophy t={t} />
-        <Contact    t={t} />
+        <Contact t={t} />
         <SiteFooter t={t} />
       </div>
     </>

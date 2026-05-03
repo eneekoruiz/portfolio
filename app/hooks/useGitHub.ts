@@ -97,7 +97,11 @@ export function useGitHub(t: Tx) {
         setAllRepos(payload);
         setErrorMsg('');
 
-      } catch (err) {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          // Ignoramos el error si fue abortado intencionadamente (ej. Strict Mode double mount)
+          return;
+        }
         const message = err instanceof Error ? err.message : 'Error de red desconocido';
         if (process.env.NODE_ENV === 'development') {
           console.warn('GitHub API error:', message);
@@ -105,9 +109,9 @@ export function useGitHub(t: Tx) {
         setAllRepos([]);
         setOffline(true);
         setErrorMsg(message);
+        setLoad(false);
       } finally {
         clearTimeout(timeoutId);
-        setLoad(false);
       }
     };
 

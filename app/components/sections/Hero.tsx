@@ -87,9 +87,9 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
         gsap.to(textContainerRef.current, {
           '--mx': `${x}px`,
           '--my': `${y}px`,
-          duration: 0.2,
-          ease: 'power2.out',
-          overwrite: 'auto'
+          duration: 0.15,
+          ease: 'sine.out',
+          overwrite: true
         });
       }
     };
@@ -152,11 +152,12 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
       <div className="h-txt flex-1 flex flex-col justify-center max-w-[1200px] mx-auto w-full px-8 py-8 relative z-[1]">
         <div className="max-w-full lg:max-w-[54%]">
           
-          <div className="mb-5">
+          <div className="mb-5 overflow-hidden pb-2" ref={textContainerRef}>
             <p className="h-ln text-[clamp(1.1rem,2.2vw,1.65rem)] font-medium text-lead mb-1">{greeting}</p>
-            <div className="relative" ref={textContainerRef}>
-              {/* Texto Base Apagado */}
-              <div className="h-ln opacity-30 dark:opacity-20 pointer-events-none">
+            
+            <div className="relative">
+              {/* Texto Base (Ahora más visible: opacity-60) */}
+              <div className="h-ln opacity-60 dark:opacity-50 pointer-events-none">
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Eneko</h1>
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Ruiz.</h1>
               </div>
@@ -165,7 +166,7 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
               <div 
                 className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full drop-shadow-[0_0_12px_var(--brand)]"
                 style={{
-                  backgroundImage: 'radial-gradient(circle 220px at var(--mx, -500px) var(--my, -500px), var(--ink) 10%, var(--brand) 50%, transparent 80%)',
+                  backgroundImage: 'radial-gradient(circle 240px at var(--mx, -500px) var(--my, -500px), var(--ink) 10%, var(--brand) 50%, transparent 80%)',
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',

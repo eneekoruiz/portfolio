@@ -89,10 +89,14 @@ export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
           yPercent: -120, opacity: 0,
           stagger: 0.015, duration: 0.28, ease: 'power3.in',
         })
-        // 6. Fade out del fondo
+        // Notificamos a page.tsx que empiece a animar el Hero justo al empezar a subir la cortina
+        .add(() => {
+          if (onComplete) onComplete();
+        }, '-=0.1')
+        // 6. Slide up de la cortina (estilo Awwwards)
         .to(containerRef.current, {
-          opacity: 0, duration: 0.28, ease: 'power2.inOut',
-        }, '-=0.25');
+          yPercent: -100, duration: 0.75, ease: 'expo.inOut',
+        }, '<');
 
     }, containerRef);
 

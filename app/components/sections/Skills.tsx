@@ -57,7 +57,8 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
       {/* rotateX(-5deg) para que no necesite tanta altura vertical */}
       <div ref={containerRef} className="relative" style={{ width: 0, height: 0, transformStyle: 'preserve-3d', transform: 'rotateX(-5deg)' }}>
         {techs.map((tech) => {
-          const techColor = LANG_COLORS[tech] || cardColor;
+          // Usar el color de la tarjeta (categoría) para mantener coherencia visual
+          const techColor = cardColor;
 
           return (
             <div
