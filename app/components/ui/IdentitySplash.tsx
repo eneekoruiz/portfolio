@@ -39,10 +39,11 @@ const WELCOME_TEXT: Record<Lang, string> = {
 
 interface IdentitySplashProps {
   onComplete: () => void;
+  onReveal:   () => void;
   lang:       Lang;
 }
 
-export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
+export function IdentitySplash({ onComplete, onReveal, lang }: IdentitySplashProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef      = useRef<HTMLDivElement>(null);
   const lineRef      = useRef<HTMLDivElement>(null);
@@ -91,17 +92,21 @@ export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
         })
         // Notificamos a page.tsx que empiece a animar el Hero justo al empezar a subir la cortina
         .add(() => {
-          if (onComplete) onComplete();
+          if (onReveal) onReveal();
         }, '-=0.1')
         // 6. Slide up de la cortina (estilo Awwwards)
         .to(containerRef.current, {
           yPercent: -100, duration: 0.75, ease: 'expo.inOut',
-        }, '<');
+        }, '<')
+        .add(() => {
+          if (onComplete) onComplete();
+        });
 
     }, containerRef);
 
     return () => ctx.revert();
-  }, [onComplete]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Solo una vez al montar
 
   return (
     <div

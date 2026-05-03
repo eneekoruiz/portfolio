@@ -19,7 +19,7 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (phase !== 'checking') return;
     const hasSeenIntro = sessionStorage.getItem('hasSeenIntro') === 'true';
-    setPhase(hasSeenIntro ? 'ready' : 'splash');
+    setPhase(hasSeenIntro ? 'ready' : 'loading');
   }, [phase]);
 
   const markSeen = useCallback(() => {

@@ -46,6 +46,7 @@ import { useIntro } from './components/IntroProvider';
 
 // ── UI components ──────────────────────────────────────────────────────────
 import { InfallibleCursor } from './components/ui/InfallibleCursor';
+import { Preloader } from './components/ui/Preloader';
 import { LangDD } from './components/ui/LangDD';
 import { ThemeToggle } from './components/ui/ThemeToggle';
 import { CmdModal } from './components/ui/CmdModal';
@@ -84,11 +85,12 @@ export default function Home() {
 
   // ── Estado ──────────────────────────────────────────────────────────────
   const { phase, setPhase, markSeen } = useIntro();
+  const [showHero, setShowHero] = useState(false);
   const [lang, setLang] = useState<Lang>('es');
   const [menu, setMenu] = useState(false);
   const [cmd, setCmd] = useState(false);
 
-  const ready = phase === 'ready';
+  const ready = phase === 'ready' || showHero;
   const t = TX[lang];
   const reduced = usePreferredMotion();
   const greeting = useGreeting(t.times, t.greetingFn);
@@ -420,19 +422,27 @@ export default function Home() {
     }
   }, []);
 
+  // ── Callbacks de Intro ────────────────────────────────────────────────
+  const onPreloaderDone = useCallback(() => setPhase('splash'), [setPhase]);
+  const onSplashReveal = useCallback(() => setShowHero(true), []);
+  const onSplashComplete = useCallback(() => {
+    setPhase('ready');
+    markSeen();
+  }, [setPhase, markSeen]);
+
   // Guard SSR
   if (phase === 'checking') return null;
 
   return (
     <>
       {/* ── SPLASH SCREEN / LOADING ── */}
-      {phase === 'splash' && (
+      {phase === 'loading' && <Preloader onDone={onPreloaderDone} />}
+
+      {(phase === 'splash' || (phase === 'ready' && !ready)) && (
         <IdentitySplash
           lang={lang}
-          onComplete={() => {
-            setPhase('ready');
-            markSeen();
-          }}
+          onReveal={onSplashReveal}
+          onComplete={onSplashComplete}
         />
       )}
 
