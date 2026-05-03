@@ -16,14 +16,17 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
   // Keep first render identical on server and client to avoid hydration mismatches.
   const [phase, setPhase] = useState<IntroPhase>('checking');
 
+  // Estado persistente solo durante la sesión SPA (se resetea con F5)
+  const [hasSeen, setHasSeen] = useState(false);
+
   useEffect(() => {
     if (phase !== 'checking') return;
-    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro') === 'true';
-    setPhase(hasSeenIntro ? 'ready' : 'loading');
-  }, [phase]);
+    // Si ya lo hemos visto en esta sesión de navegación, saltamos al final
+    setPhase(hasSeen ? 'ready' : 'loading');
+  }, [phase, hasSeen]);
 
   const markSeen = useCallback(() => {
-    sessionStorage.setItem('hasSeenIntro', 'true');
+    setHasSeen(true);
     setPhase('ready');
   }, []);
 

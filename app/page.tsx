@@ -513,6 +513,8 @@ export default function Home() {
       <div
         ref={main}
         style={{
+          // Ocultar el contenido real durante el preloader para evitar el "flash"
+          visibility: (phase === 'loading' || phase === 'checking') ? 'hidden' : 'visible',
           // Evitar interacciones hasta que termine el splash
           pointerEvents: ready ? 'auto' : 'none',
         }}
