@@ -33,6 +33,10 @@ export const metadata: Metadata = {
     title: 'Eneko Ruiz — Full Stack Developer', images: ['/og.png'],
   },
   robots: { index: true, follow: true },
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
 };
 
 const jsonLd = {
