@@ -3,12 +3,18 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
 const TECH_MESSAGES = [
-  'INITIALIZING SYSTEM',
-  'LOADING ASSETS',
-  'COMPILING SHADERS',
-  'OPTIMIZING GPU PIPELINE',
-  'BOOTSTRAPPING INTERFACE',
-  'READY',
+  'Initialising Data Streams...',
+  'Compiling MVC Logic...',
+  'Mapping Semantic DOM...',
+  'Bootstrapping Firebase SDK...',
+  'Hydrating React Tree...',
+  'Resolving Mongoose Refs...',
+  'Validating Bcrypt Salts...',
+  'Mounting ScrollTrigger...',
+  'Parsing Atomic Transactions...',
+  'Calibrating GSAP Timeline...',
+  'Injecting WCAG 2.1 Layer...',
+  'System Ready.',
 ];
 
 export function Preloader({ onDone }: { onDone: () => void }) {
@@ -21,14 +27,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     const msgInterval = setInterval(() => {
       setMsgIdx(i => (i + 1) % (TECH_MESSAGES.length - 1));
-    }, 150); // Mucho más rápido
+    }, 280); 
     return () => clearInterval(msgInterval);
   }, []);
 
   useEffect(() => {
     let v = 0;
     const tick = () => {
-      v += Math.random() * 15 + 5; // Salto mayor para que sea rápido
+      v += Math.random() * 4 + 1; // Más lento, más natural
       if (v >= 100) {
         setN(100);
         setMsgIdx(TECH_MESSAGES.length - 1);
@@ -36,14 +42,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           const tl = gsap.timeline({ onComplete: onDone });
           tl.to(containerRef.current, { 
             opacity: 0, 
-            duration: 0.4, 
+            duration: 0.6, 
             ease: 'power2.inOut' 
           });
-        }, 150);
+        }, 300);
         return;
       }
       setN(Math.round(v));
-      setTimeout(tick, 10 + Math.random() * 20);
+      setTimeout(tick, 25 + Math.random() * 25);
     };
     setTimeout(tick, 50);
   }, [onDone]);
