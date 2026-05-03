@@ -24,6 +24,13 @@ import { PROJECTS_CONTENT, CODE_SNIPPETS } from '../../lib/projects-data';
 import { LANG_COLORS }     from '../../lib/constants';
 import type { Lang }       from '../../lib/types';
 import { InfallibleCursor } from '../../components/ui/InfallibleCursor';
+import { useMagnetic }     from '../../hooks/useMagnetic';
+import { useTextScramble } from '../../hooks/useTextScramble';
+import {
+  createLiquidCurtain,
+  animateLiquidCurtainIn,
+  animateLiquidCurtainOut,
+} from '../../components/ui/LiquidCurtain';
 
 // ── DYNAMIC IMPORTS: Defer heavy components until after route transition ──
 type DNAHelixProps = { accent: string; secondary: string; darkMode: boolean };
@@ -127,6 +134,19 @@ export default function ProjectPage() {
   const snippet = CODE_SNIPPETS[safeId];
   const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com/login' : isJava ? null : 'https://ana-peluquera.lovable.app/';
 
+  // 🎯 Punto 6 — Magnetic buttons
+  const closeMagRef = useMagnetic<HTMLButtonElement>({ strength: 0.3, innerStrength: 0.12 });
+  const backMagRef  = useMagnetic<HTMLButtonElement>({ strength: 0.25, innerStrength: 0.1 });
+
+  // 🎯 Punto 7 — Text scramble for project title
+  const titleText = content?.title ?? summary?.name ?? safeId;
+  const { text: scrambledTitle, ref: titleRef } = useTextScramble(titleText, {
+    trigger: 'mount',
+    charSpeed: 35,
+    iterations: 4,
+    delay: 200,
+  });
+
   // Detect dark mode
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark')
@@ -136,6 +156,7 @@ export default function ProjectPage() {
 
   /**
    * 💎 FADE OUT TRANSITION LAYER + Trigger animation boot
+   * Handles both SVG liquid curtains (Punto 8) and legacy div overlays.
    */
   useEffect(() => {
     const overlay = document.getElementById('project-transition-layer');
@@ -144,21 +165,35 @@ export default function ProjectPage() {
       const reveal = () => {
         if (done) return;
         done = true;
-        gsap.to(overlay, {
-          opacity: 0,
-          duration: 0.32,
-          ease: 'power3.out',
-          onComplete: () => {
-            overlay.remove();
-            setIsReadyToAnimate(true); // NOW load all 3D backgrounds!
-          }
-        });
+
+        const isSVG = overlay.tagName.toLowerCase() === 'svg';
+
+        if (isSVG) {
+          // 🌊 Liquid curtain reveal
+          animateLiquidCurtainOut(overlay as unknown as SVGSVGElement, {
+            duration: 0.7,
+            onComplete: () => {
+              setIsReadyToAnimate(true);
+            },
+          });
+        } else {
+          // Legacy div overlay
+          gsap.to(overlay, {
+            opacity: 0,
+            duration: 0.32,
+            ease: 'power3.out',
+            onComplete: () => {
+              overlay.remove();
+              setIsReadyToAnimate(true);
+            },
+          });
+        }
       };
 
-      // Esperar al menos dos paints para asegurar que el nuevo árbol ya montó.
+      // Wait for two paints to ensure the new tree is mounted.
       requestAnimationFrame(() => requestAnimationFrame(reveal));
 
-      // Fallback defensivo por si el scheduler retrasa frames.
+      // Defensive fallback if the scheduler delays frames.
       const fallback = window.setTimeout(reveal, 360);
       return () => window.clearTimeout(fallback);
     } else {
@@ -166,41 +201,34 @@ export default function ProjectPage() {
     }
   }, []);
 
-  // 💎 TRANSITION: Exit curtain to prevent FOUC on home page
+  // 💎 TRANSITION: Exit liquid curtain to prevent FOUC on home page
   const handleReturn = (e: React.MouseEvent) => {
     e.preventDefault();
 
     router.prefetch('/');
-
     (window as any).__lenis?.stop?.();
 
-    const overlay = document.createElement('div');
-    overlay.id = 'return-overlay';
-    Object.assign(overlay.style, {
-      position: 'fixed', inset: 0, backgroundColor: theme.accent, zIndex: 99999,
-      transform: 'scaleY(0)', transformOrigin: 'top'
+    // Remove stale overlays
+    document.getElementById('return-overlay')?.remove();
+
+    // 🌊 Punto 8 — SVG Liquid Curtain (replaces plain div overlay)
+    const svg = createLiquidCurtain({
+      color: theme.accent,
+      direction: 'down',
+      id: 'return-overlay',
     });
-    document.body.appendChild(overlay);
+    document.body.appendChild(svg);
 
-    let hasNavigated = false;
-
-    gsap.to(overlay, {
-      scaleY: 1, duration: 0.32, ease: 'expo.inOut',
-      onUpdate: () => {
-        const currentScale = Number(gsap.getProperty(overlay, 'scaleY'));
-        if (!hasNavigated && currentScale >= 0.78) {
-          hasNavigated = true;
-          sessionStorage.setItem('hasSeenIntro', 'true');
-          router.replace('/');
-        }
+    animateLiquidCurtainIn(svg, {
+      duration: 1.0,
+      onMidway: () => {
+        sessionStorage.setItem('hasSeenIntro', 'true');
+        router.replace('/');
       },
       onComplete: () => {
-        if (!hasNavigated) {
-          hasNavigated = true;
-          sessionStorage.setItem('hasSeenIntro', 'true');
-          router.replace('/');
-        }
-      }
+        // Ensure navigation happened
+        sessionStorage.setItem('hasSeenIntro', 'true');
+      },
     });
   };
 
@@ -278,10 +306,13 @@ export default function ProjectPage() {
       <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-3rem)] max-w-[1200px]">
         <div className="flex items-center justify-between px-6 py-3.5 rounded-2xl bg-white/80 dark:bg-black/50 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-glass">
           <button
+            ref={backMagRef}
             onClick={handleReturn}
             className="flex items-center gap-2 font-medium text-xs tracking-wide opacity-70 hover:opacity-100 transition-opacity text-ink bg-transparent border-none cursor-pointer"
           >
-            <ChevronLeft size={16} /> Todos los proyectos
+            <span className="flex items-center gap-2">
+              <ChevronLeft size={16} /> Todos los proyectos
+            </span>
           </button>
           <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10">
             <Activity size={10} style={{ color: theme.accent }} className="animate-pulse" />
@@ -295,10 +326,11 @@ export default function ProjectPage() {
         {/* ── HERO ── */}
         <section className="flex flex-col items-center text-center mb-32">
           <h1
+            ref={titleRef as React.Ref<HTMLHeadingElement>}
             className="font-black uppercase italic tracking-tighter leading-[0.85] mb-6"
             style={{ fontSize: 'clamp(3rem, 8vw, 6.5rem)', color: theme.accent }}
           >
-            {content?.title ?? summary.name}
+            {scrambledTitle}
           </h1>
           <p className="text-xl md:text-2xl font-light opacity-50 tracking-tight max-w-2xl mb-16 text-ink">
             {content?.subtitle}
@@ -439,10 +471,13 @@ export default function ProjectPage() {
             {content?.outcomeP}
           </p>
           <button
+            ref={closeMagRef}
             onClick={handleReturn}
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-ink text-page font-medium text-sm transition-transform hover:scale-105 active:scale-95 shadow-xl border-none cursor-pointer"
           >
-            Cerrar caso de estudio <ArrowUpRight size={16} />
+            <span className="flex items-center gap-3">
+              Cerrar caso de estudio <ArrowUpRight size={16} />
+            </span>
           </button>
         </section>
       </main>

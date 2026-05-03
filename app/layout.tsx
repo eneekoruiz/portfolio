@@ -9,7 +9,7 @@ import { SmoothScroll } from './components/ui/SmoothScroll';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
-  display: 'swap',
+  display: 'block',
   weight: ['400','500','600','700','800','900'],
 });
 

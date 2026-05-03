@@ -104,7 +104,7 @@ export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
       ref={containerRef}
       // z-[9998]: por encima de contenido (visible gracias a visibility:hidden
       // en page.tsx) pero por debajo del cursor (z-[99999])
-      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center will-change-[opacity]"
+      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center"
       aria-hidden="true"
     >
       <div className="flex flex-col items-center">
@@ -117,7 +117,7 @@ export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
             {word.split('').map((char, i) => (
               <span
                 key={i}
-                className="char font-black text-[clamp(3.5rem,8vw,7rem)] tracking-[-0.03em] leading-none inline-block will-change-transform"
+                className="char font-black text-[clamp(3.5rem,8vw,7rem)] tracking-[-0.03em] leading-none inline-block"
                 /* opacity:0 y yPercent:110 los fija gsap.set() en useEffect */
               >
                 {char === ' ' ? '\u00A0' : char}
@@ -131,7 +131,7 @@ export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
           <div className="h-[2px] w-10 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
             <div
               ref={lineRef}
-              className="h-full w-full bg-brand origin-center will-change-transform"
+              className="h-full w-full bg-brand origin-center"
               /* scaleX:0 lo fija gsap.set() en useEffect */
             />
           </div>

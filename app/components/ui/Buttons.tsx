@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Download, Check, ArrowUpRight, Github, Zap } from 'lucide-react';
+import { useMagnetic } from '../../hooks/useMagnetic';
 
 type BtnState = 'idle' | 'animating' | 'done';
 
@@ -147,6 +148,7 @@ export function BranchMergeBtn({ label, href = 'https://github.com/eneekoruiz' }
   const [state, setState] = useState<BtnState>('idle');
   const [drawn, setDrawn] = useState(false);
   const toRef = useRef<ReturnType<typeof setTimeout>>();
+  const magnetRef = useMagnetic<HTMLButtonElement>({ strength: 0.3, innerStrength: 0.12 });
 
   const handleClick = () => {
     if (state !== 'idle') return;
@@ -166,6 +168,7 @@ export function BranchMergeBtn({ label, href = 'https://github.com/eneekoruiz' }
 
   return (
     <button
+      ref={magnetRef}
       onClick={handleClick}
       disabled={state !== 'idle'}
       data-h

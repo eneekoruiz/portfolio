@@ -32,6 +32,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { Search } from 'lucide-react';
+import { animateLiquidCurtainOut } from './components/ui/LiquidCurtain';
 
 // ── Lib ────────────────────────────────────────────────────────────────────
 import { TX, LANG_LABELS } from './lib/translations';
@@ -92,7 +93,7 @@ export default function Home() {
   const t       = TX[lang];
   const reduced = usePreferredMotion();
   const greeting = useGreeting(t.times, t.greetingFn);
-  const { repos, top3, load, offline } = useGitHub(t);
+  const { repos, top3, load, offline, errorMsg } = useGitHub(t);
 
   // ── Tab title dinámico ────────────────────────────────────────────────
   useEffect(() => {
@@ -167,6 +168,49 @@ export default function Home() {
     return () => io.disconnect();
   }, [ready, t]);
 
+  // ── Fix #2: Nav active section indicator on scroll ──────────────────
+  useEffect(() => {
+    if (!ready) return;
+    const sections = t.hrefs.map((h: string) => document.querySelector(h)).filter(Boolean) as HTMLElement[];
+    const navLinks = navInner.current?.querySelectorAll<HTMLAnchorElement>('a');
+    if (!sections.length || !navLinks?.length) return;
+
+    const ctx = gsap.context(() => {
+      function setActive(idx: number) {
+        const link = navLinks![idx];
+        if (!link || !indRef.current || !navInner.current) return;
+
+        activeLinkRef.current = link;
+        const r = link.getBoundingClientRect();
+        const nr = navInner.current.getBoundingClientRect();
+        gsap.to(indRef.current, {
+          x: r.left - nr.left,
+          width: r.width,
+          height: r.height,
+          opacity: 0.65,
+          duration: 0.3,
+          ease: 'power3.out',
+          overwrite: 'auto',
+        });
+      }
+
+      sections.forEach((sec, idx) => {
+        ScrollTrigger.create({
+          trigger: sec,
+          start: 'top 50%',
+          end: 'bottom 50%',
+          onEnter: () => setActive(idx),
+          onEnterBack: () => setActive(idx),
+        });
+      });
+      
+      // Initialize with the first section if we are at the top
+      if (window.scrollY < 100) setActive(0);
+    });
+
+    return () => ctx.revert();
+  }, [ready, t]);
+
   // ── Animación menú overlay móvil ──────────────────────────────────────
   useEffect(() => {
     menuRefs.current.forEach((el, i) => {
@@ -188,12 +232,16 @@ export default function Home() {
       const saved = raw ? JSON.parse(raw) : null;
       if (saved?.scrollY != null) {
         const lenis = (window as any).__lenis;
+        // Freeze Lenis so it doesn't interfere with the programmatic scroll
         lenis?.stop?.();
-        lenis?.scrollTo?.(saved.scrollY, { immediate: true, force: true });
+
+        // Immediate scroll — runs before first paint (useLayoutEffect)
         window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
+        // Also tell Lenis about the scroll position
+        lenis?.scrollTo?.(saved.scrollY, { immediate: true, force: true });
       }
     } catch (_) {
-      // Ignorar errores de sessionStorage y seguir con el render normal.
+      // Ignore sessionStorage errors and continue with normal render.
     }
   }, [ready]);
 
@@ -211,31 +259,68 @@ export default function Home() {
     return () => clearTimeout(id);
   }, [ready]);
 
-  // ────────────────────────────────────────────────────────────────────────
-  // RETURN CURTAIN — la home revela la cortina cuando ya montó
-  // ────────────────────────────────────────────────────────────────────────
+  /**
+   * RETURN CURTAIN — sincronizado con scroll restaurado (Fase 1, Punto 1)
+   * ──────────────────────────────────────────────────────────────────────
+   * La cortina se desvanece DESPUÉS de que el DOM haya pintado
+   * con el scroll ya restaurado y el acordeón abierto.
+   * Al completarse, rearranca Lenis, limpia navState y refresca ST.
+   */
   useEffect(() => {
     if (!ready) return;
 
     const overlay = document.getElementById(RETURN_OVERLAY_ID);
-    if (!overlay) return;
+    if (!overlay) {
+      // FIX CRÍTICO: Si no hay overlay (ej: navegación atrás del navegador directa),
+      // asegurarnos de reiniciar Lenis de todas formas y limpiar el state.
+      (window as any).__lenis?.start?.();
+      try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) {}
+      return;
+    }
 
     let cancelled = false;
+
     const reveal = () => {
       if (cancelled) return;
-      gsap.to(overlay, {
-        opacity: 0,
-        duration: 0.34,
-        ease: 'power3.out',
-        onComplete: () => {
-          overlay.remove();
-          (window as any).__lenis?.start?.();
-        },
-      });
+
+      // Detect if the overlay is an SVG (liquid curtain) or a plain div (legacy)
+      const isSVG = overlay.tagName.toLowerCase() === 'svg';
+
+      if (isSVG) {
+        // 🌊 Punto 8 — Liquid curtain reveal (SVG path morphing)
+        animateLiquidCurtainOut(overlay as unknown as SVGSVGElement, {
+          duration: 0.45,
+          onComplete: () => {
+            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) {}
+            (window as any).__lenis?.start?.();
+            ScrollTrigger.refresh();
+          },
+        });
+      } else {
+        // Legacy div overlay — simple opacity fade
+        gsap.to(overlay, {
+          opacity: 0,
+          duration: 0.34,
+          ease: 'power3.out',
+          onComplete: () => {
+            overlay.remove();
+            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) {}
+            (window as any).__lenis?.start?.();
+            ScrollTrigger.refresh();
+          },
+        });
+      }
     };
 
+    // Wait 3 rAFs so the accordion body has fully painted at the correct height
+    // before the curtain starts fading out. This prevents any visible layout shift.
     const raf1 = requestAnimationFrame(() => {
-      const raf2 = requestAnimationFrame(reveal);
+      if (cancelled) return;
+      const raf2 = requestAnimationFrame(() => {
+        if (cancelled) return;
+        const raf3 = requestAnimationFrame(reveal);
+        overlay.setAttribute('data-raf3', String(raf3));
+      });
       overlay.setAttribute('data-raf2', String(raf2));
     });
 
@@ -244,6 +329,8 @@ export default function Home() {
       cancelAnimationFrame(raf1);
       const raf2 = Number(overlay.getAttribute('data-raf2'));
       if (raf2) cancelAnimationFrame(raf2);
+      const raf3 = Number(overlay.getAttribute('data-raf3'));
+      if (raf3) cancelAnimationFrame(raf3);
     };
   }, [ready]);
 
@@ -313,11 +400,9 @@ export default function Home() {
       x: r.left - nr.left, width: r.width, height: r.height,
       duration: 0.2, ease: 'power3.out', opacity: 1,
     });
-    el.style.color = 'var(--ink)';
   }, []);
 
   const onNavLeave = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.currentTarget.style.color = '';
   }, []);
 
   const onNavContainerLeave = useCallback(() => {
@@ -413,7 +498,7 @@ export default function Home() {
           </div>
         </div>
         <div className="absolute bottom-8 left-14 right-14 flex justify-between">
-          <span className="text-[10px] font-bold tracking-[.22em] uppercase text-lead/30">ENEKO RUIZ · 2026</span>
+          <span className="text-[10px] font-bold tracking-[.22em] uppercase text-lead/30">ENEKO RUIZ · {new Date().getFullYear()}</span>
           <span className="text-[10px] font-bold tracking-[.22em] uppercase text-lead/20">DONOSTIA</span>
         </div>
       </div>
@@ -453,11 +538,19 @@ export default function Home() {
                 <a
                   key={link}
                   href={t.hrefs[i]}
-                  className="n-el relative z-[1] text-[13px] font-semibold text-lead no-underline px-[14px] py-[7px]"
+                  className="n-el relative z-[1] text-[13px] font-semibold text-lead no-underline px-[14px] py-[7px] group"
                   onMouseEnter={onNavEnter}
                   onMouseLeave={onNavLeave}
                 >
-                  {link}
+                  {/* V2 Polish: Split-text hover effect */}
+                  <span className="relative overflow-hidden block">
+                    <span className="block transition-transform duration-400 ease-expo group-hover:-translate-y-full">
+                      {link}
+                    </span>
+                    <span className="absolute top-0 left-0 block translate-y-full transition-transform duration-400 ease-expo group-hover:translate-y-0 text-ink">
+                      {link}
+                    </span>
+                  </span>
                 </a>
               ))}
             </nav>
@@ -487,7 +580,7 @@ export default function Home() {
         {/* ════ SECCIONES ════ */}
         <Hero       t={t} greeting={greeting} reduced={reduced} setMag={() => {}} />
         <Skills     t={t} />
-        <Projects   t={t} top3={top3} repos={repos} load={load} offline={offline} BranchMergeBtn={BranchMergeBtn} />
+        <Projects   t={t} top3={top3} repos={repos} load={load} offline={offline} errorMsg={errorMsg} BranchMergeBtn={BranchMergeBtn} />
         <About      t={t} />
         <Philosophy t={t} />
         <Contact    t={t} />

@@ -1,38 +1,10 @@
 'use client';
 
 /**
+ * PROJECTS SECTION — Selected Works & GitHub Activity
  * ─────────────────────────────────────────────────────────────────────────────
- * PROJECTS SECTION — Selected Works + GitHub Activity
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * CAMBIOS vs. versión anterior:
- *
- * 1. FIX CONFLICTO DE SCROLL ─────────────────────────────────────────────────
- *    ANTES: useLayoutEffect intentaba scrollear Y restaurar el acordeón
- *    cuando había un retorno desde /work/[id]. Esto conflictuaba con
- *    page.tsx que también intentaba scrollear.
- *
- *    AHORA: si hay un returnColor en sessionStorage, page.tsx ya scrolleó
- *    (useLayoutEffect síncrono). Projects.tsx SOLO restaura el acordeón,
- *    sin tocar el scroll. El clearNavState se hace aquí para no bloquear
- *    futuros opens de acordeón.
- *
- * 2. VISUAL OVERHAUL de los acordeones ────────────────────────────────────
- *    - Fondo expanded: gradiente sutil con el color del proyecto
- *    - Tarjeta lifecycle: border y fondo con más alpha (05→0a, 25→35)
- *    - Tarjeta info: glass más pronunciado en dark mode
- *    - Row header: separadores más elegantes, tipografía más compacta en móvil
- *    - Número de orden: transición de color y tamaño mejorada
- *
- * 3. ANIMACIONES MÁS SNAPPY ───────────────────────────────────────────────
- *    - Acordeón abre/cierra: 0.5s → 0.35s
- *    - Reveal de sección: 0.8s → 0.55s
- *    - Stagger de rows: 0.04 → 0.03
- *
- * 4. GSAP CONTEXT CORRECTO ────────────────────────────────────────────────
- *    El useEffect del acordeón crea animaciones sin contexto. Se añade
- *    el contexto y cleanup correcto.
- * ─────────────────────────────────────────────────────────────────────────────
+ * Renders the expandable project accordion and GitHub activity list.
+ * Includes scroll-based skew inertia and responsive layout handling.
  */
 
 import { useRef, useEffect, useState, useLayoutEffect } from 'react';
@@ -45,6 +17,10 @@ import {
 } from 'lucide-react';
 import { LANG_COLORS } from '../../lib/constants';
 import type { ProjectCard, RepoFull, Tx } from '../../lib/types';
+import {
+  createLiquidCurtain,
+  animateLiquidCurtainIn,
+} from '../ui/LiquidCurtain';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
@@ -88,13 +64,13 @@ const PROJ_THEMES: Record<string, {
     color: '#e69400',   // ámbar más cálido, menos amarillo puro
     img: 'radial-gradient(ellipse at 50% 120%, #e6940020 0%, transparent 65%)',
     gradient: 'linear-gradient(to bottom, #e694000a 0%, transparent 100%)',
-    progress: 3, btnText: 'Ver Repositorio', hasAudit: false,
+    progress: 3, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'spotshare-parking': {
     color: '#00d4e8',   // cian ligeramente menos saturado
     img: 'radial-gradient(ellipse at 50% 120%, #00d4e820 0%, transparent 65%)',
     gradient: 'linear-gradient(to bottom, #00d4e80a 0%, transparent 100%)',
-    progress: 2, btnText: 'Ver Repositorio', hasAudit: false,
+    progress: 2, btnText: 'Source Code', hasAudit: false,
   },
   'pke_web': {
     color: '#9b1fff',   // violeta más oscuro, más legible en light
@@ -135,9 +111,11 @@ interface RepoRowProps {
   activeRepo: number | null;
   setActiveRepo: (i: number | null) => void;
   lineRef: (el: HTMLDivElement | null) => void;
+  /** Derived from gsap.matchMedia() — true when viewport ≤ 768px */
+  isMobile: boolean;
 }
 
-function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef }: RepoRowProps) {
+function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoRowProps) {
   const isActive = activeRepo === idx;
 
   return (
@@ -147,9 +125,9 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef }: RepoRowProps) {
     >
       <div
         className="py-[18px] md:py-5 cursor-pointer relative z-10"
-        onMouseEnter={() => window.innerWidth > 768 && setActiveRepo(idx)}
-        onMouseLeave={() => window.innerWidth > 768 && setActiveRepo(null)}
-        onClick={() => window.innerWidth <= 768 && setActiveRepo(isActive ? null : idx)}
+        onMouseEnter={() => !isMobile && setActiveRepo(idx)}
+        onMouseLeave={() => !isMobile && setActiveRepo(null)}
+        onClick={() => isMobile && setActiveRepo(isActive ? null : idx)}
       >
         <div className="flex items-start md:items-center gap-4 md:gap-5">
           <span className="font-mono text-[10px] text-lead/40 w-6 shrink-0 pt-1 md:pt-0">
@@ -215,9 +193,11 @@ interface WorkRowProps {
   idx: number;
   isExpanded: boolean;
   onToggle: () => void;
+  /** If true, skip the GSAP tween — open the accordion body immediately (for scroll restoration). */
+  skipAnimation?: boolean;
 }
 
-function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
+function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: WorkRowProps) {
   const [isNavigating, setIsNavigating] = useState(false);
   const [isPrefetched, setIsPrefetched] = useState(false);
   const rowRef   = useRef<HTMLDivElement>(null);
@@ -239,9 +219,20 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
    * correctamente si el componente se desmonta mientras está animando.
    * Antes era un gsap.to() huérfano sin cleanup.
    */
+  /**
+   * Accordion expand/collapse animation.
+   * If `skipAnimation` is true (return from /work), we set height/opacity
+   * instantly so the DOM has the correct height BEFORE page.tsx restores scroll.
+   */
   useEffect(() => {
     const body = bodyRef.current;
     if (!body) return;
+
+    // On return from /work/[id]: open instantly so scroll restoration is accurate.
+    if (skipAnimation && isExpanded) {
+      gsap.set(body, { height: 'auto', opacity: 1 });
+      return;
+    }
 
     ctxRef.current?.revert();
     ctxRef.current = gsap.context(() => {
@@ -254,17 +245,23 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
     });
 
     return () => ctxRef.current?.revert();
-  }, [isExpanded]);
+  }, [isExpanded, skipAnimation]);
 
-  // Scroll suave en móvil al abrir
+  // Scroll suave en móvil al abrir — uses gsap.matchMedia() (Punto 5)
   useEffect(() => {
-    if (isExpanded && rowRef.current && window.innerWidth <= 768) {
+    if (skipAnimation) return;
+    if (!isExpanded || !rowRef.current) return;
+
+    const mm = gsap.matchMedia();
+    mm.add('(max-width: 768px)', () => {
       setTimeout(() => {
         const y = rowRef.current!.getBoundingClientRect().top + window.scrollY - 90;
         window.scrollTo({ top: y, behavior: 'smooth' });
-      }, 150);  // ← era 180
-    }
-  }, [isExpanded]);
+      }, 150);
+    });
+
+    return () => mm.revert();
+  }, [isExpanded, skipAnimation]);
 
   const handleNavigate = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -273,47 +270,31 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
     setIsNavigating(true);
 
     saveNavState({ openIdx: idx, scrollY: window.scrollY });
-    document.getElementById('project-transition-layer')?.remove();
 
-    const overlay = document.createElement('div');
-    overlay.id = 'project-transition-layer';
-    Object.assign(overlay.style, {
-      position:        'fixed',
-      inset:           '0',
-      backgroundColor: theme.color,
-      zIndex:          '99999',
-      transform:       'scaleY(0)',
-      transformOrigin: 'bottom',
-      pointerEvents:   'all',
+    // Remove any stale transition layer
+    document.getElementById('project-transition-layer')?.remove();
+    document.getElementById('liquid-curtain')?.remove();
+
+    // 🌊 Punto 8 — SVG Liquid Curtain (replaces plain div overlay)
+    const svg = createLiquidCurtain({
+      color: theme.color,
+      direction: 'up',
+      id: 'project-transition-layer',
     });
-    document.body.appendChild(overlay);
+    document.body.appendChild(svg);
 
     const targetRoute = `/work/${safeId}`;
-    // Warm-up extra: en dev ayuda a disparar compilación antes del push real.
     router.prefetch(targetRoute);
 
-    let hasNavigated = false;
-
-    gsap.to(overlay, {
-      scaleY:   1,
-      duration: 0.28,
-      ease:     'expo.inOut',
-      onUpdate: () => {
-        // Arrancamos navegación antes de terminar la subida para solapar tiempos de carga.
-        const currentScale = Number(gsap.getProperty(overlay, 'scaleY'));
-        if (!hasNavigated && currentScale >= 0.78) {
-          hasNavigated = true;
-          router.push(targetRoute);
-          // El botón deja estado de carga en cuanto la cortina ya cubre prácticamente todo.
-          setIsNavigating(false);
-        }
+    animateLiquidCurtainIn(svg, {
+      duration: 1.0,
+      onMidway: () => {
+        router.push(targetRoute);
+        setIsNavigating(false);
       },
       onComplete: () => {
-        if (!hasNavigated) {
-          hasNavigated = true;
-          router.push(targetRoute);
-          setIsNavigating(false);
-        }
+        // Ensure navigation happened even if onMidway was too early
+        setIsNavigating(false);
       },
     });
   };
@@ -542,16 +523,12 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle }: WorkRowProps) {
 
           {/*
            * VISUAL CHANGE: Tarjeta info del proyecto
-           * - Border más visible en dark mode
-           * - Background glass más pronunciado
-           * - Padding inferior reducido para compacidad
+           * - Background subido de 012 a 05
+           * - Border más definido
+           * - Padding y rounded ajustados
            */}
           <div
-            className="p-5 md:p-6 rounded-2xl border flex flex-col justify-between gap-4"
-            style={{
-              borderColor:     'rgba(0,0,0,0.05)',
-              backgroundColor: 'rgba(0,0,0,0.012)',
-            }}
+            className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.05] flex flex-col justify-between gap-6"
           >
             <p className="text-sm md:text-[15px] font-light leading-relaxed text-ink/78">
               {proj.desc}
@@ -597,7 +574,7 @@ function SkeletonRow({ idx }: { idx: number }) {
   return (
     <div
       className="border-b border-black/5 dark:border-white/5 py-[14px] md:py-5 px-0 md:px-6 flex items-center justify-between animate-pulse"
-      style={{ animationDelay: `${idx * 0.07}s` }}  // ← era 0.08
+      style={{ animationDelay: `${idx * 0.07}s` }}
     >
       <div className="flex items-center gap-5">
         <span className="w-4 h-3 rounded bg-black/8 dark:bg-white/8" />
@@ -616,26 +593,49 @@ interface ProjectsProps {
   repos: RepoFull[];
   load: boolean;
   offline: boolean;
+  errorMsg: string;
   BranchMergeBtn: React.ComponentType<{ label: string; href: string }>;
 }
 
-export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: ProjectsProps) {
+export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeBtn }: ProjectsProps) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [activeRepo,  setActiveRepo]  = useState<number | null>(null);
   const lineRefs   = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
 
   /**
-   * FIX CONFLICTO DE SCROLL
-   * ──────────────────────────────────────────────────────────────────────────
-   * ANTES: este hook intentaba scrollear Y restaurar el acordeón, conflictuando
-   * con page.tsx que también intentaba scrollear (efecto: scroll doble/rebote).
+   * gsap.matchMedia() — reactive mobile breakpoint (Punto 5, Fase 2)
+   * Replaces all static `window.innerWidth <= 768` checks.
+   * Auto-reverts when viewport crosses the breakpoint.
+   */
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(max-width: 768px)', () => {
+      setIsMobile(true);
+      return () => setIsMobile(false);
+    });
+    return () => mm.revert();
+  }, []);
+
+  /**
+   * isReturning — true when the user is coming back from /work/[id].
+   * Tells PremiumWorkRow to open the accordion INSTANTLY (duration: 0)
+   * so the DOM height is correct before page.tsx restores the scroll position.
+   * Cleared after the first render cycle so subsequent toggles animate normally.
+   */
+  const isReturning = useRef(false);
+
+  /**
+   * FIX SCROLL RESTAURACIÓN (Punto 1, Fase 1)
+   * ──────────────────────────────────────────
+   * Projects.tsx SOLO restaura el acordeón abierto.
+   * El scroll lo maneja exclusivamente page.tsx (useLayoutEffect síncrono)
+   * para evitar scroll doble y rebotes.
    *
-   * AHORA:
-   * - page.tsx restaura el scroll del contexto compartido antes del paint.
-   * - aquí solo restauramos el acordeón y limpiamos el estado de navegación.
-   *
-   * clearNavState() se llama DESPUÉS de restaurar el acordeón.
+   * `isReturning` is set to true so PremiumWorkRow opens the body with
+   * gsap.set() (instant) instead of gsap.to() (animated).
+   * This guarantees the DOM has the correct height before scroll restoration.
    */
   useLayoutEffect(() => {
     if (load || top3.length === 0) return;
@@ -643,34 +643,75 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
     const saved = loadNavState();
     if (!saved) return;
 
-    // Restaurar acordeón abierto siempre
-    setExpandedIdx(saved.openIdx);
-    const id = setTimeout(() => {
-      window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
-      clearNavState();
-    }, 0);
+    // Flag for PremiumWorkRow to skip the animation
+    isReturning.current = true;
 
-    return () => clearTimeout(id);
+    // Solo restaurar acordeón — NO tocar scroll
+    setExpandedIdx(saved.openIdx);
   }, [load, top3.length]);
+
+  /**
+   * Clear the isReturning flag after the first paint so subsequent
+   * accordion toggles animate normally.
+   */
+  useEffect(() => {
+    if (!isReturning.current) return;
+    // Wait one frame for the instant-open to settle
+    const raf = requestAnimationFrame(() => {
+      isReturning.current = false;
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [expandedIdx]);
 
   // ── Animaciones de entrada — DURACIÓN REDUCIDA ────────────────────────────
   useEffect(() => {
     if (load) return;
     const ctx = gsap.context(() => {
       gsap.fromTo('.projects-header',
-        { opacity: 0, y: 32 },          // ← era y:40
+        { opacity: 0, y: 32 },
         {
           opacity: 1, y: 0, duration: 0.26, ease: 'power3.out',
           scrollTrigger: { trigger: sectionRef.current, start: 'top 85%', once: true },
         }
       );
       gsap.fromTo('.work-row-anim',
-        { opacity: 0, y: 16 },           // ← era y:20
+        { opacity: 0, y: 16 },
         {
           opacity: 1, y: 0, duration: 0.18, stagger: 0.015, ease: 'power2.out',
           scrollTrigger: { trigger: '.projects-list', start: 'top 90%', once: true },
         }
       );
+
+      /**
+       * 🎯 Punto 9 — Skew on Scroll (Inertia)
+       * Applies a subtle skewY to accordion rows based on scroll velocity.
+       * Uses ScrollTrigger's built-in getVelocity() for detection.
+       * The skew returns to 0 when the user stops scrolling.
+       */
+      const rows = gsap.utils.toArray<HTMLElement>('.work-row-anim');
+      if (rows.length > 0) {
+        const skewSetter = gsap.quickTo(rows, 'skewY', {
+          duration: 0.4,
+          ease: 'power3.out',
+        });
+
+        ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: 'top bottom',
+          end: 'bottom top',
+          onUpdate: (self) => {
+            // Clamp velocity to a reasonable range (-3 to 3 degrees)
+            const velocity = self.getVelocity();
+            const skew = gsap.utils.clamp(-3, 3, velocity / 400);
+            skewSetter(skew);
+          },
+        });
+
+        // Ensure skew resets when scroll stops
+        ScrollTrigger.addEventListener('scrollEnd', () => {
+          skewSetter(0);
+        });
+      }
     });
     return () => ctx.revert();
   }, [load]);
@@ -693,6 +734,7 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
       <section
         ref={sectionRef}
         id="work"
+        aria-label="Proyectos"
         className="py-16 md:py-28 px-5 md:px-8 max-w-[1300px] mx-auto relative z-20"
       >
         {/* Encabezado */}
@@ -732,6 +774,7 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
                     idx={i}
                     isExpanded={expandedIdx === i}
                     onToggle={() => handleToggle(i)}
+                    skipAnimation={isReturning.current && expandedIdx === i}
                   />
                 </div>
               ))
@@ -756,26 +799,34 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
 
         <div className="min-h-[200px]">
           {offline && (
-            <div className="my-6 px-4 py-5 rounded-lg border border-amber-500/30 dark:border-amber-500/20 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20 dark:to-transparent backdrop-blur-sm">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 flex-shrink-0">
-                  <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+            <div className="my-6 px-5 py-6 rounded-2xl border border-red-500/15 dark:border-red-500/10 bg-gradient-to-br from-red-50/40 via-transparent to-transparent dark:from-red-950/15 dark:via-transparent backdrop-blur-sm">
+              <div className="flex items-start gap-4">
+                <div className="mt-0.5 flex-shrink-0 w-9 h-9 rounded-xl bg-red-500/10 dark:bg-red-500/5 border border-red-500/15 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                   </svg>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-lead mb-1">
-                    Conexión con GitHub limitada
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-ink mb-1.5">
+                    Error al conectar con GitHub API
                   </h3>
-                  <p className="text-[12px] leading-relaxed text-lead/70 mb-3">
-                    Los datos en vivo no están disponibles en este momento. Estoy mostrando una copia local de mis proyectos destacados para que puedas explorar mi trabajo. Los datos reales se sincronizarán cuando se restaure la conexión.
+                  {errorMsg && (
+                    <code className="block text-[11px] font-mono text-red-600 dark:text-red-400 bg-red-500/5 dark:bg-red-500/[0.07] rounded-lg px-3 py-2 mb-3 border border-red-500/10 break-all">
+                      {errorMsg}
+                    </code>
+                  )}
+                  <p className="text-[12px] leading-relaxed text-lead/60 mb-4">
+                    Para ver mis últimos repositorios, visita mi perfil de GitHub directamente.
                   </p>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="text-[11px] font-medium px-3 py-1.5 rounded border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 transition-colors duration-200"
+                  <a
+                    href="https://github.com/eneekoruiz"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-page text-[10px] font-bold uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-transform shadow-md"
                   >
-                    Reintentar conexión
-                  </button>
+                    Ver perfil en GitHub
+                    <ArrowUpRight size={12} />
+                  </a>
                 </div>
               </div>
             </div>
@@ -793,7 +844,7 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
                 </div>
               ))}
             </div>
-          ) : (
+          ) : !offline && repos.length > 0 ? (
             <div>
               {repos.slice(0, 10).map((r, i) => (
                 <RepoRow
@@ -803,10 +854,11 @@ export function Projects({ t, top3, repos, load, offline, BranchMergeBtn }: Proj
                   activeRepo={activeRepo}
                   setActiveRepo={setActiveRepo}
                   lineRef={el => { lineRefs.current[i] = el; }}
+                  isMobile={isMobile}
                 />
               ))}
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="flex justify-center mt-10 md:mt-12">

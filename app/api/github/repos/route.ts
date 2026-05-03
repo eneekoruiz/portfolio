@@ -15,15 +15,29 @@ export async function GET(request: NextRequest) {
     });
 
     const data = await res.json();
+
+    // Propagar error técnico real de GitHub al cliente
+    if (!res.ok) {
+      const ghMessage = data?.message || res.statusText || 'Unknown error';
+      return NextResponse.json(
+        { error: `${res.status}: ${ghMessage}` },
+        {
+          status: res.status,
+          headers: { 'Cache-Control': 'no-store' },
+        },
+      );
+    }
+
     return NextResponse.json(data, {
-      status: res.status,
+      status: 200,
       headers: {
         'Cache-Control': 'no-store',
       },
     });
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Network error';
     return NextResponse.json(
-      { error: 'Unable to fetch GitHub repositories' },
+      { error: `502: ${message}` },
       { status: 502 },
     );
   }

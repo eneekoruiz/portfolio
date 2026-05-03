@@ -62,7 +62,7 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
           return (
             <div
               key={tech}
-              className="mini-cyl-item absolute will-change-transform pointer-events-auto cursor-default"
+              className="mini-cyl-item absolute pointer-events-auto cursor-default"
               style={{ left: 0, top: 0, transformStyle: 'preserve-3d' }}
               onMouseEnter={() => setPaused(true)}
               onMouseLeave={() => setPaused(false)}
@@ -174,7 +174,7 @@ export function Skills({ t }: SkillsProps) {
 
   return (
     // Reducido de py-24 a py-12
-    <section ref={containerRef} id="skills" data-section="skills" className="py-12 px-8 max-w-[1200px] mx-auto relative z-10 border-t border-black/5 dark:border-white/5">
+    <section ref={containerRef} id="skills" data-section="skills" aria-label="Habilidades" className="py-12 px-8 max-w-[1200px] mx-auto relative z-10 border-t border-black/5 dark:border-white/5">
 
       {/* HEADER COMPACTO */}
       <div className="skills-header text-center mb-10 space-y-3 opacity-0">

@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { Mail, Github, Linkedin, ArrowUpRight, Check } from 'lucide-react';
+import { useMagnetic } from '../../hooks/useMagnetic';
 import type { Tx } from '../../lib/types';
 
 const EMAIL = 'eneekoruiz@gmail.com';
@@ -16,31 +17,8 @@ const CONTACTS = [
 /* ── Email copy card with clipboard UX ── */
 function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
   const [copied, setCopied] = useState(false);
-  const cardRef  = useRef<HTMLDivElement>(null);
+  const cardRef  = useMagnetic<HTMLDivElement>({ strength: 0.06, innerStrength: 0.09 });
   const iconRef  = useRef<HTMLDivElement>(null);
-
-  // Magnetic effect
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-    const iconEl = iconRef.current;
-
-    const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const dx = (e.clientX - (r.left + r.width  / 2)) * 0.06;
-      const dy = (e.clientY - (r.top  + r.height / 2)) * 0.06;
-      gsap.to(el, { x: dx, y: dy, duration: .35, ease: 'power3.out' });
-      if (iconEl) gsap.to(iconEl, { x: dx * 1.5, y: dy * 1.5, duration: .25, ease: 'power3.out' });
-    };
-    const onLeave = () => {
-      gsap.to(el, { x: 0, y: 0, duration: .55, ease: 'elastic.out(1,.4)' });
-      if (iconEl) gsap.to(iconEl, { x: 0, y: 0, duration: .45, ease: 'elastic.out(1,.4)' });
-    };
-
-    el.addEventListener('mousemove', onMove);
-    el.addEventListener('mouseleave', onLeave);
-    return () => { el.removeEventListener('mousemove', onMove); el.removeEventListener('mouseleave', onLeave); };
-  }, []);
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -81,7 +59,7 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
       >
         <div className="flip-inner min-h-[180px]">
           <div
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} transition-all duration-300`}
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} transition-all duration-300 dark:bg-[#111]/80`}
             style={{ boxShadow: `inset 0 0 60px ${c.glow}` }}
           >
             <div ref={iconRef} className="transition-all duration-200">
@@ -112,36 +90,15 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
 
 /* ── Standard social card with magnetic icon ── */
 function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useMagnetic<HTMLDivElement>({ strength: 0.06, innerStrength: 0.1 });
   const iconRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-    const iconEl = iconRef.current;
-
-    const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const dx = (e.clientX - (r.left + r.width  / 2)) * 0.06;
-      const dy = (e.clientY - (r.top  + r.height / 2)) * 0.06;
-      gsap.to(el, { x: dx, y: dy, duration: .35, ease: 'power3.out' });
-      if (iconEl) gsap.to(iconEl, { x: dx * 1.6, y: dy * 1.6, duration: .25, ease: 'power3.out' });
-    };
-    const onLeave = () => {
-      gsap.to(el, { x: 0, y: 0, duration: .55, ease: 'elastic.out(1,.4)' });
-      if (iconEl) gsap.to(iconEl, { x: 0, y: 0, duration: .45, ease: 'elastic.out(1,.4)' });
-    };
-
-    el.addEventListener('mousemove', onMove);
-    el.addEventListener('mouseleave', onLeave);
-    return () => { el.removeEventListener('mousemove', onMove); el.removeEventListener('mouseleave', onLeave); };
-  }, []);
 
   return (
     <div ref={cardRef} className="flip-wrap sr">
       <a href={c.href} target="_blank" rel="noopener noreferrer" aria-label={c.label} data-h className="block h-full no-underline">
         <div className="flip-inner min-h-[180px]">
-          <div className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd}`} style={{ boxShadow: `inset 0 0 60px ${c.glow}` }}>
+          <div className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} dark:bg-[#111]/80`} style={{ boxShadow: `inset 0 0 60px ${c.glow}` }}>
+
             <div ref={iconRef}>
               <c.icon size={28} style={{ color: c.bg }} aria-hidden="true" />
             </div>
@@ -165,7 +122,7 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
 
 export function Contact({ t }: { t: Tx }) {
   return (
-    <section id="contact" data-section="contact" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-white/40 dark:bg-transparent">
+    <section id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-white/40 dark:bg-transparent">
       <div className="px-8 max-w-[1200px] mx-auto">
         <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>
         <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3">{t.coH}</h2>

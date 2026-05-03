@@ -9,6 +9,7 @@ export function useGitHub(t: Tx) {
   const [allRepos, setAllRepos] = useState<Repo[]>([]);
   const [load, setLoad] = useState(true);
   const [offline, setOffline] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const PROJECT_IDS = [
     'ana-peluquera',
@@ -54,19 +55,6 @@ export function useGitHub(t: Tx) {
     });
   };
 
-  const buildFallback = () => PROJECT_IDS.map((id, i) => ({
-    n: `0${i + 1}`,
-    name: id,
-    tag: id === 'ana-peluquera' ? 'Full-Stack' : id === 'who-are-ya-backend' ? 'Backend' : 'Engineering',
-    year: '2026',
-    size: '---',
-    desc: getDesc(id),
-    langs: customStacks[id] || [],
-    challenge: 'Optimización de arquitectura.',
-    architecture: 'Lead Architect',
-    outcome: 'Producción'
-  }));
-
   useEffect(() => {
     let idleHandle: number | null = null;
     let timeoutHandle: NodeJS.Timeout | null = null;
@@ -95,16 +83,28 @@ export function useGitHub(t: Tx) {
           },
         });
 
-        if (!res.ok) throw new Error("GitHub API Error");
+        if (!res.ok) {
+          // Parsear el error técnico real desde la API route
+          let errText = `${res.status}: ${res.statusText}`;
+          try {
+            const errBody = await res.json();
+            if (errBody?.error) errText = errBody.error;
+          } catch (_) {}
+          throw new Error(errText);
+        }
+
         const payload: Repo[] = await res.json();
         setAllRepos(payload);
+        setErrorMsg('');
 
       } catch (err) {
+        const message = err instanceof Error ? err.message : 'Error de red desconocido';
         if (process.env.NODE_ENV === 'development') {
-          console.warn('GitHub offline o error, cargando fallback de 5 proyectos.', err);
+          console.warn('GitHub API error:', message);
         }
         setAllRepos([]);
         setOffline(true);
+        setErrorMsg(message);
       } finally {
         clearTimeout(timeoutId);
         setLoad(false);
@@ -125,7 +125,23 @@ export function useGitHub(t: Tx) {
     };
   }, []);
 
+  /**
+   * Derive top3 (portfolio projects) and repos (GitHub activity) from API data.
+   *
+   * KEY DESIGN DECISION (Fase 1, Punto 3):
+   * - top3 is ALWAYS built — they use static author data (stacks, descriptions)
+   *   and are only enriched with metadata (date, size) when the API succeeds.
+   * - repos (GitHub Activity section) is only populated when the API succeeds.
+   * - When offline/error: repos stays empty, the error UI takes over.
+   *   No "local copy" fallback that would mask the real error.
+   */
   useEffect(() => {
+    if (load) return;
+
+    // Always build portfolio project cards (they don't depend on the API).
+    // If we have API data, enrich them with metadata; otherwise, use defaults.
+    setTop3(buildProjectCards(allRepos));
+
     if (allRepos.length > 0) {
       const recent = allRepos
         .filter(r => !r.fork)
@@ -133,16 +149,14 @@ export function useGitHub(t: Tx) {
         .map(r => ({ ...r, langs: [r.language].filter(Boolean) as string[] }));
 
       setRepos(recent as RepoFull[]);
-      setTop3(buildProjectCards(allRepos));
       setOffline(false);
-      return;
-    }
-
-    if (!load) {
+      setErrorMsg('');
+    } else {
+      // API failed or returned empty — repos section stays empty.
+      // The error UI in Projects.tsx will show the technical error + CTA.
       setRepos([]);
-      setTop3(buildFallback() as ProjectCard[]);
     }
   }, [allRepos, load, t]);
 
-  return { repos, top3, load, offline };
+  return { repos, top3, load, offline, errorMsg };
 }
