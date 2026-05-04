@@ -240,12 +240,28 @@ export default function ProjectPage() {
   // 💎 TRANSITION: Exit liquid curtain to prevent FOUC on home page
   const handleReturn = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
-    router.prefetch('/');
-    (window as any).__lenis?.stop?.();
+    // 🚀 AGGRESSIVE CLEANUP: Stop everything that could block navigation
+    const lenis = (window as any).__lenis;
+    lenis?.stop?.();
+    
+    // Kill any active GSAP tweens on the body or fixed elements
+    gsap.killTweensOf(document.body);
+    document.querySelectorAll('[id^="return-overlay"]').forEach(el => el.remove());
 
-    // Remove stale overlays
-    document.getElementById('return-overlay')?.remove();
+    const navigate = () => {
+      sessionStorage.setItem('hasSeenIntro', 'true');
+      lenis?.start?.();
+      router.replace('/', { scroll: false });
+      
+      // 🚨 ABSOLUTE FALLBACK: If router doesn't respond in 800ms
+      setTimeout(() => {
+        if (window.location.pathname !== '/') {
+           window.location.href = '/';
+        }
+      }, 800);
+    };
 
     // 🌊 Punto 8 — SVG Liquid Curtain (replaces plain div overlay)
     const svg = createLiquidCurtain({
@@ -256,20 +272,18 @@ export default function ProjectPage() {
     document.body.appendChild(svg);
 
     animateLiquidCurtainIn(svg, {
-      duration: 0.7,
-      onMidway: () => {
-        sessionStorage.setItem('hasSeenIntro', 'true');
-        router.replace('/', { scroll: false });
-      },
+      duration: 0.6,
+      onMidway: navigate,
       onComplete: () => {
-        sessionStorage.setItem('hasSeenIntro', 'true');
+        setTimeout(() => svg.remove(), 200);
       },
     });
 
     // Safety fallback: force navigation if animation hangs
     setTimeout(() => {
-      sessionStorage.setItem('hasSeenIntro', 'true');
-      router.replace('/', { scroll: false });
+      if (document.getElementById('return-overlay')) {
+        navigate();
+      }
     }, 1500);
   };
 

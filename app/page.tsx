@@ -143,6 +143,20 @@ export default function Home() {
     };
   }, [t]);
 
+  // ── Global Transition Cleanup (Safety for return from project) ────────
+  useEffect(() => {
+    const cleanup = () => {
+      document.querySelectorAll('[id^="return-overlay"]').forEach(el => {
+        gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => el.remove() });
+      });
+      (window as any).__lenis?.start?.();
+    };
+    cleanup();
+    // Safety delay for slow navigations
+    const timer = setTimeout(cleanup, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   // ── Bloquear scroll con modal/menú ───────────────────────────────────
   useEffect(() => {
     document.body.style.overflow = cmd || menu ? 'hidden' : '';
