@@ -332,8 +332,8 @@ export default function ProjectPage() {
         subtitle={content?.subtitle ?? ''}
         accent={theme.accent}
         accentBg={theme.helixA}
-        liveUrl={liveUrl}
-        videoUrl={videoUrl}
+        liveUrl={liveUrl ?? undefined}
+        videoUrl={videoUrl ?? undefined}
         iframeTitle={`${safeId} Preview`}
         label={theme.label}
         langs={summary?.langs ?? []}
