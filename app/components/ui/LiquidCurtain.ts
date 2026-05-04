@@ -110,7 +110,7 @@ export function animateLiquidCurtainIn(
 ) {
   clearTweens(svg);
   
-  const { duration = 0.48, onMidway, onComplete } = opts;
+  const { duration = 0.4, onMidway, onComplete } = opts; // Snappier default
   const path1 = svg.querySelector('.liquid-base')!;
   const path2 = svg.querySelector('.liquid-main')!;
   const direction = path1.getAttribute('data-direction') || 'up';
@@ -122,15 +122,15 @@ export function animateLiquidCurtainIn(
   const t1 = gsap.to(p1, {
     value: 1,
     duration,
-    ease: 'power3.inOut',
+    ease: 'expo.inOut', // Faster snap
     onUpdate: () => path1.setAttribute('d', buildCurtainPath(direction as 'up' | 'down', p1.value)),
   });
 
   const t2 = gsap.to(p2, {
     value: 1,
     duration,
-    delay: 0.05,
-    ease: 'power3.inOut',
+    delay: 0.04, // Reduced delay
+    ease: 'expo.inOut',
     onUpdate: () => {
       const t = p2.value;
       path2.setAttribute('d', buildCurtainPath(direction as 'up' | 'down', t));

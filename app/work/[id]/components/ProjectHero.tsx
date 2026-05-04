@@ -82,7 +82,7 @@ export function ProjectHero({
         trigger: heroRef.current,
         start: 'top top',
         end: '+=160%', // Slightly longer for more control
-        scrub: 1.2,
+        scrub: 1, // Snappier scrub
         pin: true,
         anticipatePin: 1,
         onUpdate: (self) => {
@@ -141,10 +141,10 @@ export function ProjectHero({
           height: '85vh',
           opacity: 1,
           filter: 'blur(0px) brightness(1)',
-          ease: 'expo.inOut',
-          duration: 3,
+          ease: 'expo.out', // Snappier entrance
+          duration: 2, // Reduced duration
         },
-        0.3
+        0.2 // Earlier start
       )
       
       // Phase 3: Final Depth Adjustment
@@ -175,7 +175,7 @@ export function ProjectHero({
         rotateY: xPercent * 15,
         rotateX: -yPercent * 15,
         scale: 1.05,
-        duration: 0.5,
+        duration: 0.4, // Snappier
         ease: 'power2.out',
         overwrite: 'auto'
       });
@@ -185,7 +185,7 @@ export function ProjectHero({
           x: xPercent * 40,
           y: yPercent * 40,
           opacity: 0.4,
-          duration: 1.5,
+          duration: 1.2, // Snappier
         });
       }
 
@@ -210,7 +210,7 @@ export function ProjectHero({
     if (isInteracting) {
       gsap.fromTo('.studio-bar', 
         { y: 50, opacity: 0, scale: 0.9 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.75)' }
+        { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' }
       );
     }
   }, { scope: heroRef, dependencies: [isInteracting] });
