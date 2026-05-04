@@ -231,6 +231,9 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
     // On return from /work/[id]: open instantly so scroll restoration is accurate.
     if (skipAnimation && isExpanded) {
       gsap.set(body, { height: 'auto', opacity: 1 });
+      // Force a reflow so the browser calculates the correct height
+      // eslint-disable-next-line no-unused-expressions
+      body.offsetHeight;
       return;
     }
 
@@ -240,7 +243,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
         height:   isExpanded ? 'auto' : 0,
         opacity:  isExpanded ? 1 : 0,
         duration: 0.22,
-        ease:     isExpanded ? 'expo.out' : 'power2.inOut',
+        ease:     isExpanded ? 'power3.out' : 'power2.inOut',
       });
     });
 
@@ -700,9 +703,9 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
           start: 'top bottom',
           end: 'bottom top',
           onUpdate: (self) => {
-            // Clamp velocity to a reasonable range (-3 to 3 degrees)
+            // Clamp velocity to a reasonable range (-3.5 to 3.5 degrees)
             const velocity = self.getVelocity();
-            const skew = gsap.utils.clamp(-3, 3, velocity / 400);
+            const skew = gsap.utils.clamp(-3.5, 3.5, velocity / 320);
             skewSetter(skew);
           },
         });
@@ -761,7 +764,7 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
 
         {/* Lista */}
         <div className="projects-list border-t border-black/10 dark:border-white/10">
-          {(load || top3.length === 0)
+          {top3.length === 0
             ? [0, 1, 2, 3, 4].map(i => (
                 <div key={i} className="work-row-anim">
                   <SkeletonRow idx={i} />

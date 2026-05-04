@@ -11,16 +11,17 @@ import { useEffect, useRef, useState } from 'react';
 const N        = 2_500;
 const TWO_PI   = Math.PI * 2;
 const ARMS     = 3;         // spiral arms
+// Default frame period (ms) — high in normal mode, relaxed in lite mode
 const FPS_CAP  = 1000 / 144;
 
 // Particle: [x, y, vx, vy, baseR, baseTheta, arm, hue, size]
 const STRIDE = 9;
 
-function initParticles(W: number, H: number): Float32Array {
-  const buf = new Float32Array(N * STRIDE);
+function initParticles(count: number, W: number, H: number): Float32Array {
+  const buf = new Float32Array(count * STRIDE);
   const cx = W / 2, cy = H / 2;
 
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < count; i++) {
     const off  = i * STRIDE;
     const arm  = i % ARMS;
     // Distribute along arm — inner dense, outer sparse
@@ -54,6 +55,7 @@ export default function LabPage() {
   const mouseRef = useRef({ x: 0.5, y: 0.5, active: false });
   const timeRef  = useRef(0);
   const [fps,    setFps]    = useState(0);
+  const [particles, setParticles] = useState(N);
   const [attract, setAttract] = useState(false);
   const [speed,   setSpeed]   = useState(1.0);
 
@@ -91,7 +93,13 @@ export default function LabPage() {
     cv.addEventListener('touchmove', onTouch, { passive: true });
     cv.addEventListener('touchend', () => { mouseRef.current.active = false; });
 
-    let buf = initParticles(W, H);
+    // Detect lightweight mode. This is set by the layout inline script
+    const LITE = !!((window as any).__LITE) || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const localN = LITE ? Math.max(400, Math.floor(N * 0.22)) : N;
+    setParticles(localN);
+
+    let buf = initParticles(localN, W, H);
     let raf = 0, lastT = 0, frames = 0, lastFpsT = 0;
     let attractMode = false;
     let simSpeed    = 1.0;
@@ -101,15 +109,17 @@ export default function LabPage() {
       setSpeed:   (v: number)  => { simSpeed = v;    },
     };
 
-    const ORBIT_SPEED  = 0.00022;   // base angular velocity
-    const DAMPEN       = 0.985;
-    const MOUSE_PULL   = 0.000035;
-    const CORE_PULL    = 0.000012;  // gentle pull toward galactic center
+    const ORBIT_SPEED  = LITE ? 0.00018 : 0.00022;   // base angular velocity
+    const DAMPEN       = LITE ? 0.987 : 0.985;
+    const MOUSE_PULL   = LITE ? 0.00002 : 0.000035;
+    const CORE_PULL    = LITE ? 0.00001 : 0.000012;  // gentle pull toward galactic center
+
+    const framePeriod = LITE ? (1000 / 45) : FPS_CAP; // ms per frame
 
     const render = (t: number) => {
       raf = requestAnimationFrame(render);
       const dt = t - lastT;
-      if (dt < FPS_CAP - 1) return;
+      if (dt < framePeriod - 2) return;
       lastT = t;
       timeRef.current += dt * simSpeed;
 
@@ -125,7 +135,7 @@ export default function LabPage() {
       ctx.fillRect(0, 0, W, H);
 
       /* ── Update & draw ── */
-      for (let i = 0; i < N; i++) {
+      for (let i = 0; i < localN; i++) {
         const o = i * STRIDE;
         let px = buf[o],   py = buf[o+1];
         let vx = buf[o+2], vy = buf[o+3];
@@ -189,14 +199,16 @@ export default function LabPage() {
         }
       }
 
-      /* Center bulge glow */
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
-      grad.addColorStop(0, 'rgba(120,180,255,0.12)');
-      grad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.beginPath();
-      ctx.arc(cx, cy, 90, 0, TWO_PI);
-      ctx.fillStyle = grad;
-      ctx.fill();
+      // Slight center glow (reduced in LITE mode to avoid extra work)
+      if (!LITE) {
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
+        grad.addColorStop(0, 'rgba(120,180,255,0.12)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(cx, cy, 90, 0, TWO_PI);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
     };
 
     raf = requestAnimationFrame(render);
@@ -225,7 +237,7 @@ export default function LabPage() {
         <div className="bg-black/40 backdrop-blur-md rounded-2xl px-5 py-3 border border-white/[0.08]">
           <h1 className="font-mono font-bold text-white text-[15px] tracking-[.2em] mb-0.5">GALACTIC SPIRAL</h1>
           <p className="font-mono text-[9px] text-white/30 tracking-[.18em]">
-            {N.toLocaleString()} PARTICLES · {fps} FPS
+            {particles.toLocaleString()} PARTICLES · {fps} FPS
           </p>
         </div>
         <a href="/" className="pointer-events-auto bg-black/40 backdrop-blur-md border border-white/[0.08] hover:border-white/20 rounded-xl px-4 py-2 font-mono text-[11px] text-white/50 hover:text-white/80 transition-all flex items-center gap-2">

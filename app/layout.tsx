@@ -86,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="theme-color" content="#f5f5f7" />
         <meta name="color-scheme" content="light dark" />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var q=new URLSearchParams(location.search); if(q.get('lite')==='1'){window.__LITE=true; localStorage.setItem('lite','1'); document.documentElement.setAttribute('data-lite','1'); return;} if(localStorage.getItem('lite')==='1'){window.__LITE=true; document.documentElement.setAttribute('data-lite','1'); return;} var dm = navigator.deviceMemory || 0; if(dm && dm <= 1) { window.__LITE = true; document.documentElement.setAttribute('data-lite','1'); } }catch(e){} })();` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

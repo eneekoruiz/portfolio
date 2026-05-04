@@ -20,7 +20,16 @@
 
 import gsap from 'gsap';
 
-// ── SVG Creation ──────────────────────────────────────────────
+// Map to track active tweens per SVG to prevent race conditions during rapid navigation
+const activeTweens = new Map<SVGSVGElement, gsap.core.Tween[]>();
+
+function clearTweens(svg: SVGSVGElement) {
+  const tweens = activeTweens.get(svg);
+  if (tweens) {
+    tweens.forEach(t => t.kill());
+    activeTweens.delete(svg);
+  }
+}
 
 export interface LiquidCurtainOptions {
   /** Fill color of the main curtain */
@@ -99,7 +108,9 @@ export function animateLiquidCurtainIn(
   svg: SVGSVGElement,
   opts: LiquidAnimateOptions = {},
 ) {
-  const { duration = 0.55, onMidway, onComplete } = opts;
+  clearTweens(svg);
+  
+  const { duration = 0.48, onMidway, onComplete } = opts;
   const path1 = svg.querySelector('.liquid-base')!;
   const path2 = svg.querySelector('.liquid-main')!;
   const direction = path1.getAttribute('data-direction') || 'up';
@@ -108,41 +119,36 @@ export function animateLiquidCurtainIn(
   const p1 = { value: 0 };
   const p2 = { value: 0 };
 
-  // Animación de la capa oscura (va primero)
-  gsap.to(p1, {
+  const t1 = gsap.to(p1, {
     value: 1,
     duration,
     ease: 'power3.inOut',
     onUpdate: () => path1.setAttribute('d', buildCurtainPath(direction as 'up' | 'down', p1.value)),
   });
 
-  // Animación de la capa principal (va detrás)
-  gsap.to(p2, {
+  const t2 = gsap.to(p2, {
     value: 1,
     duration,
-    delay: 0.1, // Desfase para el efecto doble
+    delay: 0.05,
     ease: 'power3.inOut',
     onUpdate: () => {
       const t = p2.value;
       path2.setAttribute('d', buildCurtainPath(direction as 'up' | 'down', t));
-
-      // Fire midway callback at ~80% coverage
       if (!midwayFired && t >= 0.78) {
         midwayFired = true;
         onMidway?.();
       }
     },
     onComplete: () => {
-      // Ensure final path is perfectly flat
-      const finalPath = direction === 'up' 
-        ? 'M 0 0 L 100 0 L 100 100 L 0 100 Z'
-        : 'M 0 0 L 100 0 L 100 100 L 0 100 Z';
-      
+      const finalPath = 'M 0 0 L 100 0 L 100 100 L 0 100 Z';
       path1.setAttribute('d', finalPath);
       path2.setAttribute('d', finalPath);
+      activeTweens.delete(svg);
       onComplete?.();
     },
   });
+
+  activeTweens.set(svg, [t1, t2]);
 }
 
 // ── Animation OUT (curtain reveals — used on the destination page) ──
@@ -162,7 +168,9 @@ export function animateLiquidCurtainOut(
   svg: SVGSVGElement,
   opts: LiquidRevealOptions = {},
 ) {
-  const { duration = 0.45, onComplete } = opts;
+  clearTweens(svg);
+
+  const { duration = 0.42, onComplete } = opts;
   const path1 = svg.querySelector('.liquid-base')!;
   const path2 = svg.querySelector('.liquid-main')!;
   const direction = path1.getAttribute('data-direction') || 'up';
@@ -170,26 +178,27 @@ export function animateLiquidCurtainOut(
   const p1 = { value: 0 };
   const p2 = { value: 0 };
 
-  // Capa oscura desaparece primero
-  gsap.to(p1, {
+  const t1 = gsap.to(p1, {
     value: 1,
     duration,
     ease: 'power3.out',
     onUpdate: () => path1.setAttribute('d', buildRevealPath(direction as 'up' | 'down', p1.value)),
   });
 
-  // Capa principal desaparece ligeramente después
-  gsap.to(p2, {
+  const t2 = gsap.to(p2, {
     value: 1,
     duration,
-    delay: 0.1,
+    delay: 0.06,
     ease: 'power3.out',
     onUpdate: () => path2.setAttribute('d', buildRevealPath(direction as 'up' | 'down', p2.value)),
     onComplete: () => {
       svg.remove();
+      activeTweens.delete(svg);
       onComplete?.();
     },
   });
+
+  activeTweens.set(svg, [t1, t2]);
 }
 
 // ── Path builders ─────────────────────────────────────────────

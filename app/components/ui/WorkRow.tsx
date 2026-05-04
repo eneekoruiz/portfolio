@@ -62,7 +62,9 @@ export function WorkRow({ proj, idx }: { proj: ProjectCard; idx: number }) {
 
   const xTo = useRef<gsap.QuickToFunc>();
   const yTo = useRef<gsap.QuickToFunc>();
-  const rotateTo = useRef<gsap.QuickToFunc>();
+  const rotateXTo = useRef<gsap.QuickToFunc>();
+  const rotateYTo = useRef<gsap.QuickToFunc>();
+  const zTo = useRef<gsap.QuickToFunc>();
 
   const slug = proj.name.toLowerCase().replace(/[\s_]+/g, '-');
   const summary = SUMMARIES[slug] || { impact: proj.desc, challenge: proj.challenge };
@@ -71,9 +73,11 @@ export function WorkRow({ proj, idx }: { proj: ProjectCard; idx: number }) {
 
   useEffect(() => {
     if (!followerRef.current) return;
-    xTo.current = gsap.quickTo(followerRef.current, 'x', { duration: 0.32, ease: 'power3' });
-    yTo.current = gsap.quickTo(followerRef.current, 'y', { duration: 0.32, ease: 'power3' });
-    rotateTo.current = gsap.quickTo(followerRef.current, 'rotate', { duration: 0.22, ease: 'power2' });
+    xTo.current = gsap.quickTo(followerRef.current, 'x', { duration: 0.5, ease: 'power3.out' });
+    yTo.current = gsap.quickTo(followerRef.current, 'y', { duration: 0.5, ease: 'power3.out' });
+    rotateXTo.current = gsap.quickTo(followerRef.current, 'rotateX', { duration: 0.5, ease: 'power2.out' });
+    rotateYTo.current = gsap.quickTo(followerRef.current, 'rotateY', { duration: 0.5, ease: 'power2.out' });
+    zTo.current = gsap.quickTo(followerRef.current, 'z', { duration: 0.5, ease: 'power2.out' });
   }, [mounted]);
 
   const toggle = useCallback((e: React.MouseEvent) => {
@@ -101,22 +105,30 @@ export function WorkRow({ proj, idx }: { proj: ProjectCard; idx: number }) {
 
   const onMove = (e: React.MouseEvent) => {
     if (window.matchMedia('(pointer: coarse)').matches) return;
+    
     xTo.current?.(e.clientX);
     yTo.current?.(e.clientY);
-    const box = e.currentTarget.getBoundingClientRect();
-    rotateTo.current?.((e.clientX - box.left - box.width / 2) * 0.02);
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const xRel = (e.clientX - rect.left) / rect.width - 0.5;
+    const yRel = (e.clientY - rect.top) / rect.height - 0.5;
+    
+    // Extreme 3D Tilt
+    rotateYTo.current?.(xRel * 40); // Horizontal tilt
+    rotateXTo.current?.(yRel * -40); // Vertical tilt
+    zTo.current?.(50); // Move closer on move
   };
 
   const onEnter = () => {
     if (window.matchMedia('(pointer: coarse)').matches) return;
-    gsap.to(followerRef.current, { scale: 1, opacity: 1, duration: 0.28, ease: 'expo.out' });
-    gsap.to(titleRef.current, { x: 16, duration: 0.24, ease: 'power2.out' });
+    gsap.to(followerRef.current, { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.2)' });
+    gsap.to(titleRef.current, { x: 24, duration: 0.3, ease: 'power3.out' });
     videoRef.current?.play().catch(() => {});
   };
 
   const onLeave = () => {
-    gsap.to(followerRef.current, { scale: 0, opacity: 0, duration: 0.22 });
-    gsap.to(titleRef.current, { x: 0, duration: 0.24, ease: 'power2.out' });
+    gsap.to(followerRef.current, { scale: 0, opacity: 0, duration: 0.3, z: 0, rotateX: 0, rotateY: 0 });
+    gsap.to(titleRef.current, { x: 0, duration: 0.3, ease: 'power3.out' });
     videoRef.current?.pause();
   };
 
@@ -207,8 +219,12 @@ export function WorkRow({ proj, idx }: { proj: ProjectCard; idx: number }) {
         <div
           ref={followerRef}
           className="fixed top-0 left-0 z-[150] pointer-events-none opacity-0 scale-0 origin-center -translate-x-1/2 -translate-y-1/2 will-change-transform"
+          style={{ perspective: '1000px' }}
         >
-          <div className="w-[420px] aspect-[16/10] rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-page/50 backdrop-blur-2xl">
+          <div 
+            className="w-[480px] aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-white/20 bg-page/10 backdrop-blur-3xl"
+            style={{ transformStyle: 'preserve-3d' }}
+          >
             <video
               ref={videoRef}
               src={proj.video || `/${slug}.mp4`}

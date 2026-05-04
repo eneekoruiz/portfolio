@@ -96,10 +96,15 @@ export function useGitHub(t: Tx) {
         const payload: Repo[] = await res.json();
         setAllRepos(payload);
         setErrorMsg('');
+        setOffline(false);
+        setLoad(false);
 
       } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') {
-          // Ignoramos el error si fue abortado intencionadamente (ej. Strict Mode double mount)
+          // Si es un abort por timeout, marcamos offline pero terminamos la carga
+          setOffline(true);
+          setErrorMsg('Timeout: La API de GitHub no respondió a tiempo');
+          setLoad(false);
           return;
         }
         const message = err instanceof Error ? err.message : 'Error de red desconocido';
@@ -140,24 +145,22 @@ export function useGitHub(t: Tx) {
    *   No "local copy" fallback that would mask the real error.
    */
   useEffect(() => {
-    if (load) return;
-
-    // Always build portfolio project cards (they don't depend on the API).
-    // If we have API data, enrich them with metadata; otherwise, use defaults.
+    // Siempre construimos top3 (Selected Works), incluso si aún cargamos la API.
+    // Esto evita el skeleton inicial innecesario en la sección principal.
     setTop3(buildProjectCards(allRepos));
+
+    if (load) return;
 
     if (allRepos.length > 0) {
       const recent = allRepos
         .filter(r => !r.fork)
         .slice(0, 8)
-        .map(r => ({ ...r, langs: [r.language].filter(Boolean) as string[] }));
+        .map(r => ({ ...r, langs: (r as any).all_languages || [r.language].filter(Boolean) }));
 
       setRepos(recent as RepoFull[]);
       setOffline(false);
       setErrorMsg('');
     } else {
-      // API failed or returned empty — repos section stays empty.
-      // The error UI in Projects.tsx will show the technical error + CTA.
       setRepos([]);
     }
   }, [allRepos, load, t]);

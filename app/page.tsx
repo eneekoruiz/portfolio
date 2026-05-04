@@ -85,12 +85,11 @@ export default function Home() {
 
   // ── Estado ──────────────────────────────────────────────────────────────
   const { phase, setPhase, markSeen } = useIntro();
-  const [showHero, setShowHero] = useState(false);
   const [lang, setLang] = useState<Lang>('es');
   const [menu, setMenu] = useState(false);
   const [cmd, setCmd] = useState(false);
 
-  const ready = phase === 'ready' || showHero;
+  const ready = phase === 'ready';
   const t = TX[lang];
   const reduced = usePreferredMotion();
   const greeting = useGreeting(t.times, t.greetingFn);
@@ -226,7 +225,7 @@ export default function Home() {
   }, [menu, reduced]);
 
   useLayoutEffect(() => {
-    if (!ready) return;
+    if (!ready || load) return;
 
     try {
       const raw = sessionStorage.getItem(PROJECTS_NAV_KEY);
@@ -238,13 +237,31 @@ export default function Home() {
 
         // Immediate scroll — runs before first paint (useLayoutEffect)
         window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
-        // Also tell Lenis about the scroll position
-        lenis?.scrollTo?.(saved.scrollY, { immediate: true, force: true });
       }
     } catch (_) {
       // Ignore sessionStorage errors and continue with normal render.
     }
-  }, [ready]);
+  }, [ready, load]);
+
+  useEffect(() => {
+    if (!ready || load) return;
+
+    // FIX Punto 5: After Projects has opened the accordion in useLayoutEffect,
+    // we now re-sync Lenis and refresh ScrollTrigger to match the new DOM height.
+    const lenis = (window as any).__lenis;
+    try {
+      const raw = sessionStorage.getItem(PROJECTS_NAV_KEY);
+      const saved = raw ? JSON.parse(raw) : null;
+      if (saved?.scrollY != null) {
+        // Tell Lenis about the scroll position and restart it
+        lenis?.scrollTo?.(saved.scrollY, { immediate: true, force: true });
+        lenis?.start?.();
+      }
+    } catch (_) {
+      // Ignore sessionStorage errors
+    }
+    ScrollTrigger.refresh();
+  }, [ready, load]);
 
   useEffect(() => {
     if (!ready) return;
@@ -424,7 +441,10 @@ export default function Home() {
 
   // ── Callbacks de Intro ────────────────────────────────────────────────
   const onPreloaderDone = useCallback(() => setPhase('splash'), [setPhase]);
-  const onSplashReveal = useCallback(() => setShowHero(true), []);
+  const onSplashReveal = useCallback(() => {
+    // onReveal es llamado mientras el IdentitySplash está saliendo.
+    // Podría usarse para pre-cargar animaciones aquí si es necesario.
+  }, []);
   const onSplashComplete = useCallback(() => {
     setPhase('ready');
     markSeen();
@@ -435,15 +455,17 @@ export default function Home() {
 
   return (
     <>
-      {/* ── SPLASH SCREEN / LOADING ── */}
-      {phase === 'loading' && <Preloader onDone={onPreloaderDone} />}
-
-      {(phase === 'splash' || (phase === 'ready' && !ready)) && (
-        <IdentitySplash
-          lang={lang}
-          onReveal={onSplashReveal}
-          onComplete={onSplashComplete}
-        />
+      {/* ── SPLASH SCREEN / LOADING (Sincronizados para fluidez) ── */}
+      {(phase === 'loading' || phase === 'splash' || (phase === 'ready' && !ready)) && (
+        <>
+          <IdentitySplash
+            lang={lang}
+            onReveal={onSplashReveal}
+            onComplete={onSplashComplete}
+            active={phase === 'splash' || phase === 'ready'}
+          />
+          {phase === 'loading' && <Preloader onDone={onPreloaderDone} />}
+        </>
       )}
 
       <InfallibleCursor />
@@ -513,8 +535,12 @@ export default function Home() {
       <div
         ref={main}
         style={{
-          // Ocultar el contenido real durante el preloader para evitar el "flash"
-          visibility: (phase === 'loading' || phase === 'checking') ? 'hidden' : 'visible',
+          // FIX Punto 3: Ocultar ESTRICTAMENTE el contenido durante TODAS las fases pre-ready
+          // (loading + splash) para evitar el parpadeo / bleed-through visual
+          visibility: ready ? 'visible' : 'hidden',
+          opacity:    ready ? 1 : 0,
+          height:     ready ? 'auto' : 0,
+          overflow:   ready ? 'visible' : 'hidden',
           // Evitar interacciones hasta que termine el splash
           pointerEvents: ready ? 'auto' : 'none',
         }}
@@ -582,7 +608,13 @@ export default function Home() {
         </header>
 
         {/* ════ SECCIONES ════ */}
-        <Hero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} />
+        <Hero
+          t={t}
+          greeting={greeting}
+          reduced={reduced}
+          setMag={() => { }}
+          phase={phase}
+        />
         <Skills t={t} />
         <Projects t={t} top3={top3} repos={repos} load={load} offline={offline} errorMsg={errorMsg} BranchMergeBtn={BranchMergeBtn} />
         <About t={t} />

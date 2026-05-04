@@ -33,9 +33,26 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Optimize Tailwind transitions globally for maximum smoothness */
+.transition {
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition-duration: 300ms;
+}
+.transition-colors,
+.transition-opacity,
+.transition-transform {
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition-duration: 300ms;
+}
+.duration-200 { transition-duration: 200ms; }
+.duration-300 { transition-duration: 300ms; }
+.duration-500 { transition-duration: 500ms; }
+
 html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -43,9 +60,12 @@ body {
   background: var(--page);
   color: var(--ink);
   overflow-x: hidden;
-  transition: background 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              color 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              border-color 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Optimized transitions: faster for responsiveness, cubic-bezier for organic feel */
+  transition: background 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Prevent layout shifts and ensure smooth animations */
+  will-change: auto;
 }
 
 ::-webkit-scrollbar { width: 4px; }
@@ -95,14 +115,29 @@ body::after {
   body::after { display: none; }
 }
 
-/* ── 5. SCROLL REVEAL ── */
-.sr { opacity: 0; transform: translateY(30px); }
-.sr.in {
-  opacity: 1; transform: translateY(0);
-  transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);
+/* Disable heavy visuals when lite mode is active */
+html[data-lite='1'] body::after { display: none !important; }
+html[data-lite='1'] .cur-dot, html[data-lite='1'] .cur-ring { display: none !important; }
+html[data-lite='1'] html, html[data-lite='1'] body, html[data-lite='1'] a, html[data-lite='1'] button { cursor: auto !important; }
+html[data-lite='1'] .will-gpu { will-change: auto !important; transform: none !important; }
+
+/* ── 5. GLOBAL ANIMATION DEFAULTS ── */
+/* Prevent forced layout calculations during animations */
+.will-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
-/* ── 6. BUTTON STATES ── */
+/* ── 6. SCROLL REVEAL — Optimized for smooth entrance ── */
+.sr { opacity: 0; transform: translateY(30px); will-change: opacity, transform; }
+.sr.in {
+  opacity: 1; transform: translateY(0);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── 7. BUTTON STATES — GPU-accelerated ── */
 @keyframes btn-scan {
   from { transform: translateX(-100%); }
   to   { transform: translateX(100%); }
@@ -114,7 +149,7 @@ body::after {
 .btn-bit {
   position: absolute; font-family: monospace; font-size: 10px;
   color: var(--brand); opacity: 0.6; pointer-events: none; line-height: 1;
-  animation: bit-fly 0.8s ease-out forwards;
+  animation: bit-fly 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 @keyframes bit-fly {
   from { transform: translateY(0); opacity: 0.7; }

@@ -26,6 +26,7 @@ import type { Lang }       from '../../lib/types';
 import { InfallibleCursor } from '../../components/ui/InfallibleCursor';
 import { useMagnetic }     from '../../hooks/useMagnetic';
 import { useTextScramble } from '../../hooks/useTextScramble';
+import { ProjectHero }     from './components/ProjectHero';
 import {
   createLiquidCurtain,
   animateLiquidCurtainIn,
@@ -113,7 +114,6 @@ export default function ProjectPage() {
   const { id }   = useParams();
   const router   = useRouter();
   const main     = useRef<HTMLDivElement>(null);
-  const heroMonitorRef = useRef<HTMLDivElement>(null);
 
   const [lang]     = useState<Lang>('es');
   const [darkMode, setDarkMode] = useState(false);
@@ -132,7 +132,8 @@ export default function ProjectPage() {
 
   const content = PROJECTS_CONTENT[safeId]?.[lang] ?? PROJECTS_CONTENT[safeId]?.['en'] ?? PROJECTS_CONTENT[safeId]?.['es'];
   const snippet = CODE_SNIPPETS[safeId];
-  const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com/login' : isJava ? null : 'https://ana-peluquera.lovable.app/';
+  const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com/login' : (isJava || isSpot || isA11y) ? null : 'https://ana-peluquera.lovable.app/';
+  const videoUrl = isJava ? '/loginjsf.mp4' : null;
 
   // 🎯 Punto 6 — Magnetic buttons
   const closeMagRef = useMagnetic<HTMLButtonElement>({ strength: 0.3, innerStrength: 0.12 });
@@ -140,7 +141,7 @@ export default function ProjectPage() {
 
   // 🎯 Punto 7 — Text scramble for project title
   const titleText = content?.title ?? summary?.name ?? safeId;
-  const { text: scrambledTitle, ref: titleRef } = useTextScramble(titleText, {
+  const { text: scrambledTitle } = useTextScramble(titleText, {
     trigger: 'mount',
     charSpeed: 35,
     iterations: 4,
@@ -159,7 +160,9 @@ export default function ProjectPage() {
    * Handles both SVG liquid curtains (Punto 8) and legacy div overlays.
    */
   useEffect(() => {
+    // 🌊 Punto 8 — Liquid curtain reveal or fallback
     const overlay = document.getElementById('project-transition-layer');
+    
     if (overlay) {
       let done = false;
       const reveal = () => {
@@ -169,19 +172,14 @@ export default function ProjectPage() {
         const isSVG = overlay.tagName.toLowerCase() === 'svg';
 
         if (isSVG) {
-          // 🌊 Liquid curtain reveal
           animateLiquidCurtainOut(overlay as unknown as SVGSVGElement, {
-            duration: 0.7,
-            onComplete: () => {
-              setIsReadyToAnimate(true);
-            },
+            duration: 0.6,
+            onComplete: () => setIsReadyToAnimate(true),
           });
         } else {
-          // Legacy div overlay
           gsap.to(overlay, {
             opacity: 0,
-            duration: 0.32,
-            ease: 'power3.out',
+            duration: 0.3,
             onComplete: () => {
               overlay.remove();
               setIsReadyToAnimate(true);
@@ -190,14 +188,17 @@ export default function ProjectPage() {
         }
       };
 
-      // Wait for two paints to ensure the new tree is mounted.
-      requestAnimationFrame(() => requestAnimationFrame(reveal));
-
-      // Defensive fallback if the scheduler delays frames.
-      const fallback = window.setTimeout(reveal, 360);
-      return () => window.clearTimeout(fallback);
+      // Ensure we reveal as soon as possible
+      const raf = requestAnimationFrame(() => requestAnimationFrame(reveal));
+      const fallback = setTimeout(reveal, 500); // Safety fallback
+      
+      return () => {
+        cancelAnimationFrame(raf);
+        clearTimeout(fallback);
+      };
     } else {
-      setIsReadyToAnimate(true); // Fallback for direct links
+      // No overlay found (direct link or fast navigation), enable effects immediately
+      setIsReadyToAnimate(true);
     }
   }, []);
 
@@ -220,26 +221,26 @@ export default function ProjectPage() {
     document.body.appendChild(svg);
 
     animateLiquidCurtainIn(svg, {
-      duration: 1.0,
+      duration: 0.7,
       onMidway: () => {
         sessionStorage.setItem('hasSeenIntro', 'true');
-        router.replace('/');
+        router.replace('/', { scroll: false });
       },
       onComplete: () => {
-        // Ensure navigation happened
         sessionStorage.setItem('hasSeenIntro', 'true');
       },
     });
+
+    // Safety fallback: force navigation if animation hangs
+    setTimeout(() => {
+      sessionStorage.setItem('hasSeenIntro', 'true');
+      router.replace('/', { scroll: false });
+    }, 1500);
   };
 
   // ── Entry animations (scope = main, auto cleanup) ────────────
   useGSAP(() => {
     if (!main.current || !content) return;
-
-    gsap.fromTo(heroMonitorRef.current,
-      { scale: 0.9, opacity: 0, y: 40 },
-      { scale: 1, opacity: 1, y: 0, duration: 0.72, ease: 'power3.out', delay: 0.06 }
-    );
 
     // Section reveals
     gsap.utils.toArray<HTMLElement>('.reveal-sec').forEach(el => {
@@ -267,6 +268,9 @@ export default function ProjectPage() {
 
   // ── Loading states ───────────────────────────────────────────────────────
   if (!content || !summary) return notFound();
+
+  // Calculate project index for numbering
+  const projectIndex = Object.keys(PROJECT_SUMMARIES).indexOf(safeId) + 1;
 
   return (
     <div
@@ -303,7 +307,7 @@ export default function ProjectPage() {
       )}
 
       {/* ── HEADER ── */}
-      <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-3rem)] max-w-[1200px]">
+      <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[500] w-[calc(100%-3rem)] max-w-[1200px]">
         <div className="flex items-center justify-between px-6 py-3.5 rounded-2xl bg-white/80 dark:bg-black/50 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-glass">
           <button
             ref={backMagRef}
@@ -321,58 +325,23 @@ export default function ProjectPage() {
         </div>
       </header>
 
-      <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-40 pb-32">
+      {/* ── FAKE 3D HERO (Full-viewport parallax + zoom) ── */}
+      <ProjectHero
+        projectId={safeId}
+        title={scrambledTitle}
+        subtitle={content?.subtitle ?? ''}
+        accent={theme.accent}
+        accentBg={theme.helixA}
+        liveUrl={liveUrl}
+        videoUrl={videoUrl}
+        iframeTitle={`${safeId} Preview`}
+        label={theme.label}
+        langs={summary?.langs ?? []}
+        darkMode={darkMode}
+        index={projectIndex}
+      />
 
-        {/* ── HERO ── */}
-        <section className="flex flex-col items-center text-center mb-32">
-          <h1
-            ref={titleRef as React.Ref<HTMLHeadingElement>}
-            className="font-black uppercase italic tracking-tighter leading-[0.85] mb-6"
-            style={{ fontSize: 'clamp(3rem, 8vw, 6.5rem)', color: theme.accent }}
-          >
-            {scrambledTitle}
-          </h1>
-          <p className="text-xl md:text-2xl font-light opacity-50 tracking-tight max-w-2xl mb-16 text-ink">
-            {content?.subtitle}
-          </p>
-
-          <div
-            ref={heroMonitorRef}
-            className="w-full rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/40 backdrop-blur-xl relative group"
-            style={{
-              height: 'clamp(300px, 60vw, 600px)',
-              boxShadow: `0 40px 100px -20px ${theme.accent}30`,
-            }}
-          >
-            <div className="h-10 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/5 flex items-center px-4 gap-2">
-              <div className="flex gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
-                <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-              </div>
-              <div className="flex-1 text-center font-mono text-[10px] opacity-40 text-ink">
-                {`${safeId}.exe`}
-              </div>
-            </div>
-            <div className="h-[calc(100%-2.5rem)] relative bg-white dark:bg-[#050505]">
-              {liveUrl ? (
-                <iframe
-                  src={liveUrl}
-                  className="w-full h-full border-none opacity-90 group-hover:opacity-100 transition-opacity duration-700"
-                  title="Preview"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-ink">
-                  <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 shadow-xl">
-                    <Cpu size={32} style={{ color: theme.accent }} className="animate-pulse" />
-                  </div>
-                  <p className="font-mono text-xs opacity-40 uppercase tracking-widest">System Core Active</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
+      <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-40 pb-32 bg-page">
 
         {/* ── OBJECTIVE & STACK ── */}
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-16 mb-40 items-start">

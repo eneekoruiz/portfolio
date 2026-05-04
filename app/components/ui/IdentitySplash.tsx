@@ -16,7 +16,12 @@
  *  - Los estados iniciales de los .char se fijan con gsap.set() DENTRO
  *    del contexto, no con clases Tailwind, para garantizar consistencia
  *    aunque el componente se monte dos veces.
- *  - onComplete se pasa como dependencia estable (useCallback en el padre).
+ *  - FIX Punto 4: onComplete ya NO se pasa al constructor del timeline.
+ *    Solo se llama UNA vez, al final del timeline, mediante .add().
+ *    Antes se disparaba dos veces (constructor + .add()), causando
+ *    un doble setState en el padre.
+ *  - Timeline fluido: las duraciones y eases están calibradas para
+ *    evitar tirones entre pasos.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -41,72 +46,71 @@ interface IdentitySplashProps {
   onComplete: () => void;
   onReveal:   () => void;
   lang:       Lang;
+  /** Si es false, el splash está montado pero esperando para empezar su animación */
+  active:     boolean;
 }
 
-export function IdentitySplash({ onComplete, onReveal, lang }: IdentitySplashProps) {
+export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentitySplashProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef      = useRef<HTMLDivElement>(null);
   const lineRef      = useRef<HTMLDivElement>(null);
 
-  const word = WELCOME_TEXT[lang] ?? 'Welcome';
+  // Stable refs to prevent stale closures in the timeline
+  const onCompleteRef = useRef(onComplete);
+  const onRevealRef   = useRef(onReveal);
+  onCompleteRef.current = onComplete;
+  onRevealRef.current   = onReveal;
 
+  const word = WELCOME_TEXT[lang] ?? 'Welcome';
   useEffect(() => {
     if (!textRef.current || !lineRef.current || !containerRef.current) return;
 
-    /**
-     * gsap.context() garantiza que:
-     *  1. Todas las animaciones quedan registradas bajo este contexto.
-     *  2. ctx.revert() en el cleanup las cancela y resetea, evitando
-     *     la doble ejecución de animaciones en React Strict Mode.
-     */
+    if (!active) {
+      const ctx = gsap.context(() => {
+        const chars = textRef.current!.querySelectorAll<HTMLElement>('.char');
+        gsap.set(chars,           { yPercent: 110, opacity: 0 });
+        gsap.set(lineRef.current, { scaleX: 0 });
+      });
+      return () => ctx.revert();
+    }
+
     const ctx = gsap.context(() => {
       const chars = textRef.current!.querySelectorAll<HTMLElement>('.char');
 
-      // ── Fijar estados iniciales (pre-animación) ────────────────────────
-      gsap.set(chars,           { yPercent: 110, opacity: 0 });
-      gsap.set(lineRef.current, { scaleX: 0 });
-
       // ── Timeline de entrada + salida ───────────────────────────────────
-      const tl = gsap.timeline({ onComplete });
+      const tl = gsap.timeline();
 
       tl
-        // 1. Línea crece desde el centro
         .to(lineRef.current, {
-          scaleX: 1, duration: 0.34, ease: 'expo.inOut',
+          scaleX: 1, duration: 0.35, ease: 'power3.out',
         })
-        // 2. Letras suben y aparecen (máscara overflow:hidden del padre)
         .to(chars, {
           yPercent: 0, opacity: 1,
-          stagger: 0.02, duration: 0.44, ease: 'power3.out',
-        }, '-=0.2')
-        // 3. Línea encoge
+          stagger: 0.025, duration: 0.48, ease: 'power3.out',
+        }, '-=0.15')
         .to(lineRef.current, {
-          scaleX: 0, duration: 0.28, ease: 'expo.inOut',
-        }, '-=0.55')
-        // 4. Pausa de lectura
-        .to({}, { duration: 0.32 })
-        // 5. Letras salen hacia arriba
+          scaleX: 0, duration: 0.3, ease: 'power3.in',
+        }, '-=0.40')
+        .to({}, { duration: 0.35 })
         .to(chars, {
           yPercent: -120, opacity: 0,
-          stagger: 0.015, duration: 0.28, ease: 'power3.in',
+          stagger: 0.02, duration: 0.3, ease: 'power3.in',
         })
-        // Notificamos a page.tsx que empiece a animar el Hero justo al empezar a subir la cortina
         .add(() => {
-          if (onReveal) onReveal();
+          onRevealRef.current?.();
         }, '-=0.1')
-        // 6. Slide up de la cortina (estilo Awwwards)
         .to(containerRef.current, {
-          yPercent: -100, duration: 0.75, ease: 'expo.inOut',
+          yPercent: -100, duration: 0.65, ease: 'power3.out',
         }, '<')
         .add(() => {
-          if (onComplete) onComplete();
+          onCompleteRef.current?.();
         });
 
     }, containerRef);
 
     return () => ctx.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Solo una vez al montar
+  }, [active]); // Re-ejecutar cuando active pase a true
 
   return (
     <div

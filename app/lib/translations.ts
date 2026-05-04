@@ -73,7 +73,7 @@ export const TX: Record<Lang, Tx> = {
   es: mkTx(
     ['Buenos días', 'Buenas tardes', 'Buenas noches'], 'soy', (t) => `${t}, soy`,
     'Ingeniero Informático · Full Stack Developer', 'Me obsesiono con los detalles que nadie nota pero todo el mundo siente.', 'Disponible',
-    'Ver proyectos', 'Contactar', 'Descargar CV', 'DESPLAZA', ['Inicio', 'Stack', 'Proyectos', 'Sobre mí', 'Contacto'],
+    'Ver proyectos', 'Contactar', 'Ver Currículum', 'DESPLAZA', ['Inicio', 'Stack', 'Proyectos', 'Sobre mí', 'Contacto'],
     'Sobre mí', 'Entiendo lo\nque necesitas.', 'He aprendido que el código más valioso no es el más elegante — es el que resuelve exactamente el problema de quien lo usa. Backend sólido. Frontend que se siente bien. Sin dogmas.',
     [['5+', 'Proyectos activos'], ['100%', 'Foco en calidad'], ['∞', 'Arquitectura sólida']],
     'Tecnologías que domino.', 'Proyectos', 'Selected Works.',
@@ -88,7 +88,7 @@ export const TX: Record<Lang, Tx> = {
   en: mkTx(
     ['Good morning', 'Good afternoon', 'Good evening'], "I'm", (t) => `${t}, I'm`,
     'Computer Engineer · Full Stack Developer', 'I agonise over the details no one notices — and that everyone ends up feeling.', 'Available',
-    'See work', 'Contact', 'Download CV', 'SCROLL', ['Home', 'Stack', 'Projects', 'About', 'Contact'],
+    'See work', 'Contact', 'View Curriculum', 'SCROLL', ['Home', 'Stack', 'Projects', 'About', 'Contact'],
     'About', 'I understand\nwhat you need.', "The most valuable code is never the cleverest — it is the one that dissolves the precise frustration of the person using it. Robust backend. Frontend that feels alive. No dogma.",
     [['5+', 'Active projects'], ['100%', 'Quality focus'], ['∞', 'Solid architecture']],
     'Technologies I master.', 'Projects', 'Selected Works.',
@@ -103,7 +103,7 @@ export const TX: Record<Lang, Tx> = {
   eu: mkTx(
     ['Egun on', 'Arratsalde on', 'Gabon'], 'naiz', (t) => `${t} ·`,
     'Informatika Ingeniaria · Full Stack Developer', 'Inork nabaritzen ez dituen, baina denek sentitzen dituzten xehetasunetan jartzen dut arreta.', 'Eskuragarri',
-    'Lanak ikusi', 'Idatzi', 'CV deskargatu', 'MUGITU', ['Hasiera', 'Stack', 'Nire lan garrantzitsuenak', 'Ni buruz', 'Kontaktua'],
+    'Lanak ikusi', 'Idatzi', 'Curriculuma ikusi', 'MUGITU', ['Hasiera', 'Stack', 'Nire lan garrantzitsuenak', 'Ni buruz', 'Kontaktua'],
     'Ni buruz', 'Zer behar duzun\nexaktuki ulertzen dut.', 'Nik ikasi dudana hauxe da: kode baliotsuena ez da inoiz azpimarragarriena — erabiltzailearen arazo zehatza modu natural batez konpontzen duena baizik. Backend sendoa. Ondo sentitzen den interfaze bat. Dogmarik gabe.',
     [['5+', 'Proiektu aktibo'], ['100%', 'Kalitate ardatza'], ['∞', 'Arkitektura sendo']],
     'Menperatzen ditudan teknologiak.', 'Proiektuak', 'Hautatutako lanak.',
@@ -118,7 +118,7 @@ export const TX: Record<Lang, Tx> = {
   fr: mkTx(
     ['Bonjour', 'Bon après-midi', 'Bonsoir'], 'je suis', (t) => `${t}, je suis`,
     'Ingénieur Informatique · Full Stack Developer', "Je m'obsède sur les détails que personne ne remarque mais que tous ressentent.", 'Disponible',
-    'Voir proyectos', 'Contacter', 'Télécharger CV', 'DÉFILER', ['Accueil', 'Stack', 'Projets', 'À propos', 'Contact'],
+    'Voir projets', 'Contacter', 'Voir Curriculum', 'DÉFILER', ['Accueil', 'Stack', 'Projets', 'À propos', 'Contact'],
     'À propos', 'Je comprends\nce dont vous avez besoin.', "Le code le plus précieux n'est pas le plus élégant.",
     [['5+', 'Projets actifs'], ['100%', 'Focus qualité'], ['∞', 'Architecture solide']],
     'Technologies que je maîtrise.', 'Projets', 'Travaux sélectionnés.',
@@ -133,7 +133,7 @@ export const TX: Record<Lang, Tx> = {
   it: mkTx(
     ['Buongiorno', 'Buon pomeriggio', 'Buonasera'], 'sono', (t) => `${t}, sono`,
     'Ingegnere Informatico · Full Stack Developer', "Mi ossessiono sui dettagli che nessuno nota ma tutti sentono.", 'Disponibile',
-    'Vedi progetti', 'Contattare', 'Scarica CV', 'SCORRI', ['Inizio', 'Stack', 'Progetti', 'Chi sono', 'Contatto'],
+    'Vedi progetti', 'Contattare', 'Vedi Curriculum', 'SCORRI', ['Inizio', 'Stack', 'Progetti', 'Chi sono', 'Contatto'],
     'Chi sono', 'Capisco cosa\nhai bisogno.', "Il codice più prezioso non è il più elegante.",
     [['5+', 'Progetti attivi'], ['100%', 'Focus qualità'], ['∞', 'Architettura solida']],
     'Tecnologie che padroneggio.', 'Progetti', 'Lavori selezionati.',
@@ -148,7 +148,7 @@ export const TX: Record<Lang, Tx> = {
   de: mkTx(
     ['Guten Morgen', 'Guten Tag', 'Guten Abend'], 'ich bin', (t) => `${t}, ich bin`,
     'Informatikingenieur · Full Stack Developer', 'Ich obsessiere über Details, die niemand bemerkt.', 'Verfügbar',
-    'Projekte', 'Kontakt', 'CV herunterladen', 'SCROLLEN', ['Start', 'Stack', 'Projekte', 'Über mich', 'Kontakt'],
+    'Projekte', 'Kontakt', 'Curriculum ansehen', 'SCROLLEN', ['Start', 'Stack', 'Projekte', 'Über mich', 'Kontakt'],
     'Über mich', 'Ich verstehe,\nwas Sie brauchen.', "Der wertvollste Code ist nicht der eleganteste.",
     [['5+', 'Aktive Projekte'], ['100%', 'Qualitätsfokus'], ['∞', 'Solide Architektur']],
     'Technologien, die ich beherrsche.', 'Projekte', 'Ausgewählte Arbeiten.',
@@ -163,7 +163,7 @@ export const TX: Record<Lang, Tx> = {
   pt: mkTx(
     ['Bom dia', 'Boa tarde', 'Boa noite'], 'sou', (t) => `${t}, sou`,
     'Engenheiro Informático · Full Stack Developer', 'Obsessiono-me com detalhes que ninguém nota.', 'Disponível',
-    'Ver projetos', 'Contactar', 'Baixar CV', 'ROLAR', ['Início', 'Stack', 'Projetos', 'Sobre mim', 'Contato'],
+    'Ver projetos', 'Contactar', 'Ver Currículum', 'ROLAR', ['Início', 'Stack', 'Projetos', 'Sobre mim', 'Contato'],
     'Sobre mim', 'Entendo o que\nvocê precisa.', "O código mais valioso não é o mais elegante.",
     [['5+', 'Projetos ativos'], ['100%', 'Foco en qualidade'], ['∞', 'Arquitectura sólida']],
     'Tecnologias que domino.', 'Proyectos', 'Trabalhos selecionados.',
@@ -178,7 +178,7 @@ export const TX: Record<Lang, Tx> = {
   ca: mkTx(
     ['Bon dia', 'Bona tarda', 'Bona nit'], 'sóc', (t) => `${t}, sóc`,
     'Enginyer Informàtic · Full Stack Developer', "M'obsessiono amb detalls que ningú nota.", 'Disponible',
-    'Projectes', 'Contactar', 'CV descarregar', 'DESPLAÇA', ['Inici', 'Stack', 'Projectes', 'Sobre mi', 'Contacte'],
+    'Projectes', 'Contactar', 'Veure Currículum', 'DESPLAÇA', ['Inici', 'Stack', 'Projectes', 'Sobre mi', 'Contacte'],
     'Sobre mi', 'Entenc el que\nnecessites.', "El codi més valuós no és el més elegant.",
     [['5+', 'Projectes actius'], ['100%', 'Focus en qualitat'], ['∞', 'Arquitectura sòlida']],
     'Tecnologies que domino.', 'Projectes', 'Treballs seleccionats.',
@@ -193,7 +193,7 @@ export const TX: Record<Lang, Tx> = {
   gl: mkTx(
     ['Bos días', 'Boa tarde', 'Boa noite'], 'son', (t) => `${t}, son`,
     'Enxeñeiro Informático · Full Stack Developer', 'Obsesiónome cos detalles que ninguén nota.', 'Dispoñible',
-    'Proxectos', 'Contactar', 'Descargar CV', 'DESPRAZAR', ['Inicio', 'Stack', 'Proxectos', 'Sobre min', 'Contacto'],
+    'Proxectos', 'Contactar', 'Ver Currículum', 'DESPRAZAR', ['Inicio', 'Stack', 'Proxectos', 'Sobre min', 'Contacto'],
     'Sobre min', 'Entendo o que\nnecesitas.', "O código máis valioso no é o máis elegante.",
     [['5+', 'Proxectos activos'], ['100%', 'Foco en calidade'], ['∞', 'Arquitectura sólida']],
     'Tecnoloxías que domino.', 'Proxectos', 'Traballos seleccionados.',

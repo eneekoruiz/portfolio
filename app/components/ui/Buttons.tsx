@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Download, Check, ArrowUpRight, Github, Zap } from 'lucide-react';
 import { useMagnetic } from '../../hooks/useMagnetic';
 
@@ -62,11 +63,14 @@ export function BinaryStreamBtn({
   label,
   variant = 'light',
   className,
+  href = '/curriculum',
 }: {
   label: string;
   variant?: 'light' | 'dark';
   className?: string;
+  href?: string;
 }) {
+  const router = useRouter();
   const [state, setState]       = useState<BtnState>('idle');
   const [progress, setProgress] = useState(0);
   const [bits, setBits]         = useState<{ id: number; x: number; y: number; v: string }[]>([]);
@@ -94,10 +98,15 @@ export function BinaryStreamBtn({
       if (p >= 100) {
         clearInterval(ivRef.current); clearInterval(bvRef.current);
         setBits([]); setProgress(100); setState('done'); setShowRipple(true);
-        const a = document.createElement('a');
-        a.href = '/cv.pdf'; a.download = 'Eneko-Ruiz-CV.pdf';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        toRef.current = setTimeout(() => { setState('idle'); setProgress(0); setShowRipple(false); }, 3000);
+        
+        // Navigate to curriculum page with smooth transition
+        toRef.current = setTimeout(() => {
+          if (href.startsWith('http')) {
+            window.location.assign(href);
+          } else {
+            router.push(href);
+          }
+        }, 500);
       } else { setProgress(p); }
     }, 30);
   };
@@ -136,7 +145,7 @@ export function BinaryStreamBtn({
           style={{ left: `${b.x}%`, top: `${b.y}%`, animationDelay: '0ms' }}>{b.v}</span>
       ))}
       {showRipple && <span className="btn-done-ripple bg-[rgba(52,199,89,.35)]" aria-hidden="true" />}
-      {state === 'idle'      && <><Download size={14} aria-hidden="true" />{label}</>}
+      {state === 'idle'      && <><ArrowUpRight size={14} aria-hidden="true" />{label}</>}
       {state === 'animating' && <><span className="font-mono text-[11px] tracking-wider text-brand animate-pulse">01</span>{label}…</>}
       {state === 'done'      && <><Check size={15} aria-hidden="true" />OK</>}
     </button>

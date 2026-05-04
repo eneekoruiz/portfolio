@@ -1,5 +1,24 @@
 'use client';
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * INTRO PROVIDER — Phase state management for loading sequence
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * Phases: 'checking' → 'loading' → 'splash' → 'ready'
+ *
+ * FIX Punto 5: Now reads `hasSeenIntro` from sessionStorage on mount.
+ * Previously, the `hasSeen` flag was pure React state that reset on every
+ * client-side navigation, causing the full Preloader + Splash to replay
+ * when returning from /work/[id]. Now, once `markSeen()` is called,
+ * it persists in sessionStorage for the entire browser session.
+ *
+ * This also ensures that when /work/[id] sets `hasSeenIntro` in
+ * sessionStorage before navigating back, IntroProvider picks it up
+ * and skips straight to 'ready'.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 export type IntroPhase = 'checking' | 'loading' | 'splash' | 'ready';
@@ -12,21 +31,34 @@ interface IntroContextValue {
 
 const IntroContext = createContext<IntroContextValue | null>(null);
 
+const SESSION_KEY = 'hasSeenIntro';
+
 export function IntroProvider({ children }: { children: React.ReactNode }) {
   // Keep first render identical on server and client to avoid hydration mismatches.
   const [phase, setPhase] = useState<IntroPhase>('checking');
 
-  // Estado persistente solo durante la sesión SPA (se resetea con F5)
-  const [hasSeen, setHasSeen] = useState(false);
-
   useEffect(() => {
     if (phase !== 'checking') return;
-    // Si ya lo hemos visto en esta sesión de navegación, saltamos al final
-    setPhase(hasSeen ? 'ready' : 'loading');
-  }, [phase, hasSeen]);
+
+    // FIX Punto 5: Read persisted state from sessionStorage
+    // This covers both:
+    //   1. Return from /work/[id] (which sets hasSeenIntro before navigating)
+    //   2. SPA-internal re-renders where markSeen was previously called
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(SESSION_KEY) === 'true';
+    } catch (_) {
+      // sessionStorage may be unavailable (private browsing, etc.)
+    }
+
+    setPhase(seen ? 'ready' : 'loading');
+  }, [phase]);
 
   const markSeen = useCallback(() => {
-    setHasSeen(true);
+    // Persist to sessionStorage so it survives client-side navigation
+    try {
+      sessionStorage.setItem(SESSION_KEY, 'true');
+    } catch (_) {}
     setPhase('ready');
   }, []);
 

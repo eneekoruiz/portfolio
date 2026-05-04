@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 
 
@@ -13,22 +13,62 @@ interface HeroProps {
   greeting: string;
   reduced: boolean;
   setMag: (el: HTMLElement | null) => void;
+  phase: string;
 }
 
-export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
+export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
   const contactBtnRef = useRef<HTMLDivElement>(null);
   const leftBtnRef = useRef<HTMLDivElement>(null);
   const rightBtnRef = useRef<HTMLDivElement>(null);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const hasRequestedPermission = useRef(false);
+  const touchStartPos = useRef({ x: 0, y: 0 });
+
+  // ── Solicitar permiso de giroscopio (iOS 13+) ──────────────────────
+  const requestDevicePermission = async () => {
+    if (hasRequestedPermission.current || typeof DeviceOrientationEvent === 'undefined') return;
+    
+    // @ts-ignore
+    if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) {
+      try {
+        hasRequestedPermission.current = true;
+        // @ts-ignore
+        const permission = await DeviceOrientationEvent.requestPermission();
+        return permission === 'granted';
+      } catch (e) {
+        console.log('Device orientation permission denied or unavailable');
+        return false;
+      }
+    }
+    return true; // Android y otros: permiso implícito
+  };
 
   useEffect(() => {
     if (reduced) return;
+    
+    // Detectar si es dispositivo móvil
+    const checkMobile = () => {
+      const isTouchDevice = () => {
+        return (
+          (typeof window !== 'undefined' && ('ontouchstart' in window)) ||
+          (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0)
+        );
+      };
+      setIsMobile(isTouchDevice());
+    };
+
+    checkMobile();
+
     const btn = contactBtnRef.current;
     const hero = document.getElementById('hero');
     if (!btn || !hero) return;
 
+    // ── MODO DESKTOP: Mouse ────────────────────────────────────────────
     const onMove = (e: MouseEvent) => {
+      if (isMobile) return; // En móvil, ignorar mousemove
+      
       const rect = btn.getBoundingClientRect();
       const currentX = (gsap.getProperty(btn, 'x') as number) || 0;
       const currentY = (gsap.getProperty(btn, 'y') as number) || 0;
@@ -53,7 +93,6 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
         const nY = (nRect.top - nCurrentY) + nRect.height / 2;
         const distToNeighbor = Math.sqrt(Math.pow(e.clientX - nX, 2) + Math.pow(e.clientY - nY, 2));
         
-        // Si el ratón está a menos de 180px de Proyectos o CV, soltamos el imán
         if (distToNeighbor < 180) isNearOtherBtn = true;
       });
 
@@ -66,10 +105,9 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
           y: distY * 0.6 * force,
           duration: 0.3,
           ease: 'power3.out',
-          overwrite: true // Evita conflictos con animaciones anteriores
+          overwrite: true
         });
       } else {
-        // Retorno elástico cuando se suelta o entra en zona de escudo
         gsap.to(btn, { 
           x: 0, 
           y: 0, 
@@ -79,7 +117,7 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
         });
       }
 
-      // --- LÓGICA DE LINTERNA (SPOTLIGHT) ---
+      // --- LÓGICA DE LINTERNA (SPOTLIGHT) ────────────────────────────
       if (textContainerRef.current) {
         const tRect = textContainerRef.current.getBoundingClientRect();
         const x = e.clientX - tRect.left;
@@ -95,9 +133,9 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
     };
 
     const onLeave = () => {
+      if (isMobile) return;
       gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' });
       
-      // Apagar linterna moviéndola fuera
       if (textContainerRef.current) {
         gsap.to(textContainerRef.current, {
           '--mx': `-500px`,
@@ -108,28 +146,105 @@ export function Hero({ t, greeting, reduced, setMag }: HeroProps) {
       }
     };
 
-    // Animación inicial: barrido de la linterna (Sweep)
-    if (textContainerRef.current) {
+    // ── MODO MÓVIL: Giroscopio + Fallback Touch ────────────────────────
+    const setupMobileOrientation = async () => {
+      const hasPermission = await requestDevicePermission();
+      
+      if (!hasPermission) {
+        console.log('No device orientation permission. Using touch fallback.');
+        setupTouchFallback();
+        return;
+      }
+
+      const onDeviceOrientation = (event: DeviceOrientationEvent) => {
+        if (!textContainerRef.current || !isMobile) return;
+
+        const gamma = event.gamma ?? 0;
+        const beta = event.beta ?? 0;
+
+        const tRect = textContainerRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(((gamma + 90) / 180) * tRect.width, tRect.width));
+        const y = Math.max(0, Math.min(((beta + 180) / 360) * tRect.height, tRect.height));
+
+        gsap.set(textContainerRef.current, {
+          '--mx': `${x}px`,
+          '--my': `${y}px`,
+        });
+      };
+
+      window.addEventListener('deviceorientation', onDeviceOrientation);
+      
+      return () => window.removeEventListener('deviceorientation', onDeviceOrientation);
+    };
+
+    const setupTouchFallback = () => {
+      const onTouchMove = (e: TouchEvent) => {
+        if (!textContainerRef.current || e.touches.length === 0) return;
+
+        const touch = e.touches[0];
+        const tRect = textContainerRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(touch.clientX - tRect.left, tRect.width));
+        const y = Math.max(0, Math.min(touch.clientY - tRect.top, tRect.height));
+
+        gsap.set(textContainerRef.current, {
+          '--mx': `${x}px`,
+          '--my': `${y}px`,
+        });
+      };
+
+      const onTouchEnd = () => {
+        if (textContainerRef.current) {
+          gsap.to(textContainerRef.current, {
+            '--mx': `-500px`,
+            '--my': `-500px`,
+            duration: 0.6,
+            ease: 'power2.out'
+          });
+        }
+      };
+
+      window.addEventListener('touchmove', onTouchMove);
+      window.addEventListener('touchend', onTouchEnd);
+
+      return () => {
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+      };
+    };
+
+    // Setup según dispositivo
+    let cleanup: (() => void) | undefined;
+
+    if (isMobile) {
+      setupMobileOrientation().then(c => { cleanup = c; });
+    } else {
+      hero.addEventListener('mousemove', onMove);
+      hero.addEventListener('mouseleave', onLeave);
+    }
+
+    // ── Animación inicial: barrido de la linterna ───────────────────
+    // Solo se dispara cuando el intro (splash) ha terminado (phase === 'ready')
+    if (phase === 'ready' && textContainerRef.current && !isMobile && !reduced) {
       gsap.fromTo(textContainerRef.current,
         { '--mx': '-200px', '--my': '100px' },
         { 
-          '--mx': '800px', 
-          '--my': '100px', 
-          duration: 1.8, 
-          ease: 'power2.inOut', 
-          delay: 0.8 
+          '--mx': '1000px', 
+          '--my': '150px', 
+          duration: 2.2, 
+          ease: 'power3.inOut', 
+          delay: 0.2 // Pequeño delay tras el curtain reveal
         }
       );
     }
 
-    hero.addEventListener('mousemove', onMove);
-    hero.addEventListener('mouseleave', onLeave);
-
     return () => {
-      hero.removeEventListener('mousemove', onMove);
-      hero.removeEventListener('mouseleave', onLeave);
+      if (!isMobile) {
+        hero.removeEventListener('mousemove', onMove);
+        hero.removeEventListener('mouseleave', onLeave);
+      }
+      if (cleanup) cleanup();
     };
-  }, [reduced]);
+  }, [reduced, isMobile, phase]);
 
   return (
     <section id="hero" aria-label="Hero" className="min-h-[100svh] flex flex-col overflow-hidden pt-[80px] relative snap-start">
