@@ -3,8 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET(request: NextRequest) {
-  const search = request.nextUrl.searchParams.toString();
+export async function GET(request: Request) {
+  let search = '';
+  try {
+    const { searchParams } = new URL(request.url);
+    search = searchParams.toString();
+  } catch (e) {
+    console.error('URL parsing failed:', e);
+  }
+  
   const endpoint = `https://api.github.com/users/eneekoruiz/repos${search ? `?${search}` : ''}`;
   const token = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
 

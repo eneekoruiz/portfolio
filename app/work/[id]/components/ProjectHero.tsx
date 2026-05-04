@@ -188,6 +188,21 @@ export function ProjectHero({
           duration: 1.5,
         });
       }
+
+      // 🚀 UX MIDDLE GROUND: Release interaction if mouse leaves the screenRef area
+      if (isInteracting && screenRef.current) {
+        const r = screenRef.current.getBoundingClientRect();
+        const buffer = 20; // px
+        if (
+          clientX < r.left - buffer || 
+          clientX > r.right + buffer || 
+          clientY < r.top - buffer || 
+          clientY > r.bottom + buffer
+        ) {
+          setIsInteracting(false);
+          (window as any).__lenis?.start();
+        }
+      }
     };
 
     window.addEventListener('mousemove', onMove);
@@ -278,10 +293,12 @@ export function ProjectHero({
         {/* ── PROJECT PREVIEW SCREEN ── */}
         <div
           ref={screenRef}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden bg-black flex items-center justify-center"
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border transition-all duration-500 overflow-hidden bg-black flex items-center justify-center ${isInteracting ? 'ring-4 ring-white/10' : 'border-white/10'}`}
           style={{
             transformStyle: 'preserve-3d',
             willChange: 'transform, opacity, filter',
+            borderColor: isInteracting ? accent : 'rgba(255,255,255,0.1)',
+            boxShadow: isInteracting ? `0 0 60px ${accent}30` : '0 50px 100px -20px rgba(0,0,0,0.5)',
           }}
         >
           {/* 🚀 INTERACTION SHIELD & CTA */}
