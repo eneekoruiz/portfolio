@@ -456,13 +456,13 @@ export default function Home() {
   return (
     <>
       {/* ── SPLASH SCREEN / LOADING (Sincronizados para fluidez) ── */}
-      {(phase === 'loading' || phase === 'splash' || (phase === 'ready' && !ready)) && (
+      {(phase === 'loading' || phase === 'splash') && (
         <>
           <IdentitySplash
             lang={lang}
             onReveal={onSplashReveal}
             onComplete={onSplashComplete}
-            active={phase === 'splash' || phase === 'ready'}
+            active={phase === 'splash'}
           />
           {phase === 'loading' && <Preloader onDone={onPreloaderDone} />}
         </>
