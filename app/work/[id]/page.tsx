@@ -85,25 +85,60 @@ function GlareCard({ children, accent, className = '', style }: {
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const r = cardRef.current?.getBoundingClientRect();
     if (!r || !glareRef.current) return;
-    const x = ((e.clientX - r.left) / r.width)  * 100;
-    const y = ((e.clientY - r.top)  / r.height) * 100;
-    glareRef.current.style.setProperty('--gx', `${x}%`);
-    glareRef.current.style.setProperty('--gy', `${y}%`);
+    
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    
+    const xPercent = (x / r.width - 0.5) * 2;
+    const yPercent = (y / r.height - 0.5) * 2;
+    
+    gsap.to(cardRef.current, {
+      rotateY: xPercent * 6,
+      rotateX: -yPercent * 6,
+      duration: 0.5,
+      ease: 'power2.out',
+      overwrite: 'auto'
+    });
+
+    const gx = (x / r.width)  * 100;
+    const gy = (y / r.height) * 100;
+    glareRef.current.style.setProperty('--gx', `${gx}%`);
+    glareRef.current.style.setProperty('--gy', `${gy}%`);
+  };
+
+  const onLeave = () => {
+    gsap.to(cardRef.current, {
+      rotateY: 0,
+      rotateX: 0,
+      duration: 1,
+      ease: 'power2.out',
+      overwrite: 'auto'
+    });
   };
 
   return (
     <div
       ref={cardRef}
       onMouseMove={onMove}
-      className={`relative overflow-hidden rounded-3xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-black/15 dark:hover:border-white/15 hover:shadow-2xl hover:-translate-y-1 group ${className}`}
-      style={style}
+      onMouseLeave={onLeave}
+      className={`relative overflow-hidden rounded-3xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-black/15 dark:hover:border-white/15 hover:shadow-2xl group ${className}`}
+      style={{
+        ...style,
+        perspective: '1000px',
+        transformStyle: 'preserve-3d'
+      }}
     >
-      <div
-        ref={glareRef}
-        className="absolute inset-0 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: `radial-gradient(circle 300px at var(--gx,50%) var(--gy,50%), ${accent}15, transparent)` }}
+      <div 
+        ref={glareRef} 
+        className="absolute inset-0 pointer-events-none z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100" 
+        style={{ 
+          background: `radial-gradient(circle 300px at var(--gx,50%) var(--gy,50%), ${accent}20, transparent 80%)`,
+          transform: 'translateZ(50px)' 
+        }} 
       />
-      <div className="relative z-20">{children}</div>
+      <div className="relative z-0" style={{ transform: 'translateZ(20px)' }}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -238,33 +273,46 @@ export default function ProjectPage() {
     }, 1500);
   };
 
-  // ── Entry animations (scope = main, auto cleanup) ────────────
+  // ── Section reveals (Static, only run once when content is ready) ──────────
   useGSAP(() => {
     if (!main.current || !content) return;
 
-    // Section reveals
-    gsap.utils.toArray<HTMLElement>('.reveal-sec').forEach(el => {
+    const sections = gsap.utils.toArray<HTMLElement>('.reveal-sec');
+    sections.forEach(el => {
       gsap.fromTo(el,
         { opacity: 0, y: 40 },
         {
-          opacity: 1, y: 0, duration: 0.42, ease: 'power2.out',
-          scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+          opacity: 1, 
+          y: 0, 
+          duration: 0.6, 
+          ease: 'power2.out',
+          scrollTrigger: { 
+            trigger: el, 
+            start: 'top 88%', 
+            once: true,
+            // Prevent interference with pinning
+            fastScrollEnd: true,
+          },
         }
       );
     });
+  }, { scope: main, dependencies: [content] });
 
-    // Only rotate helix SVG if components are loaded
-    if (isReadyToAnimate) {
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: main.current,
-          start: 'top top', end: 'bottom bottom',
-          scrub: 0.7,
-        },
-      }).to('.helix-group', { rotateY: 360, ease: 'none' }, 0);
-    }
+  // ── Helix Animation (Depends on isReadyToAnimate) ──────────────────────────
+  useGSAP(() => {
+    if (!main.current || !isReadyToAnimate) return;
 
-  }, { scope: main, dependencies: [safeId, content, isReadyToAnimate] }); // KEY dependency!
+    const helixTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: main.current,
+        start: 'top top', 
+        end: 'bottom bottom',
+        scrub: 1,
+      },
+    });
+
+    helixTl.to('.helix-group', { rotateY: 360, ease: 'none' }, 0);
+  }, { scope: main, dependencies: [isReadyToAnimate] });
 
   // ── Loading states ───────────────────────────────────────────────────────
   if (!content || !summary) return notFound();

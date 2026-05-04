@@ -43,6 +43,7 @@ import { usePreferredMotion } from './hooks/usePreferredMotion';
 import { useGreeting } from './hooks/useGreeting';
 import { useGitHub } from './hooks/useGitHub';
 import { useIntro } from './components/IntroProvider';
+import { useMagnetic } from './hooks/useMagnetic';
 
 // ── UI components ──────────────────────────────────────────────────────────
 import { InfallibleCursor } from './components/ui/InfallibleCursor';
@@ -61,6 +62,15 @@ import { Projects } from './components/sections/Projects';
 import { Philosophy } from './components/sections/Philosophy';
 import { Contact } from './components/sections/Contact';
 import { SiteFooter } from './components/sections/SiteFooter';
+import dynamic from 'next/dynamic';
+
+// ── DYNAMIC VISUALIZERS (Consistencia con /work/[id]) ──
+const DNAHelix = dynamic<{ accent: string; secondary: string; darkMode: boolean }>(
+  () => import('./work/visualizers').then(m => m.DNAHelix), { ssr: false }
+);
+const TerrainMesh = dynamic<{ accent: string }>(
+  () => import('./work/visualizers').then(m => m.TerrainMesh), { ssr: false }
+);
 
 // Registrar plugins GSAP una sola vez en cliente
 if (typeof window !== 'undefined') {
@@ -74,6 +84,31 @@ const PROJECTS_NAV_KEY = 'projects_nav_state';
 const RETURN_OVERLAY_ID = 'return-overlay';
 
 type Phase = 'checking' | 'loading' | 'splash' | 'ready';
+
+function NavItem({ link, href, onEnter, onLeave }: { 
+  link: string; href: string; onEnter: (e: React.MouseEvent<HTMLAnchorElement>) => void; onLeave: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+}) {
+  const ref = useMagnetic<HTMLAnchorElement>({ strength: 0.2 });
+
+  return (
+    <a
+      ref={ref}
+      href={href}
+      className="n-el relative z-[1] text-[13px] font-semibold text-lead no-underline px-[14px] py-[7px] group transition-transform duration-200"
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+    >
+      <span className="relative overflow-hidden block">
+        <span className="block transition-transform duration-400 ease-expo group-hover:-translate-y-full">
+          {link}
+        </span>
+        <span className="absolute top-0 left-0 block translate-y-full transition-transform duration-400 ease-expo group-hover:translate-y-0 text-ink">
+          {link}
+        </span>
+      </span>
+    </a>
+  );
+}
 
 export default function Home() {
   // ── Refs ────────────────────────────────────────────────────────────────
@@ -408,6 +443,17 @@ export default function Home() {
       .to('.h-fd', { opacity: 1, y: 0, duration: 0.24, stagger: 0.025 }, '-=0.18')
       // Memoji — DURACIÓN REDUCIDA (1.4→0.9)
       .to('.memoji', { opacity: 1, x: 0, duration: 0.42, ease: 'power3.out' }, '-=0.3');
+      // Helix rotation (home specific)
+      gsap.to('.helix-group', {
+        rotateY: 360,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: main.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.5,
+        }
+      });
   }, { scope: main, dependencies: [ready, reduced] });
 
   // ── Indicador deslizante de la nav ─────────────────────────────────────
@@ -469,6 +515,28 @@ export default function Home() {
       )}
 
       <InfallibleCursor />
+
+      {/* ── 3D BACKGROUND (DEFERRED) ── */}
+      {ready && (
+        <>
+          <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" style={{ perspective: '1200px' }}>
+            <div
+              className="helix-group will-change-transform"
+              style={{
+                width: 'clamp(200px, 40vw, 500px)', height: '240vh',
+                opacity: 0.05,
+                filter: 'blur(40px)',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <DNAHelix accent="#000" secondary="#555" darkMode={false} />
+            </div>
+          </div>
+          <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.05]">
+            <TerrainMesh accent="currentColor" />
+          </div>
+        </>
+      )}
 
       {cmd && (
         <CmdModal lang={lang} setLang={setLang} onClose={() => setCmd(false)} t={t} />
@@ -564,24 +632,14 @@ export default function Home() {
                 ref={indRef}
                 className="nav-ind absolute top-0 left-0 h-9 bg-black/5 dark:bg-white/10 rounded-xl opacity-0"
               />
-              {t.menu.map((link, i) => (
-                <a
-                  key={link}
-                  href={t.hrefs[i]}
-                  className="n-el relative z-[1] text-[13px] font-semibold text-lead no-underline px-[14px] py-[7px] group"
-                  onMouseEnter={onNavEnter}
-                  onMouseLeave={onNavLeave}
-                >
-                  {/* V2 Polish: Split-text hover effect */}
-                  <span className="relative overflow-hidden block">
-                    <span className="block transition-transform duration-400 ease-expo group-hover:-translate-y-full">
-                      {link}
-                    </span>
-                    <span className="absolute top-0 left-0 block translate-y-full transition-transform duration-400 ease-expo group-hover:translate-y-0 text-ink">
-                      {link}
-                    </span>
-                  </span>
-                </a>
+              {t.menu.map((link: string, i: number) => (
+                <NavItem 
+                  key={link} 
+                  link={link} 
+                  href={t.hrefs[i]} 
+                  onEnter={onNavEnter} 
+                  onLeave={onNavLeave} 
+                />
               ))}
             </nav>
 

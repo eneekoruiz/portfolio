@@ -21,11 +21,11 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { Activity } from 'lucide-react';
+import { Activity, MousePointer2, X, ExternalLink, MoveUp } from 'lucide-react';
 import type { Lang } from '../../../lib/types';
 
 if (typeof window !== 'undefined') {
@@ -69,68 +69,90 @@ export function ProjectHero({
   const screenRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const [canInteract, setCanInteract] = useState(false);
 
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
   useGSAP(() => {
     if (!heroRef.current || !bgImageRef.current || !titleRef.current || !screenRef.current) return;
 
-    // 1. Core Timeline with extended scroll distance
+    // 1. Cinematic Scroll Sequence
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: heroRef.current,
         start: 'top top',
-        end: '+=250%', // Enough distance for two distinct phases
-        scrub: 1,
+        end: '+=160%', // Slightly longer for more control
+        scrub: 1.2,
         pin: true,
-        pinSpacing: true,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          // 🚀 UX SHIELD: Definitive fix for iframe scroll stealing
+          if (screenRef.current) {
+            const isLocked = self.progress > 0.98;
+            setCanInteract(isLocked);
+            
+            // We use a CSS variable or direct style to toggle the pointer events of the SHIELD
+            screenRef.current.style.setProperty('--shield-opacity', isLocked ? '0' : '1');
+            screenRef.current.style.setProperty('--shield-pointer', isLocked ? 'none' : 'all');
+          }
+        }
       },
     });
 
     tl
-      // Phase 1: Title Focus -> Out
+      // Phase 1: Title & Background Dissolve
       .to(contentRef.current, {
-        yPercent: -120,
+        y: -200,
         opacity: 0,
-        scale: 0.9,
-        ease: 'power2.inOut',
+        scale: 0.75,
+        filter: 'blur(30px)',
+        ease: 'power2.in',
         duration: 1.2,
       }, 0)
       .to(bgImageRef.current, {
-        scale: 1.8,
-        opacity: 0.3,
-        y: 100,
-        ease: 'none',
-        duration: 1.2,
+        scale: 3,
+        opacity: 0.01,
+        filter: 'blur(80px)',
+        ease: 'power2.inOut',
+        duration: 2,
       }, 0)
 
-      // Phase 2: Screen Entrance & Expansion
+      // Phase 2: High-Performance 3D Entrance (Cinematic Zoom)
       .fromTo(screenRef.current,
         { 
-          y: '100vh', 
-          scale: 0.7, 
-          borderRadius: '4rem',
-          width: '80vw',
-          opacity: 0.5 
+          y: '80vh', 
+          scale: 0.2, 
+          rotateX: 45,
+          rotateY: -15, // Subtle side tilt for depth
+          z: -1000,
+          borderRadius: '10rem',
+          width: '40vw',
+          opacity: 0,
+          filter: 'blur(20px) brightness(0.5)',
         },
         { 
           y: '0vh', 
           scale: 1, 
-          borderRadius: '0rem',
-          width: '100vw',
-          height: '100vh',
+          rotateX: 0,
+          rotateY: 0,
+          z: 0,
+          borderRadius: '2.5rem',
+          width: '90vw',
+          height: '85vh',
           opacity: 1,
-          ease: 'power3.out',
-          duration: 2,
+          filter: 'blur(0px) brightness(1)',
+          ease: 'expo.inOut',
+          duration: 3,
         },
-        0.4 // Starts before title fully disappears for fluidity
+        0.3
       )
       
-      // Overlay darkening as screen takes over
+      // Phase 3: Final Depth Adjustment
       .to(overlayRef.current, {
         opacity: 1,
-        backgroundColor: '#000',
-        duration: 1,
-      }, 1);
+        backgroundColor: 'rgba(0,0,0,0.92)',
+        duration: 2,
+      }, 0.8);
 
     // 2. Idle floating for title while visible
     gsap.to(titleRef.current, {
@@ -150,10 +172,12 @@ export function ProjectHero({
       const yPercent = (clientY / innerHeight - 0.5) * 2;
       
       gsap.to(titleRef.current, {
-        rotateY: xPercent * 10,
-        rotateX: -yPercent * 10,
-        duration: 1.2,
+        rotateY: xPercent * 15,
+        rotateX: -yPercent * 15,
+        scale: 1.05,
+        duration: 0.5,
         ease: 'power2.out',
+        overwrite: 'auto'
       });
       
       if (glareRef.current) {
@@ -167,11 +191,14 @@ export function ProjectHero({
     };
 
     window.addEventListener('mousemove', onMove);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-    };
-
-  }, { scope: heroRef });
+    // 4. Studio Mode Entrance Animation (One-time)
+    if (isInteracting) {
+      gsap.fromTo('.studio-bar', 
+        { y: 50, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.75)' }
+      );
+    }
+  }, { scope: heroRef, dependencies: [isInteracting] });
 
   return (
     <>
@@ -201,7 +228,7 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full pt-[14vh] will-change-transform"
+          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full pt-[20vh] md:pt-[24vh] will-change-transform"
         >
           <div className="relative group mb-12" style={{ transformStyle: 'preserve-3d' }}>
             <div
@@ -248,19 +275,89 @@ export function ProjectHero({
           </div>
         </div>
 
-        {/* ── Phase 2 Content: Full-Screen Screen ── */}
-        <div 
+        {/* ── PROJECT PREVIEW SCREEN ── */}
+        <div
           ref={screenRef}
-          className="absolute z-[30] h-[90vh] overflow-hidden shadow-[0_100px_200px_-50px_rgba(0,0,0,0.8)] bg-[#050505] will-change-transform"
-          style={{ transformStyle: 'preserve-3d' }}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden bg-black flex items-center justify-center"
+          style={{
+            transformStyle: 'preserve-3d',
+            willChange: 'transform, opacity, filter',
+          }}
         >
+          {/* 🚀 INTERACTION SHIELD & CTA */}
+          <div 
+            className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-700 bg-black/0 group/shield"
+            style={{ 
+              opacity: isInteracting ? 0 : 'var(--shield-opacity, 1)',
+              pointerEvents: isInteracting ? 'none' : 'all',
+              backgroundColor: canInteract ? 'rgba(0,0,0,0.2)' : 'transparent',
+              backdropFilter: canInteract ? 'blur(4px)' : 'none',
+            }}
+            onClick={() => {
+              if (canInteract) {
+                setIsInteracting(true);
+                (window as any).__lenis?.stop();
+              }
+            }}
+          >
+            {canInteract && !isInteracting && (
+              <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-700">
+                <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-2xl group-hover/shield:scale-110 transition-transform cursor-pointer studio-pulse">
+                   <MousePointer2 size={24} className="animate-pulse" />
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/60 bg-black/40 px-4 py-2 rounded-lg border border-white/10">
+                  Click to Interact with Live Site
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* 🚀 STUDIO CONTROL BAR */}
+          {isInteracting && (
+            <div className="studio-bar absolute bottom-6 left-1/2 -translate-x-1/2 z-[110] flex items-center gap-3">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl">
+                <div className="flex items-center gap-2 pr-4 border-r border-white/10">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-white/80">Studio Mode Active</span>
+                </div>
+                <button 
+                  onClick={() => {
+                    setIsInteracting(false);
+                    (window as any).__lenis?.start();
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-white/90 group"
+                >
+                  <MoveUp size={14} className="group-hover:-translate-y-1 transition-transform" />
+                  <span className="text-[10px] font-black uppercase tracking-tighter">Exit to Scroll</span>
+                </button>
+                {liveUrl && (
+                  <a 
+                    href={liveUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/60 hover:text-white"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
           {liveUrl ? (
             <iframe 
               ref={iframeRef}
               src={liveUrl} 
               title={iframeTitle}
-              className="w-full h-full border-none"
+              className="w-full h-full border-none transition-opacity duration-1000"
               loading="eager"
+              style={{ 
+                opacity: 0.95,
+                background: '#050505',
+              }}
+              onLoad={(e) => {
+                (e.target as HTMLIFrameElement).style.opacity = '1';
+              }}
             />
           ) : videoUrl ? (
             <video src={videoUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" />

@@ -117,17 +117,30 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         });
       }
 
-      // --- LÓGICA DE LINTERNA (SPOTLIGHT) ────────────────────────────
+      // --- LÓGICA DE LINTERNA (SPOTLIGHT) & 3D PARALLAX ────────────────────────────
       if (textContainerRef.current) {
         const tRect = textContainerRef.current.getBoundingClientRect();
         const x = e.clientX - tRect.left;
         const y = e.clientY - tRect.top;
+        
+        // Spotlight
         gsap.to(textContainerRef.current, {
           '--mx': `${x}px`,
           '--my': `${y}px`,
           duration: 0.15,
           ease: 'sine.out',
           overwrite: true
+        });
+
+        // 3D Parallax Tilt for the title
+        const xPercent = (x / tRect.width - 0.5) * 2;
+        const yPercent = (y / tRect.height - 0.5) * 2;
+        gsap.to(textContainerRef.current, {
+          rotateY: xPercent * 5,
+          rotateX: -yPercent * 5,
+          duration: 1,
+          ease: 'power2.out',
+          overwrite: 'auto'
         });
       }
     };
@@ -140,8 +153,10 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         gsap.to(textContainerRef.current, {
           '--mx': `-500px`,
           '--my': `-500px`,
-          duration: 0.8,
-          ease: 'power2.out'
+          rotateX: 0,
+          rotateY: 0,
+          duration: 1.5,
+          ease: 'elastic.out(1, 0.3)'
         });
       }
     };
