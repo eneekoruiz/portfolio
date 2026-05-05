@@ -324,7 +324,7 @@ export default function ProjectPage() {
       ref={main}
       className="relative min-h-[350vh] overflow-x-hidden selection:bg-brand/20 bg-page text-ink transition-colors duration-300"
     >
-      <InfallibleCursor />
+
 
       {/* ── 3D BACKGROUND (DEFERRED LOADING) ── */}
       {isReadyToAnimate && (
@@ -334,7 +334,7 @@ export default function ProjectPage() {
               className="helix-group will-change-transform"
               style={{
                 width: 'clamp(180px, 30vw, 420px)', height: '210vh',
-                opacity: darkMode ? 0.3 : 0.15,
+                opacity: darkMode ? 0.45 : 0.25,
                 filter: `drop-shadow(0 0 30px ${theme.helixA}60)`,
                 transformStyle: 'preserve-3d',
               }}

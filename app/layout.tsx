@@ -27,16 +27,15 @@ export const metadata: Metadata = {
     type: 'website', locale: 'es_ES', url: 'https://eneko.dev', siteName: 'Eneko Ruiz',
     title: 'Eneko Ruiz — Full Stack Developer',
     description: 'Donostia · Me obsesiono con los detalles que nadie nota pero todo el mundo siente.',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Eneko Ruiz Portfolio' }],
+    images: [],
   },
   twitter: {
     card: 'summary_large_image', creator: '@eneekoruiz',
-    title: 'Eneko Ruiz — Full Stack Developer', images: ['/og.png'],
+    title: 'Eneko Ruiz — Full Stack Developer', images: [],
   },
   robots: { index: true, follow: true },
   icons: {
     icon: '/icon.png',
-    apple: '/apple-icon.png',
   },
 };
 

@@ -527,7 +527,7 @@ export default function Home() {
         </>
       )}
 
-      <InfallibleCursor />
+
 
       {/* ── 3D BACKGROUND (DEFERRED) ── */}
       {ready && (

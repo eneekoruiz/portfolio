@@ -408,7 +408,7 @@ export function ProjectHero({
               style={{ 
                 opacity: 0.95,
                 background: '#050505',
-                filter: isInteracting ? 'none' : 'blur(12px) grayscale(0.5)',
+                filter: (canInteract && !isInteracting) ? 'blur(12px) grayscale(0.5)' : 'none',
                 transform: isInteracting ? 'scale(1)' : 'scale(1.05)',
               }}
               onLoad={(e) => {

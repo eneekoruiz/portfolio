@@ -44,8 +44,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
       ctx.clearRect(0, 0, w, h);
       
       const steps = 60;
-      const speed = 0.003; // Slower for realism
-      const scrollImpact = scrollRef.current * 0.0004;
+      const speed = 0.008; // More dynamic rotation
+      const scrollImpact = scrollRef.current * 0.0012; // More responsive scroll movement
       rotationRef.current += speed;
       
       const baseRotation = rotationRef.current + scrollImpact;
@@ -64,8 +64,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           else ctx.lineTo(x, y);
         }
         ctx.strokeStyle = s === 0 ? accent : secondary;
-        ctx.lineWidth = 1.2;
-        ctx.globalAlpha = 0.2;
+        ctx.lineWidth = 2.5; // Thicker strands
+        ctx.globalAlpha = 0.4; // More opacity
         ctx.stroke();
       }
 
@@ -95,11 +95,11 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
 
         // Draw Nodes
         const drawNode = (x: number, z: number, color: string) => {
-          const size = 1.2 + (z + 1) * 1.5;
+          const size = 1.5 + (z + 1) * 2.2; // Larger nodes
           ctx.beginPath();
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fillStyle = color;
-          ctx.globalAlpha = 0.3 + (z + 1) * 0.4;
+          ctx.globalAlpha = 0.4 + (z + 1) * 0.5;
           
           if (z > 0.7) {
             ctx.shadowBlur = 12;
