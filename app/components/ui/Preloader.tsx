@@ -2,87 +2,63 @@
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- * PRELOADER — Terminal-style loading with grid, blue glow & text expansion exit
+ * PREMIUM PRELOADER — Minimalist high-fidelity reveal
  * ─────────────────────────────────────────────────────────────────────────────
  *
  * ESTÉTICA:
- *   - Cuadrícula de fondo (grid lines) visible a 0.06/0.10 opacity
- *   - Resplandor azul pulsante detrás del porcentaje (--brand color)
- *   - Barra de progreso animada bajo los mensajes técnicos
- *
- * ANIMACIÓN DE SALIDA (Professional Slide):
- *   Cuando el contador llega a 100%, se dispara un timeline GSAP secuencial:
- *     1. El mensaje técnico y la barra se desvanecen rápidamente
- *     2. El porcentaje hace un ligero scale + fade out elegante
- *     3. El contenedor entero se desliza hacia arriba (yPercent: -100)
- *     4. onDone() se llama al final del slide
- *
- * FIX: Se elimina el setTimeout que causaba desincronización entre el
- *      fin del conteo y la animación de salida.
+ *   - Fondo negro puro con ruido orgánico (vía globals.css)
+ *   - Tipografía masiva con tracking negativo y efecto "shimmer"
+ *   - Progreso visual mediante una línea ultra-fina y resplandor radial
+ *   - Transición de salida tipo "Cinematic Zoom & Fade"
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 
-const TECH_MESSAGES = [
-  'Initialising Data Streams...',
-  'Compiling MVC Logic...',
-  'Mapping Semantic DOM...',
-  'Bootstrapping Firebase SDK...',
-  'Hydrating React Tree...',
-  'Resolving Mongoose Refs...',
-  'Validating Bcrypt Salts...',
-  'Mounting ScrollTrigger...',
-  'Parsing Atomic Transactions...',
-  'Calibrating GSAP Timeline...',
-  'Injecting WCAG 2.1 Layer...',
-  'Warming JAX-WS Endpoints...',
-  'System Ready.',
-];
-
 export function Preloader({ onDone }: { onDone: () => void }) {
   const [n, setN] = useState(0);
-  const [msgIdx, setMsgIdx] = useState(0);
-
   const containerRef = useRef<HTMLDivElement>(null);
   const numRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLParagraphElement>(null);
+  const barContainerRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
+  const lightRef = useRef<HTMLDivElement>(null);
   const exitFired = useRef(false);
 
-  // Stable ref to onDone so the counter effect doesn't re-trigger
+  // Stable ref to onDone
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
-  // ── Rotating tech messages ─────────────────────────────────────────────
+  // ── Counter Logic (High precision) ──────────────────────────────────────
   useEffect(() => {
-    const id = setInterval(() => {
-      setMsgIdx(i => (i + 1) % (TECH_MESSAGES.length - 1));
-    }, 280);
-    return () => clearInterval(id);
+    let v = 0;
+    let rafId: number;
+
+    const tick = () => {
+      // Random but smooth increments
+      const inc = Math.random() * 3 + 1;
+      v += inc;
+      
+      if (v >= 100) {
+        setN(100);
+        // Small delay to let the user see "100%" before exit
+        setTimeout(() => playExit(), 150);
+        return;
+      }
+      
+      setN(Math.round(v));
+      rafId = requestAnimationFrame(() => {
+        setTimeout(tick, 20 + Math.random() * 15);
+      });
+    };
+
+    tick();
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
-  // ── Pulsing glow animation (loops while loading) ──────────────────────
-  useEffect(() => {
-    if (!glowRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(glowRef.current,
-        { scale: 1, opacity: 0.4 },
-        {
-          scale: 1.35, opacity: 0.7,
-          duration: 1.6,
-          ease: 'sine.inOut',
-          repeat: -1,
-          yoyo: true,
-        }
-      );
-    });
-    return () => ctx.revert();
-  }, []);
-
-  // ── Exit animation — fires exactly when counter reaches 100% ──────────
+  // ── Exit Animation (Cinematic & Premium) ──────────────────────────────
   const playExit = useCallback(() => {
     if (exitFired.current) return;
     exitFired.current = true;
@@ -92,146 +68,89 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     });
 
     tl
-      // 1. Tech message & progress bar fade out fast
-      .to([textRef.current, barRef.current], {
+      // 1. Zoom and fade out the UI elements
+      .to([numRef.current, barContainerRef.current], {
+        scale: 1.1,
         opacity: 0,
-        y: -10,
-        duration: 0.2,
-        stagger: 0.05,
-        ease: 'power2.in',
+        duration: 0.5,
+        ease: 'power3.inOut',
+        stagger: 0.1,
       })
-      // 2. Number fades out with a subtle scale up (not massive)
-      .to(numRef.current, {
-        scale: 1.15,
+      // 2. Light pulse
+      .to(lightRef.current, {
+        scale: 2,
         opacity: 0,
-        duration: 0.35,
-        ease: 'power2.out',
-      }, '-=0.1')
-      // 3. Glow fades out
-      .to(glowRef.current, {
-        opacity: 0,
-        scale: 1.5,
-        duration: 0.3,
+        duration: 0.6,
         ease: 'power2.inOut',
-      }, '<')
-      // 4. Elegant slide up of the entire container (more fluid transition to splash)
+      }, '-=0.3')
+      // 3. Fade entire container
       .to(containerRef.current, {
-        yPercent: -100,
-        duration: 0.65,
-        ease: 'power4.inOut',
-      }, '-=0.15');
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.inOut',
+      }, '-=0.2');
   }, []);
-
-  // ── Counter logic ─────────────────────────────────────────────────────
-  useEffect(() => {
-    let v = 0;
-    let rafId: number;
-
-    const tick = () => {
-      v += Math.random() * 4 + 1.5;
-      if (v >= 100) {
-        setN(100);
-        setMsgIdx(TECH_MESSAGES.length - 1);
-        // Trigger exit on next frame so React has painted the "100%"
-        rafId = requestAnimationFrame(() => playExit());
-        return;
-      }
-      setN(Math.round(v));
-      setTimeout(tick, 18 + Math.random() * 12);
-    };
-
-    setTimeout(tick, 30);
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [playExit]);
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-page text-ink overflow-hidden"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-white overflow-hidden"
     >
-      {/* ── Grid background ── */}
+      {/* ── Ambient Light (Follows progress) ── */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.06] dark:opacity-[0.10]"
+        ref={lightRef}
+        className="absolute pointer-events-none rounded-full opacity-30"
         style={{
-          backgroundImage:
-            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+          width: '60vw',
+          height: '60vw',
+          background: 'radial-gradient(circle, rgba(0,102,255,0.15) 0%, transparent 70%)',
+          filter: 'blur(100px)',
+          transform: `scale(${0.8 + (n / 100) * 0.4})`,
         }}
       />
 
-      {/* ── Scanline overlay for tech feel ── */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.015] dark:opacity-[0.03]"
-        style={{
-          backgroundImage:
-            'repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 3px)',
-        }}
-      />
-
-      {/* ── Blue glow (pulsing) ── */}
-      <div
-        ref={glowRef}
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: '220px',
-          height: '220px',
-          background: 'radial-gradient(circle, rgba(var(--brand-rgb), 0.6) 0%, rgba(var(--brand-rgb), 0.2) 45%, transparent 70%)',
-          filter: 'blur(40px)',
-          opacity: 0.4,
-        }}
-      />
-
-      {/* ── Content ── */}
-      <div className="relative z-10 flex flex-col items-center gap-6">
-        {/* Percentage number */}
+      {/* ── Main Counter ── */}
+      <div className="relative z-10 flex flex-col items-center">
         <div
           ref={numRef}
-          className="font-black text-[clamp(4rem,12vw,11rem)] tracking-[-0.04em] leading-none origin-center select-none"
-          style={{ willChange: 'transform, opacity' }}
+          className="font-black text-[clamp(6rem,18vw,14rem)] tracking-[-0.06em] leading-none mb-4 select-none gpu-accelerated"
         >
-          {n}%
+          {n.toString().padStart(2, '0')}
         </div>
 
-        {/* Tech message + progress bar */}
-        <div className="flex flex-col items-center gap-3">
-          <p
-            ref={textRef}
-            className="font-mono text-[10px] tracking-[0.4em] uppercase text-lead font-bold"
-          >
-            {TECH_MESSAGES[msgIdx]}
-          </p>
-
-          {/* Progress bar */}
-          <div
-            ref={barRef}
-            className="w-36 h-[2px] bg-black/5 dark:bg-white/5 relative overflow-hidden rounded-full"
-          >
+        {/* ── Progress Bar (Minimalist) ── */}
+        <div 
+          ref={barContainerRef}
+          className="flex flex-col items-center gap-4 opacity-50"
+        >
+          <div className="w-48 h-[1px] bg-white/10 relative overflow-hidden">
             <div
-              className="absolute inset-0 origin-left transition-transform duration-100 ease-out rounded-full"
-              style={{
+              ref={barRef}
+              className="absolute inset-0 bg-white origin-left"
+              style={{ 
                 transform: `scaleX(${n / 100})`,
-                background: `linear-gradient(90deg, rgba(var(--brand-rgb), 0.6), rgba(var(--brand-rgb), 1))`,
+                transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' 
               }}
             />
+          </div>
+          
+          <div className="flex items-center gap-3">
+             <span className="font-mono text-[9px] tracking-[0.5em] uppercase opacity-40 font-bold">
+               {n < 100 ? 'System Loading' : 'Complete'}
+             </span>
+             <div className={`w-1 h-1 rounded-full bg-brand ${n < 100 ? 'animate-pulse' : ''}`} />
           </div>
         </div>
       </div>
 
-      {/* ── Corner markers (tech aesthetic) ── */}
-      <div className="absolute top-6 left-6 w-5 h-5 border-l border-t border-current opacity-[0.08] dark:opacity-[0.12]" />
-      <div className="absolute top-6 right-6 w-5 h-5 border-r border-t border-current opacity-[0.08] dark:opacity-[0.12]" />
-      <div className="absolute bottom-6 left-6 w-5 h-5 border-l border-b border-current opacity-[0.08] dark:opacity-[0.12]" />
-      <div className="absolute bottom-6 right-6 w-5 h-5 border-r border-b border-current opacity-[0.08] dark:opacity-[0.12]" />
-
-      {/* ── Bottom status line ── */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 opacity-40">
-        <div className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
-        <span className="font-mono text-[9px] tracking-[0.35em] uppercase text-lead font-bold">
-          SYS.BOOT
-        </span>
+      {/* ── Corner Indices (Premium Detail) ── */}
+      <div className="absolute top-10 left-10 flex flex-col gap-1 opacity-20">
+        <div className="w-8 h-px bg-white" />
+        <span className="font-mono text-[8px] tracking-[0.2em] uppercase">Eneko Ruiz</span>
+      </div>
+      <div className="absolute bottom-10 right-10 flex items-center gap-4 opacity-20">
+        <span className="font-mono text-[8px] tracking-[0.2em] uppercase">Est. 2026</span>
+        <div className="w-8 h-px bg-white" />
       </div>
     </div>
   );

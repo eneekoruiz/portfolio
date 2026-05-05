@@ -36,27 +36,29 @@ export async function GET(request: Request) {
 
     // Enrich the first 8 non-fork repos with all languages
     const enrichedRepos = await Promise.all(
-      repos.filter((r: any) => !r.fork).slice(0, 8).map(async (repo: any) => {
-        try {
-          const langRes = await fetch(repo.languages_url, {
-            headers: {
-              Accept: 'application/vnd.github+json',
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            next: { revalidate: 3600 } // Cache languages for an hour
-          });
-          if (langRes.ok) {
-            const langData = await langRes.json();
-            return { ...repo, all_languages: Object.keys(langData) };
-          }
-        } catch (_) {}
-        return { ...repo, all_languages: repo.language ? [repo.language] : [] };
-      })
+      repos
+        .filter((r: { fork: boolean }) => !r.fork)
+        .slice(0, 8)
+        .map(async (repo: { id: number; languages_url: string; language: string | null }) => {
+          try {
+            const langRes = await fetch(repo.languages_url, {
+              headers: {
+                Accept: 'application/vnd.github+json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              next: { revalidate: 3600 } // Cache languages for an hour
+            });
+            if (langRes.ok) {
+              const langData: Record<string, number> = await langRes.json();
+              return { ...repo, all_languages: Object.keys(langData) };
+            }
+          } catch (_) {}
+          return { ...repo, all_languages: repo.language ? [repo.language] : [] };
+        })
     );
 
     // Replace enriched repos back in the list or just return them if we only care about those
-    // For simplicity and since useGitHub slices anyway, we can return everything but enriched ones updated
-    const finalData = repos.map((r: any) => {
+    const finalData = repos.map((r: { id: number }) => {
       const enriched = enrichedRepos.find(er => er.id === r.id);
       return enriched || r;
     });

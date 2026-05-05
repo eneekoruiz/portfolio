@@ -76,8 +76,12 @@ export function InfallibleCursor() {
       }
     };
 
-    // Bucle de animación (Lerp matemático) a 144fps target
     const animate = () => {
+      if (document.visibilityState !== 'visible') {
+        rafRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       // Suavizado de posición (Lerp) - Factor 0.15 para lag premium
       cx.current += (mx.current - cx.current) * 0.15;
       cy.current += (my.current - cy.current) * 0.15;

@@ -81,17 +81,18 @@ export function ProjectHero({
       scrollTrigger: {
         trigger: heroRef.current,
         start: 'top top',
-        end: '+=160%', // Slightly longer for more control
-        scrub: 1, // Snappier scrub
+        end: '+=160%',
+        scrub: 1,
         pin: true,
         anticipatePin: 1,
         onUpdate: (self) => {
-          // 🚀 UX SHIELD: Definitive fix for iframe scroll stealing
-          if (screenRef.current) {
-            const isLocked = self.progress > 0.98;
+          // 🚀 UX SHIELD: Optimized threshold check
+          const isLocked = self.progress > 0.98;
+          if (canInteract !== isLocked) {
             setCanInteract(isLocked);
-            
-            // We use a CSS variable or direct style to toggle the pointer events of the SHIELD
+          }
+          
+          if (screenRef.current) {
             screenRef.current.style.setProperty('--shield-opacity', isLocked ? '0' : '1');
             screenRef.current.style.setProperty('--shield-pointer', isLocked ? 'none' : 'all');
           }
@@ -100,35 +101,33 @@ export function ProjectHero({
     });
 
     tl
-      // Phase 1: Title & Background Dissolve
+      // Phase 1: Title & Background Dissolve (REMOVED HEAVY BLURS for CPU fluidity)
       .to(contentRef.current, {
-        y: -200,
+        y: -150,
         opacity: 0,
-        scale: 0.75,
-        filter: 'blur(30px)',
+        scale: 0.8,
+        force3D: true,
         ease: 'power2.in',
         duration: 1.2,
       }, 0)
       .to(bgImageRef.current, {
-        scale: 3,
-        opacity: 0.01,
-        filter: 'blur(80px)',
+        scale: 2,
+        opacity: 0.05,
+        force3D: true,
         ease: 'power2.inOut',
         duration: 2,
       }, 0)
 
-      // Phase 2: High-Performance 3D Entrance (Cinematic Zoom)
+      // Phase 2: High-Performance 3D Entrance
       .fromTo(screenRef.current,
         { 
-          y: '80vh', 
-          scale: 0.2, 
-          rotateX: 45,
-          rotateY: -15, // Subtle side tilt for depth
-          z: -1000,
-          borderRadius: '10rem',
-          width: '40vw',
+          y: '60vh', 
+          scale: 0.3, 
+          rotateX: 30,
+          z: -500,
+          borderRadius: '8rem',
+          width: '50vw',
           opacity: 0,
-          filter: 'blur(20px) brightness(0.5)',
         },
         { 
           y: '0vh', 
@@ -140,59 +139,62 @@ export function ProjectHero({
           width: '90vw',
           height: '85vh',
           opacity: 1,
-          filter: 'blur(0px) brightness(1)',
-          ease: 'expo.out', // Snappier entrance
-          duration: 2, // Reduced duration
+          force3D: true,
+          ease: 'expo.out',
+          duration: 2,
         },
-        0.2 // Earlier start
+        0.2
       )
       
       // Phase 3: Final Depth Adjustment
       .to(overlayRef.current, {
         opacity: 1,
-        backgroundColor: 'rgba(0,0,0,0.92)',
+        backgroundColor: 'rgba(0,0,0,0.95)',
         duration: 2,
       }, 0.8);
 
-    // 2. Idle floating for title while visible
+    // 2. Idle floating
     gsap.to(titleRef.current, {
-      y: '+=10',
+      y: '+=8',
       duration: 3,
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
+      force3D: true,
     });
 
-    // 3. Mouse Interaction (only affects title when visible)
+    // 3. Mouse Interaction (Optimized)
     const onMove = (e: MouseEvent) => {
       if (!titleRef.current) return;
       const { clientX, clientY } = e;
       const { innerWidth, innerHeight } = window;
-      const xPercent = (clientX / innerWidth - 0.5) * 2;
-      const yPercent = (clientY / innerHeight - 0.5) * 2;
+      const mx = (clientX / innerWidth - 0.5) * 2;
+      const my = (clientY / innerHeight - 0.5) * 2;
       
       gsap.to(titleRef.current, {
-        rotateY: xPercent * 15,
-        rotateX: -yPercent * 15,
-        scale: 1.05,
-        duration: 0.4, // Snappier
+        rotateY: mx * 12,
+        rotateX: -my * 12,
+        scale: 1.02,
+        duration: 0.6,
         ease: 'power2.out',
-        overwrite: 'auto'
+        overwrite: 'auto',
+        force3D: true,
       });
       
       if (glareRef.current) {
         gsap.to(glareRef.current, {
-          x: xPercent * 40,
-          y: yPercent * 40,
-          opacity: 0.4,
-          duration: 1.2, // Snappier
+          x: mx * 30,
+          y: my * 30,
+          opacity: 0.3,
+          duration: 1,
+          force3D: true,
         });
       }
 
-      // 🚀 UX MIDDLE GROUND: Release interaction if mouse leaves the screenRef area
+      // 🚀 UX MIDDLE GROUND
       if (isInteracting && screenRef.current) {
         const r = screenRef.current.getBoundingClientRect();
-        const buffer = 20; // px
+        const buffer = 40;
         if (
           clientX < r.left - buffer || 
           clientX > r.right + buffer || 
@@ -200,20 +202,44 @@ export function ProjectHero({
           clientY > r.bottom + buffer
         ) {
           setIsInteracting(false);
-          (window as any).__lenis?.start();
         }
       }
     };
 
     window.addEventListener('mousemove', onMove);
-    // 4. Studio Mode Entrance Animation (One-time)
+    
     if (isInteracting) {
       gsap.fromTo('.studio-bar', 
-        { y: 50, opacity: 0, scale: 0.9 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' }
+        { y: 30, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out', force3D: true }
       );
     }
-  }, { scope: heroRef, dependencies: [isInteracting] });
+
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+    };
+  }, { scope: heroRef, dependencies: [isInteracting, canInteract] });
+
+  // ── 🚀 STUDIO MODE SIDE EFFECTS (Scroll Lock & ESC Key) ────────────────
+  useEffect(() => {
+    if (isInteracting) {
+      // 1. Strict Scroll Lock
+      document.body.style.overflow = 'hidden';
+      (window as any).__lenis?.stop();
+
+      // 2. ESC Key Listener
+      const handleEsc = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setIsInteracting(false);
+      };
+      window.addEventListener('keydown', handleEsc);
+      
+      return () => {
+        document.body.style.overflow = '';
+        (window as any).__lenis?.start();
+        window.removeEventListener('keydown', handleEsc);
+      };
+    }
+  }, [isInteracting]);
 
   return (
     <>

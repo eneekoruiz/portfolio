@@ -155,7 +155,10 @@ export function useGitHub(t: Tx) {
       const recent = allRepos
         .filter(r => !r.fork)
         .slice(0, 8)
-        .map(r => ({ ...r, langs: (r as any).all_languages || [r.language].filter(Boolean) }));
+        .map(r => ({
+          ...r,
+          langs: (r as Repo & { all_languages?: string[] }).all_languages || (r.language ? [r.language] : [])
+        }));
 
       setRepos(recent as RepoFull[]);
       setOffline(false);

@@ -123,10 +123,17 @@ html[data-lite='1'] .will-gpu { will-change: auto !important; transform: none !i
 
 /* ── 5. GLOBAL ANIMATION DEFAULTS ── */
 /* Prevent forced layout calculations during animations */
-.will-gpu {
+.will-gpu, .gpu-accelerated {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* Optimization: Smooth scroll but snappy response */
+html {
+  scroll-behavior: smooth;
+  -webkit-backface-visibility: hidden;
 }
 
 /* ── 6. SCROLL REVEAL — Optimized for smooth entrance ── */

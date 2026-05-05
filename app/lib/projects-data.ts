@@ -1,7 +1,22 @@
 // app/lib/projects-data.ts
 import type { Lang } from './types';
 
-export const PROJECTS_CONTENT: any = {
+export interface ProjectContent {
+  title: string;
+  subtitle: string;
+  role: string;
+  objective: string;
+  algorithmH: string;
+  algorithmP: string;
+  supabaseH: string;
+  supabaseP: string;
+  outcomeH: string;
+  outcomeP: string;
+  codeSpotlight: string;
+  techBadges: string[];
+}
+
+export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectContent>>> = {
   'ana-peluquera': {
     es: {
       title: 'AG Beauty Salon', subtitle: 'Booking Orchestration & CMS', role: 'Full-Stack Lead Architect',

@@ -18,28 +18,33 @@ export function GlareCard({ children, accent, className = '', style }: { childre
     const yPercent = (y / r.height - 0.5) * 2; // -1 to 1
     
     gsap.to(cardRef.current, {
-      rotateY: xPercent * 15, // Amplified from 8 to 15
+      rotateY: xPercent * 15,
       rotateX: -yPercent * 15,
-      scale: 1.05, // Added scale for more noticeability
-      duration: 0.5,
+      scale: 1.05,
+      duration: 0.4,
       ease: 'power2.out',
-      overwrite: 'auto'
+      overwrite: 'auto',
+      force3D: true
     });
 
-    // Dynamic Glare
-    const gx = (x / r.width) * 100;
-    const gy = (y / r.height) * 100;
-    glareRef.current.style.setProperty('--gx', `${gx}%`);
-    glareRef.current.style.setProperty('--gy', `${gy}%`);
+    // Dynamic Glare (Optimized)
+    if (glareRef.current) {
+      const gx = (x / r.width) * 100;
+      const gy = (y / r.height) * 100;
+      glareRef.current.style.setProperty('--gx', `${gx}%`);
+      glareRef.current.style.setProperty('--gy', `${gy}%`);
+    }
   };
 
   const onLeave = () => {
     gsap.to(cardRef.current, {
       rotateY: 0,
       rotateX: 0,
-      duration: 1.2,
-      ease: 'elastic.out(1, 0.3)',
-      overwrite: 'auto'
+      scale: 1,
+      duration: 0.8,
+      ease: 'power3.out',
+      overwrite: 'auto',
+      force3D: true
     });
   };
 

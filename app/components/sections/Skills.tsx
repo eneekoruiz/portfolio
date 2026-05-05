@@ -25,27 +25,43 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
     const items = containerRef.current?.querySelectorAll<HTMLDivElement>('.mini-cyl-item');
     if (!items) return;
 
+    let isVisible = false;
+
     const animate = () => {
-      if (!paused) angleRef.current += 0.004; 
+      if (!paused && isVisible) angleRef.current += 0.004; 
       const a = angleRef.current;
       
-      items.forEach((el, i) => {
-        const theta = i * angleStep + a;
-        const x = Math.sin(theta) * radius;
-        const z = Math.cos(theta) * radius;
-        
-        const scale = 0.5 + ((z + radius) / (2 * radius)) * 0.5;
-        const opacity = 0.2 + ((z + radius) / (2 * radius)) * 0.8;
-        
-        el.style.transform = `translate(-50%, -50%) translateX(${x.toFixed(1)}px) translateZ(${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
-        el.style.opacity = String(opacity.toFixed(3));
-        el.style.zIndex = String(Math.round(z + radius));
-      });
+      if (isVisible) {
+        items.forEach((el, i) => {
+          const theta = i * angleStep + a;
+          const x = Math.sin(theta) * radius;
+          const z = Math.cos(theta) * radius;
+          
+          const scale = 0.5 + ((z + radius) / (2 * radius)) * 0.5;
+          const opacity = 0.2 + ((z + radius) / (2 * radius)) * 0.8;
+          
+          el.style.transform = `translate(-50%, -50%) translateX(${x.toFixed(1)}px) translateZ(${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+          el.style.opacity = String(opacity.toFixed(3));
+          el.style.zIndex = String(Math.round(z + radius));
+        });
+      }
       animRef.current = requestAnimationFrame(animate);
     };
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+
+    if (containerRef.current) observer.observe(containerRef.current);
+
     animate();
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+    return () => { 
+      if (animRef.current) cancelAnimationFrame(animRef.current); 
+      observer.disconnect();
+    };
   }, [paused, N, radius, angleStep]);
 
   return (

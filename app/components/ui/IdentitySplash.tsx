@@ -115,23 +115,20 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
   return (
     <div
       ref={containerRef}
-      // z-[9998]: por encima de contenido (visible gracias a visibility:hidden
-      // en page.tsx) pero por debajo del cursor (z-[99999])
-      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center"
+      // z-[9998]: por encima de contenido
+      className="fixed inset-0 z-[9998] bg-black text-white flex flex-col items-center justify-center"
       aria-hidden="true"
     >
       <div className="flex flex-col items-center">
         {/*
           Máscara de overflow: las letras "nacen" subiendo desde abajo
-          gracias a yPercent:110 inicial + overflow-hidden en el contenedor.
         */}
-        <div className="overflow-hidden pb-2 mb-5">
+        <div className="overflow-hidden pb-2 mb-8">
           <div ref={textRef} className="flex">
             {word.split('').map((char, i) => (
               <span
                 key={i}
-                className="char font-black text-[clamp(3.5rem,8vw,7rem)] tracking-[-0.03em] leading-none inline-block"
-                /* opacity:0 y yPercent:110 los fija gsap.set() en useEffect */
+                className="char font-black text-[clamp(4rem,10vw,8.5rem)] tracking-[-0.05em] leading-none inline-block gpu-accelerated"
               >
                 {char === ' ' ? '\u00A0' : char}
               </span>
@@ -140,15 +137,14 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
         </div>
 
         {/* Línea animada + nombre */}
-        <div className="flex items-center gap-4">
-          <div className="h-[2px] w-10 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+        <div className="flex items-center gap-6">
+          <div className="h-[1px] w-12 bg-white/10 rounded-full overflow-hidden">
             <div
               ref={lineRef}
               className="h-full w-full bg-brand origin-center"
-              /* scaleX:0 lo fija gsap.set() en useEffect */
             />
           </div>
-          <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-lead font-bold">
+          <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-white/40 font-bold">
             Eneko Ruiz
           </span>
         </div>

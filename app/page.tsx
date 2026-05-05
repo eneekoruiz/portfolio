@@ -539,7 +539,7 @@ export default function Home() {
               style={{
                 width: 'clamp(200px, 40vw, 500px)', height: '240vh',
                 opacity: 0.05,
-                filter: 'blur(40px)',
+                filter: 'blur(12px)',
                 transformStyle: 'preserve-3d',
               }}
             >

@@ -38,7 +38,6 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         const permission = await DeviceOrientationEvent.requestPermission();
         return permission === 'granted';
       } catch (e) {
-        console.log('Device orientation permission denied or unavailable');
         return false;
       }
     }
@@ -166,7 +165,6 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       const hasPermission = await requestDevicePermission();
       
       if (!hasPermission) {
-        console.log('No device orientation permission. Using touch fallback.');
         setupTouchFallback();
         return;
       }

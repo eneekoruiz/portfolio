@@ -80,8 +80,7 @@ export const TerrainMesh = ({ accent }: { accent: string }) => {
 
     const draw = () => {
       if (!activeRef.current || document.visibilityState !== 'visible') {
-        if (animRef.current) cancelAnimationFrame(animRef.current);
-        animRef.current = undefined;
+        animRef.current = requestAnimationFrame(draw);
         return;
       }
 

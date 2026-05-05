@@ -49,20 +49,23 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index, isMo
       );
     });
 
-    // 2. Efecto Spotlight
+    // 2. Efecto Spotlight (Optimized with RequestAnimationFrame)
+    let rafId: number;
     const onMouseMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      el.style.setProperty('--mouse-x', `${x}px`);
-      el.style.setProperty('--mouse-y', `${y}px`);
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        el.style.setProperty('--mouse-x', `${x}px`);
+        el.style.setProperty('--mouse-y', `${y}px`);
+      });
     };
 
-    // 3. Físicas orgánicas en el Hover
-    const onEnter = () => gsap.to(el, { y: -4, scale: 1.01, duration: 0.22, ease: 'back.out(1.5)' });
-    const onLeave = () => gsap.to(el, { y: 0, scale: 1, duration: 0.288, ease: 'power3.out' });
+    // 3. Físicas orgánicas en el Hover (Hardware accelerated)
+    const onEnter = () => gsap.to(el, { y: -4, scale: 1.01, duration: 0.22, ease: 'back.out(1.5)', force3D: true });
+    const onLeave = () => gsap.to(el, { y: 0, scale: 1, duration: 0.28, ease: 'power3.out', force3D: true });
 
-    // Solo aplicamos los listeners si no estamos en un dispositivo móvil (touch)
     if (window.matchMedia('(hover: hover)').matches) {
       el.addEventListener('mousemove', onMouseMove);
       el.addEventListener('mouseenter', onEnter);
@@ -71,6 +74,7 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index, isMo
     
     return () => {
       ctx.revert();
+      cancelAnimationFrame(rafId);
       el.removeEventListener('mousemove', onMouseMove);
       el.removeEventListener('mouseenter', onEnter);
       el.removeEventListener('mouseleave', onLeave);
