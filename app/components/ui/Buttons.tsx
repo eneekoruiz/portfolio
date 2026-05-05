@@ -94,21 +94,27 @@ export function BinaryStreamBtn({
 
     let p = 0;
     ivRef.current = setInterval(() => {
-      p += 100 / 60;
+      p += 100 / 20; // 20 steps instead of 60 -> 600ms total
       if (p >= 100) {
         clearInterval(ivRef.current); clearInterval(bvRef.current);
         setBits([]); setProgress(100); setState('done'); setShowRipple(true);
         
-        // Navigate to curriculum page with smooth transition
+        // Navigate faster after animation
         toRef.current = setTimeout(() => {
           if (href.startsWith('http')) {
             window.location.assign(href);
           } else {
             router.push(href);
           }
-        }, 500);
+        }, 150); // 150ms instead of 500ms
       } else { setProgress(p); }
     }, 30);
+  };
+
+  const handleMouseEnter = () => {
+    if (!href.startsWith('http')) {
+      router.prefetch(href);
+    }
   };
 
   useEffect(() => () => { clearInterval(ivRef.current); clearInterval(bvRef.current); clearTimeout(toRef.current); }, []);
@@ -120,6 +126,7 @@ export function BinaryStreamBtn({
   return (
     <button
       onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
       disabled={state !== 'idle'}
       data-h
       aria-label={label}

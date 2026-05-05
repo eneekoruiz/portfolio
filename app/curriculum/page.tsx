@@ -8,20 +8,53 @@
  * with smooth transitions and liquid curtain effects for navigation
  */
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ChevronLeft, ExternalLink } from 'lucide-react';
 
 export default function CurriculumPage() {
   const router = useRouter();
+  const { theme, resolvedTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+
+  // ── THEME SYNC ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const targetTheme = theme === 'system' ? resolvedTheme : theme;
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({
+        type: 'set-theme',
+        theme: targetTheme
+      }, '*');
+    }
+  }, [theme, resolvedTheme, loading]); // Also trigger when loading ends
+
+  useEffect(() => {
+    document.title = 'Currículum | Eneko Ruiz';
+    return () => {
+      document.title = 'Eneko Ruiz — Portfolio'; // Fallback on unmount
+    };
+  }, []);
+
+  useEffect(() => {
+    // Safety timeout: if after 8s it hasn't loaded, show the fallback
+    const timer = setTimeout(() => {
+      if (loading) {
+        setHasError(true);
+        setShowFallback(true);
+        setLoading(false);
+      }
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   // ── ENTRANCE ANIMATION ──────────────────────────────────────────────
   useGSAP(() => {
@@ -47,8 +80,8 @@ export default function CurriculumPage() {
   const handleReturn = () => {
     gsap.to(containerRef.current, {
       opacity: 0,
-      duration: 0.4,
-      ease: 'power2.in',
+      duration: 0.25,
+      ease: 'expo.in',
       onComplete: () => router.back(),
     });
   };
@@ -102,35 +135,43 @@ export default function CurriculumPage() {
           ref={iframeRef}
           src="https://eneko-ruiz-curriculum.vercel.app"
           title="Eneko Ruiz Curriculum"
-          className={`w-full h-full border-none transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}
+          className={`w-full h-full border-none transition-all duration-1000 ${loading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
           onLoad={() => {
             setLoading(false);
+            setHasError(false);
+            setShowFallback(false);
           }}
-          onError={() => setHasError(true)}
+          onError={() => {
+            setLoading(false);
+            setHasError(true);
+            setShowFallback(true);
+          }}
         />
         
         {/* FALLBACK: Si no carga por seguridad (X-Frame-Options) */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-page z-10 pointer-events-none opacity-0 animate-delayed-fade-in">
-          <div className="w-20 h-20 mb-8 rounded-full bg-brand/10 flex items-center justify-center text-brand">
-            <ExternalLink size={32} />
+        {showFallback && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-page z-10 animate-in fade-in duration-700">
+            <div className="w-20 h-20 mb-8 rounded-full bg-brand/10 flex items-center justify-center text-brand">
+              <ExternalLink size={32} />
+            </div>
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-4 text-ink">
+              Contenido Protegido
+            </h2>
+            <p className="max-w-md text-lead text-sm leading-relaxed mb-8">
+              Por motivos de seguridad (X-Frame-Options), algunos navegadores bloquean la visualización incrustada. Pulsa el botón de arriba para ver el currículum a pantalla completa.
+            </p>
+            <div className="pointer-events-auto">
+              <a
+                href="https://eneko-ruiz-curriculum.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(0,102,255,0.2)]"
+              >
+                Ver Currículum Original
+              </a>
+            </div>
           </div>
-          <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-4 text-ink">
-            Contenido Protegido
-          </h2>
-          <p className="max-w-md text-lead text-sm leading-relaxed mb-8">
-            Por motivos de seguridad (X-Frame-Options), algunos navegadores bloquean la visualización incrustada. Pulsa el botón de arriba para ver el currículum a pantalla completa.
-          </p>
-          <div className="pointer-events-auto">
-            <a
-              href="https://eneko-ruiz-curriculum.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(0,102,255,0.2)]"
-            >
-              Ver Currículum Original
-            </a>
-          </div>
-        </div>
+        )}
       </main>
 
       {/* Mobile-friendly back button for easier navigation */}
@@ -144,7 +185,7 @@ export default function CurriculumPage() {
         </button>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes delayed-fade-in {
           0% { opacity: 0; transform: translateY(10px); }
           80% { opacity: 0; }

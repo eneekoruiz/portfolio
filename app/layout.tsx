@@ -5,6 +5,7 @@ import './globals.css';
 import { IntroProvider } from './components/IntroProvider';
 import { EasterEgg } from './components/ui/EasterEgg';
 import { SmoothScroll } from './components/ui/SmoothScroll';
+import { InfallibleCursor } from './components/ui/InfallibleCursor';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="theme-color" content="#f5f5f7" />
         <meta name="color-scheme" content="light dark" />
+        <link rel="preconnect" href="https://eneko-ruiz-curriculum.vercel.app" />
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var q=new URLSearchParams(location.search); if(q.get('lite')==='1'){window.__LITE=true; localStorage.setItem('lite','1'); document.documentElement.setAttribute('data-lite','1'); return;} if(localStorage.getItem('lite')==='1'){window.__LITE=true; document.documentElement.setAttribute('data-lite','1'); return;} var dm = navigator.deviceMemory || 0; if(dm && dm <= 1) { window.__LITE = true; document.documentElement.setAttribute('data-lite','1'); } }catch(e){} })();` }} />
         <script
           type="application/ld+json"
@@ -93,9 +95,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
           <SmoothScroll />
           <EasterEgg />
+          <InfallibleCursor />
           <IntroProvider>{children}</IntroProvider>
         </ThemeProvider>
       </body>

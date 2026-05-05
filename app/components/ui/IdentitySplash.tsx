@@ -116,7 +116,7 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
     <div
       ref={containerRef}
       // z-[9998]: por encima de contenido
-      className="fixed inset-0 z-[9998] bg-black text-white flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center"
       aria-hidden="true"
     >
       <div className="flex flex-col items-center">
@@ -138,13 +138,13 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
 
         {/* Línea animada + nombre */}
         <div className="flex items-center gap-6">
-          <div className="h-[1px] w-12 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-[1px] w-12 bg-ink/10 rounded-full overflow-hidden">
             <div
               ref={lineRef}
               className="h-full w-full bg-brand origin-center"
             />
           </div>
-          <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-white/40 font-bold">
+          <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-ink/40 font-bold">
             Eneko Ruiz
           </span>
         </div>

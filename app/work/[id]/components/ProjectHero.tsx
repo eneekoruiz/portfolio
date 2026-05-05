@@ -26,7 +26,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { Activity, MousePointer2, X, ExternalLink, MoveUp } from 'lucide-react';
-import type { Lang } from '../../../lib/types';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -45,6 +44,7 @@ interface ProjectHeroProps {
   langs: string[];
   darkMode: boolean;
   index?: number;
+  isReady?: boolean;
 }
 
 export function ProjectHero({
@@ -60,6 +60,7 @@ export function ProjectHero({
   langs,
   darkMode,
   index = 1,
+  isReady = true,
 }: ProjectHeroProps) {
   const heroRef = useRef<HTMLDivElement>(null);
   const bgImageRef = useRef<HTMLDivElement>(null);
@@ -71,10 +72,16 @@ export function ProjectHero({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isInteracting, setIsInteracting] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
+  const interRef = useRef(false);
+  const canRef   = useRef(false);
+
+  // Sync refs with state for use in event listeners
+  useEffect(() => { interRef.current = isInteracting; }, [isInteracting]);
+  useEffect(() => { canRef.current   = canInteract;   }, [canInteract]);
 
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
   useGSAP(() => {
-    if (!heroRef.current || !bgImageRef.current || !titleRef.current || !screenRef.current) return;
+    if (!isReady || !heroRef.current || !bgImageRef.current || !titleRef.current || !screenRef.current) return;
 
     // 1. Cinematic Scroll Sequence
     const tl = gsap.timeline({
@@ -87,8 +94,10 @@ export function ProjectHero({
         anticipatePin: 1,
         onUpdate: (self) => {
           // 🚀 UX SHIELD: Optimized threshold check
-          const isLocked = self.progress > 0.98;
-          if (canInteract !== isLocked) {
+          // 🚀 UX SHIELD: Lowered threshold to trigger earlier (96%)
+          const isLocked = self.progress > 0.96;
+          if (canRef.current !== isLocked) {
+            canRef.current = isLocked;
             setCanInteract(isLocked);
           }
           
@@ -118,15 +127,15 @@ export function ProjectHero({
         duration: 2,
       }, 0)
 
-      // Phase 2: High-Performance 3D Entrance
+      // Phase 2: High-Performance 3D Entrance (Premium Depth)
       .fromTo(screenRef.current,
         { 
-          y: '60vh', 
-          scale: 0.3, 
-          rotateX: 30,
-          z: -500,
-          borderRadius: '8rem',
-          width: '50vw',
+          y: '80vh', 
+          scale: 0.2, 
+          rotateX: 45, // More aggressive angle
+          z: -800,
+          borderRadius: '12rem',
+          width: '40vw',
           opacity: 0,
         },
         { 
@@ -136,14 +145,14 @@ export function ProjectHero({
           rotateY: 0,
           z: 0,
           borderRadius: '2.5rem',
-          width: '90vw',
+          width: '95vw', // Slightly wider for immersion
           height: '85vh',
           opacity: 1,
           force3D: true,
           ease: 'expo.out',
-          duration: 2,
+          duration: 2.2, // Slightly slower for 'grandeur'
         },
-        0.2
+        0.1
       )
       
       // Phase 3: Final Depth Adjustment
@@ -192,7 +201,7 @@ export function ProjectHero({
       }
 
       // 🚀 UX MIDDLE GROUND
-      if (isInteracting && screenRef.current) {
+      if (interRef.current && screenRef.current) {
         const r = screenRef.current.getBoundingClientRect();
         const buffer = 40;
         if (
@@ -218,14 +227,15 @@ export function ProjectHero({
     return () => {
       window.removeEventListener('mousemove', onMove);
     };
-  }, { scope: heroRef, dependencies: [isInteracting, canInteract] });
+  }, { scope: heroRef, dependencies: [isReady] });
 
   // ── 🚀 STUDIO MODE SIDE EFFECTS (Scroll Lock & ESC Key) ────────────────
   useEffect(() => {
     if (isInteracting) {
-      // 1. Strict Scroll Lock
+      // 1. Strict Scroll Lock & UI Cleanups
       document.body.style.overflow = 'hidden';
-      (window as any).__lenis?.stop();
+      document.body.classList.add('studio-active');
+      window.__lenis?.stop();
 
       // 2. ESC Key Listener
       const handleEsc = (e: KeyboardEvent) => {
@@ -235,7 +245,8 @@ export function ProjectHero({
       
       return () => {
         document.body.style.overflow = '';
-        (window as any).__lenis?.start();
+        document.body.classList.remove('studio-active');
+        window.__lenis?.start();
         window.removeEventListener('keydown', handleEsc);
       };
     }
@@ -248,7 +259,7 @@ export function ProjectHero({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className="relative h-[100vh] w-full overflow-hidden flex items-center justify-center bg-black"
+        className="relative h-[100vh] w-full overflow-hidden flex items-center justify-center bg-transparent"
         style={{ perspective: '2000px' }}
       >
         {/* ── Background Layer ── */}
@@ -329,17 +340,17 @@ export function ProjectHero({
         >
           {/* 🚀 INTERACTION SHIELD & CTA */}
           <div 
-            className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-700 bg-black/0 group/shield"
+            className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-1000 bg-black/0 group/shield"
             style={{ 
-              opacity: isInteracting ? 0 : 'var(--shield-opacity, 1)',
+              opacity: isInteracting ? 0 : 1,
               pointerEvents: isInteracting ? 'none' : 'all',
-              backgroundColor: canInteract ? 'rgba(0,0,0,0.2)' : 'transparent',
-              backdropFilter: canInteract ? 'blur(4px)' : 'none',
+              backgroundColor: canInteract ? 'rgba(0,0,0,0.4)' : 'transparent',
+              backdropFilter: canInteract ? 'blur(10px)' : 'none',
             }}
             onClick={() => {
               if (canInteract) {
                 setIsInteracting(true);
-                (window as any).__lenis?.stop();
+                window.__lenis?.stop();
               }
             }}
           >
@@ -348,8 +359,8 @@ export function ProjectHero({
                 <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-2xl group-hover/shield:scale-110 transition-transform cursor-pointer studio-pulse">
                    <MousePointer2 size={24} className="animate-pulse" />
                 </div>
-                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/60 bg-black/40 px-4 py-2 rounded-lg border border-white/10">
-                  Click to Interact with Live Site
+                <span className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-white bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 shadow-2xl">
+                  Test Live Preview
                 </span>
               </div>
             )}
@@ -361,17 +372,17 @@ export function ProjectHero({
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl">
                 <div className="flex items-center gap-2 pr-4 border-r border-white/10">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-white/80">Studio Mode Active</span>
+                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-white/80">Live Preview Active</span>
                 </div>
                 <button 
                   onClick={() => {
                     setIsInteracting(false);
-                    (window as any).__lenis?.start();
+                    window.__lenis?.start();
                   }}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-white/90 group"
                 >
                   <MoveUp size={14} className="group-hover:-translate-y-1 transition-transform" />
-                  <span className="text-[10px] font-black uppercase tracking-tighter">Exit to Scroll</span>
+                  <span className="text-[10px] font-black uppercase tracking-tighter">Exit Preview</span>
                 </button>
                 {liveUrl && (
                   <a 
@@ -392,20 +403,30 @@ export function ProjectHero({
               ref={iframeRef}
               src={liveUrl} 
               title={iframeTitle}
-              className="w-full h-full border-none transition-opacity duration-1000"
+              className="w-full h-full border-none transition-all duration-1000"
               loading="eager"
               style={{ 
                 opacity: 0.95,
                 background: '#050505',
+                filter: isInteracting ? 'none' : 'blur(12px) grayscale(0.5)',
+                transform: isInteracting ? 'scale(1)' : 'scale(1.05)',
               }}
               onLoad={(e) => {
                 (e.target as HTMLIFrameElement).style.opacity = '1';
               }}
             />
           ) : videoUrl ? (
-            <video src={videoUrl} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+            <video 
+              src={videoUrl} 
+              autoPlay muted loop playsInline 
+              className="w-full h-full object-cover transition-all duration-1000" 
+              style={{ filter: isInteracting ? 'none' : 'blur(12px) grayscale(0.5)', transform: isInteracting ? 'scale(1)' : 'scale(1.05)' }}
+            />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-black/40">
+            <div 
+              className="w-full h-full flex items-center justify-center bg-black/40 transition-all duration-1000"
+              style={{ filter: isInteracting ? 'none' : 'blur(12px)', transform: isInteracting ? 'scale(1)' : 'scale(1.05)' }}
+            >
                <Activity size={32} className="text-brand animate-pulse opacity-20" />
             </div>
           )}

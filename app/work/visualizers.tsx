@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { Database, Server, Radar, CheckCircle2, Layers } from 'lucide-react';
 
@@ -9,55 +9,133 @@ import { Database, Server, Radar, CheckCircle2, Layers } from 'lucide-react';
 export const DNAHelix = ({ accent, secondary, darkMode }: {
   accent: string; secondary: string; darkMode: boolean;
 }) => {
-  const W = 120, H = 1200, steps = 80;
-  const { strandA, strandB, rungs } = useMemo(() => {
-    const strandA: string[] = [];
-    const strandB: string[] = [];
-    const rungs: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollRef = useRef(0);
+  const rotationRef = useRef(0);
 
-    for (let i = 0; i <= steps; i++) {
-      const t  = (i / steps) * Math.PI * 6;
-      const y  = (i / steps) * H;
-      const xA = W / 2 + Math.sin(t) * (W * 0.38);
-      const xB = W / 2 + Math.sin(t + Math.PI) * (W * 0.38);
-      strandA.push(`${i === 0 ? 'M' : 'L'} ${xA.toFixed(2)} ${y.toFixed(2)}`);
-      strandB.push(`${i === 0 ? 'M' : 'L'} ${xB.toFixed(2)} ${y.toFixed(2)}`);
-      if (i % 4 === 0 && i > 0 && i < steps) rungs.push({ x1: xA, y1: y, x2: xB, y2: y });
-    }
-
-    return { strandA, strandB, rungs };
+  useEffect(() => {
+    const handleScroll = () => {
+      scrollRef.current = window.scrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    let frame = 0;
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    const draw = () => {
+      frame = requestAnimationFrame(draw);
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      if (w === 0 || h === 0) return;
+
+      ctx.clearRect(0, 0, w, h);
+      
+      const steps = 60;
+      const speed = 0.003; // Slower for realism
+      const scrollImpact = scrollRef.current * 0.0004;
+      rotationRef.current += speed;
+      
+      const baseRotation = rotationRef.current + scrollImpact;
+
+      // Draw Strands first (under nodes)
+      for (let s = 0; s < 2; s++) {
+        const offset = s === 0 ? 0 : Math.PI;
+        ctx.beginPath();
+        for (let i = 0; i <= steps; i++) {
+          const progress = i / steps;
+          const y = progress * h;
+          const angle = progress * Math.PI * 4 + baseRotation + offset;
+          const r = w * 0.35;
+          const x = w / 2 + Math.cos(angle) * r;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = s === 0 ? accent : secondary;
+        ctx.lineWidth = 1.2;
+        ctx.globalAlpha = 0.2;
+        ctx.stroke();
+      }
+
+      for (let i = 0; i <= steps; i++) {
+        const progress = i / steps;
+        const y = progress * h;
+        const angle = progress * Math.PI * 4 + baseRotation;
+        
+        const r = w * 0.35;
+        const x1 = w / 2 + Math.cos(angle) * r;
+        const x2 = w / 2 + Math.cos(angle + Math.PI) * r;
+        
+        // Depth simulation (z-index)
+        const z1 = Math.sin(angle);
+        const z2 = Math.sin(angle + Math.PI);
+        
+        // Draw Rung
+        if (i % 3 === 0) {
+          ctx.beginPath();
+          ctx.moveTo(x1, y);
+          ctx.lineTo(x2, y);
+          ctx.strokeStyle = accent;
+          ctx.globalAlpha = 0.08 * (z1 + z2 + 2) / 2;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+
+        // Draw Nodes
+        const drawNode = (x: number, z: number, color: string) => {
+          const size = 1.2 + (z + 1) * 1.5;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.3 + (z + 1) * 0.4;
+          
+          if (z > 0.7) {
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = color;
+          } else {
+            ctx.shadowBlur = 0;
+          }
+          
+          ctx.fill();
+        };
+
+        drawNode(x1, z1, accent);
+        drawNode(x2, z2, secondary);
+      }
+      
+      ctx.shadowBlur = 0;
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+    draw();
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', resize);
+    };
+  }, [accent, secondary]);
+
   return (
-    <svg className="helix-svg w-full h-full will-change-transform" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" shapeRendering="geometricPrecision">
-      <defs>
-        <filter id="helix-glow" x="-50%" y="-5%" width="200%" height="110%">
-          <feGaussianBlur stdDeviation={darkMode ? '3' : '1.5'} result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        <linearGradient id="strand-grad-a" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={accent}    stopOpacity="0.1" />
-          <stop offset="40%"  stopColor={accent}    stopOpacity="0.9" />
-          <stop offset="100%" stopColor={accent}    stopOpacity="0.1" />
-        </linearGradient>
-        <linearGradient id="strand-grad-b" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={secondary} stopOpacity="0.05" />
-          <stop offset="50%"  stopColor={secondary} stopOpacity="0.5" />
-          <stop offset="100%" stopColor={secondary} stopOpacity="0.05" />
-        </linearGradient>
-      </defs>
-      <path className="helix-strand-a" d={strandA.join(' ')} fill="none" stroke="url(#strand-grad-a)" strokeWidth="1.4" strokeLinecap="round" filter="url(#helix-glow)" />
-      <path className="helix-strand-b" d={strandB.join(' ')} fill="none" stroke="url(#strand-grad-b)" strokeWidth="0.7" strokeLinecap="round" />
-      {rungs.map((r, i) => (
-        <g key={i}>
-          <line className="helix-rung" x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2} stroke={accent} strokeWidth="0.35" opacity="0.25" strokeDasharray="1.5 1.5" />
-          <circle cx={(r.x1 + r.x2) / 2} cy={r.y1} r="0.8" fill={i % 3 === 0 ? accent : secondary} opacity="0.35" />
-        </g>
-      ))}
-    </svg>
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full will-change-transform pointer-events-none"
+      style={{ display: 'block' }}
+    />
   );
 };
-
 // ── TerrainMesh ───────────────────────────────────────────────────────────────
 
 export const TerrainMesh = ({ accent }: { accent: string }) => {

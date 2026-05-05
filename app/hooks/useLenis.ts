@@ -21,6 +21,13 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import type Lenis from 'lenis';
+
+declare global {
+  interface Window {
+    __lenis?: Lenis;
+  }
+}
 
 export function useLenis(ready: boolean, reduced: boolean): void {
   // Guardamos la referencia de la fn del ticker para poder limpiarla
@@ -29,7 +36,7 @@ export function useLenis(ready: boolean, reduced: boolean): void {
   useEffect(() => {
     if (!ready || reduced) return;
 
-    let lenis: any;
+    let lenis: Lenis;
 
     import('lenis')
       .then(({ default: Lenis }) => {
@@ -44,7 +51,7 @@ export function useLenis(ready: boolean, reduced: boolean): void {
         });
 
         // Exponer globalmente para el lock de scroll de modales
-        (window as any).__lenis = lenis;
+        window.__lenis = lenis;
 
         /**
          * ✅ ÚNICO driver: gsap.ticker
@@ -74,7 +81,7 @@ export function useLenis(ready: boolean, reduced: boolean): void {
         tickerFnRef.current = null;
       }
       lenis?.destroy?.();
-      delete (window as any).__lenis;
+      delete window.__lenis;
     };
   }, [ready, reduced]);
 }

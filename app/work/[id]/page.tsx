@@ -6,7 +6,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { notFound, useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -23,7 +23,6 @@ import { TX }              from '../../lib/translations';
 import { PROJECTS_CONTENT, CODE_SNIPPETS } from '../../lib/projects-data';
 import { LANG_COLORS }     from '../../lib/constants';
 import type { Lang }       from '../../lib/types';
-import { InfallibleCursor } from '../../components/ui/InfallibleCursor';
 import { useMagnetic }     from '../../hooks/useMagnetic';
 import { useTextScramble } from '../../hooks/useTextScramble';
 import { ProjectHero }     from './components/ProjectHero';
@@ -243,7 +242,7 @@ export default function ProjectPage() {
     e.stopPropagation();
 
     // 🚀 AGGRESSIVE CLEANUP: Stop everything that could block navigation
-    const lenis = (window as any).__lenis;
+    const lenis = window.__lenis;
     lenis?.stop?.();
     
     // Kill any active GSAP tweens on the body or fixed elements
@@ -312,21 +311,7 @@ export default function ProjectPage() {
     });
   }, { scope: main, dependencies: [content] });
 
-  // ── Helix Animation (Depends on isReadyToAnimate) ──────────────────────────
-  useGSAP(() => {
-    if (!main.current || !isReadyToAnimate) return;
-
-    const helixTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: main.current,
-        start: 'top top', 
-        end: 'bottom bottom',
-        scrub: 1,
-      },
-    });
-
-    helixTl.to('.helix-group', { rotateY: 360, ease: 'none' }, 0);
-  }, { scope: main, dependencies: [isReadyToAnimate] });
+  // ── Helix Animation is now handled internally in Canvas-based DNAHelix ─────
 
   // ── Loading states ───────────────────────────────────────────────────────
   if (!content || !summary) return notFound();
@@ -349,7 +334,7 @@ export default function ProjectPage() {
               className="helix-group will-change-transform"
               style={{
                 width: 'clamp(180px, 30vw, 420px)', height: '210vh',
-                opacity: darkMode ? 0.2 : 0.1,
+                opacity: darkMode ? 0.3 : 0.15,
                 filter: `drop-shadow(0 0 30px ${theme.helixA}60)`,
                 transformStyle: 'preserve-3d',
               }}
@@ -369,8 +354,9 @@ export default function ProjectPage() {
       )}
 
       {/* ── HEADER ── */}
-      <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[500] w-[calc(100%-3rem)] max-w-[1200px]">
-        <div className="flex items-center justify-between px-6 py-3.5 rounded-2xl bg-white/80 dark:bg-black/50 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-glass">
+      {/* ── HEADER ── */}
+      <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-3rem)] max-w-[1200px] transition-all duration-500 ease-expo [[class*='studio-active']_&]:opacity-0 [[class*='studio-active']_&]:pointer-events-none [[class*='studio-active']_&]:-translate-y-10">
+        <div className="flex items-center justify-between px-6 py-3.5 rounded-2xl bg-white/90 dark:bg-black/60 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-glass">
           <button
             ref={backMagRef}
             onClick={handleReturn}
@@ -401,9 +387,10 @@ export default function ProjectPage() {
         langs={summary?.langs ?? []}
         darkMode={darkMode}
         index={projectIndex}
+        isReady={isReadyToAnimate}
       />
 
-      <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-40 pb-32 bg-page">
+      <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-40 pb-32 bg-transparent">
 
         {/* ── OBJECTIVE & STACK ── */}
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-16 mb-40 items-start">

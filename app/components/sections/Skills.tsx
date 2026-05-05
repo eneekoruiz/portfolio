@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { Server, MonitorSmartphone, Cpu, Database, Code } from 'lucide-react';
 import { LANG_COLORS } from '../../lib/constants';
+import type { Tx } from '../../lib/types';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -115,7 +116,7 @@ const SKILL_CARDS = [
 
 const ICONS = [Server, MonitorSmartphone, Cpu, Database];
 
-interface SkillsProps { t: any; }
+interface SkillsProps { t: Tx; }
 
 export function Skills({ t }: SkillsProps) {
   const containerRef = useRef<HTMLElement>(null);

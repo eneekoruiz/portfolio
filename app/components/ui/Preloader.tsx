@@ -94,7 +94,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-white overflow-hidden"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-page text-ink overflow-hidden"
     >
       {/* ── Ambient Light (Follows progress) ── */}
       <div
@@ -123,10 +123,10 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           ref={barContainerRef}
           className="flex flex-col items-center gap-4 opacity-50"
         >
-          <div className="w-48 h-[1px] bg-white/10 relative overflow-hidden">
+          <div className="w-48 h-[1px] bg-ink/10 relative overflow-hidden">
             <div
               ref={barRef}
-              className="absolute inset-0 bg-white origin-left"
+              className="absolute inset-0 bg-ink origin-left"
               style={{ 
                 transform: `scaleX(${n / 100})`,
                 transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' 
@@ -145,12 +145,12 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
       {/* ── Corner Indices (Premium Detail) ── */}
       <div className="absolute top-10 left-10 flex flex-col gap-1 opacity-20">
-        <div className="w-8 h-px bg-white" />
+        <div className="w-8 h-px bg-ink" />
         <span className="font-mono text-[8px] tracking-[0.2em] uppercase">Eneko Ruiz</span>
       </div>
       <div className="absolute bottom-10 right-10 flex items-center gap-4 opacity-20">
         <span className="font-mono text-[8px] tracking-[0.2em] uppercase">Est. 2026</span>
-        <div className="w-8 h-px bg-white" />
+        <div className="w-8 h-px bg-ink" />
       </div>
     </div>
   );

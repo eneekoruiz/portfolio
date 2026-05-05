@@ -47,7 +47,7 @@ export interface LiquidCurtainOptions {
  * The path starts as a flat line at the edge (invisible).
  */
 export function createLiquidCurtain(opts: LiquidCurtainOptions): SVGSVGElement {
-  const { color, baseColor = '#0A0A0A', direction, id = 'liquid-curtain' } = opts;
+  const { color, baseColor = 'var(--page)', direction, id = 'liquid-curtain' } = opts;
 
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');

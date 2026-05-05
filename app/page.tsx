@@ -46,7 +46,6 @@ import { useIntro } from './components/IntroProvider';
 import { useMagnetic } from './hooks/useMagnetic';
 
 // ── UI components ──────────────────────────────────────────────────────────
-import { InfallibleCursor } from './components/ui/InfallibleCursor';
 import { Preloader } from './components/ui/Preloader';
 import { LangDD } from './components/ui/LangDD';
 import { ThemeToggle } from './components/ui/ThemeToggle';
