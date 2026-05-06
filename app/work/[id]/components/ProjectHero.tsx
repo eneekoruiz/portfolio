@@ -140,8 +140,9 @@ export function ProjectHero({
           z: 0,
           filter: 'blur(0px)',
           borderRadius: '2.5rem',
-          width: '92vw', 
-          height: '82vh',
+          // RESPONSIVE DIMENSIONS
+          width: window.innerWidth < 768 ? '94vw' : '92vw', 
+          height: window.innerWidth < 768 ? '70dvh' : '82dvh',
           force3D: true,
           ease: 'expo.inOut',
           duration: 2.2, 
@@ -230,8 +231,8 @@ export function ProjectHero({
         left: '50%',
         xPercent: -50,
         yPercent: -50,
-        width: '92vw',
-        height: '82vh',
+        width: window.innerWidth < 768 ? '94vw' : '92vw',
+        height: window.innerWidth < 768 ? '70dvh' : '82dvh',
         borderRadius: '2.5rem',
         zIndex: 30,
         duration: 0.7,
@@ -377,35 +378,37 @@ export function ProjectHero({
 
           {/* Studio HUD */}
           {isInteracting && (
-            <div className="studio-bar absolute top-8 left-8 right-8 z-[110] flex items-center justify-between pointer-events-none">
-              <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 shadow-2xl pointer-events-auto">
-                <div className="flex items-center gap-3 pr-6 border-r border-white/10">
-                  <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
-                  <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90">{title} // LIVE</span>
+            <div className="studio-bar absolute top-4 md:top-8 left-4 md:left-8 right-4 md:right-8 z-[110] flex items-center justify-between pointer-events-none">
+              <div className="flex items-center gap-3 md:gap-4 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 shadow-2xl pointer-events-auto">
+                <div className="flex items-center gap-2 md:gap-3 pr-4 md:pr-6 border-r border-white/10">
+                  <div className="w-2 md:w-2.5 h-2 md:h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
+                  <span className="font-mono text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[100px] md:max-w-none">
+                    {title} <span className="hidden xs:inline">// LIVE</span>
+                  </span>
                 </div>
-                <div className="flex items-center gap-6 text-white/40 font-mono text-[9px] uppercase tracking-widest">
+                <div className="flex items-center gap-4 md:gap-6 text-white/40 font-mono text-[8px] md:text-[9px] uppercase tracking-widest">
                    <span className="hidden sm:block">Status: Stable</span>
-                   <span className="hidden md:block">Viewport: Fullscreen</span>
+                   <span className="hidden lg:block">Viewport: Fullscreen</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pointer-events-auto">
+              <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
                 {liveUrl && (
                   <a 
                     href={liveUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="p-4 rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all"
+                    className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all"
                   >
-                    <ExternalLink size={18} />
+                    <ExternalLink size={16} className="md:w-[18px] md:h-[18px]" />
                   </a>
                 )}
                 <button 
                   onClick={() => setIsInteracting(false)}
-                  className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-brand text-white shadow-[0_0_30px_rgba(0,163,255,0.3)] hover:scale-105 active:scale-95 transition-all group"
+                  className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl bg-brand text-white shadow-[0_0_30px_rgba(0,163,255,0.3)] hover:scale-105 active:scale-95 transition-all group"
                 >
-                  <X size={18} />
-                  <span className="text-[11px] font-black uppercase tracking-widest">Close Studio</span>
+                  <X size={16} className="md:w-[18px] md:h-[18px]" />
+                  <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">Close Studio</span>
                 </button>
               </div>
             </div>

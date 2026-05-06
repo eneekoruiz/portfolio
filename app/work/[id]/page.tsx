@@ -135,7 +135,7 @@ function GlareCard({ children, accent, className = '', style }: {
           transform: 'translateZ(50px)' 
         }} 
       />
-      <div className="relative z-0" style={{ transform: 'translateZ(20px)' }}>
+      <div className="relative z-0 h-full w-full" style={{ transform: 'translateZ(20px)' }}>
         {children}
       </div>
     </div>
@@ -333,7 +333,7 @@ export default function ProjectPage() {
             <div
               className="helix-group will-change-transform"
               style={{
-                width: 'clamp(180px, 30vw, 420px)', height: '210vh',
+                width: 'clamp(140px, 40vw, 420px)', height: '210vh',
                 opacity: darkMode ? 0.45 : 0.25,
                 filter: `drop-shadow(0 0 30px ${theme.helixA}60)`,
                 transformStyle: 'preserve-3d',
@@ -363,12 +363,12 @@ export default function ProjectPage() {
             className="flex items-center gap-2 font-medium text-xs tracking-wide opacity-70 hover:opacity-100 transition-opacity text-ink bg-transparent border-none cursor-pointer"
           >
             <span className="flex items-center gap-2">
-              <ChevronLeft size={16} /> Todos los proyectos
+              <ChevronLeft size={16} /> <span className="hidden xs:inline">Todos los proyectos</span><span className="xs:hidden">Volver</span>
             </span>
           </button>
-          <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10">
-            <Activity size={10} style={{ color: theme.accent }} className="animate-pulse" />
-            {theme.label}
+          <div className="flex items-center gap-2 font-mono text-[8px] md:text-[9px] uppercase tracking-widest px-2.5 md:px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 truncate max-w-[120px] md:max-w-none">
+            <Activity size={10} style={{ color: theme.accent }} className="animate-pulse shrink-0" />
+            <span className="truncate">{theme.label}</span>
           </div>
         </div>
       </header>
@@ -390,12 +390,12 @@ export default function ProjectPage() {
         isReady={isReadyToAnimate}
       />
 
-      <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-40 pb-32 bg-transparent">
+        <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-24 md:pt-40 pb-32 bg-transparent">
 
-        {/* ── OBJECTIVE & STACK ── */}
-        <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-16 mb-40 items-start">
-          <div className="space-y-6">
-            <h2 className="text-xs font-mono uppercase tracking-[0.3em] opacity-40 border-b border-black/10 dark:border-white/10 pb-4 text-ink">
+          {/* ── OBJECTIVE & STACK ── */}
+          <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-10 md:gap-16 mb-24 md:mb-40 items-start">
+            <div className="space-y-6">
+              <h2 className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] opacity-40 border-b border-black/10 dark:border-white/10 pb-4 text-ink">
               El Desafío
             </h2>
             <p className="text-2xl md:text-3xl font-light leading-relaxed tracking-tight text-ink/90">
@@ -418,9 +418,9 @@ export default function ProjectPage() {
         </section>
 
         {/* ── ARCHITECTURE & VISUALIZER ── */}
-        <section className="reveal-sec grid grid-cols-1 md:grid-cols-2 gap-16 mb-40 items-center">
+        <section className="reveal-sec grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-24 md:mb-40 items-center">
           <div className="order-2 md:order-1">
-            <GlareCard accent={theme.accent} className="p-10">
+            <GlareCard accent={theme.accent} className="p-6 md:p-10">
               {!isBackend && !isJava && !isA11y && !isSpot && <SandwichDiagram accent={theme.accent} />}
               {isBackend && <MVCTerminal accent={theme.accent} />}
               {isJava    && <DistributedNodes accent={theme.accent} />}
@@ -428,20 +428,20 @@ export default function ProjectPage() {
               {isSpot    && <SpotshareHeatmap accent={theme.accent} />}
             </GlareCard>
           </div>
-          <div className="order-1 md:order-2 space-y-6">
+          <div className="order-1 md:order-2 space-y-4 md:space-y-6">
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center border border-black/10 dark:border-white/10 shadow-lg"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center border border-black/10 dark:border-white/10 shadow-lg"
               style={{ background: `${theme.accent}15` }}
             >
-              {isBackend ? <Database size={20} style={{ color: theme.accent }} />
-               : isJava  ? <Server   size={20} style={{ color: theme.accent }} />
-               : isA11y  ? <Layers   size={20} style={{ color: theme.accent }} />
-               :            <Zap     size={20} style={{ color: theme.accent }} />}
+              {isBackend ? <Database size={18} style={{ color: theme.accent }} />
+               : isJava  ? <Server   size={18} style={{ color: theme.accent }} />
+               : isA11y  ? <Layers   size={18} style={{ color: theme.accent }} />
+               :            <Zap     size={18} style={{ color: theme.accent }} />}
             </div>
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tight leading-tight text-ink">
+            <h2 className="text-2xl md:text-4xl font-medium tracking-tight leading-tight text-ink">
               {content?.algorithmH}
             </h2>
-            <p className="text-lg opacity-60 leading-relaxed font-light text-ink">
+            <p className="text-base md:text-lg opacity-60 leading-relaxed font-light text-ink">
               {content?.algorithmP}
             </p>
           </div>
@@ -449,24 +449,24 @@ export default function ProjectPage() {
 
         {/* ── CODE ── */}
         {snippet && (
-          <section className="reveal-sec mb-40">
-            <div className="mb-10 space-y-4 max-w-2xl text-ink">
-              <h2 className="text-3xl font-medium tracking-tight">{content?.supabaseH}</h2>
-              <p className="text-lg opacity-60 font-light">{content?.supabaseP}</p>
+          <section className="reveal-sec mb-24 md:mb-40">
+            <div className="mb-6 md:mb-10 space-y-3 md:space-y-4 max-w-2xl text-ink">
+              <h2 className="text-2xl md:text-3xl font-medium tracking-tight">{content?.supabaseH}</h2>
+              <p className="text-base md:text-lg opacity-60 font-light">{content?.supabaseP}</p>
             </div>
-            <div className="rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-2xl relative group">
+            <div className="rounded-2xl md:rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-2xl relative group">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <div className="h-12 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/5 flex items-center justify-between px-6">
-                <div className="flex items-center gap-3 text-ink">
-                  <Terminal size={14} className="opacity-40" />
-                  <span className="text-[10px] font-mono opacity-40 uppercase tracking-widest">
+              <div className="h-10 md:h-12 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/5 flex items-center justify-between px-4 md:px-6">
+                <div className="flex items-center gap-2 md:gap-3 text-ink">
+                  <Terminal size={12} className="opacity-40" />
+                  <span className="text-[9px] md:text-[10px] font-mono opacity-40 uppercase tracking-widest">
                     {content?.codeSpotlight}
                   </span>
                 </div>
-                <ShieldCheck size={14} style={{ color: theme.accent }} className="opacity-50" />
+                <ShieldCheck size={12} style={{ color: theme.accent }} className="opacity-50" />
               </div>
-              <pre className="p-8 overflow-x-auto bg-black/[0.02] dark:bg-transparent">
-                <code className="font-mono text-[13px] leading-loose" style={{ color: theme.accent }}>
+              <pre className="p-5 md:p-8 overflow-x-auto bg-black/[0.02] dark:bg-transparent">
+                <code className="font-mono text-[11px] md:text-[13px] leading-loose" style={{ color: theme.accent }}>
                   {snippet}
                 </code>
               </pre>
