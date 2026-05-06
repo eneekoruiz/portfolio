@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // 1 hour
 
 const GITHUB_USER = 'eneekoruiz';
 const CACHE_TTL = 3600; // 1 hour

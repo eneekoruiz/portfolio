@@ -1,6 +1,6 @@
 # ENEKO RUIZ | SOFTWARE ENGINEER
 
-A production-grade portfolio focusing on high-performance motion design and scalable React architecture. Built with **Next.js 14 (App Router)**, featuring a full transition to **Server Components (RSC)** for optimal SEO and LCP metrics.
+A high-performance portfolio focusing on motion design and hardened React architecture. Built with **Next.js 14 (App Router)**, utilizing **Server Components (RSC)** for optimized rendering and data integrity.
 
 ---
 
