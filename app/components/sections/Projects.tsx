@@ -583,12 +583,12 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
   const isReturning = useRef(false);
 
   useLayoutEffect(() => {
-    if (load || top3.length === 0) return;
+    if (top3.length === 0) return;
     const saved = loadNavState();
     if (!saved) return;
     isReturning.current = true;
     setExpandedIdx(saved.openIdx);
-  }, [load, top3.length]);
+  }, [top3.length]);
 
   useEffect(() => {
     if (!isReturning.current) return;

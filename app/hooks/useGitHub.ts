@@ -55,6 +55,11 @@ export function useGitHub(t: Tx) {
     });
   };
 
+  // 💎 FIX: Initialize top3 immediately to avoid layout shifts and improve scroll restoration
+  if (top3.length === 0) {
+    setTop3(buildProjectCards([]));
+  }
+
   useEffect(() => {
     let idleHandle: number | null = null;
     let timeoutHandle: NodeJS.Timeout | null = null;

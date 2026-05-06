@@ -39,7 +39,17 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (phase !== 'checking') return;
-    setPhase(hasSeenGlobal ? 'ready' : 'loading');
+    
+    let hasSeenSession = false;
+    try {
+      hasSeenSession = sessionStorage.getItem('hasSeenIntro') === 'true';
+    } catch (_) {}
+
+    if (hasSeenGlobal || hasSeenSession) {
+      setPhase('ready');
+    } else {
+      setPhase('loading');
+    }
   }, [phase]);
 
   const markSeen = useCallback(() => {

@@ -273,7 +273,7 @@ export default function Home() {
   }, [menu, reduced]);
 
   useLayoutEffect(() => {
-    if (!ready || load) return;
+    if (!ready) return;
 
     try {
       const raw = sessionStorage.getItem(PROJECTS_NAV_KEY);
@@ -289,10 +289,10 @@ export default function Home() {
     } catch (_) {
       // Ignore sessionStorage errors and continue with normal render.
     }
-  }, [ready, load]);
+  }, [ready]);
 
   useEffect(() => {
-    if (!ready || load) return;
+    if (!ready) return;
 
     // FIX Punto 5: After Projects has opened the accordion in useLayoutEffect,
     // we now re-sync Lenis and refresh ScrollTrigger to match the new DOM height.
@@ -309,7 +309,7 @@ export default function Home() {
       // Ignore sessionStorage errors
     }
     ScrollTrigger.refresh();
-  }, [ready, load]);
+  }, [ready]);
 
   useEffect(() => {
     if (!ready) return;
