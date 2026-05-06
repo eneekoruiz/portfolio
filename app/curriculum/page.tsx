@@ -92,6 +92,29 @@ export default function CurriculumPage() {
       }, 0.2);
   }, { scope: containerRef });
 
+  // ── CINEMATIC REVEAL ──
+  useGSAP(() => {
+    if (!loading && iframeRef.current) {
+      gsap.fromTo(iframeRef.current, 
+        { 
+          opacity: 0, 
+          y: 30, 
+          scale: 0.98,
+          filter: 'blur(10px)' 
+        },
+        { 
+          opacity: 1, 
+          y: 0, 
+          scale: 1,
+          filter: 'blur(0px)',
+          duration: 1.2, 
+          ease: 'expo.out',
+          delay: 0.1
+        }
+      );
+    }
+  }, [loading]);
+
   const handleReturn = () => {
     gsap.to(containerRef.current, {
       opacity: 0,
