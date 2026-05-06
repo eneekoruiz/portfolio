@@ -210,42 +210,10 @@ export function ProjectHero({
 
     if (isInteracting) {
       const tl = gsap.timeline();
-      tl.to(screenRef.current, {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100dvh',
-        x: 0,
-        y: 0,
-        translateX: 0,
-        translateY: 0,
-        borderRadius: 0,
-        zIndex: 999,
-        duration: 0.8,
-        ease: 'expo.inOut',
-      })
-      .fromTo('.studio-bar', 
+      tl.fromTo('.studio-bar', 
         { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'back.out(1.7)' },
-        '-=0.3'
+        { y: 0, opacity: 1, duration: 0.6, ease: 'back.out(1.7)' }
       );
-    } else {
-      gsap.to(screenRef.current, {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        xPercent: -50,
-        yPercent: -50,
-        x: 0,
-        y: 0,
-        width: window.innerWidth < 768 ? '94vw' : '92vw',
-        height: window.innerWidth < 768 ? '65dvh' : '82dvh',
-        borderRadius: '2.5rem',
-        zIndex: 30,
-        duration: 0.7,
-        ease: 'expo.out',
-      });
     }
   }, [isInteracting]);
 
@@ -355,7 +323,7 @@ export function ProjectHero({
             transformStyle: 'preserve-3d',
             willChange: 'transform, width, height, border-radius',
             borderColor: isInteracting ? 'transparent' : 'rgba(255,255,255,0.1)',
-            transform: 'translate(-50%, -50%) scale(0.05)',
+            transform: 'scale(0.05)',
             opacity: 0,
           }}
         >

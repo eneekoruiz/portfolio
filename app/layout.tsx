@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
@@ -6,6 +5,7 @@ import { IntroProvider } from './components/IntroProvider';
 import { EasterEgg } from './components/ui/EasterEgg';
 import { SmoothScroll } from './components/ui/SmoothScroll';
 import { InfallibleCursor } from './components/ui/InfallibleCursor';
+import { baseMetadata, jsonLd } from './lib/metadata';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,71 +14,7 @@ const inter = Inter({
   weight: ['400','500','600','700','800','900'],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://eneko.dev'),
-  title: {
-    default: 'Eneko Ruiz — Ingeniero Informático & Full Stack Developer',
-    template: '%s · Eneko Ruiz',
-  },
-  description: 'Ingeniero Informático & Full Stack Developer desde Donostia, País Vasco. Me obsesiono con los detalles que nadie nota pero todo el mundo siente.',
-  keywords: ['Eneko Ruiz','Full Stack','Donostia','Python','Java','Node.js','React','Next.js','TypeScript'],
-  authors: [{ name: 'Eneko Ruiz', url: 'https://eneko.dev' }],
-  openGraph: {
-    type: 'website', locale: 'es_ES', url: 'https://eneko.dev', siteName: 'Eneko Ruiz',
-    title: 'Eneko Ruiz — Full Stack Developer',
-    description: 'Donostia · Me obsesiono con los detalles que nadie nota pero todo el mundo siente.',
-    images: [{ url: 'https://eneko.dev/og.png', width: 1200, height: 630, alt: 'Eneko Ruiz — Full Stack Developer' }],
-  },
-  twitter: {
-    card: 'summary_large_image', creator: '@eneekoruiz',
-    title: 'Eneko Ruiz — Full Stack Developer', images: ['https://eneko.dev/og.png'],
-  },
-  robots: { index: true, follow: true },
-  icons: {
-    icon: '/icon.png',
-  },
-};
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'Person',
-      '@id': 'https://eneko.dev/#person',
-      name: 'Eneko Ruiz',
-      url: 'https://eneko.dev',
-      email: 'eneekoruiz@gmail.com',
-      jobTitle: 'Ingeniero Informático · Full Stack Developer',
-      description: 'Full Stack Developer desde Donostia especializado en React, Next.js, Python y Java. Me obsesiono con los detalles que nadie nota pero todo el mundo siente.',
-      image: 'https://eneko.dev/og.png',
-      address: { '@type': 'PostalAddress', addressLocality: 'Donostia-San Sebastián', addressRegion: 'País Vasco', addressCountry: 'ES' },
-      sameAs: ['https://github.com/eneekoruiz','https://linkedin.com/in/eneekoruiz'],
-      knowsAbout: ['JavaScript','TypeScript','React','Next.js','Python','Java','Node.js','PostgreSQL','Docker','CI/CD'],
-      alumniOf: { '@type': 'EducationalOrganization', name: 'Universidad del País Vasco / Euskal Herriko Unibertsitatea', url: 'https://www.ehu.eus' },
-    },
-    {
-      '@type': 'SoftwareSourceCode',
-      '@id': 'https://eneko.dev/#portfolio-source',
-      name: 'Portfolio de Eneko Ruiz',
-      description: 'Portfolio personal desarrollado con Next.js 14, React, Tailwind CSS y GSAP.',
-      codeRepository: 'https://github.com/eneekoruiz/portfolio',
-      programmingLanguage: ['TypeScript','CSS','JavaScript'],
-      runtimePlatform: 'Node.js',
-      author: { '@id': 'https://eneko.dev/#person' },
-      url: 'https://eneko.dev',
-      license: 'https://opensource.org/licenses/MIT',
-    },
-    {
-      '@type': 'WebSite',
-      '@id': 'https://eneko.dev/#website',
-      url: 'https://eneko.dev',
-      name: 'Eneko Ruiz — Portfolio',
-      description: 'Ingeniero Informático & Full Stack Developer desde Donostia.',
-      author: { '@id': 'https://eneko.dev/#person' },
-      inLanguage: ['es','en','eu'],
-    },
-  ],
-};
+export const metadata = baseMetadata;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -87,10 +23,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#f5f5f7" />
         <meta name="color-scheme" content="light dark" />
         <link rel="preconnect" href="https://eneko-ruiz-curriculum.vercel.app" />
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var q=new URLSearchParams(location.search); if(q.get('lite')==='1'){window.__LITE=true; localStorage.setItem('lite','1'); document.documentElement.setAttribute('data-lite','1'); return;} if(localStorage.getItem('lite')==='1'){window.__LITE=true; document.documentElement.setAttribute('data-lite','1'); return;} var dm = navigator.deviceMemory || 0; if(dm && dm <= 1) { window.__LITE = true; document.documentElement.setAttribute('data-lite','1'); } }catch(e){} })();` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {/* Lite mode / Device memory detection script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var q = new URLSearchParams(location.search);
+                  if (q.get('lite') === '1') {
+                    window.__LITE = true;
+                    localStorage.setItem('lite', '1');
+                    document.documentElement.setAttribute('data-lite', '1');
+                    return;
+                  }
+                  if (localStorage.getItem('lite') === '1') {
+                    window.__LITE = true;
+                    document.documentElement.setAttribute('data-lite', '1');
+                    return;
+                  }
+                  var dm = navigator.deviceMemory || 0;
+                  if (dm && dm <= 1) {
+                    window.__LITE = true;
+                    document.documentElement.setAttribute('data-lite', '1');
+                  }
+                } catch (e) {}
+              })();
+            `.replace(/\s{2,}/g, ' '),
+          }}
         />
       </head>
       <body>

@@ -70,6 +70,7 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
     <div 
       className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden rounded-[28px] pt-10" 
       style={{ perspective: '800px' }}
+      aria-hidden="true"
     >
       {/* rotateX(-5deg) para que no necesite tanta altura vertical */}
       <div ref={containerRef} className="relative" style={{ width: 0, height: 0, transformStyle: 'preserve-3d', transform: 'rotateX(-5deg)' }}>
@@ -208,11 +209,11 @@ export function Skills({ t }: SkillsProps) {
       </div>
 
       {/* ── GRID DE TARJETAS (Efecto Semilla) ── */}
-      <div className="skill-cards-grid grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 relative z-20">
+      <div className="skill-cards-grid grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 relative z-20" role="list">
         {SKILL_CARDS.map((card, i) => {
           const Icon = ICONS[i];
           return (
-            <div key={card.h} className="skill-card-wrapper opacity-0">
+            <div key={card.h} className="skill-card-wrapper opacity-0" role="listitem">
               {/* TARJETA CHATA: h-[200px] y p-6 */}
               <div 
                 className="relative h-[200px] p-6 rounded-[28px] border shadow-md hover:shadow-xl transition-all duration-500 overflow-hidden group backdrop-blur-xl"

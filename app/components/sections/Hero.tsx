@@ -271,7 +271,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
     <section id="hero" aria-label="Hero" className="min-h-[100svh] flex flex-col overflow-hidden pt-[80px] relative snap-start">
       
       {/* Memoji + Pill */}
-      <div className="memoji hidden lg:flex lg:flex-col items-center justify-start absolute right-0 top-0 w-1/2 h-full pb-20 z-0 pointer-events-none">
+      <div className="memoji hidden lg:flex lg:flex-col items-center justify-start absolute right-0 top-0 w-1/2 h-full pb-20 z-0 pointer-events-none" aria-hidden="true">
         <div className="flex flex-col items-center w-full max-w-[500px] mt-[110px] h-full">
           <div className="mb-6 z-10 pointer-events-auto h-fd shrink-0">
             <LiveStatus label={t.status} />
@@ -301,6 +301,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
               {/* Texto Iluminado por la linterna */}
               <div 
                 className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full drop-shadow-[0_0_12px_var(--brand)]"
+                aria-hidden="true"
                 style={{
                   backgroundImage: 'radial-gradient(circle 240px at var(--mx, -500px) var(--my, -500px), var(--ink) 10%, var(--brand) 50%, transparent 80%)',
                   WebkitBackgroundClip: 'text',

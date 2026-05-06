@@ -34,19 +34,7 @@
 }
 
 /* Optimize Tailwind transitions globally for maximum smoothness */
-.transition {
-  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transition-duration: 300ms;
-}
-.transition-colors,
-.transition-opacity,
-.transition-transform {
-  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transition-duration: 300ms;
-}
-.duration-200 { transition-duration: 200ms; }
-.duration-300 { transition-duration: 300ms; }
-.duration-500 { transition-duration: 500ms; }
+/* Base animations and transitions are handled via specific utility classes or component-level CSS to avoid global side-effects. */
 
 html {
   scroll-behavior: smooth;

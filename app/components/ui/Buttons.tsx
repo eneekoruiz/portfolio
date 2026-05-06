@@ -35,6 +35,7 @@ export function WorkScrollBtn({ label }: { label: string }) {
         state === 'done'     ? 'bg-brand text-white scale-[1.02] shadow-[0_8px_28px_rgba(0,102,255,.35)]'
         : state === 'animating' ? 'bg-ink text-page scale-[1.01] shadow-[0_8px_28px_rgba(0,0,0,.25)]'
         : 'bg-ink text-page shadow-[0_8px_28px_rgba(0,0,0,.2)] hover:scale-[1.05] hover:shadow-[0_12px_40px_rgba(0,0,0,.3)]',
+        'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none'
       ].join(' ')}
     >
       {state === 'animating' && (
@@ -137,6 +138,7 @@ export function BinaryStreamBtn({
         state === 'done'      ? 'bg-[#34c759] text-white border-none scale-[1.02]'
         : state === 'animating' ? 'border border-brand/40 text-ink dark:text-page bg-transparent scale-[1.01]'
         : [baseIdle, 'hover:scale-[1.05]'].join(' '),
+        'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none',
         className ?? '',
       ].join(' ')}
     >
@@ -196,6 +198,7 @@ export function BranchMergeBtn({ label, href = 'https://github.com/eneekoruiz' }
         state === 'done'
           ? 'bg-ink text-page scale-[1.02]'
           : 'bg-white/65 dark:bg-white/[0.06] backdrop-blur-[18px] border border-black/9 dark:border-white/10 text-lead hover:bg-ink hover:text-page hover:scale-[1.02]',
+        'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none',
       ].join(' ')}
     >
       {state === 'idle' && <><Github size={15} aria-hidden="true" /><span>{label}</span><span className="font-mono opacity-40 text-[11px]">_</span></>}
@@ -245,6 +248,7 @@ export function PortalWarpBtn({ className }: { className?: string }) {
         'text-[11px] font-bold text-brand tracking-[.08em]',
         'transition-all duration-200',
         state === 'idle' ? 'hover:bg-brand/15 dark:hover:bg-brand/20 hover:shadow-[0_0_12px_rgba(0,102,255,0.3)]' : 'scale-[0.97]',
+        'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none',
         className ?? '',
       ].join(' ')}
     >

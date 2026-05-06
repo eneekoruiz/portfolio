@@ -1,40 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
-export async function GET(request: Request) {
-  let search = '';
-  try {
-    const { searchParams } = new URL(request.url);
-    search = searchParams.toString();
-  } catch (e) {
-    console.error('URL parsing failed:', e);
-  }
+const GITHUB_USER = 'eneekoruiz';
+const CACHE_TTL = 3600; // 1 hour
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
   
-  const endpoint = `https://api.github.com/users/eneekoruiz/repos${search ? `?${search}` : ''}`;
+  // Hardened param validation
+  const sort = searchParams.get('sort') || 'updated';
+  const direction = searchParams.get('direction') || 'desc';
+  const per_page = Math.min(parseInt(searchParams.get('per_page') || '30', 10), 100);
+
+  const cleanParams = new URLSearchParams({
+    sort,
+    direction,
+    per_page: per_page.toString(),
+  });
+
+  const endpoint = `https://api.github.com/users/${GITHUB_USER}/repos?${cleanParams.toString()}`;
   const token = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
+
+  const requestHeaders: HeadersInit = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'Eneko-Portfolio-Backend',
+  };
+
+  if (token) {
+    requestHeaders.Authorization = `Bearer ${token}`;
+  }
 
   try {
     const res = await fetch(endpoint, {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      headers: requestHeaders,
+      next: { revalidate: CACHE_TTL },
     });
 
-    let repos = await res.json();
-
-    if (!res.ok) {
-      const ghMessage = repos?.message || res.statusText || 'Unknown error';
+    // Handle Rate Limiting
+    if (res.status === 403) {
+      const resetTime = res.headers.get('X-RateLimit-Reset');
       return NextResponse.json(
-        { error: `${res.status}: ${ghMessage}` },
-        { status: res.status, headers: { 'Cache-Control': 'no-store' } },
+        { error: 'GitHub API rate limit exceeded', resetAt: resetTime },
+        { status: 429, headers: { 'Retry-After': resetTime || '3600' } }
       );
     }
 
-    // Enrich the first 8 non-fork repos with all languages
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: `GitHub API error: ${errorData.message || res.statusText}` },
+        { status: res.status, headers: { 'Cache-Control': 'no-store' } }
+      );
+    }
+
+    const repos = await res.json();
+
+    // Enrich the first 8 non-fork repos with all languages in parallel
     const enrichedRepos = await Promise.all(
       repos
         .filter((r: { fork: boolean }) => !r.fork)
@@ -42,22 +64,20 @@ export async function GET(request: Request) {
         .map(async (repo: { id: number; languages_url: string; language: string | null }) => {
           try {
             const langRes = await fetch(repo.languages_url, {
-              headers: {
-                Accept: 'application/vnd.github+json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
-              next: { revalidate: 3600 } // Cache languages for an hour
+              headers: requestHeaders,
+              next: { revalidate: CACHE_TTL },
             });
             if (langRes.ok) {
               const langData: Record<string, number> = await langRes.json();
               return { ...repo, all_languages: Object.keys(langData) };
             }
-          } catch (_) {}
+          } catch (e) {
+            console.error(`Failed to enrich repo ${repo.id}:`, e);
+          }
           return { ...repo, all_languages: repo.language ? [repo.language] : [] };
         })
     );
 
-    // Replace enriched repos back in the list or just return them if we only care about those
     const finalData = repos.map((r: { id: number }) => {
       const enriched = enrichedRepos.find(er => er.id === r.id);
       return enriched || r;
@@ -65,13 +85,15 @@ export async function GET(request: Request) {
 
     return NextResponse.json(finalData, {
       status: 200,
-      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=1800' },
+      headers: {
+        'Cache-Control': `public, s-maxage=${CACHE_TTL}, stale-while-revalidate=${CACHE_TTL / 2}`,
+      },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Network error';
+    console.error('GitHub API Route error:', err);
     return NextResponse.json(
-      { error: `502: ${message}` },
-      { status: 502 },
+      { error: 'Internal Server Error' },
+      { status: 500 }
     );
   }
 }

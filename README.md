@@ -1,63 +1,55 @@
-# ENEKO RUIZ | FULL STACK & SYSTEMS
+# ENEKO RUIZ | SOFTWARE ENGINEER
 
-This portfolio is a technical space designed to demonstrate the intersection between low-level systems engineering and high-performance frontend development. No templates or UI kits were used—everything is built from scratch with a focus on physics-based interaction and modular architecture.
+A production-grade portfolio focusing on high-performance motion design and scalable React architecture. Built with **Next.js 14 (App Router)**, featuring a full transition to **Server Components (RSC)** for optimal SEO and LCP metrics.
 
 ---
 
-## TECH STACK
+## Technical Architecture
 
-| LAYER | TECHNOLOGY |
+- **Rendering Strategy**: hybrid approach using Server Components for data pre-fetching and specialized Client Components for GSAP-driven interactions.
+- **Motion Engine**: custom proximity-based interaction system using GSAP and Lenis for smooth, physics-based scrolling.
+- **Data Integrity**: direct integration with GitHub REST API with server-side caching and atomic fallback states.
+- **Security**: strict Content-Security-Policy (CSP), hardened API routes, and zero-public-token architecture.
+- **A11Y**: WCAG-compliant semantic structure, full keyboard navigation, and `prefers-reduced-motion` support.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
 | :--- | :--- |
 | **Framework** | Next.js 14 (App Router) |
 | **Logic** | TypeScript |
-| **Animation** | GSAP (GreenSock) |
+| **Motion** | GSAP (GreenSock) |
 | **Styling** | Tailwind CSS |
-| **API** | GitHub REST API |
 | **Infrastructure** | Vercel |
 
 ---
 
-## CORE ENGINEERING
+## Featured Work (Selection)
 
-### Magnetic UI Engine
-I developed a custom proximity-based interaction system using GSAP. The primary Call-to-Action (CTA) acts as a gravitational body that attracts the cursor within a 500px radius. To ensure usability, the engine includes "repel" logic that releases the element when the cursor targets neighboring buttons, preventing interaction conflicts.
-
-### Dynamic Data & Fallbacks
-The project integrates directly with the GitHub API to pull live repository metrics. To handle API rate limits or connectivity issues, I implemented a custom caching layer and a "headless" state that displays local project data (Selected Works) as a fallback, ensuring the UI never breaks.
+*   **PL/0 Compiler**: A functional compiler implementation in C, handling lexical analysis, recursive descent parsing, and P-code generation.
+*   **GestDB**: A robust database abstraction layer for PostgreSQL built with Java, focusing on connection pooling and schema integrity.
+*   **NetSim**: A network protocol simulator in Python utilizing socket programming and multi-threading.
 
 ---
 
-## FEATURED PROJECTS
+## Deployment & Setup
 
-**PL/0 Compiler (C)**
-A functional compiler built from the ground up in C. Handles lexical analysis, syntax parsing, and code generation for the PL/0 language.
+```bash
+# Clone
+git clone https://github.com/eneekoruiz/portfolio.git
 
-**GestDB (Java)**
-A database management layer designed for PostgreSQL. Focused on optimizing JDBC connections and handling complex relational schemas.
+# Install
+npm install
 
-**NetSim (Python)**
-A network protocol simulator. Uses Python threading and socket programming to model data transmission and collision handling.
+# Build & Verify
+npm run build
+```
 
----
-
-## LOCAL SETUP
-
-To run this project locally:
-
-1. Clone the repository:
-   `git clone https://github.com/eneekoruiz/portfolio.git`
-
-2. Install dependencies:
-   `npm install`
-
-3. Start the development server:
-   `npm run dev`
-
-*Note: A GitHub Personal Access Token (GITHUB_TOKEN) is recommended in your .env.local to avoid API rate-limiting during development.*
+*Note: Requires `GITHUB_TOKEN` in environment variables for authenticated API requests.*
 
 ---
 
-## CONTACT
-
-**Eneko Ruiz** Software Developer  
-[eneekoruiz@gmail.com](mailto:eneekoruiz@gmail.com)  
+© 2026 Eneko Ruiz.  
+[eneekoruiz@gmail.com](mailto:eneekoruiz@gmail.com)

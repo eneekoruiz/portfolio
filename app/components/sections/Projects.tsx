@@ -202,6 +202,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
   const router   = useRouter();
 
   const safeId = proj.name.toLowerCase().replace(/[\s_]+/g, '-');
+  const panelId = `panel-${safeId}`;
   const theme  = PROJ_THEMES[safeId] ?? DEFAULT_THEME;
 
   useEffect(() => {
@@ -315,7 +316,9 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
       {/* ── CABECERA DEL ACORDEÓN ── */}
       <button
         onClick={onToggle}
+        id={`btn-${safeId}`}
         aria-expanded={isExpanded}
+        aria-controls={panelId}
         onMouseEnter={() => {
           if (theme.hasAudit && !isPrefetched) {
             router.prefetch(`/work/${safeId}`);
@@ -386,8 +389,13 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
         </div>
       </button>
 
-      {/* ── CUERPO DEL ACORDEÓN (Bento Box) ── */}
-      <div ref={bodyRef} style={{ height: 0, overflow: 'hidden', opacity: 0 }}>
+      <div 
+        ref={bodyRef} 
+        id={panelId}
+        role="region"
+        aria-labelledby={`btn-${safeId}`}
+        style={{ height: 0, overflow: 'hidden', opacity: 0 }}
+      >
         <div className="pb-6 md:pb-10 pt-2 px-0 md:px-6 grid grid-cols-1 lg:grid-cols-[1.15fr_2fr] gap-3 md:gap-4 relative z-10">
 
           {/* Lifecycle Card */}

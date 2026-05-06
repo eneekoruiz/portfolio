@@ -26,7 +26,7 @@ export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => vo
         aria-haspopup="menu"
         aria-expanded={open}
         data-h
-        className="flex items-center gap-[.3rem] px-[.75rem] py-[.38rem] rounded-[10px] border border-black/9 dark:border-white/10 bg-white/65 dark:bg-white/[0.06] backdrop-blur-[18px] text-[12px] font-bold text-lead tracking-[.04em] transition-all duration-200"
+        className="flex items-center gap-[.3rem] px-[.75rem] py-[.38rem] rounded-[10px] border border-black/9 dark:border-white/10 bg-white/65 dark:bg-white/[0.06] backdrop-blur-[18px] text-[12px] font-bold text-lead tracking-[.04em] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none"
       >
         {lang.toUpperCase()}
         <ChevronDown size={11} className="transition-transform duration-300 ease-spring" style={{ transform: open ? 'rotate(180deg)' : '' }} />
@@ -34,7 +34,7 @@ export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => vo
       
       {open && (
         /* ── EL ARREGLO ESTÁ AQUÍ: Contenedor rígido estilo iOS ── */
-        <div className="absolute top-[120%] right-0 w-44 p-2 rounded-2xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-2xl z-[999] origin-top-right animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-[120%] right-0 w-44 p-2 rounded-2xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-2xl z-[999] origin-top-right animate-in fade-in zoom-in-95 duration-200" role="menu">
           
           {/* Scroll interno seguro para móviles */}
           <div className="max-h-[40vh] overflow-y-auto scrollbar-hide flex flex-col gap-1">
@@ -42,10 +42,11 @@ export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => vo
               <button
                 key={k}
                 type="button"
-                className={`flex items-center justify-between px-[.9rem] py-[.55rem] rounded-[11px] text-[13px] text-left transition-all duration-100 ${
+                role="menuitem"
+                className={`flex items-center justify-between px-[.9rem] py-[.55rem] rounded-[11px] text-[13px] text-left transition-all duration-100 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset outline-none ${
                   lang === k 
                     ? 'font-bold text-brand bg-brand/10 dark:bg-brand/20' 
-                    : 'font-medium text-ink hover:bg-black/5 dark:hover:bg-white/5'
+                    : 'font-medium text-ink hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5'
                 }`}
                 onClick={() => { setLang(k as Lang); setOpen(false); }}
               >

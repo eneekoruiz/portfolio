@@ -119,6 +119,9 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     <div
       ref={containerRef}
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-page text-ink overflow-hidden"
+      role="status"
+      aria-live="polite"
+      aria-busy={n < 100}
     >
       {/* ── Grid Background ── */}
       <div 
@@ -127,12 +130,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           backgroundImage: `radial-gradient(var(--ink) 1px, transparent 1px)`,
           backgroundSize: '40px 40px',
         }}
+        aria-hidden="true"
       />
 
       {/* ── Ambient Light (Follows progress) ── */}
       <div
         ref={lightRef}
         className="absolute pointer-events-none rounded-full opacity-20"
+        aria-hidden="true"
         style={{
           width: '80vw',
           height: '80vw',
@@ -146,6 +151,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       <div
         ref={spotlightRef}
         className="absolute pointer-events-none z-0"
+        aria-hidden="true"
         style={{
           width: '400px',
           height: '400px',
@@ -160,6 +166,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           ref={numRef}
           className="font-black text-[clamp(7rem,22vw,16rem)] tracking-[-0.08em] leading-none mb-4 select-none gpu-accelerated mix-blend-difference"
           style={{ color: 'var(--ink)' }}
+          aria-label={`${n} percent loaded`}
         >
           {n.toString().padStart(2, '0')}
         </div>
@@ -168,6 +175,10 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         <div 
           ref={barContainerRef}
           className="flex flex-col items-center gap-4 opacity-40"
+          role="progressbar"
+          aria-valuenow={n}
+          aria-valuemin={0}
+          aria-valuemax={100}
         >
           <div className="w-64 h-[1px] bg-ink/10 relative overflow-hidden rounded-full">
             <div
@@ -184,7 +195,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
              <span className="font-mono text-[9px] tracking-[0.6em] uppercase opacity-40 font-black">
                {n < 100 ? 'Initializing Protocol' : 'Signal Synchronized'}
              </span>
-             <div className={`w-1.5 h-1.5 rounded-full bg-brand ${n < 100 ? 'animate-pulse' : ''}`} />
+             <div className={`w-1.5 h-1.5 rounded-full bg-brand ${n < 100 ? 'animate-pulse' : ''}`} aria-hidden="true" />
           </div>
         </div>
       </div>

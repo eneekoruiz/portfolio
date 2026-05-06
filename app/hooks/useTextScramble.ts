@@ -36,8 +36,8 @@ export function useTextScramble(
 ) {
   const {
     trigger = 'inView',
-    charSpeed = 40,
-    iterations = 3,
+    charSpeed = 25,
+    iterations = 2,
     delay = 0,
     threshold = 0.3,
   } = options;
