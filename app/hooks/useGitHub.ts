@@ -4,13 +4,6 @@ import { useState, useEffect } from 'react';
 import type { Repo, RepoFull, ProjectCard, Tx } from '../lib/types';
 
 export function useGitHub(t: Tx) {
-  const [repos, setRepos] = useState<RepoFull[]>([]);
-  const [top3, setTop3] = useState<ProjectCard[]>([]);
-  const [allRepos, setAllRepos] = useState<Repo[]>([]);
-  const [load, setLoad] = useState(true);
-  const [offline, setOffline] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-
   const PROJECT_IDS = [
     'ana-peluquera',
     'who-are-ya-backend',
@@ -55,10 +48,13 @@ export function useGitHub(t: Tx) {
     });
   };
 
-  // 💎 FIX: Initialize top3 immediately to avoid layout shifts and improve scroll restoration
-  if (top3.length === 0) {
-    setTop3(buildProjectCards([]));
-  }
+  const [repos, setRepos] = useState<RepoFull[]>([]);
+  // Derive initial top3 state to avoid layout shifts and render-phase setStates
+  const [top3, setTop3] = useState<ProjectCard[]>(() => buildProjectCards([]));
+  const [allRepos, setAllRepos] = useState<Repo[]>([]);
+  const [load, setLoad] = useState(true);
+  const [offline, setOffline] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     let idleHandle: number | null = null;

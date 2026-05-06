@@ -25,6 +25,7 @@ export function InfallibleCursor() {
   
   // Refs de control
   const isHover = useRef(false);
+  const isMagnetic = useRef(false);
   const shakeTO = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => { setMounted(true); }, []);
@@ -41,8 +42,34 @@ export function InfallibleCursor() {
     setTimeout(() => { opacity.current = 1; }, 100);
 
     const onMove = (e: MouseEvent) => {
-      mx.current = e.clientX;
-      my.current = e.clientY;
+      // Magnetic Stickiness Detection
+      const target = e.target as HTMLElement;
+      const magneticEl = target.closest('[data-magnetic]') as HTMLElement;
+      
+      if (magneticEl) {
+        const rect = magneticEl.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // Stick closer to center as mouse gets closer
+        const dx = e.clientX - centerX;
+        const dy = e.clientY - centerY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        if (dist < 100) {
+          mx.current = centerX + dx * 0.25;
+          my.current = centerY + dy * 0.25;
+          isMagnetic.current = true;
+        } else {
+          mx.current = e.clientX;
+          my.current = e.clientY;
+          isMagnetic.current = false;
+        }
+      } else {
+        mx.current = e.clientX;
+        my.current = e.clientY;
+        isMagnetic.current = false;
+      }
 
       // Calcular velocidad nativa para el Shake
       const speed = Math.abs(e.movementX) + Math.abs(e.movementY);
@@ -154,18 +181,6 @@ export function InfallibleCursor() {
 
   return (
     <>
-      {/* Estilos CSS específicos para la animación de pulsación del Shake */}
-      <style>{`
-        @keyframes cursorPulse {
-          0% { box-shadow: 0 0 0 0px rgba(255,255,255,0.7); }
-          50% { box-shadow: 0 0 0 15px rgba(255,255,255,0); }
-          100% { box-shadow: 0 0 0 0px rgba(255,255,255,0); }
-        }
-        .cursor-shake-pulse {
-          animation: cursorPulse 0.25s ease-out infinite;
-        }
-      `}</style>
-
       {/* El Cursor */}
       <div
         ref={cursorRef}

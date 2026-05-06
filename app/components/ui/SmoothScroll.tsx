@@ -30,6 +30,18 @@ export function SmoothScroll() {
     gsap.ticker.add(tickerFnRef.current);
     gsap.ticker.lagSmoothing(0);
 
+    // Scroll Progress Bar Logic
+    gsap.to('#scroll-progress', {
+      scaleX: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: 'body',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.3,
+      }
+    });
+
     return () => {
       if (tickerFnRef.current) {
         gsap.ticker.remove(tickerFnRef.current);

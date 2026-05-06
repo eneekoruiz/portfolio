@@ -84,30 +84,6 @@ const RETURN_OVERLAY_ID = 'return-overlay';
 
 type Phase = 'checking' | 'loading' | 'splash' | 'ready';
 
-function NavItem({ link, href, onEnter, onLeave }: { 
-  link: string; href: string; onEnter: (e: React.MouseEvent<HTMLAnchorElement>) => void; onLeave: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-}) {
-  const ref = useMagnetic<HTMLAnchorElement>({ strength: 0.2 });
-
-  return (
-    <a
-      ref={ref}
-      href={href}
-      className="n-el relative z-[1] text-[13px] font-semibold text-lead no-underline px-[14px] py-[7px] group transition-transform duration-200"
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-    >
-      <span className="relative overflow-hidden block">
-        <span className="block transition-transform duration-400 ease-expo group-hover:-translate-y-full">
-          {link}
-        </span>
-        <span className="absolute top-0 left-0 block translate-y-full transition-transform duration-400 ease-expo group-hover:translate-y-0 text-ink">
-          {link}
-        </span>
-      </span>
-    </a>
-  );
-}
 
 export default function Home() {
   // ── Refs ────────────────────────────────────────────────────────────────
@@ -469,16 +445,32 @@ export default function Home() {
       });
   }, { scope: main, dependencies: [ready, reduced] });
 
-  // ── Indicador deslizante de la nav ─────────────────────────────────────
+  // ── Liquid Nav Indicator ─────────────────────────────────────
   const onNavEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     const el = e.currentTarget;
     if (!indRef.current || !navInner.current) return;
     const r = el.getBoundingClientRect();
     const nr = navInner.current.getBoundingClientRect();
-    gsap.to(indRef.current, {
-      x: r.left - nr.left, width: r.width, height: r.height,
-      duration: 0.2, ease: 'power3.out', opacity: 1,
-    });
+    
+    const targetX = r.left - nr.left;
+    const currentX = gsap.getProperty(indRef.current, 'x') as number;
+    const distance = Math.abs(targetX - currentX);
+    const stretch = Math.min(1.4, 1 + distance / 200);
+
+    const tl = gsap.timeline();
+    tl.to(indRef.current, {
+      x: targetX,
+      width: r.width,
+      scaleX: stretch,
+      height: r.height,
+      opacity: 1,
+      duration: 0.35,
+      ease: 'power3.out',
+    }).to(indRef.current, {
+      scaleX: 1,
+      duration: 0.45,
+      ease: 'elastic.out(1, 0.5)',
+    }, '-=0.15');
   }, []);
 
   const onNavLeave = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -508,6 +500,32 @@ export default function Home() {
     setPhase('ready');
     markSeen();
   }, [setPhase, markSeen]);
+
+  function NavItem({ link, href, onEnter, onLeave }: {
+    link: string; href: string; onEnter: (e: React.MouseEvent<HTMLAnchorElement>) => void; onLeave: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  }) {
+    const ref = useMagnetic<HTMLAnchorElement>({ strength: 0.2 });
+
+    return (
+      <a
+        ref={ref}
+        href={href}
+        className="n-el relative z-[1] text-[13px] font-semibold text-lead no-underline px-[14px] py-[7px] group transition-transform duration-200"
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeave}
+        aria-current={activeLinkRef.current === ref.current ? 'page' : undefined}
+      >
+        <span className="relative overflow-hidden block">
+          <span className="block transition-transform duration-400 ease-expo group-hover:-translate-y-full">
+            {link}
+          </span>
+          <span className="absolute top-0 left-0 block translate-y-full transition-transform duration-400 ease-expo group-hover:translate-y-0 text-ink">
+            {link}
+          </span>
+        </span>
+      </a>
+    );
+  }
 
   // Guard SSR
   if (phase === 'checking') return null;
@@ -559,12 +577,14 @@ export default function Home() {
       <div
         role="dialog"
         aria-modal="true"
+        aria-labelledby="mobile-menu-title"
         aria-hidden={!menu}
         data-lenis-prevent="true"
         className="fixed inset-0 z-[80] bg-white/97 dark:bg-[#0a0a0a]/97 backdrop-blur-[40px] transition-[clip-path] duration-[600ms] [transition-timing-function:cubic-bezier(.76,0,.24,1)]"
         style={{ clipPath: menu ? 'inset(0)' : 'inset(100% 0 0 0)', pointerEvents: menu ? 'all' : 'none' }}
         data-noprint
       >
+        <h2 id="mobile-menu-title" className="sr-only">Menú de Navegación</h2>
         <button
           onClick={() => setMenu(false)}
           className="absolute top-5 right-8 p-2 text-lead hover:text-ink transition-colors"

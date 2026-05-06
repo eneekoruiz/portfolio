@@ -86,9 +86,42 @@ body {
   .custom-cursor-dot { mix-blend-mode: difference; }
 }
 
+/* Cursor Shake Pulse */
+@keyframes cursorPulse {
+  0% { box-shadow: 0 0 0 0px rgba(255,255,255,0.7); }
+  50% { box-shadow: 0 0 0 15px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0px rgba(255,255,255,0); }
+}
+.cursor-shake-pulse {
+  animation: cursorPulse 0.25s ease-out infinite;
+}
+
 @media (max-width: 768px) {
   .cur-dot, .cur-ring { display: none !important; }
   * { cursor: auto !important; }
+}
+
+/* SOTD Grade Polish */
+#scroll-progress {
+  box-shadow: 0 0 12px var(--brand);
+}
+
+.glass-premium {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.dark .glass-premium {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Refined Grain */
+.grain-overlay {
+  opacity: 0.045 !important;
+  pointer-events: none;
 }
 
 /* ── 4. NOISE GRAIN ── */

@@ -21,6 +21,7 @@ import {
   createLiquidCurtain,
   animateLiquidCurtainIn,
 } from '../ui/LiquidCurtain';
+import { ProjectPreviewFollower } from '../ui/ProjectPreviewFollower';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
@@ -567,6 +568,7 @@ interface ProjectsProps {
 export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeBtn }: ProjectsProps) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [activeRepo,  setActiveRepo]  = useState<number | null>(null);
+  const [hoveredProject, setHoveredProject] = useState<{name: string, color: string} | null>(null);
   const lineRefs   = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -608,6 +610,24 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
           scrollTrigger: { trigger: sectionRef.current, start: 'top 85%', once: true },
         }
       );
+      // Cinematic Title Reveal
+      const titleChars = sectionRef.current?.querySelectorAll('.title-char');
+      if (titleChars) {
+        gsap.fromTo(titleChars,
+          { y: '100%', rotateX: -90, opacity: 0 },
+          {
+            y: 0, rotateX: 0, opacity: 1,
+            duration: 1.2,
+            stagger: 0.03,
+            ease: 'expo.out',
+            scrollTrigger: {
+              trigger: '.projects-header',
+              start: 'top 85%',
+            }
+          }
+        );
+      }
+
       gsap.fromTo('.work-row-anim',
         { opacity: 0, y: 16 },
         {
@@ -670,8 +690,21 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
             </p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
-            <h2 className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.88] text-ink uppercase italic">
-              Selected<br/>Works.
+            <h2 
+              className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.88] text-ink uppercase italic perspective-1000"
+              aria-label="Selected Works"
+            >
+              <div className="overflow-hidden inline-block">
+                { "Selected".split('').map((c, i) => (
+                  <span key={i} className="title-char inline-block will-change-transform">{c}</span>
+                ))}
+              </div>
+              <br/>
+              <div className="overflow-hidden inline-block">
+                { "Works.".split('').map((c, i) => (
+                  <span key={i} className="title-char inline-block will-change-transform">{c}</span>
+                ))}
+              </div>
             </h2>
             <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.22em] text-lead/30 mb-1">
               Click to expand ↓
@@ -687,7 +720,12 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
                 </div>
               ))
             : top3.map((p, i) => (
-                <div key={p.n} className="work-row-anim">
+                <div 
+                  key={p.n} 
+                  className="work-row-anim"
+                  onMouseEnter={() => !isMobile && setHoveredProject({ name: p.name, color: PROJ_THEMES[p.name.toLowerCase().replace(/[\s_]+/g, '-')]?.color || '#888' })}
+                  onMouseLeave={() => !isMobile && setHoveredProject(null)}
+                >
                   <PremiumWorkRow
                     proj={p}
                     idx={i}
@@ -699,6 +737,8 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
               ))
           }
         </div>
+
+        <ProjectPreviewFollower activeProject={hoveredProject} />
       </section>
 
       <section

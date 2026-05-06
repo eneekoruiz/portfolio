@@ -71,6 +71,7 @@ export function ProjectHero({
   const glareRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isInteracting, setIsInteracting] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
   const interRef = useRef(false);
   const canRef   = useRef(false);
@@ -140,9 +141,14 @@ export function ProjectHero({
           z: 0,
           filter: 'blur(0px)',
           borderRadius: '2.5rem',
-          // RESPONSIVE DIMENSIONS
-          width: window.innerWidth < 768 ? '94vw' : '92vw', 
-          height: window.innerWidth < 768 ? '70dvh' : '82dvh',
+          xPercent: -50,
+          yPercent: -50,
+          left: '50%',
+          top: '50%',
+          // RESPONSIVE DIMENSIONS - Use relative units for better mobile behavior
+          width: '94vw', 
+          maxWidth: window.innerWidth < 768 ? '100%' : '1400px',
+          height: window.innerWidth < 768 ? '65dvh' : '82dvh',
           force3D: true,
           ease: 'expo.inOut',
           duration: 2.2, 
@@ -231,13 +237,14 @@ export function ProjectHero({
         left: '50%',
         xPercent: -50,
         yPercent: -50,
+        x: 0,
+        y: 0,
         width: window.innerWidth < 768 ? '94vw' : '92vw',
-        height: window.innerWidth < 768 ? '70dvh' : '82dvh',
+        height: window.innerWidth < 768 ? '65dvh' : '82dvh',
         borderRadius: '2.5rem',
         zIndex: 30,
         duration: 0.7,
         ease: 'expo.out',
-        clearProps: 'position,top,left,xPercent,yPercent',
       });
     }
   }, [isInteracting]);
@@ -343,11 +350,13 @@ export function ProjectHero({
         {/* ── PROJECT PREVIEW SCREEN (STUDIO) ── */}
         <div
           ref={screenRef}
-          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center ${isInteracting ? 'shadow-none' : 'shadow-2xl border border-white/10'}`}
+          className={`absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center ${isInteracting ? 'shadow-none' : 'shadow-2xl border border-white/10'}`}
           style={{
             transformStyle: 'preserve-3d',
             willChange: 'transform, width, height, border-radius',
             borderColor: isInteracting ? 'transparent' : 'rgba(255,255,255,0.1)',
+            transform: 'translate(-50%, -50%) scale(0.05)',
+            opacity: 0,
           }}
         >
           {/* Interaction Shield */}
@@ -415,16 +424,25 @@ export function ProjectHero({
           )}
 
           {liveUrl ? (
-            <iframe 
-              ref={iframeRef}
-              src={liveUrl} 
-              title={iframeTitle}
-              className="w-full h-full border-none"
-              style={{ 
-                background: '#000',
-                filter: (canInteract && !isInteracting) ? 'blur(10px) brightness(0.5)' : 'none',
-              }}
-            />
+            <>
+              {!iframeLoaded && (
+                <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black gap-4">
+                  <div className="w-10 h-10 border-2 border-white/10 border-t-brand rounded-full animate-spin" />
+                  <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30">Booting Environment...</span>
+                </div>
+              )}
+              <iframe 
+                ref={iframeRef}
+                src={liveUrl} 
+                onLoad={() => setIframeLoaded(true)}
+                title={iframeTitle}
+                className={`w-full h-full border-none transition-opacity duration-1000 ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
+                style={{ 
+                  background: '#000',
+                  filter: (canInteract && !isInteracting) ? 'blur(10px) brightness(0.5)' : 'none',
+                }}
+              />
+            </>
           ) : (
              <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
                 <Activity size={48} className="text-white/10 animate-pulse" />

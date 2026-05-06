@@ -10,7 +10,7 @@ import { InfallibleCursor } from './components/ui/InfallibleCursor';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
-  display: 'block',
+  display: 'swap',
   weight: ['400','500','600','700','800','900'],
 });
 
@@ -27,11 +27,11 @@ export const metadata: Metadata = {
     type: 'website', locale: 'es_ES', url: 'https://eneko.dev', siteName: 'Eneko Ruiz',
     title: 'Eneko Ruiz — Full Stack Developer',
     description: 'Donostia · Me obsesiono con los detalles que nadie nota pero todo el mundo siente.',
-    images: [],
+    images: [{ url: 'https://eneko.dev/og.png', width: 1200, height: 630, alt: 'Eneko Ruiz — Full Stack Developer' }],
   },
   twitter: {
     card: 'summary_large_image', creator: '@eneekoruiz',
-    title: 'Eneko Ruiz — Full Stack Developer', images: [],
+    title: 'Eneko Ruiz — Full Stack Developer', images: ['https://eneko.dev/og.png'],
   },
   robots: { index: true, follow: true },
   icons: {
@@ -94,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <div id="scroll-progress" className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0" />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
           <SmoothScroll />
           <EasterEgg />

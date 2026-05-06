@@ -12,6 +12,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollRef = useRef(0);
   const rotationRef = useRef(0);
+  const activeRef = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,21 +37,28 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
     };
 
     const draw = () => {
-      frame = requestAnimationFrame(draw);
+      if (!activeRef.current || document.visibilityState !== 'visible') {
+        frame = requestAnimationFrame(draw);
+        return;
+      }
+
       const w = canvas.offsetWidth;
       const h = canvas.offsetHeight;
-      if (w === 0 || h === 0) return;
+      if (w === 0 || h === 0) {
+        frame = requestAnimationFrame(draw);
+        return;
+      }
 
       ctx.clearRect(0, 0, w, h);
       
       const steps = 60;
-      const speed = 0.008; // More dynamic rotation
-      const scrollImpact = scrollRef.current * 0.0012; // More responsive scroll movement
+      const speed = 0.008; 
+      const scrollImpact = scrollRef.current * 0.0012; 
       rotationRef.current += speed;
       
       const baseRotation = rotationRef.current + scrollImpact;
 
-      // Draw Strands first (under nodes)
+      // Draw Strands
       for (let s = 0; s < 2; s++) {
         const offset = s === 0 ? 0 : Math.PI;
         ctx.beginPath();
@@ -64,8 +72,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           else ctx.lineTo(x, y);
         }
         ctx.strokeStyle = s === 0 ? accent : secondary;
-        ctx.lineWidth = 2.5; // Thicker strands
-        ctx.globalAlpha = 0.4; // More opacity
+        ctx.lineWidth = 2.5;
+        ctx.globalAlpha = 0.4;
         ctx.stroke();
       }
 
@@ -78,11 +86,9 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
         const x1 = w / 2 + Math.cos(angle) * r;
         const x2 = w / 2 + Math.cos(angle + Math.PI) * r;
         
-        // Depth simulation (z-index)
         const z1 = Math.sin(angle);
         const z2 = Math.sin(angle + Math.PI);
         
-        // Draw Rung
         if (i % 3 === 0) {
           ctx.beginPath();
           ctx.moveTo(x1, y);
@@ -93,9 +99,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.stroke();
         }
 
-        // Draw Nodes
         const drawNode = (x: number, z: number, color: string) => {
-          const size = 1.5 + (z + 1) * 2.2; // Larger nodes
+          const size = 1.5 + (z + 1) * 2.2;
           ctx.beginPath();
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fillStyle = color;
@@ -107,7 +112,6 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           } else {
             ctx.shadowBlur = 0;
           }
-          
           ctx.fill();
         };
 
@@ -116,17 +120,28 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
       }
       
       ctx.shadowBlur = 0;
+      frame = requestAnimationFrame(draw);
     };
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        activeRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.01 }
+    );
+
     resize();
+    observer.observe(canvas);
     window.addEventListener('resize', resize);
     draw();
 
     return () => {
       cancelAnimationFrame(frame);
+      observer.disconnect();
       window.removeEventListener('resize', resize);
     };
   }, [accent, secondary]);
+
 
   return (
     <canvas
