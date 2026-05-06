@@ -327,12 +327,12 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
             </div>
             
             {/* BOTÓN CONTACTAR (MAGNÉTICO) */}
-            <div className="relative group z-10" ref={contactBtnRef}>
+            <div ref={contactBtnRef} className="relative group z-10 flex">
               <div className="absolute inset-0 bg-brand rounded-full blur opacity-40 group-hover:opacity-60 animate-pulse pointer-events-none" />
               <a
                 href="#contact"
                 aria-label={t.ctaContact}
-                className="relative flex items-center justify-center gap-1.5 px-8 py-3.5 rounded-full bg-brand text-white font-bold text-[14px] no-underline transition-transform hover:scale-105"
+                className="relative flex items-center justify-center gap-2 px-[1.85rem] py-[.85rem] rounded-full bg-brand text-white font-bold text-[14px] no-underline transition-transform hover:scale-105"
               >
                 <span>{t.ctaContact}</span>
                 <svg className="w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

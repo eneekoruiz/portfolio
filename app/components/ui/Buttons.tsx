@@ -30,7 +30,7 @@ export function WorkScrollBtn({ label }: { label: string }) {
       data-h
       aria-label={label}
       className={[
-        'relative inline-flex items-center gap-1.5 px-[1.85rem] py-[.85rem] rounded-full overflow-hidden',
+        'relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full overflow-hidden',
         'font-bold text-[14px] tracking-[-0.2px] transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]',
         state === 'done'     ? 'bg-brand text-white scale-[1.02] shadow-[0_8px_28px_rgba(0,102,255,.35)]'
         : state === 'animating' ? 'bg-ink text-page scale-[1.01] shadow-[0_8px_28px_rgba(0,0,0,.25)]'
@@ -190,7 +190,7 @@ export function BranchMergeBtn({ label, href = 'https://github.com/eneekoruiz' }
       data-h
       aria-label={label}
       className={[
-        'relative inline-flex items-center gap-2 px-8 py-[.85rem] rounded-full overflow-hidden',
+        'relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full overflow-hidden',
         'font-bold text-[13px] tracking-[-0.2px]',
         'transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]',
         state === 'done'
