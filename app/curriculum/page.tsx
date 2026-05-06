@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ChevronLeft, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ExternalLink, Printer, Share2 } from 'lucide-react';
 
 export default function CurriculumPage() {
   const router = useRouter();
@@ -36,6 +36,21 @@ export default function CurriculumPage() {
       }, '*');
     }
   }, [theme, resolvedTheme, loading]); // Also trigger when loading ends
+
+  // Send theme again shortly after load to ensure iframe receives it
+  useEffect(() => {
+    if (!loading && iframeRef.current?.contentWindow) {
+      const targetTheme = theme === 'system' ? resolvedTheme : theme;
+      // Small delay to let iframe's own scripts initialize
+      const timer = setTimeout(() => {
+        iframeRef.current?.contentWindow?.postMessage({
+          type: 'set-theme',
+          theme: targetTheme
+        }, '*');
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, theme, resolvedTheme]);
 
   useEffect(() => {
     document.title = 'Currículum | Eneko Ruiz';
@@ -86,6 +101,26 @@ export default function CurriculumPage() {
     });
   };
 
+  const handlePrint = () => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'print-cv' }, '*');
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Eneko Ruiz Mollón — CV',
+          text: 'Currículum de Eneko Ruiz Mollón',
+          url: 'https://eneko-ruiz-curriculum.vercel.app'
+        });
+      } catch (err) {}
+    } else if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'share-cv' }, '*');
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -108,15 +143,35 @@ export default function CurriculumPage() {
           RESUME // ENEKO RUIZ
         </h1>
 
-        <a
-          href="https://eneko-ruiz-curriculum.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-page text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
-        >
-          <ExternalLink size={14} />
-          <span>Abrir Directo</span>
-        </a>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 dark:border-white/10 text-ink text-[11px] font-bold uppercase tracking-[0.1em] hover:scale-105 transition-all"
+            title="Imprimir CV"
+          >
+            <Printer size={14} />
+            <span className="hidden sm:inline">Imprimir</span>
+          </button>
+
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 dark:border-white/10 text-ink text-[11px] font-bold uppercase tracking-[0.1em] hover:scale-105 transition-all"
+            title="Compartir CV"
+          >
+            <Share2 size={14} />
+            <span className="hidden sm:inline">Compartir</span>
+          </button>
+
+          <a
+            href="https://eneko-ruiz-curriculum.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-page text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
+          >
+            <ExternalLink size={14} />
+            <span className="hidden sm:inline">Abrir Directo</span>
+          </a>
+        </div>
       </header>
 
       {/* ── CONTENT AREA ── */}
