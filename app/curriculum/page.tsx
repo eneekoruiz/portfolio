@@ -136,6 +136,8 @@ export default function CurriculumPage() {
           src="https://eneko-ruiz-curriculum.vercel.app"
           title="Eneko Ruiz Curriculum"
           className={`w-full h-full border-none transition-all duration-1000 ${loading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+          allow="web-share; clipboard-write; print"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
           onLoad={() => {
             setLoading(false);
             setHasError(false);

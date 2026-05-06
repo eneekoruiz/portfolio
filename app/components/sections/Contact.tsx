@@ -17,7 +17,7 @@ const CONTACTS = [
 /* ── Email copy card with clipboard UX ── */
 function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
   const [copied, setCopied] = useState(false);
-  const cardRef  = useMagnetic<HTMLDivElement>({ strength: 0.06, innerStrength: 0.09 });
+  const cardRef  = useMagnetic<HTMLDivElement>({ strength: 0.015, innerStrength: 0.04 });
   const iconRef  = useRef<HTMLDivElement>(null);
 
   const handleClick = async (e: React.MouseEvent) => {
@@ -90,7 +90,7 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
 
 /* ── Standard social card with magnetic icon ── */
 function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
-  const cardRef = useMagnetic<HTMLDivElement>({ strength: 0.06, innerStrength: 0.1 });
+  const cardRef = useMagnetic<HTMLDivElement>({ strength: 0.015, innerStrength: 0.04 });
   const iconRef = useRef<HTMLDivElement>(null);
 
   return (

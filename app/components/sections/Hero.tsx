@@ -236,16 +236,24 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
     }
 
     // ── Animación inicial: barrido de la linterna ───────────────────
-    // Solo se dispara cuando el intro (splash) ha terminado (phase === 'ready')
     if (phase === 'ready' && textContainerRef.current && !isMobile && !reduced) {
-      gsap.fromTo(textContainerRef.current,
-        { '--mx': '-200px', '--my': '100px' },
+      const tl = gsap.timeline({
+        onComplete: () => {
+          // Asegurarse de que el hover tome el control total después de la animación
+          gsap.set(textContainerRef.current, { clearProps: 'all' });
+        }
+      });
+
+      tl.fromTo(textContainerRef.current,
+        { '--mx': '-200px', '--my': '100px', rotateX: 5, rotateY: -10 },
         { 
-          '--mx': '1000px', 
+          '--mx': '1200px', 
           '--my': '150px', 
+          rotateX: 0,
+          rotateY: 0,
           duration: 2.2, 
           ease: 'power3.inOut', 
-          delay: 0.2 // Pequeño delay tras el curtain reveal
+          delay: 0.4
         }
       );
     }

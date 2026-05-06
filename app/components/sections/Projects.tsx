@@ -7,7 +7,7 @@
  * Includes scroll-based skew inertia and responsive layout handling.
  */
 
-import { useRef, useEffect, useState, useLayoutEffect } from 'react';
+import { useRef, useEffect, useState, useLayoutEffect, useCallback } from 'react';
 import { useRouter }     from 'next/navigation';
 import gsap              from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -36,9 +36,6 @@ const LIFECYCLE = [
 const SESSION_KEY      = 'projects_nav_state';
 /**
  * Temas por proyecto — paleta refinada
- *
- * VISUAL CHANGE: Se sube el alpha del gradiente de fondo de 15 a 20
- * para que sea más perceptible sin resultar agresivo.
  */
 const PROJ_THEMES: Record<string, {
   color: string;
@@ -55,25 +52,25 @@ const PROJ_THEMES: Record<string, {
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'who-are-ya-backend': {
-    color: '#00c940',   // ligeramente menos neon, más legible
+    color: '#00c940',
     img: 'radial-gradient(ellipse at 50% 120%, #00c94020 0%, transparent 65%)',
     gradient: 'linear-gradient(to bottom, #00c9400a 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'rides24ofiziala': {
-    color: '#e69400',   // ámbar más cálido, menos amarillo puro
+    color: '#e69400',
     img: 'radial-gradient(ellipse at 50% 120%, #e6940020 0%, transparent 65%)',
     gradient: 'linear-gradient(to bottom, #e694000a 0%, transparent 100%)',
     progress: 3, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'spotshare-parking': {
-    color: '#00d4e8',   // cian ligeramente menos saturado
+    color: '#00d4e8',
     img: 'radial-gradient(ellipse at 50% 120%, #00d4e820 0%, transparent 65%)',
     gradient: 'linear-gradient(to bottom, #00d4e80a 0%, transparent 100%)',
     progress: 2, btnText: 'Source Code', hasAudit: false,
   },
   'pke_web': {
-    color: '#9b1fff',   // violeta más oscuro, más legible en light
+    color: '#9b1fff',
     img: 'radial-gradient(ellipse at 50% 120%, #9b1fff20 0%, transparent 65%)',
     gradient: 'linear-gradient(to bottom, #9b1fff0a 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
@@ -111,7 +108,6 @@ interface RepoRowProps {
   activeRepo: number | null;
   setActiveRepo: (i: number | null) => void;
   lineRef: (el: HTMLDivElement | null) => void;
-  /** Derived from gsap.matchMedia() — true when viewport ≤ 768px */
   isMobile: boolean;
 }
 
@@ -193,7 +189,6 @@ interface WorkRowProps {
   idx: number;
   isExpanded: boolean;
   onToggle: () => void;
-  /** If true, skip the GSAP tween — open the accordion body immediately (for scroll restoration). */
   skipAnimation?: boolean;
 }
 
@@ -214,43 +209,44 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
     setIsPrefetched(true);
   }, [isPrefetched, router, safeId, theme.hasAudit]);
 
-  /**
-   * FIX: Usar gsap.context() para que el tween del acordeón se limpie
-   * correctamente si el componente se desmonta mientras está animando.
-   * Antes era un gsap.to() huérfano sin cleanup.
-   */
-  /**
-   * Accordion expand/collapse animation.
-   * If `skipAnimation` is true (return from /work), we set height/opacity
-   * instantly so the DOM has the correct height BEFORE page.tsx restores scroll.
-   */
   useEffect(() => {
     const body = bodyRef.current;
     if (!body) return;
 
-    // On return from /work/[id]: open instantly so scroll restoration is accurate.
     if (skipAnimation && isExpanded) {
       gsap.set(body, { height: 'auto', opacity: 1 });
-      // Force a reflow so the browser calculates the correct height
       // eslint-disable-next-line no-unused-expressions
       body.offsetHeight;
       return;
     }
 
-    ctxRef.current?.revert();
     ctxRef.current = gsap.context(() => {
-      gsap.to(body, {
-        height:   isExpanded ? 'auto' : 0,
-        opacity:  isExpanded ? 1 : 0,
-        duration: 0.22,
-        ease:     isExpanded ? 'power3.out' : 'power2.inOut',
-      });
+      if (isExpanded) {
+        gsap.fromTo(body, 
+          { height: 0, opacity: 0, y: -20 },
+          {
+            height: 'auto',
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'elastic.out(1, 0.8)',
+            clearProps: 'transform',
+          }
+        );
+      } else {
+        gsap.to(body, {
+          height: 0,
+          opacity: 0,
+          y: -10,
+          duration: 0.3,
+          ease: 'power2.inOut',
+        });
+      }
     });
 
     return () => ctxRef.current?.revert();
   }, [isExpanded, skipAnimation]);
 
-  // Scroll suave en móvil al abrir — uses gsap.matchMedia() (Punto 5)
   useEffect(() => {
     if (skipAnimation) return;
     if (!isExpanded || !rowRef.current) return;
@@ -274,20 +270,13 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
 
     saveNavState({ openIdx: idx, scrollY: window.scrollY });
 
-    // Remove any stale transition layer
-    document.getElementById('project-transition-layer')?.remove();
-    document.getElementById('liquid-curtain')?.remove();
-
-    // 🌊 Punto 8 — SVG Liquid Curtain (replaces plain div overlay)
+    const targetRoute = `/work/${safeId}`;
     const svg = createLiquidCurtain({
       color: theme.color,
       direction: 'up',
-      id: 'project-transition-layer',
+      id: 'project-transition-layer'
     });
     document.body.appendChild(svg);
-
-    const targetRoute = `/work/${safeId}`;
-    router.prefetch(targetRoute);
 
     animateLiquidCurtainIn(svg, {
       duration: 1.0,
@@ -296,7 +285,6 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
         setIsNavigating(false);
       },
       onComplete: () => {
-        // Ensure navigation happened even if onMidway was too early
         setIsNavigating(false);
       },
     });
@@ -308,14 +296,19 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
       className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-colors duration-300"
       style={isExpanded ? { background: theme.gradient } : undefined}
     >
-      {/*
-       * VISUAL CHANGE: Glow de hover ahora usa un gradiente elíptico
-       * más amplio que el anterior radial-gradient circular.
-       * Más sutil y elegante, especialmente en dark mode.
-       */}
+      {/* Dynamic Hover Glow */}
       <div
         className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 pointer-events-none hidden md:block"
-        style={{ background: theme.img }}
+        style={{ 
+          background: theme.img.replace('20%', '35%'), 
+          filter: 'blur(40px)'
+        }}
+      />
+
+      {/* Top Border Glow on Hover */}
+      <div 
+        className="absolute top-0 left-0 w-full h-[1px] opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 z-20"
+        style={{ background: `linear-gradient(90deg, transparent, ${theme.color}40, transparent)` }}
       />
 
       {/* ── CABECERA DEL ACORDEÓN ── */}
@@ -336,73 +329,59 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
         }}
         className="relative z-10 w-full text-left py-[16px] md:py-[22px] px-0 md:px-6 flex items-center justify-between gap-4 cursor-pointer group/btn"
       >
-        {/*
-         * VISUAL CHANGE: Número de orden — transición de escala + color
-         * El número se hace más prominente cuando el row está expandido.
-         */}
+        {/* Order Number with Theme Color Shift */}
         <span
-          className="font-mono text-[10px] md:text-[11px] w-7 shrink-0 tabular-nums transition-all duration-300 font-semibold"
+          className="font-mono text-[10px] md:text-[11px] w-7 shrink-0 tabular-nums transition-all duration-300 font-semibold group-hover/row:scale-110 origin-left"
           style={{
             color:   isExpanded ? theme.color : 'var(--lead)',
             opacity: isExpanded ? 1 : 0.4,
           }}
         >
-          {String(idx + 1).padStart(2, '0')}
+          <span className="group-hover/row:opacity-100 group-hover/row:text-[var(--theme-color)] transition-colors duration-300" style={{ '--theme-color': theme.color } as React.CSSProperties}>
+            {String(idx + 1).padStart(2, '0')}
+          </span>
         </span>
 
         <div className="flex-1 min-w-0 flex items-center gap-3 md:gap-5">
-          {/*
-           * VISUAL CHANGE: Nombre del proyecto
-           * - font-size: clamp ligeramente más compacto en mobile (0.95→0.88)
-           * - En estado cerrado: text-ink con ligera opacidad (0.85)
-           * - En estado abierto: color del proyecto
-           */}
+          {/* Project Name with Color & Translation Pop */}
           <h3
-            className="font-bold leading-tight tracking-tight min-w-0 transition-colors duration-300"
+            className="font-bold leading-tight tracking-tight min-w-0 transition-all duration-500 group-hover/row:translate-x-2"
             style={{
               fontSize: 'clamp(0.92rem, 2.2vw, 1.42rem)',
               color:    isExpanded ? theme.color : 'var(--ink)',
               opacity:  isExpanded ? 1 : 0.9,
-              // Evitar truncado en móvil para que el texto se vea completo
               overflow: 'hidden',
               display: '-webkit-box',
               WebkitLineClamp: 1,
               WebkitBoxOrient: 'vertical',
             }}
           >
-            {proj.name.replace(/-/g, ' ').replace(/_/g, ' ')}
+            <span className="group-hover/row:text-[var(--theme-color)] transition-colors duration-300" style={{ '--theme-color': theme.color } as React.CSSProperties}>
+              {proj.name.replace(/-/g, ' ').replace(/_/g, ' ')}
+            </span>
           </h3>
 
-          {/*
-           * VISUAL CHANGE: Tag — texto case-preserving en lugar de uppercase
-           * Más elegante y menos agresivo visualmente en mobile
-           */}
           <span
-            className="hidden sm:block font-mono text-[8px] md:text-[9px] uppercase tracking-[0.28em] md:tracking-[0.3em] opacity-0 group-hover/btn:opacity-55 transition-opacity duration-300 whitespace-nowrap shrink-0"
+            className="hidden sm:block font-mono text-[8px] md:text-[9px] uppercase tracking-[0.28em] md:tracking-[0.3em] opacity-0 group-hover/btn:opacity-100 transition-all duration-300 whitespace-nowrap shrink-0 translate-x-4 group-hover/btn:translate-x-0"
             style={{ color: theme.color, letterSpacing: '0.28em' }}
           >
             {proj.tag}
           </span>
         </div>
 
-        {/* Año — solo desktop */}
-        <span className="hidden lg:block font-mono text-[11px] text-lead/35 shrink-0 tabular-nums">
+        <span className="hidden lg:block font-mono text-[11px] text-lead/35 shrink-0 tabular-nums group-hover/row:opacity-100 transition-opacity">
           {proj.year}
         </span>
 
-        {/*
-         * VISUAL CHANGE: Chevron — ahora usa el color del tema cuando está expandido
-         * Antes era siempre bg-ink (negro), ahora usa bg del color del proyecto.
-         */}
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${
             isExpanded
-              ? 'rotate-180 text-white'
-              : 'border border-black/10 dark:border-white/15 text-lead group-hover/row:border-opacity-60 group-hover/row:text-ink dark:group-hover/row:text-white'
+              ? 'rotate-180 text-white shadow-lg'
+              : 'border border-black/10 dark:border-white/15 text-lead group-hover/row:border-[var(--theme-color)] group-hover/row:text-[var(--theme-color)]'
           }`}
-          style={isExpanded ? { backgroundColor: theme.color } : undefined}
+          style={isExpanded ? { backgroundColor: theme.color } : ({ '--theme-color': theme.color } as React.CSSProperties)}
         >
-          <ChevronDown size={15} strokeWidth={2} />
+          <ChevronDown size={15} strokeWidth={2.5} />
         </div>
       </button>
 
@@ -410,12 +389,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
       <div ref={bodyRef} style={{ height: 0, overflow: 'hidden', opacity: 0 }}>
         <div className="pb-6 md:pb-10 pt-2 px-0 md:px-6 grid grid-cols-1 lg:grid-cols-[1.15fr_2fr] gap-3 md:gap-4 relative z-10">
 
-          {/*
-           * VISUAL CHANGE: Tarjeta Lifecycle
-           * - Background alpha subido de 05 a 0a (ligeramente más visible)
-           * - Border alpha subido de 25 a 35 (más definido)
-           * - Añadido box-shadow interior sutil
-           */}
+          {/* Lifecycle Card */}
           <div
             className="p-5 md:p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden group/card"
             style={{
@@ -424,7 +398,6 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
               boxShadow:       `inset 0 1px 0 ${theme.color}12`,
             }}
           >
-            {/* Glow ambiental */}
             <div
               className="absolute top-0 right-0 w-32 h-32 blur-[70px] opacity-20 transition-opacity duration-700 group-hover/card:opacity-40 pointer-events-none"
               style={{ backgroundColor: theme.color }}
@@ -524,12 +497,6 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
             )}
           </div>
 
-          {/*
-           * VISUAL CHANGE: Tarjeta info del proyecto
-           * - Background subido de 012 a 05
-           * - Border más definido
-           * - Padding y rounded ajustados
-           */}
           <div
             className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.05] flex flex-col justify-between gap-6"
           >
@@ -538,17 +505,14 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-black/5 dark:border-white/5">
-              {/* Año */}
               <div className="space-y-1">
                 <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.34em] text-lead/40">Año</span>
                 <span className="block font-semibold text-[13px] text-ink">{proj.year}</span>
               </div>
-              {/* Tamaño */}
               <div className="space-y-1">
                 <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.34em] text-lead/40">Tamaño</span>
                 <span className="block font-semibold text-[13px] text-ink">{proj.size}</span>
               </div>
-              {/* Stack — ocupa full en mobile, 1 col en sm */}
               <div className="col-span-2 sm:col-span-1 space-y-2">
                 <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.34em] text-lead/40">Stack</span>
                 <div className="flex flex-wrap gap-1">
@@ -581,14 +545,14 @@ function SkeletonRow({ idx }: { idx: number }) {
     >
       <div className="flex items-center gap-5">
         <span className="w-4 h-3 rounded bg-black/8 dark:bg-white/8" />
-        <span className="block h-5 w-36 md:w-56 rounded-lg bg-black/5 dark:bg-white/5" />  {/* ← más corto en mobile */}
+        <span className="block h-5 w-36 md:w-56 rounded-lg bg-black/5 dark:bg-white/5" />
       </div>
       <span className="block h-8 w-8 rounded-full bg-black/5 dark:bg-white/5" />
     </div>
   );
 }
 
-// ── Componente principal ──────────────────────────────────────────────────────
+// ── Main Component ──────────────────────────────────────────────────────
 
 interface ProjectsProps {
   t: Tx;
@@ -606,11 +570,6 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
   const lineRefs   = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
 
-  /**
-   * gsap.matchMedia() — reactive mobile breakpoint (Punto 5, Fase 2)
-   * Replaces all static `window.innerWidth <= 768` checks.
-   * Auto-reverts when viewport crosses the breakpoint.
-   */
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const mm = gsap.matchMedia();
@@ -621,52 +580,24 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
     return () => mm.revert();
   }, []);
 
-  /**
-   * isReturning — true when the user is coming back from /work/[id].
-   * Tells PremiumWorkRow to open the accordion INSTANTLY (duration: 0)
-   * so the DOM height is correct before page.tsx restores the scroll position.
-   * Cleared after the first render cycle so subsequent toggles animate normally.
-   */
   const isReturning = useRef(false);
 
-  /**
-   * FIX SCROLL RESTAURACIÓN (Punto 1, Fase 1)
-   * ──────────────────────────────────────────
-   * Projects.tsx SOLO restaura el acordeón abierto.
-   * El scroll lo maneja exclusivamente page.tsx (useLayoutEffect síncrono)
-   * para evitar scroll doble y rebotes.
-   *
-   * `isReturning` is set to true so PremiumWorkRow opens the body with
-   * gsap.set() (instant) instead of gsap.to() (animated).
-   * This guarantees the DOM has the correct height before scroll restoration.
-   */
   useLayoutEffect(() => {
     if (load || top3.length === 0) return;
-
     const saved = loadNavState();
     if (!saved) return;
-
-    // Flag for PremiumWorkRow to skip the animation
     isReturning.current = true;
-
-    // Solo restaurar acordeón — NO tocar scroll
     setExpandedIdx(saved.openIdx);
   }, [load, top3.length]);
 
-  /**
-   * Clear the isReturning flag after the first paint so subsequent
-   * accordion toggles animate normally.
-   */
   useEffect(() => {
     if (!isReturning.current) return;
-    // Wait one frame for the instant-open to settle
     const raf = requestAnimationFrame(() => {
       isReturning.current = false;
     });
     return () => cancelAnimationFrame(raf);
   }, [expandedIdx]);
 
-  // ── Animaciones de entrada — DURACIÓN REDUCIDA ────────────────────────────
   useEffect(() => {
     if (load) return;
     const ctx = gsap.context(() => {
@@ -685,12 +616,6 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
         }
       );
 
-      /**
-       * 🎯 Punto 9 — Skew on Scroll (Inertia)
-       * Applies a subtle skewY to accordion rows based on scroll velocity.
-       * Uses ScrollTrigger's built-in getVelocity() for detection.
-       * The skew returns to 0 when the user stops scrolling.
-       */
       const rows = gsap.utils.toArray<HTMLElement>('.work-row-anim');
       if (rows.length > 0) {
         const skewSetter = gsap.quickTo(rows, 'skewY', {
@@ -703,14 +628,12 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
           start: 'top bottom',
           end: 'bottom top',
           onUpdate: (self) => {
-            // Clamp velocity to a reasonable range (-3.5 to 3.5 degrees)
             const velocity = self.getVelocity();
-            const skew = gsap.utils.clamp(-3.5, 3.5, velocity / 320);
+            const skew = gsap.utils.clamp(-2.5, 2.5, velocity / 400);
             skewSetter(skew);
           },
         });
 
-        // Ensure skew resets when scroll stops
         ScrollTrigger.addEventListener('scrollEnd', () => {
           skewSetter(0);
         });
@@ -733,14 +656,12 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
 
   return (
     <>
-      {/* ════ SELECTED WORKS ════ */}
       <section
         ref={sectionRef}
         id="work"
         aria-label="Proyectos"
         className="py-16 md:py-28 px-5 md:px-8 max-w-[1300px] mx-auto relative z-20"
       >
-        {/* Encabezado */}
         <div className="projects-header mb-10 md:mb-16">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 md:w-10 bg-ink opacity-12" />
@@ -749,10 +670,6 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
             </p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
-            {/*
-             * VISUAL CHANGE: Título — tamaño ligeramente reducido en mobile
-             * para dar más espacio al contenido de los acordeones.
-             */}
             <h2 className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.88] text-ink uppercase italic">
               Selected<br/>Works.
             </h2>
@@ -762,7 +679,6 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
           </div>
         </div>
 
-        {/* Lista */}
         <div className="projects-list border-t border-black/10 dark:border-white/10">
           {top3.length === 0
             ? [0, 1, 2, 3, 4].map(i => (
@@ -785,7 +701,6 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
         </div>
       </section>
 
-      {/* ════ GITHUB ACTIVITY ════ */}
       <section
         id="github"
         data-section="github"

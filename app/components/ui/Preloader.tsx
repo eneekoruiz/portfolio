@@ -23,6 +23,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   const barContainerRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const lightRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
   const exitFired = useRef(false);
 
   // Stable ref to onDone
@@ -36,19 +37,19 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
     const tick = () => {
       // Random but smooth increments
-      const inc = Math.random() * 3 + 1;
+      const inc = Math.random() * 2 + 0.5;
       v += inc;
       
       if (v >= 100) {
         setN(100);
-        // Small delay to let the user see "100%" before exit
+        // Delay before exit to emphasize the zoom
         setTimeout(() => playExit(), 150);
         return;
       }
       
       setN(Math.round(v));
       rafId = requestAnimationFrame(() => {
-        setTimeout(tick, 20 + Math.random() * 15);
+        setTimeout(tick, 10 + Math.random() * 10);
       });
     };
 
@@ -58,7 +59,24 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     };
   }, []);
 
-  // ── Exit Animation (Cinematic & Premium) ──────────────────────────────
+  // ── Spotlight Movement Animation ─────────────────────────────────────
+  useEffect(() => {
+    if (!spotlightRef.current) return;
+    
+    const moveSpotlight = () => {
+      gsap.to(spotlightRef.current, {
+        x: gsap.utils.random(-300, 300),
+        y: gsap.utils.random(-300, 300),
+        duration: gsap.utils.random(2, 4),
+        ease: 'sine.inOut',
+        onComplete: moveSpotlight
+      });
+    };
+    
+    moveSpotlight();
+  }, []);
+
+  // ── Exit Animation (Cinematic & Premium Zoom) ──────────────────────────────
   const playExit = useCallback(() => {
     if (exitFired.current) return;
     exitFired.current = true;
@@ -68,27 +86,33 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     });
 
     tl
-      // 1. Zoom and fade out the UI elements
-      .to([numRef.current, barContainerRef.current], {
-        scale: 1.1,
+      // 1. Zoom the number MASSIVELY to create a portal effect
+      .to(numRef.current, {
+        scale: 45,
         opacity: 0,
-        duration: 0.5,
-        ease: 'power3.inOut',
-        stagger: 0.1,
+        duration: 1.2,
+        ease: 'expo.inOut',
       })
-      // 2. Light pulse
+      // 2. Fade out UI elements
+      .to([barContainerRef.current, spotlightRef.current], {
+        opacity: 0,
+        duration: 0.4,
+        ease: 'power2.out',
+      }, 0)
+      // 3. Pulse and expand light
       .to(lightRef.current, {
-        scale: 2,
+        scale: 4,
         opacity: 0,
-        duration: 0.6,
-        ease: 'power2.inOut',
-      }, '-=0.3')
-      // 3. Fade entire container
+        duration: 1,
+        ease: 'power3.inOut',
+      }, 0.2)
+      // 4. Fade entire container
       .to(containerRef.current, {
+        backgroundColor: 'transparent',
         opacity: 0,
-        duration: 0.5,
+        duration: 0.8,
         ease: 'power2.inOut',
-      }, '-=0.2');
+      }, 0.6);
   }, []);
 
   return (
@@ -96,16 +120,37 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       ref={containerRef}
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-page text-ink overflow-hidden"
     >
+      {/* ── Grid Background ── */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(var(--ink) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+        }}
+      />
+
       {/* ── Ambient Light (Follows progress) ── */}
       <div
         ref={lightRef}
-        className="absolute pointer-events-none rounded-full opacity-30"
+        className="absolute pointer-events-none rounded-full opacity-20"
         style={{
-          width: '60vw',
-          height: '60vw',
+          width: '80vw',
+          height: '80vw',
           background: 'radial-gradient(circle, rgba(0,102,255,0.15) 0%, transparent 70%)',
-          filter: 'blur(100px)',
-          transform: `scale(${0.8 + (n / 100) * 0.4})`,
+          filter: 'blur(120px)',
+          transform: `scale(${1 + (n / 100) * 0.5})`,
+        }}
+      />
+
+      {/* ── Moving Spotlight (Blue Flashlight) ── */}
+      <div
+        ref={spotlightRef}
+        className="absolute pointer-events-none z-0"
+        style={{
+          width: '400px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(0,163,255,0.1) 0%, transparent 75%)',
+          filter: 'blur(60px)',
         }}
       />
 
@@ -113,7 +158,8 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       <div className="relative z-10 flex flex-col items-center">
         <div
           ref={numRef}
-          className="font-black text-[clamp(6rem,18vw,14rem)] tracking-[-0.06em] leading-none mb-4 select-none gpu-accelerated"
+          className="font-black text-[clamp(7rem,22vw,16rem)] tracking-[-0.08em] leading-none mb-4 select-none gpu-accelerated mix-blend-difference"
+          style={{ color: 'var(--ink)' }}
         >
           {n.toString().padStart(2, '0')}
         </div>
@@ -121,36 +167,36 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         {/* ── Progress Bar (Minimalist) ── */}
         <div 
           ref={barContainerRef}
-          className="flex flex-col items-center gap-4 opacity-50"
+          className="flex flex-col items-center gap-4 opacity-40"
         >
-          <div className="w-48 h-[1px] bg-ink/10 relative overflow-hidden">
+          <div className="w-64 h-[1px] bg-ink/10 relative overflow-hidden rounded-full">
             <div
               ref={barRef}
               className="absolute inset-0 bg-ink origin-left"
               style={{ 
                 transform: `scaleX(${n / 100})`,
-                transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' 
+                transition: 'transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)' 
               }}
             />
           </div>
           
-          <div className="flex items-center gap-3">
-             <span className="font-mono text-[9px] tracking-[0.5em] uppercase opacity-40 font-bold">
-               {n < 100 ? 'System Loading' : 'Complete'}
+          <div className="flex items-center gap-4">
+             <span className="font-mono text-[9px] tracking-[0.6em] uppercase opacity-40 font-black">
+               {n < 100 ? 'Initializing Protocol' : 'Signal Synchronized'}
              </span>
-             <div className={`w-1 h-1 rounded-full bg-brand ${n < 100 ? 'animate-pulse' : ''}`} />
+             <div className={`w-1.5 h-1.5 rounded-full bg-brand ${n < 100 ? 'animate-pulse' : ''}`} />
           </div>
         </div>
       </div>
 
       {/* ── Corner Indices (Premium Detail) ── */}
-      <div className="absolute top-10 left-10 flex flex-col gap-1 opacity-20">
-        <div className="w-8 h-px bg-ink" />
-        <span className="font-mono text-[8px] tracking-[0.2em] uppercase">Eneko Ruiz</span>
+      <div className="absolute top-12 left-12 flex flex-col gap-2 opacity-15">
+        <div className="w-10 h-[1px] bg-ink" />
+        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">Terminal_Auth</span>
       </div>
-      <div className="absolute bottom-10 right-10 flex items-center gap-4 opacity-20">
-        <span className="font-mono text-[8px] tracking-[0.2em] uppercase">Est. 2026</span>
-        <div className="w-8 h-px bg-ink" />
+      <div className="absolute bottom-12 right-12 flex flex-col items-end gap-2 opacity-15">
+        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">Node_01 // {new Date().getFullYear()}</span>
+        <div className="w-10 h-[1px] bg-ink" />
       </div>
     </div>
   );

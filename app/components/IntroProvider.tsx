@@ -31,34 +31,19 @@ interface IntroContextValue {
 
 const IntroContext = createContext<IntroContextValue | null>(null);
 
-const SESSION_KEY = 'hasSeenIntro';
+// Global variable survives client-side navigation but resets on full reload
+let hasSeenGlobal = false;
 
 export function IntroProvider({ children }: { children: React.ReactNode }) {
-  // Keep first render identical on server and client to avoid hydration mismatches.
   const [phase, setPhase] = useState<IntroPhase>('checking');
 
   useEffect(() => {
     if (phase !== 'checking') return;
-
-    // FIX Punto 5: Read persisted state from sessionStorage
-    // This covers both:
-    //   1. Return from /work/[id] (which sets hasSeenIntro before navigating)
-    //   2. SPA-internal re-renders where markSeen was previously called
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(SESSION_KEY) === 'true';
-    } catch (_) {
-      // sessionStorage may be unavailable (private browsing, etc.)
-    }
-
-    setPhase(seen ? 'ready' : 'loading');
+    setPhase(hasSeenGlobal ? 'ready' : 'loading');
   }, [phase]);
 
   const markSeen = useCallback(() => {
-    // Persist to sessionStorage so it survives client-side navigation
-    try {
-      sessionStorage.setItem(SESSION_KEY, 'true');
-    } catch (_) {}
+    hasSeenGlobal = true;
     setPhase('ready');
   }, []);
 

@@ -83,89 +83,83 @@ export function ProjectHero({
   useGSAP(() => {
     if (!isReady || !heroRef.current || !bgImageRef.current || !titleRef.current || !screenRef.current) return;
 
-    // 1. Cinematic Scroll Sequence
+    // 1. Cinematic Scroll Sequence — INCREASED END for better pacing
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: heroRef.current,
         start: 'top top',
-        end: '+=160%',
-        scrub: 1,
+        end: '+=250%', // More space for a grander transition
+        scrub: 1.2,
         pin: true,
         anticipatePin: 1,
         onUpdate: (self) => {
-          // 🚀 UX SHIELD: Optimized threshold check
-          // 🚀 UX SHIELD: Lowered threshold to trigger earlier (96%)
-          const isLocked = self.progress > 0.96;
+          const isLocked = self.progress > 0.88; // Trigger CTA earlier
           if (canRef.current !== isLocked) {
             canRef.current = isLocked;
             setCanInteract(isLocked);
           }
           
-          if (screenRef.current) {
-            screenRef.current.style.setProperty('--shield-opacity', isLocked ? '0' : '1');
-            screenRef.current.style.setProperty('--shield-pointer', isLocked ? 'none' : 'all');
+          if (screenRef.current && !interRef.current) {
+            screenRef.current.style.setProperty('--shield-opacity', isLocked ? '0.4' : '1');
+            screenRef.current.style.setProperty('--shield-pointer', isLocked ? 'all' : 'none');
           }
         }
       },
     });
 
     tl
-      // Phase 1: Title & Background Dissolve (REMOVED HEAVY BLURS for CPU fluidity)
+      // Phase 1: Background & Content Fade
       .to(contentRef.current, {
-        y: -150,
+        y: -120,
         opacity: 0,
-        scale: 0.8,
+        scale: 0.9,
         force3D: true,
         ease: 'power2.in',
         duration: 1.2,
       }, 0)
       .to(bgImageRef.current, {
-        scale: 2,
-        opacity: 0.05,
+        scale: 2.2,
+        opacity: 0.1,
         force3D: true,
         ease: 'power2.inOut',
-        duration: 2,
+        duration: 2.5,
       }, 0)
 
-      // Phase 2: High-Performance 3D Entrance (Premium Depth)
+      // Phase 2: Screen reveals with a "Window" effect
       .fromTo(screenRef.current,
         { 
-          y: '80vh', 
-          scale: 0.2, 
-          rotateX: 45, // More aggressive angle
-          z: -800,
-          borderRadius: '12rem',
-          width: '40vw',
+          scale: 0.05, 
           opacity: 0,
+          z: -1500,
+          filter: 'blur(30px)',
+          borderRadius: '50rem',
         },
         { 
-          y: '0vh', 
           scale: 1, 
-          rotateX: 0,
-          rotateY: 0,
-          z: 0,
-          borderRadius: '2.5rem',
-          width: '95vw', // Slightly wider for immersion
-          height: '85vh',
           opacity: 1,
+          z: 0,
+          filter: 'blur(0px)',
+          borderRadius: '2.5rem',
+          width: '92vw', 
+          height: '82vh',
           force3D: true,
-          ease: 'expo.out',
-          duration: 2.2, // Slightly slower for 'grandeur'
+          ease: 'expo.inOut',
+          duration: 2.2, 
         },
-        0.1
+        0.5
       )
       
-      // Phase 3: Final Depth Adjustment
+      // Phase 3: Darkening for focus
       .to(overlayRef.current, {
         opacity: 1,
-        backgroundColor: 'rgba(0,0,0,0.95)',
-        duration: 2,
+        backgroundColor: 'rgba(0,0,0,0.94)',
+        duration: 1.8,
       }, 0.8);
 
     // 2. Idle floating
     gsap.to(titleRef.current, {
-      y: '+=8',
-      duration: 3,
+      y: '+=12',
+      duration: 4,
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
@@ -174,60 +168,78 @@ export function ProjectHero({
 
     // 3. Mouse Interaction (Optimized)
     const onMove = (e: MouseEvent) => {
-      if (!titleRef.current) return;
+      if (!titleRef.current || interRef.current) return;
       const { clientX, clientY } = e;
       const { innerWidth, innerHeight } = window;
       const mx = (clientX / innerWidth - 0.5) * 2;
       const my = (clientY / innerHeight - 0.5) * 2;
       
       gsap.to(titleRef.current, {
-        rotateY: mx * 12,
-        rotateX: -my * 12,
-        scale: 1.02,
-        duration: 0.6,
+        rotateY: mx * 10,
+        rotateX: -my * 10,
+        scale: 1.01,
+        duration: 0.8,
         ease: 'power2.out',
         overwrite: 'auto',
-        force3D: true,
       });
       
       if (glareRef.current) {
         gsap.to(glareRef.current, {
-          x: mx * 30,
-          y: my * 30,
-          opacity: 0.3,
+          x: mx * 20,
+          y: my * 20,
+          opacity: 0.2,
           duration: 1,
-          force3D: true,
         });
-      }
-
-      // 🚀 UX MIDDLE GROUND
-      if (interRef.current && screenRef.current) {
-        const r = screenRef.current.getBoundingClientRect();
-        const buffer = 40;
-        if (
-          clientX < r.left - buffer || 
-          clientX > r.right + buffer || 
-          clientY < r.top - buffer || 
-          clientY > r.bottom + buffer
-        ) {
-          setIsInteracting(false);
-        }
       }
     };
 
     window.addEventListener('mousemove', onMove);
-    
-    if (isInteracting) {
-      gsap.fromTo('.studio-bar', 
-        { y: 30, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out', force3D: true }
-      );
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-    };
+    return () => window.removeEventListener('mousemove', onMove);
   }, { scope: heroRef, dependencies: [isReady] });
+
+  // ── 🚀 STUDIO MODE TRANSITION (Fullscreen Takeover) ────────────────
+  useGSAP(() => {
+    if (!screenRef.current) return;
+
+    if (isInteracting) {
+      const tl = gsap.timeline();
+      tl.to(screenRef.current, {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100dvh',
+        x: 0,
+        y: 0,
+        translateX: 0,
+        translateY: 0,
+        borderRadius: 0,
+        zIndex: 999,
+        duration: 0.8,
+        ease: 'expo.inOut',
+      })
+      .fromTo('.studio-bar', 
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: 'back.out(1.7)' },
+        '-=0.3'
+      );
+    } else {
+      gsap.to(screenRef.current, {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        xPercent: -50,
+        yPercent: -50,
+        width: '92vw',
+        height: '82vh',
+        borderRadius: '2.5rem',
+        zIndex: 30,
+        duration: 0.7,
+        ease: 'expo.out',
+        clearProps: 'position,top,left,xPercent,yPercent',
+      });
+    }
+  }, [isInteracting]);
 
   // ── 🚀 STUDIO MODE SIDE EFFECTS (Scroll Lock & ESC Key) ────────────────
   useEffect(() => {
@@ -259,7 +271,7 @@ export function ProjectHero({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className="relative h-[100vh] w-full overflow-hidden flex items-center justify-center bg-transparent"
+        className="relative h-[100dvh] w-full overflow-hidden flex items-center justify-center bg-transparent"
         style={{ perspective: '2000px' }}
       >
         {/* ── Background Layer ── */}
@@ -297,9 +309,9 @@ export function ProjectHero({
               <h1
                 className="font-black uppercase italic tracking-[-0.05em] leading-[0.85] text-center max-w-[1200px]"
                 style={{
-                  fontSize: 'clamp(3rem, 14vw, 11rem)',
+                  fontSize: 'clamp(3.5rem, 15vw, 12rem)',
                   color: accent,
-                  textShadow: `0 20px 80px ${accent}30`,
+                  textShadow: `0 30px 100px ${accent}40`,
                 }}
               >
                 {title}
@@ -327,73 +339,74 @@ export function ProjectHero({
           </div>
         </div>
 
-        {/* ── PROJECT PREVIEW SCREEN ── */}
+        {/* ── PROJECT PREVIEW SCREEN (STUDIO) ── */}
         <div
           ref={screenRef}
-          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border transition-all duration-500 overflow-hidden bg-black flex items-center justify-center ${isInteracting ? 'ring-4 ring-white/10' : 'border-white/10'}`}
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center ${isInteracting ? 'shadow-none' : 'shadow-2xl border border-white/10'}`}
           style={{
             transformStyle: 'preserve-3d',
-            willChange: 'transform, opacity, filter',
-            borderColor: isInteracting ? accent : 'rgba(255,255,255,0.1)',
-            boxShadow: isInteracting ? `0 0 60px ${accent}30` : '0 50px 100px -20px rgba(0,0,0,0.5)',
+            willChange: 'transform, width, height, border-radius',
+            borderColor: isInteracting ? 'transparent' : 'rgba(255,255,255,0.1)',
           }}
         >
-          {/* 🚀 INTERACTION SHIELD & CTA */}
+          {/* Interaction Shield */}
           <div 
-            className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-1000 bg-black/0 group/shield"
+            className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-700 group/shield cursor-pointer"
             style={{ 
               opacity: isInteracting ? 0 : 1,
               pointerEvents: isInteracting ? 'none' : 'all',
-              backgroundColor: canInteract ? 'rgba(0,0,0,0.4)' : 'transparent',
-              backdropFilter: canInteract ? 'blur(10px)' : 'none',
+              backgroundColor: canInteract ? 'rgba(0,0,0,0.6)' : 'transparent',
+              backdropFilter: canInteract ? 'blur(15px)' : 'none',
             }}
-            onClick={() => {
-              if (canInteract) {
-                setIsInteracting(true);
-                window.__lenis?.stop();
-              }
-            }}
+            onClick={() => canInteract && setIsInteracting(true)}
           >
             {canInteract && !isInteracting && (
-              <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-700">
-                <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-2xl group-hover/shield:scale-110 transition-transform cursor-pointer studio-pulse">
-                   <MousePointer2 size={24} className="animate-pulse" />
+              <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000">
+                <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.2)] group-hover/shield:scale-110 transition-transform studio-pulse">
+                   <MousePointer2 size={32} className="animate-pulse" />
                 </div>
-                <span className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-white bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 shadow-2xl">
-                  Test Live Preview
-                </span>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
+                    Enter Studio
+                  </span>
+                  <span className="text-[10px] text-white/40 uppercase tracking-widest">Click to Interact</span>
+                </div>
               </div>
             )}
           </div>
 
-          {/* 🚀 STUDIO CONTROL BAR */}
+          {/* Studio HUD */}
           {isInteracting && (
-            <div className="studio-bar absolute bottom-6 left-1/2 -translate-x-1/2 z-[110] flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl">
-                <div className="flex items-center gap-2 pr-4 border-r border-white/10">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-white/80">Live Preview Active</span>
+            <div className="studio-bar absolute top-8 left-8 right-8 z-[110] flex items-center justify-between pointer-events-none">
+              <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 shadow-2xl pointer-events-auto">
+                <div className="flex items-center gap-3 pr-6 border-r border-white/10">
+                  <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
+                  <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90">{title} // LIVE</span>
                 </div>
-                <button 
-                  onClick={() => {
-                    setIsInteracting(false);
-                    window.__lenis?.start();
-                  }}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-white/90 group"
-                >
-                  <MoveUp size={14} className="group-hover:-translate-y-1 transition-transform" />
-                  <span className="text-[10px] font-black uppercase tracking-tighter">Exit Preview</span>
-                </button>
+                <div className="flex items-center gap-6 text-white/40 font-mono text-[9px] uppercase tracking-widest">
+                   <span className="hidden sm:block">Status: Stable</span>
+                   <span className="hidden md:block">Viewport: Fullscreen</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pointer-events-auto">
                 {liveUrl && (
                   <a 
                     href={liveUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/60 hover:text-white"
+                    className="p-4 rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all"
                   >
-                    <ExternalLink size={14} />
+                    <ExternalLink size={18} />
                   </a>
                 )}
+                <button 
+                  onClick={() => setIsInteracting(false)}
+                  className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-brand text-white shadow-[0_0_30px_rgba(0,163,255,0.3)] hover:scale-105 active:scale-95 transition-all group"
+                >
+                  <X size={18} />
+                  <span className="text-[11px] font-black uppercase tracking-widest">Close Studio</span>
+                </button>
               </div>
             </div>
           )}
@@ -403,32 +416,16 @@ export function ProjectHero({
               ref={iframeRef}
               src={liveUrl} 
               title={iframeTitle}
-              className="w-full h-full border-none transition-all duration-1000"
-              loading="eager"
+              className="w-full h-full border-none"
               style={{ 
-                opacity: 0.95,
-                background: '#050505',
-                filter: (canInteract && !isInteracting) ? 'blur(12px) grayscale(0.5)' : 'none',
-                transform: isInteracting ? 'scale(1)' : 'scale(1.05)',
+                background: '#000',
+                filter: (canInteract && !isInteracting) ? 'blur(10px) brightness(0.5)' : 'none',
               }}
-              onLoad={(e) => {
-                (e.target as HTMLIFrameElement).style.opacity = '1';
-              }}
-            />
-          ) : videoUrl ? (
-            <video 
-              src={videoUrl} 
-              autoPlay muted loop playsInline 
-              className="w-full h-full object-cover transition-all duration-1000" 
-              style={{ filter: isInteracting ? 'none' : 'blur(12px) grayscale(0.5)', transform: isInteracting ? 'scale(1)' : 'scale(1.05)' }}
             />
           ) : (
-            <div 
-              className="w-full h-full flex items-center justify-center bg-black/40 transition-all duration-1000"
-              style={{ filter: isInteracting ? 'none' : 'blur(12px)', transform: isInteracting ? 'scale(1)' : 'scale(1.05)' }}
-            >
-               <Activity size={32} className="text-brand animate-pulse opacity-20" />
-            </div>
+             <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
+                <Activity size={48} className="text-white/10 animate-pulse" />
+             </div>
           )}
           
           <div 
@@ -436,18 +433,14 @@ export function ProjectHero({
             className="absolute inset-0 pointer-events-none opacity-0 mix-blend-overlay"
             style={{ 
               background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%)',
-              transform: 'translateZ(100px)',
             }}
           />
         </div>
 
-        {/* ── Scroll Hint ── */}
-        <div
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[40] opacity-30 hover:opacity-100 transition-opacity"
-          style={{ color: accent }}
-        >
+        {/* Scroll Hint */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[40] opacity-20">
           <div className="flex flex-col items-center gap-3">
-            <p className="font-mono text-[8px] uppercase tracking-[0.5em]">Scroll to Expand</p>
+            <p className="font-mono text-[8px] uppercase tracking-[0.5em]">Deep Scroll to Enter</p>
             <div className="w-px h-12 bg-gradient-to-b from-current to-transparent" />
           </div>
         </div>

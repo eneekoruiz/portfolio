@@ -61,6 +61,35 @@ export function InfallibleCursor() {
       }
     };
 
+    // ── IFRAME TRACKING (Same-origin or with postMessage support) ────────
+    const onMessage = (e: MessageEvent) => {
+      if (!e.data) return;
+
+      if (e.data.type === 'portfolio-cursor-move') {
+        const iframes = document.querySelectorAll('iframe');
+        let targetIframe: HTMLIFrameElement | null = null;
+        
+        for (let i = 0; i < iframes.length; i++) {
+          if (iframes[i].contentWindow === e.source) {
+            targetIframe = iframes[i] as HTMLIFrameElement;
+            break;
+          }
+        }
+
+        if (targetIframe) {
+          const rect = targetIframe.getBoundingClientRect();
+          mx.current = rect.left + e.data.x;
+          my.current = rect.top + e.data.y;
+        }
+      } else if (e.data.type === 'portfolio-cursor-hover') {
+        isHover.current = true;
+        targetScale.current = 4;
+      } else if (e.data.type === 'portfolio-cursor-leave') {
+        isHover.current = false;
+        targetScale.current = 1;
+      }
+    };
+
     // Listeners de Hover (usamos captura 'true' para delegación de eventos global)
     const onEnter = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('a,button,[data-h],input,select')) return;
@@ -105,6 +134,7 @@ export function InfallibleCursor() {
 
     // Registro de eventos
     window.addEventListener('mousemove', onMove);
+    window.addEventListener('message', onMessage);
     window.addEventListener('mouseenter', onEnter, true);
     window.addEventListener('mouseleave', onLeave, true);
     rafRef.current = requestAnimationFrame(animate);
@@ -112,6 +142,7 @@ export function InfallibleCursor() {
     // Limpieza
     return () => {
       window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('message', onMessage);
       window.removeEventListener('mouseenter', onEnter, true);
       window.removeEventListener('mouseleave', onLeave, true);
       cancelAnimationFrame(rafRef.current);

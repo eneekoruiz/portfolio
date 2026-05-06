@@ -148,7 +148,7 @@ export default function Home() {
       document.querySelectorAll('[id^="return-overlay"]').forEach(el => {
         gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => el.remove() });
       });
-      (window as any).__lenis?.start?.();
+      window.__lenis?.start?.();
     };
     cleanup();
     // Safety delay for slow navigations
