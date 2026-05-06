@@ -175,13 +175,31 @@ export default function CurriculumPage() {
       </header>
 
       {/* ── CONTENT AREA ── */}
-      <main className="flex-1 curriculum-content relative bg-white dark:bg-[#050505]">
-        
-        {/* Loader Animado */}
+      <main className="flex-1 relative bg-page overflow-hidden">
         {loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-page">
-            <div className="w-12 h-12 border-2 border-brand/20 border-t-brand rounded-full animate-spin mb-4" />
-            <p className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 animate-pulse">Sincronizando CV...</p>
+          <div className="absolute inset-0 z-10 bg-page flex items-center justify-center p-8">
+            <div className="w-full max-w-5xl h-full flex gap-8 animate-pulse">
+              {/* Sidebar Skeleton */}
+              <div className="hidden lg:flex flex-col gap-6 w-72">
+                <div className="w-32 h-32 rounded-2xl bg-ink/5" />
+                <div className="w-full h-40 rounded-2xl bg-ink/5" />
+                <div className="w-full h-64 rounded-2xl bg-ink/5" />
+              </div>
+              {/* Main Content Skeleton */}
+              <div className="flex-1 flex flex-col gap-8">
+                <div className="w-3/4 h-12 rounded-xl bg-ink/5" />
+                <div className="w-full h-24 rounded-xl bg-ink/5" />
+                <div className="space-y-4">
+                  <div className="w-full h-48 rounded-2xl bg-ink/5" />
+                  <div className="w-full h-48 rounded-2xl bg-ink/5" />
+                  <div className="w-full h-48 rounded-2xl bg-ink/5" />
+                </div>
+              </div>
+            </div>
+            {/* Minimal Spinner Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+               <div className="w-6 h-6 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
+            </div>
           </div>
         )}
 
