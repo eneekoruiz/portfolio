@@ -94,7 +94,7 @@ export default function LabPage() {
     cv.addEventListener('touchend', () => { mouseRef.current.active = false; });
 
     // Detect lightweight mode. This is set by the layout inline script
-    const LITE = !!((window as any).__LITE) || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const LITE = !!(window.__LITE) || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const localN = LITE ? Math.max(400, Math.floor(N * 0.22)) : N;
     setParticles(localN);
@@ -104,7 +104,7 @@ export default function LabPage() {
     let attractMode = false;
     let simSpeed    = 1.0;
 
-    (window as any).__galaxy = {
+    window.__galaxy = {
       setAttract: (v: boolean) => { attractMode = v; },
       setSpeed:   (v: number)  => { simSpeed = v;    },
     };
@@ -221,8 +221,8 @@ export default function LabPage() {
     };
   }, []);
 
-  useEffect(() => { (window as any).__galaxy?.setAttract(attract); }, [attract]);
-  useEffect(() => { (window as any).__galaxy?.setSpeed(speed); }, [speed]);
+  useEffect(() => { window.__galaxy?.setAttract(attract); }, [attract]);
+  useEffect(() => { window.__galaxy?.setSpeed(speed); }, [speed]);
 
   return (
     <div className="fixed inset-0 overflow-hidden select-none" style={{ background: '#020208' }}>

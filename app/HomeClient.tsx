@@ -15,6 +15,7 @@ import { usePreferredMotion } from './hooks/usePreferredMotion';
 import { useGreeting } from './hooks/useGreeting';
 import { useIntro } from './components/IntroProvider';
 import { useDeviceTilt } from './hooks/useDeviceTilt';
+import { useTheme } from 'next-themes';
 import { useTranslations } from './hooks/useTranslations';
 import { useSectionObserver } from './hooks/useSectionObserver';
 import { useScrollReveal } from './hooks/useScrollReveal';
@@ -73,11 +74,14 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   // ── Estado ──────────────────────────────────────────────────────────────
   const { phase, setPhase, markSeen } = useIntro();
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const { lang, setLang, t } = useTranslations();
   const tilt = useDeviceTilt();
   const [menu, setMenu] = useState(false);
   const [cmd, setCmd] = useState(false);
 
+  const isDark = mounted && theme === 'dark';
   const ready = phase === 'ready';
   const reduced = usePreferredMotion();
   const greeting = useGreeting(t.times, t.greetingFn);
@@ -106,9 +110,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       document.querySelectorAll('[id^="return-overlay"]').forEach(el => {
         gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => el.remove() });
       });
-      (window as any).__lenis?.start?.();
+      window.__lenis?.start?.();
     };
     cleanup();
+    setMounted(true);
     const timer = setTimeout(cleanup, 500);
     return () => clearTimeout(timer);
   }, []);
@@ -152,7 +157,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     try {
       const saved = JSON.parse(sessionStorage.getItem(PROJECTS_NAV_KEY) || '{}');
       if (saved.scrollY != null) {
-        (window as any).__lenis?.stop?.();
+        window.__lenis?.stop?.();
         window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
       }
     } catch (_) {}
@@ -160,7 +165,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   useEffect(() => {
     if (!ready) return;
-    const lenis = (window as any).__lenis;
+    const lenis = window.__lenis;
     try {
       const saved = JSON.parse(sessionStorage.getItem(PROJECTS_NAV_KEY) || '{}');
       if (saved.scrollY != null) {
@@ -185,7 +190,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     if (!ready) return;
     const overlay = document.getElementById(RETURN_OVERLAY_ID);
     if (!overlay) {
-      (window as any).__lenis?.start?.();
+      window.__lenis?.start?.();
       try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
       return;
     }
@@ -199,7 +204,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           duration: 0.45,
           onComplete: () => {
             try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
-            (window as any).__lenis?.start?.();
+            window.__lenis?.start?.();
             ScrollTrigger.refresh();
           },
         });
@@ -353,18 +358,22 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               className="helix-group will-change-transform"
               style={{
                 width: 'clamp(200px, 40vw, 500px)', height: '240vh',
-                opacity: 0.08,
-                filter: 'blur(8px)',
+                opacity: isDark ? 0.22 : 0.12,
+                filter: isDark ? 'blur(3px)' : 'blur(6px)',
                 transformStyle: 'preserve-3d',
                 transform: `rotateY(${tilt.x * 15}deg) rotateX(${-tilt.y * 15}deg)`,
                 transition: 'transform 0.2s ease-out'
               }}
             >
-              <DNAHelix accent="#000" secondary="#555" darkMode={false} />
+              <DNAHelix 
+                accent={isDark ? '#00A3FF' : '#000'} 
+                secondary={isDark ? '#0066CC' : '#555'} 
+                darkMode={isDark} 
+              />
             </div>
           </div>
           <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.05]">
-            <TerrainMesh accent="currentColor" />
+            <TerrainMesh accent={isDark ? '#00A3FF' : 'currentColor'} />
           </div>
         </>
       )}
@@ -382,9 +391,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         menuRefs={menuRefs} 
       />
 
-      <div
+      <main
         ref={main}
         id="main-content"
+        className="relative"
         style={{
           visibility: ready ? 'visible' : 'hidden',
           opacity:    ready ? 1 : 0,
@@ -412,7 +422,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         <Philosophy t={t} />
         <Contact t={t} />
         <SiteFooter t={t} />
-      </div>
+      </main>
     </>
   );
 }

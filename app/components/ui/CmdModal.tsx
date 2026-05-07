@@ -24,7 +24,7 @@ export function CmdModal({
     document.body.style.overflow  = 'hidden';
     document.body.style.paddingRight = `${scrollbarW}px`;
     // Freeze Lenis if available
-    const lenis = (window as any).__lenis;
+    const lenis = window.__lenis;
     lenis?.stop?.();
     return () => {
       document.body.style.overflow  = prev || '';

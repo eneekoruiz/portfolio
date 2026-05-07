@@ -23,7 +23,7 @@ export function SmoothScroll() {
       autoRaf: false,
     });
 
-    (window as any).__lenis = lenis;
+    window.__lenis = lenis;
     lenis.on('scroll', ScrollTrigger.update);
 
     tickerFnRef.current = (time: number) => lenis.raf(time * 1000);
@@ -48,7 +48,7 @@ export function SmoothScroll() {
         tickerFnRef.current = null;
       }
       lenis.destroy();
-      delete (window as any).__lenis;
+      delete window.__lenis;
     };
   }, []);
 

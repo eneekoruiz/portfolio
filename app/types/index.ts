@@ -72,7 +72,6 @@ export interface Tx {
   projectServerDesc: string;
 }
 
-// Project card types
 export interface ProjectCard {
   n: string;
   name: string;
@@ -85,5 +84,18 @@ export interface ProjectCard {
   architecture: string;
   outcome: string;
   video?: string;
+}
+
+// ── Global Window Interface ──────────────────────────────────────────────────
+declare global {
+  interface Window {
+    __lenis?: any;
+    __galaxy?: {
+      setAttract: (v: boolean) => void;
+      setSpeed: (v: number) => void;
+    };
+    __LITE?: boolean;
+    webkitAudioContext?: typeof AudioContext;
+  }
 }
 

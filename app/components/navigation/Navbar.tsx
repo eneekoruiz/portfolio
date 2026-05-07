@@ -42,6 +42,7 @@ export function Navbar({
 
         <nav
           ref={navInnerRef}
+          aria-label="Navegación principal"
           className="hidden md:flex items-center relative gap-1"
           onMouseLeave={onNavContainerLeave}
         >
@@ -71,6 +72,7 @@ export function Navbar({
           </button>
           <button
             onClick={() => setMenu(true)}
+            aria-label="Abrir menú"
             className="md:hidden font-bold text-[12px] text-lead tracking-[.1em] bg-none border-none p-2"
           >
             MENU
