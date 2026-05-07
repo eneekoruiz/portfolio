@@ -227,9 +227,9 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
     gsap.to(textContainerRef.current, {
       '--mx': `${x}px`,
       '--my': `${y}px`,
-      rotateY: tilt.x * 8, // Slightly reduced sensitivity
-      rotateX: -tilt.y * 8,
-      duration: 0.35, // Smooth out jitter
+      rotateY: tilt.x * 9, 
+      rotateX: -tilt.y * 9,
+      duration: 0.12, // MUCH faster response
       ease: 'power2.out',
       overwrite: 'auto'
     });

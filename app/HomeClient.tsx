@@ -37,6 +37,16 @@ import { Projects } from './components/sections/Projects';
 import { Philosophy } from './components/sections/Philosophy';
 import { Contact } from './components/sections/Contact';
 import { SiteFooter } from './components/sections/SiteFooter';
+import { memo } from 'react';
+
+// ── Memoized Sections for performance ──
+const MemoHero = memo(Hero);
+const MemoAbout = memo(About);
+const MemoSkills = memo(Skills);
+const MemoProjects = memo(Projects);
+const MemoPhilosophy = memo(Philosophy);
+const MemoContact = memo(Contact);
+const MemoFooter = memo(SiteFooter);
 
 // ── Dynamic Visualizers ──
 const DNAHelix = dynamic<{ accent: string; secondary: string; darkMode: boolean }>(
@@ -361,8 +371,12 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
                 opacity: isDark ? 0.22 : 0.12,
                 filter: isDark ? 'blur(3px)' : 'blur(6px)',
                 transformStyle: 'preserve-3d',
-                transform: `rotateY(${tilt.x * 15}deg) rotateX(${-tilt.y * 15}deg)`,
-                transition: 'transform 0.2s ease-out'
+                transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)' // Smoother CSS transition
+              }}
+              ref={(el) => {
+                if (el) {
+                  el.style.transform = `rotateY(${tilt.x * 12}deg) rotateX(${-tilt.y * 12}deg)`;
+                }
               }}
             >
               <DNAHelix 
@@ -415,13 +429,13 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           onNavContainerLeave={onNavContainerLeave} 
         />
 
-        <Hero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} phase={phase} />
-        <Skills t={t} />
-        <Projects t={t} top3={top3} repos={repos} load={load} offline={offline} errorMsg={errorMsg} BranchMergeBtn={BranchMergeBtn} />
-        <About t={t} />
-        <Philosophy t={t} />
-        <Contact t={t} />
-        <SiteFooter t={t} />
+        <MemoHero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} phase={phase} />
+        <MemoSkills t={t} />
+        <MemoProjects t={t} top3={top3} repos={repos} load={load} offline={offline} errorMsg={errorMsg} BranchMergeBtn={BranchMergeBtn} />
+        <MemoAbout t={t} />
+        <MemoPhilosophy t={t} />
+        <MemoContact t={t} />
+        <MemoFooter t={t} />
       </main>
     </>
   );
