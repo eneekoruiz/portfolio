@@ -34,7 +34,7 @@ import {
 
 // ── DYNAMIC IMPORTS: Defer heavy components until after route transition ──
 type DNAHelixProps = { accent: string; secondary: string; darkMode: boolean };
-type TerrainMeshProps = { accent: string };
+type TerrainMeshProps = { accent: string; darkMode: boolean };
 type FloatingArtifactProps = { accent: string; idx: number };
 type AccentProps = { accent: string };
 
@@ -335,8 +335,8 @@ export default function ProjectPage() {
               className="helix-group will-change-transform"
               style={{
                 width: 'clamp(140px, 40vw, 420px)', height: '210vh',
-                opacity: darkMode ? 0.45 : 0.25,
-                filter: `drop-shadow(0 0 30px ${theme.helixA}60)`,
+                opacity: darkMode ? 0.7 : 0.3,
+                filter: `drop-shadow(0 0 45px ${theme.helixA}90)`,
                 transformStyle: 'preserve-3d',
               }}
             >
@@ -344,7 +344,7 @@ export default function ProjectPage() {
             </div>
           </div>
           <div className="fixed inset-0 pointer-events-none z-0 opacity-60">
-            <TerrainMesh accent={theme.helixA} />
+            <TerrainMesh accent={theme.helixA} darkMode={darkMode} />
           </div>
           <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
             {[1, 2, 3, 4, 5].map(i => (
