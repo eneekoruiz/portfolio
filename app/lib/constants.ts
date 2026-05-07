@@ -1,6 +1,6 @@
 import { Server, Monitor, Cpu, Database } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { Lang } from './types';
+import type { Lang } from '../types';
 
 /**
  * Skill Category Definition

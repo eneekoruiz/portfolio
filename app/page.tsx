@@ -1,4 +1,4 @@
-import { TX } from './lib/translations';
+import { TX } from './data/translations';
 import { getGitHubData } from './lib/github';
 import HomeClient from './HomeClient';
 

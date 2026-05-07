@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { Server, MonitorSmartphone, Cpu, Database, Code } from 'lucide-react';
 import { LANG_COLORS } from '../../lib/constants';
-import type { Tx } from '../../lib/types';
+import type { Tx } from '../../types';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -33,7 +33,7 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
       const a = angleRef.current;
       
       if (isVisible) {
-        items.forEach((el, i) => {
+        items.forEach((el: HTMLDivElement, i: number) => {
           const theta = i * angleStep + a;
           const x = Math.sin(theta) * radius;
           const z = Math.cos(theta) * radius;
@@ -144,8 +144,8 @@ export function Skills({ t }: SkillsProps) {
           { 
             scale: 0.2, 
             opacity: 0, 
-            x: (i) => (i % 2 === 0 ? 150 : -150),
-            y: (i) => (i < 2 ? 150 : -150),
+            x: (i: number) => (i % 2 === 0 ? 150 : -150),
+            y: (i: number) => (i < 2 ? 150 : -150),
           },
           { 
             scale: 1, 

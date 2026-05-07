@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// @ts-ignore
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
+
 export const revalidate = 3600; // 1 hour
 
 const GITHUB_USER = 'eneekoruiz';
@@ -20,7 +23,7 @@ export async function GET(request: NextRequest) {
   });
 
   const endpoint = `https://api.github.com/users/${GITHUB_USER}/repos?${cleanParams.toString()}`;
-  const token = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
+  const token = GITHUB_TOKEN;
 
   const requestHeaders: HeadersInit = {
     Accept: 'application/vnd.github+json',
@@ -34,6 +37,7 @@ export async function GET(request: NextRequest) {
   try {
     const res = await fetch(endpoint, {
       headers: requestHeaders,
+      // @ts-ignore
       next: { revalidate: CACHE_TTL },
     });
 
@@ -65,6 +69,7 @@ export async function GET(request: NextRequest) {
           try {
             const langRes = await fetch(repo.languages_url, {
               headers: requestHeaders,
+              // @ts-ignore
               next: { revalidate: CACHE_TTL },
             });
             if (langRes.ok) {

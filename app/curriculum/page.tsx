@@ -8,7 +8,7 @@
  * with smooth transitions and liquid curtain effects for navigation
  */
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import gsap from 'gsap';
@@ -138,7 +138,7 @@ export default function CurriculumPage() {
           text: 'Currículum de Eneko Ruiz Mollón',
           url: 'https://eneko-ruiz-curriculum.vercel.app'
         });
-      } catch (err) {}
+      } catch (err: unknown) {}
     } else if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage({ type: 'share-cv' }, '*');
     }

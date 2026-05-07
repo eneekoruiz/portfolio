@@ -84,5 +84,6 @@ export interface ProjectCard {
   challenge: string;   
   architecture: string;
   outcome: string;
-  video?: string; // 👈 Añade esto
+  video?: string;
 }
+

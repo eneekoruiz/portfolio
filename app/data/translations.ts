@@ -1,5 +1,5 @@
 import { Target, Code2, Zap, Users, BookOpen, Heart } from 'lucide-react';
-import type { Lang, Tx, Val } from './types';
+import type { Lang, Tx, Val } from '../types';
 
 const VALS_ES: Val[] = [
   { icon: Target,   t: 'Orientado al detalle',    d: 'Los pequeños detalles separan lo bueno de lo memorable. Los noto antes de que nadie los pida.' },
@@ -221,4 +221,4 @@ export const TX: Record<Lang, Tx> = {
   ),
 };
 
-export { LANG_LABELS } from './constants';
+export { LANG_LABELS } from '../lib/constants';

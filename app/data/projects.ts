@@ -1,5 +1,5 @@
 // app/lib/projects-data.ts
-import type { Lang } from './types';
+import type { Lang } from '../types';
 
 export interface ProjectContent {
   title: string;

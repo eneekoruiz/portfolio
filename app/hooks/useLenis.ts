@@ -18,7 +18,7 @@
  * que los tickers se acumulen en re-renders.
  */
 
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type Lenis from 'lenis';

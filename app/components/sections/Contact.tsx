@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { Mail, Github, Linkedin, ArrowUpRight, Check } from 'lucide-react';
 import { useMagnetic } from '../../hooks/useMagnetic';
-import type { Tx } from '../../lib/types';
+import type { Tx } from '../../types';
 
 const EMAIL = 'eneekoruiz@gmail.com';
 

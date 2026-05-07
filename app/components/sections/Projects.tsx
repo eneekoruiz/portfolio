@@ -16,12 +16,12 @@ import {
   Activity, Code2, Loader2, ChevronDown,
 } from 'lucide-react';
 import { LANG_COLORS } from '../../lib/constants';
-import type { ProjectCard, RepoFull, Tx } from '../../lib/types';
+import type { ProjectCard, RepoFull, Tx } from '../../types';
 import {
   createLiquidCurtain,
   animateLiquidCurtainIn,
-} from '../ui/LiquidCurtain';
-import { ProjectPreviewFollower } from '../ui/ProjectPreviewFollower';
+} from '../motion/LiquidCurtain';
+import { ProjectPreviewFollower } from '../motion/ProjectPreviewFollower';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
@@ -752,6 +752,7 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
       <section
         id="github"
         data-section="github"
+        aria-label="Actividad de GitHub"
         className="border-t border-black/7 dark:border-white/10 py-12 md:py-22 px-5 md:px-8 max-w-[1200px] mx-auto relative z-10"
       >
         <div className="flex items-end justify-between pb-4 border-b border-black/7 dark:border-white/10 mb-1">

@@ -1,4 +1,4 @@
-import { Repo, RepoFull, ProjectCard, Tx } from './types';
+import { Repo, RepoFull, ProjectCard, Tx } from '../types';
 
 const GITHUB_USER = 'eneekoruiz';
 const PROJECT_IDS = [

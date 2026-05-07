@@ -2,7 +2,7 @@
 
 import { LiveStatus } from '../ui/LiveStatus';
 import { PortalWarpBtn } from '../ui/Buttons';
-import type { Tx } from '../../lib/types';
+import type { Tx } from '../../types';
 
 export function SiteFooter({ t }: { t: Tx }) {
   return (

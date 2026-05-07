@@ -28,9 +28,11 @@ A high-performance portfolio focusing on motion design and hardened React archit
 
 ## Featured Work (Selection)
 
-*   **PL/0 Compiler**: A functional compiler implementation in C, handling lexical analysis, recursive descent parsing, and P-code generation.
-*   **GestDB**: A robust database abstraction layer for PostgreSQL built with Java, focusing on connection pooling and schema integrity.
-*   **NetSim**: A network protocol simulator in Python utilizing socket programming and multi-threading.
+*   **AG Beauty Salon**: Full-stack booking platform with a custom Sandwich Algorithm and atomic Google Calendar synchronization.
+*   **Who Are Ya?**: High-performance football identity engine with an MVC architecture and MongoDB Atlas integration.
+*   **Rides24**: Distributed system implementation in Java with JAX-WS and ObjectDB, focusing on thread-safe concurrency.
+*   **SpotShare**: Cloud-native parking intelligence platform with SonarCloud audit and optimistic locking.
+*   **PKE Web**: Semantic web platform built with strict adherence to WCAG 2.1 AA accessibility standards.
 
 ---
 

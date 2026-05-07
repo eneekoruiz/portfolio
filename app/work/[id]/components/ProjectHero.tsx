@@ -93,7 +93,7 @@ export function ProjectHero({
         scrub: 1.2,
         pin: true,
         anticipatePin: 1,
-        onUpdate: (self) => {
+        onUpdate: (self: ScrollTrigger) => {
           const isLocked = self.progress > 0.88; // Trigger CTA earlier
           if (canRef.current !== isLocked) {
             canRef.current = isLocked;

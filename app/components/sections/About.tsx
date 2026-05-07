@@ -2,8 +2,8 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { NetworkParticles } from '../ui/Particles'; 
-import type { Tx } from '../../lib/types';
+import { NetworkParticles } from '../motion/Particles'; 
+import type { Tx } from '../../types';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 

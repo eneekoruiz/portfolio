@@ -1,10 +1,12 @@
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
-import './globals.css';
+import { headers } from 'next/headers';
+import { SkipLink } from './components/ui/SkipLink';
+import './styles/globals.css';
 import { IntroProvider } from './components/IntroProvider';
 import { EasterEgg } from './components/ui/EasterEgg';
-import { SmoothScroll } from './components/ui/SmoothScroll';
-import { InfallibleCursor } from './components/ui/InfallibleCursor';
+import { SmoothScroll } from './components/motion/SmoothScroll';
+import { InfallibleCursor } from './components/motion/InfallibleCursor';
 import { baseMetadata, jsonLd } from './lib/metadata';
 
 const inter = Inter({
@@ -17,6 +19,8 @@ const inter = Inter({
 export const metadata = baseMetadata;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = headers().get('x-nonce') || '';
+
   return (
     <html lang="es" className={`${inter.variable}`} suppressHydrationWarning>
       <head>
@@ -24,11 +28,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="color-scheme" content="light dark" />
         <link rel="preconnect" href="https://eneko-ruiz-curriculum.vercel.app" />
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {/* Lite mode / Device memory detection script */}
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -57,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <SkipLink />
         <div id="scroll-progress" className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0" />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
           <SmoothScroll />

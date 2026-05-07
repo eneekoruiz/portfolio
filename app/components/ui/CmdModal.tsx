@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, KeyboardEvent as RKE } from 'react';
 import { Search, Check } from 'lucide-react';
 import { LANG_LABELS } from '../../lib/constants';
-import type { Lang, Tx } from '../../lib/types';
+import type { Lang, Tx } from '../../types';
 
 export function CmdModal({
   lang, setLang, onClose, t,
@@ -111,7 +111,7 @@ export function CmdModal({
         ref={dialogRef}
         className="cmd-box flex flex-col"
         style={{ maxHeight: 'min(78vh, 560px)' }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
         onKeyDown={onKey}
         tabIndex={-1}
       >
@@ -124,7 +124,7 @@ export function CmdModal({
             className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 font-sans text-[16px] text-ink py-[1.1rem] caret-brand"
             placeholder={t.cmdPh}
             value={q}
-            onChange={e => setQ(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)}
             aria-label="Buscar"
           />
           <kbd className="font-mono text-[10px] text-lead px-[7px] py-[2px] border border-black/10 dark:border-white/10 rounded-[5px] shrink-0">ESC</kbd>

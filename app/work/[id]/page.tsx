@@ -19,10 +19,10 @@ import {
   Layers, ChevronLeft, CheckCircle2, Radar,
 } from 'lucide-react';
 
-import { TX }              from '../../lib/translations';
-import { PROJECTS_CONTENT, CODE_SNIPPETS } from '../../lib/projects-data';
+import { TX }              from '../../data/translations';
+import { PROJECTS_CONTENT, CODE_SNIPPETS } from '../../data/projects';
 import { LANG_COLORS }     from '../../lib/constants';
-import type { Lang }       from '../../lib/types';
+import type { Lang }       from '../../types';
 import { useMagnetic }     from '../../hooks/useMagnetic';
 import { useTextScramble } from '../../hooks/useTextScramble';
 import { ProjectHero }     from './components/ProjectHero';
@@ -30,7 +30,7 @@ import {
   createLiquidCurtain,
   animateLiquidCurtainIn,
   animateLiquidCurtainOut,
-} from '../../components/ui/LiquidCurtain';
+} from '../../components/motion/LiquidCurtain';
 
 // ── DYNAMIC IMPORTS: Defer heavy components until after route transition ──
 type DNAHelixProps = { accent: string; secondary: string; darkMode: boolean };
@@ -38,14 +38,14 @@ type TerrainMeshProps = { accent: string };
 type FloatingArtifactProps = { accent: string; idx: number };
 type AccentProps = { accent: string };
 
-const DNAHelix = dynamic<DNAHelixProps>(() => import('@/app/work/visualizers').then(m => m.DNAHelix), { ssr: false });
-const TerrainMesh = dynamic<TerrainMeshProps>(() => import('@/app/work/visualizers').then(m => m.TerrainMesh), { ssr: false });
-const FloatingArtifact = dynamic<FloatingArtifactProps>(() => import('@/app/work/visualizers').then(m => m.FloatingArtifact), { ssr: false });
-const SandwichDiagram = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.SandwichDiagram), { ssr: false });
-const MVCTerminal = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.MVCTerminal), { ssr: false });
-const DistributedNodes = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.DistributedNodes), { ssr: false });
-const WCAGVisualizer = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.WCAGVisualizer), { ssr: false });
-const SpotshareHeatmap = dynamic<AccentProps>(() => import('@/app/work/visualizers').then(m => m.SpotshareHeatmap), { ssr: false });
+const DNAHelix = dynamic<DNAHelixProps>(() => import('../visualizers').then(m => m.DNAHelix), { ssr: false });
+const TerrainMesh = dynamic<TerrainMeshProps>(() => import('../visualizers').then(m => m.TerrainMesh), { ssr: false });
+const FloatingArtifact = dynamic<FloatingArtifactProps>(() => import('../visualizers').then(m => m.FloatingArtifact), { ssr: false });
+const SandwichDiagram = dynamic<AccentProps>(() => import('../visualizers').then(m => m.SandwichDiagram), { ssr: false });
+const MVCTerminal = dynamic<AccentProps>(() => import('../visualizers').then(m => m.MVCTerminal), { ssr: false });
+const DistributedNodes = dynamic<AccentProps>(() => import('../visualizers').then(m => m.DistributedNodes), { ssr: false });
+const WCAGVisualizer = dynamic<AccentProps>(() => import('../visualizers').then(m => m.WCAGVisualizer), { ssr: false });
+const SpotshareHeatmap = dynamic<AccentProps>(() => import('../visualizers').then(m => m.SpotshareHeatmap), { ssr: false });
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -164,9 +164,10 @@ export default function ProjectPage() {
   const isSpot    = safeId === 'spotshare-parking';
   const isA11y    = safeId === 'pke_web';
 
-  const content = PROJECTS_CONTENT[safeId]?.[lang] ?? PROJECTS_CONTENT[safeId]?.['en'] ?? PROJECTS_CONTENT[safeId]?.['es'];
-  const snippet = CODE_SNIPPETS[safeId];
-  const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com/login' : (isJava || isSpot || isA11y) ? null : 'https://ana-peluquera.lovable.app/';
+  const projectData = PROJECTS_CONTENT[safeId as keyof typeof PROJECTS_CONTENT];
+  const content = projectData ? (projectData[lang] ?? projectData['en'] ?? projectData['es']) : undefined;
+  const snippet = CODE_SNIPPETS[safeId as keyof typeof CODE_SNIPPETS];
+  const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com' : (isJava || isSpot || isA11y) ? null : 'https://agepeluqueria.vercel.app';
   const videoUrl = isJava ? '/loginjsf.mp4' : null;
 
   // 🎯 Punto 6 — Magnetic buttons

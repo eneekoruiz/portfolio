@@ -7,7 +7,7 @@ import { ArrowUpRight, ChevronDown, Plus } from 'lucide-react';
 import gsap from 'gsap';
 import Link from 'next/link';
 import { LANG_COLORS } from '../../lib/constants';
-import type { ProjectCard } from '../../lib/types';
+import type { ProjectCard } from '../../types';
 
 // ── Web Audio click sutil ───────────────────────────
 function playClick() {

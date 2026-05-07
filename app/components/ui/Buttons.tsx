@@ -87,7 +87,7 @@ export function BinaryStreamBtn({
     setProgress(0);
 
     bvRef.current = setInterval(() => {
-      setBits(prev => {
+      setBits((prev: { id: number; x: number; y: number; v: string }[]) => {
         const fresh = { id: bitId.current++, x: Math.random() * 88 + 6, y: 10 + Math.random() * 80, v: Math.random() > .5 ? '1' : '0' };
         return [...prev.slice(-18), fresh];
       });

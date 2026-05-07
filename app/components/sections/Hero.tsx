@@ -2,11 +2,12 @@
 
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
+import { useDeviceTilt } from '../../hooks/useDeviceTilt';
 
 
 import { LiveStatus } from '../ui/LiveStatus';
 import { WorkScrollBtn, BinaryStreamBtn } from '../ui/Buttons';
-import type { Tx } from '../../lib/types';
+import type { Tx } from '../../types';
 
 interface HeroProps {
   t: Tx;
@@ -23,26 +24,11 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const tilt = useDeviceTilt();
   const hasRequestedPermission = useRef(false);
   const touchStartPos = useRef({ x: 0, y: 0 });
 
   // ── Solicitar permiso de giroscopio (iOS 13+) ──────────────────────
-  const requestDevicePermission = async () => {
-    if (hasRequestedPermission.current || typeof DeviceOrientationEvent === 'undefined') return;
-    
-    // @ts-ignore
-    if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) {
-      try {
-        hasRequestedPermission.current = true;
-        // @ts-ignore
-        const permission = await DeviceOrientationEvent.requestPermission();
-        return permission === 'granted';
-      } catch (e) {
-        return false;
-      }
-    }
-    return true; // Android y otros: permiso implícito
-  };
 
   useEffect(() => {
     if (reduced) return;
@@ -144,6 +130,28 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       }
     };
 
+    const setupTouchFallback = () => {
+      const onTouchMove = (e: TouchEvent) => {
+        if (!textContainerRef.current || e.touches.length === 0) return;
+        const touch = e.touches[0];
+        const tRect = textContainerRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(touch.clientX - tRect.left, tRect.width));
+        const y = Math.max(0, Math.min(touch.clientY - tRect.top, tRect.height));
+        gsap.set(textContainerRef.current, { '--mx': `${x}px`, '--my': `${y}px` });
+      };
+      const onTouchEnd = () => {
+        if (textContainerRef.current) {
+          gsap.to(textContainerRef.current, { '--mx': `-500px`, '--my': `-500px`, duration: 0.6, ease: 'power2.out' });
+        }
+      };
+      window.addEventListener('touchmove', onTouchMove);
+      window.addEventListener('touchend', onTouchEnd);
+      return () => {
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+      };
+    };
+
     const onLeave = () => {
       if (isMobile) return;
       gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' });
@@ -160,79 +168,12 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       }
     };
 
-    // ── MODO MÓVIL: Giroscopio + Fallback Touch ────────────────────────
-    const setupMobileOrientation = async () => {
-      const hasPermission = await requestDevicePermission();
-      
-      if (!hasPermission) {
-        setupTouchFallback();
-        return;
-      }
-
-      const onDeviceOrientation = (event: DeviceOrientationEvent) => {
-        if (!textContainerRef.current || !isMobile) return;
-
-        const gamma = event.gamma ?? 0;
-        const beta = event.beta ?? 0;
-
-        const tRect = textContainerRef.current.getBoundingClientRect();
-        const x = Math.max(0, Math.min(((gamma + 90) / 180) * tRect.width, tRect.width));
-        const y = Math.max(0, Math.min(((beta + 180) / 360) * tRect.height, tRect.height));
-
-        gsap.set(textContainerRef.current, {
-          '--mx': `${x}px`,
-          '--my': `${y}px`,
-        });
-      };
-
-      window.addEventListener('deviceorientation', onDeviceOrientation);
-      
-      return () => window.removeEventListener('deviceorientation', onDeviceOrientation);
-    };
-
-    const setupTouchFallback = () => {
-      const onTouchMove = (e: TouchEvent) => {
-        if (!textContainerRef.current || e.touches.length === 0) return;
-
-        const touch = e.touches[0];
-        const tRect = textContainerRef.current.getBoundingClientRect();
-        const x = Math.max(0, Math.min(touch.clientX - tRect.left, tRect.width));
-        const y = Math.max(0, Math.min(touch.clientY - tRect.top, tRect.height));
-
-        gsap.set(textContainerRef.current, {
-          '--mx': `${x}px`,
-          '--my': `${y}px`,
-        });
-      };
-
-      const onTouchEnd = () => {
-        if (textContainerRef.current) {
-          gsap.to(textContainerRef.current, {
-            '--mx': `-500px`,
-            '--my': `-500px`,
-            duration: 0.6,
-            ease: 'power2.out'
-          });
-        }
-      };
-
-      window.addEventListener('touchmove', onTouchMove);
-      window.addEventListener('touchend', onTouchEnd);
-
-      return () => {
-        window.removeEventListener('touchmove', onTouchMove);
-        window.removeEventListener('touchend', onTouchEnd);
-      };
-    };
-
     // Setup según dispositivo
-    let cleanup: (() => void) | undefined;
-
-    if (isMobile) {
-      setupMobileOrientation().then(c => { cleanup = c; });
-    } else {
+    if (!isMobile) {
       hero.addEventListener('mousemove', onMove);
       hero.addEventListener('mouseleave', onLeave);
+    } else {
+      setupTouchFallback();
     }
 
     // ── Animación inicial: barrido de la linterna ───────────────────
@@ -258,14 +199,32 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       );
     }
 
+    const touchCleanup = setupTouchFallback();
     return () => {
       if (!isMobile) {
         hero.removeEventListener('mousemove', onMove);
         hero.removeEventListener('mouseleave', onLeave);
       }
-      if (cleanup) cleanup();
+      touchCleanup();
     };
   }, [reduced, isMobile, phase]);
+
+  // ── MODO MÓVIL: Giroscopio (vía hook) ────────────────────────
+  useEffect(() => {
+    if (!isMobile || !textContainerRef.current) return;
+    
+    const tRect = textContainerRef.current.getBoundingClientRect();
+    // Apply tilt to spotlight position
+    const x = (tilt.x + 1) / 2 * tRect.width;
+    const y = (tilt.y + 1) / 2 * tRect.height;
+    
+    gsap.set(textContainerRef.current, {
+      '--mx': `${x}px`,
+      '--my': `${y}px`,
+      rotateY: tilt.x * 10,
+      rotateX: -tilt.y * 10,
+    });
+  }, [tilt, isMobile]);
 
   return (
     <section id="hero" aria-label="Hero" className="min-h-[100svh] flex flex-col overflow-hidden pt-[80px] relative snap-start">

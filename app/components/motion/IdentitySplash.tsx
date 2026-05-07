@@ -27,7 +27,7 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import type { Lang } from '../../lib/types';
+import type { Lang } from '@/app/types';
 
 const WELCOME_TEXT: Record<Lang, string> = {
   es: 'Bienvenido',
@@ -70,7 +70,7 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
         const chars = textRef.current!.querySelectorAll<HTMLElement>('.char');
         gsap.set(chars,           { yPercent: 110, opacity: 0 });
         gsap.set(lineRef.current, { scaleX: 0 });
-      });
+      }, containerRef.current);
       return () => ctx.revert();
     }
 
@@ -106,7 +106,7 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
           onCompleteRef.current?.();
         });
 
-    }, containerRef);
+    }, containerRef.current || undefined);
 
     return () => ctx.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,7 +125,7 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
         */}
         <div className="overflow-hidden pb-2 mb-8">
           <div ref={textRef} className="flex">
-            {word.split('').map((char, i) => (
+            {word.split('').map((char: string, i: number) => (
               <span
                 key={i}
                 className="char font-black text-[clamp(4rem,10vw,8.5rem)] tracking-[-0.05em] leading-none inline-block gpu-accelerated"

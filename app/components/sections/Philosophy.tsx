@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { BinaryStreamBtn } from '../ui/Buttons';
-import type { Tx, Val } from '../../lib/types';
+import type { Tx, Val } from '../../types';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);

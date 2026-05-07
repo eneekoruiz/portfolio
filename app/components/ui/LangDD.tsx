@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { LANG_LABELS } from '../../lib/constants';
-import type { Lang } from '../../lib/types';
+import type { Lang } from '../../types';
 
 export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
   const [open, setOpen] = useState(false);
