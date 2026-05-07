@@ -699,16 +699,16 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
             <h2 
-              className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.88] text-ink uppercase italic perspective-1000"
+              className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.95] text-ink uppercase italic perspective-1000"
               aria-label="Selected Works"
             >
-              <div className="overflow-hidden inline-block">
+              <div className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
                 { "Selected".split('').map((c, i) => (
                   <span key={i} className="title-char inline-block will-change-transform">{c}</span>
                 ))}
               </div>
               <br/>
-              <div className="overflow-hidden inline-block">
+              <div className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
                 { "Works.".split('').map((c, i) => (
                   <span key={i} className="title-char inline-block will-change-transform">{c}</span>
                 ))}

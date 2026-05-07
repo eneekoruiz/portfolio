@@ -339,9 +339,9 @@ canvas.terrain-mesh { }
   canvas.terrain-mesh { display: none !important; }
   .cylinder-wrapper { pointer-events: none; }
   h1, h2, h3 {
-    overflow-wrap: break-word;
-    word-break: break-word;
-    hyphens: auto;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
   }
 }
 
