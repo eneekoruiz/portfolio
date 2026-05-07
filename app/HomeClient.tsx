@@ -42,7 +42,7 @@ import { SiteFooter } from './components/sections/SiteFooter';
 const DNAHelix = dynamic<{ accent: string; secondary: string; darkMode: boolean }>(
   () => import('./work/visualizers').then(m => m.DNAHelix), { ssr: false }
 );
-const TerrainMesh = dynamic<{ accent: string }>(
+const TerrainMesh = dynamic<{ accent: string; darkMode: boolean }>(
   () => import('./work/visualizers').then(m => m.TerrainMesh), { ssr: false }
 );
 
@@ -373,7 +373,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
             </div>
           </div>
           <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.05]">
-            <TerrainMesh accent={isDark ? '#00A3FF' : 'currentColor'} />
+            <TerrainMesh accent={isDark ? '#00A3FF' : 'currentColor'} darkMode={isDark} />
           </div>
         </>
       )}
