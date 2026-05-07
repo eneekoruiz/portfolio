@@ -167,7 +167,7 @@ export default function ProjectPage() {
   const projectData = PROJECTS_CONTENT[safeId as keyof typeof PROJECTS_CONTENT];
   const content = projectData ? (projectData[lang] ?? projectData['en'] ?? projectData['es']) : undefined;
   const snippet = CODE_SNIPPETS[safeId as keyof typeof CODE_SNIPPETS];
-  const liveUrl = isBackend ? 'https://who-are-ya-backend.onrender.com' : (isJava || isSpot || isA11y) ? null : 'https://agepeluqueria.vercel.app';
+  const liveUrl = isBackend ? 'https://whoareya.vercel.app' : (isJava || isSpot || isA11y) ? null : 'https://agpeluqueria.vercel.app';
   const videoUrl = isJava ? '/loginjsf.mp4' : null;
 
   // 🎯 Punto 6 — Magnetic buttons
