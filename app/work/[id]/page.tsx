@@ -333,8 +333,8 @@ export default function ProjectPage() {
               className="helix-group will-change-transform"
               style={{
                 width: 'clamp(140px, 40vw, 420px)', height: '210vh',
-                opacity: darkMode ? 0.7 : 0.3,
-                filter: `drop-shadow(0 0 45px ${theme.helixA}90)`,
+                opacity: darkMode ? 0.55 : 0.3,
+                filter: `drop-shadow(0 0 25px ${theme.helixA}60)`,
                 transformStyle: 'preserve-3d',
               }}
             >

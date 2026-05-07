@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ChevronLeft, ExternalLink, Printer, Share2 } from 'lucide-react';
+import { ChevronLeft, ExternalLink } from 'lucide-react';
 
 export default function CurriculumPage() {
   const router = useRouter();
@@ -124,26 +124,6 @@ export default function CurriculumPage() {
     });
   };
 
-  const handlePrint = () => {
-    if (iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({ type: 'print-cv' }, '*');
-    }
-  };
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Eneko Ruiz Mollón — CV',
-          text: 'Currículum de Eneko Ruiz Mollón',
-          url: 'https://eneko-ruiz-curriculum.vercel.app'
-        });
-      } catch (err: unknown) {}
-    } else if (iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({ type: 'share-cv' }, '*');
-    }
-  };
-
   return (
     <div
       ref={containerRef}
@@ -167,24 +147,6 @@ export default function CurriculumPage() {
         </h1>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 dark:border-white/10 text-ink text-[11px] font-bold uppercase tracking-[0.1em] hover:scale-105 transition-all"
-            title="Imprimir CV"
-          >
-            <Printer size={14} />
-            <span className="hidden sm:inline">Imprimir</span>
-          </button>
-
-          <button
-            onClick={handleShare}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 dark:border-white/10 text-ink text-[11px] font-bold uppercase tracking-[0.1em] hover:scale-105 transition-all"
-            title="Compartir CV"
-          >
-            <Share2 size={14} />
-            <span className="hidden sm:inline">Compartir</span>
-          </button>
-
           <a
             href="https://eneko-ruiz-curriculum.vercel.app"
             target="_blank"
