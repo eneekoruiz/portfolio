@@ -3,7 +3,6 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { BinaryStreamBtn } from '../ui/Buttons';
 import type { Tx, Val } from '../../types';
 
 if (typeof window !== 'undefined') {
@@ -161,10 +160,6 @@ export function Philosophy({ t }: { t: Tx }) {
         <h2 className="sec-h font-black text-4xl md:text-5xl lg:text-6xl tracking-tight leading-none text-slate-900 dark:text-white max-w-2xl drop-shadow-sm">
           {t.valH}
         </h2>
-        <div className="shrink-0 mb-1 w-full md:w-auto sr">
-          {/* El botón ocupa todo el ancho en móvil por defecto, muy táctil */}
-          <BinaryStreamBtn label={t.ctaCv} variant="dark" />
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">

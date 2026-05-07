@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { Mail, Github, Linkedin, ArrowUpRight, Check } from 'lucide-react';
 import { useMagnetic } from '../../hooks/useMagnetic';
+import { BinaryStreamBtn } from '../ui/Buttons';
 import type { Tx } from '../../types';
 
 const EMAIL = 'eneekoruiz@gmail.com';
@@ -123,10 +124,15 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
 export function Contact({ t }: { t: Tx }) {
   return (
     <section id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-white/40 dark:bg-transparent">
-      <div className="px-8 max-w-[1200px] mx-auto">
-        <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>
-        <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3">{t.coH}</h2>
-        <p className="sec-h text-[15px] text-lead mb-12 max-w-[600px] [text-wrap:balance]">{t.coP}</p>
+      <div className="px-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-12">
+        <div className="max-w-[700px]">
+          <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>
+          <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3">{t.coH}</h2>
+          <p className="sec-h text-[15px] text-lead [text-wrap:balance]">{t.coP}</p>
+        </div>
+        <div className="shrink-0 mb-1 w-full md:w-auto sr">
+           <BinaryStreamBtn label={t.ctaCv} variant="dark" />
+        </div>
       </div>
 
       <div className="w-full px-8 max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-5">
