@@ -230,6 +230,8 @@ export default function ProjectPage() {
       return () => {
         cancelAnimationFrame(raf);
         clearTimeout(fallback);
+        // Ensure Lenis is started if we leave mid-transition
+        window.__lenis?.start?.();
       };
     } else {
       // No overlay found (direct link or fast navigation), enable effects immediately
@@ -242,28 +244,26 @@ export default function ProjectPage() {
     e.preventDefault();
     e.stopPropagation();
 
-    // 🚀 AGGRESSIVE CLEANUP: Stop everything that could block navigation
-    const lenis = window.__lenis;
-    lenis?.stop?.();
+    // 🚀 AGGRESSIVE CLEANUP
+    window.__lenis?.stop?.();
     
-    // Kill any active GSAP tweens on the body or fixed elements
-    gsap.killTweensOf(document.body);
+    // Remove existing overlays
     document.querySelectorAll('[id^="return-overlay"]').forEach(el => el.remove());
 
     const navigate = () => {
       sessionStorage.setItem('hasSeenIntro', 'true');
-      lenis?.start?.();
+      window.__lenis?.start?.(); // Start before navigating
       router.replace('/', { scroll: false });
       
-      // 🚨 ABSOLUTE FALLBACK: If router doesn't respond in 800ms
+      // Safety fallback
       setTimeout(() => {
         if (window.location.pathname !== '/') {
            window.location.href = '/';
         }
-      }, 800);
+      }, 700);
     };
 
-    // 🌊 Punto 8 — SVG Liquid Curtain (replaces plain div overlay)
+    // 🌊 Punto 8 — SVG Liquid Curtain
     const svg = createLiquidCurtain({
       color: theme.accent,
       direction: 'down',
@@ -272,19 +272,17 @@ export default function ProjectPage() {
     document.body.appendChild(svg);
 
     animateLiquidCurtainIn(svg, {
-      duration: 0.6,
+      duration: 0.45,
       onMidway: navigate,
       onComplete: () => {
-        setTimeout(() => svg.remove(), 200);
+        setTimeout(() => svg.remove(), 100);
       },
     });
 
-    // Safety fallback: force navigation if animation hangs
+    // Hard fallback
     setTimeout(() => {
-      if (document.getElementById('return-overlay')) {
-        navigate();
-      }
-    }, 1500);
+      if (document.getElementById('return-overlay')) navigate();
+    }, 1200);
   };
 
   // ── Section reveals (Static, only run once when content is ready) ──────────

@@ -110,7 +110,7 @@ export function animateLiquidCurtainIn(
 ) {
   clearTweens(svg);
   
-  const { duration = 0.4, onMidway, onComplete } = opts; // Snappier default
+  const { duration = 0.45, onMidway, onComplete } = opts; // Snappier default
   const path1 = svg.querySelector('.liquid-base')!;
   const path2 = svg.querySelector('.liquid-main')!;
   const direction = path1.getAttribute('data-direction') || 'up';
@@ -134,7 +134,7 @@ export function animateLiquidCurtainIn(
     onUpdate: () => {
       const t = p2.value;
       path2.setAttribute('d', buildCurtainPath(direction as 'up' | 'down', t));
-      if (!midwayFired && t >= 0.78) {
+      if (!midwayFired && t >= 0.45) { // Trigger MUCH earlier
         midwayFired = true;
         onMidway?.();
       }
