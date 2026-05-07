@@ -12,15 +12,16 @@ export function useDeviceTilt() {
 
   useEffect(() => {
     const handleMotion = (e: DeviceOrientationEvent) => {
-      // Gamma is left/right tilt [-90, 90]
-      // Beta is front/back tilt [-180, 180]
-      const x = e.gamma ? e.gamma / 45 : 0; // Normalize to approx [-1, 1]
-      const y = e.beta ? (e.beta - 45) / 45 : 0; // Normalize assuming 45deg holding angle
+      // Gamma: left/right [-90, 90] -> Normalize to [-1, 1]
+      const rawX = e.gamma ? e.gamma / 38 : 0; 
+      // Beta: front/back [-180, 180]. 
+      // Assume natural holding angle is around 45-55 degrees.
+      const rawY = e.beta ? (e.beta - 50) / 38 : 0; 
       
-      setTilt({ 
-        x: Math.max(-1, Math.min(1, x)), 
-        y: Math.max(-1, Math.min(1, y)) 
-      });
+      setTilt(prev => ({ 
+        x: prev.x * 0.7 + Math.max(-1, Math.min(1, rawX)) * 0.3,
+        y: prev.y * 0.7 + Math.max(-1, Math.min(1, rawY)) * 0.3 
+      }));
     };
 
     const requestPermission = async () => {

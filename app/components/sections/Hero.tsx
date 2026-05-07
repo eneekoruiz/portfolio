@@ -135,9 +135,15 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         if (!textContainerRef.current || e.touches.length === 0) return;
         const touch = e.touches[0];
         const tRect = textContainerRef.current.getBoundingClientRect();
-        const x = Math.max(0, Math.min(touch.clientX - tRect.left, tRect.width));
-        const y = Math.max(0, Math.min(touch.clientY - tRect.top, tRect.height));
-        gsap.set(textContainerRef.current, { '--mx': `${x}px`, '--my': `${y}px` });
+        const x = touch.clientX - tRect.left;
+        const y = touch.clientY - tRect.top;
+        gsap.to(textContainerRef.current, { 
+          '--mx': `${x}px`, 
+          '--my': `${y}px`,
+          duration: 0.2,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
       };
       const onTouchEnd = () => {
         if (textContainerRef.current) {
@@ -218,11 +224,14 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
     const x = (tilt.x + 1) / 2 * tRect.width;
     const y = (tilt.y + 1) / 2 * tRect.height;
     
-    gsap.set(textContainerRef.current, {
+    gsap.to(textContainerRef.current, {
       '--mx': `${x}px`,
       '--my': `${y}px`,
-      rotateY: tilt.x * 10,
-      rotateX: -tilt.y * 10,
+      rotateY: tilt.x * 8, // Slightly reduced sensitivity
+      rotateX: -tilt.y * 8,
+      duration: 0.35, // Smooth out jitter
+      ease: 'power2.out',
+      overwrite: 'auto'
     });
   }, [tilt, isMobile]);
 
@@ -262,7 +271,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                 className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full drop-shadow-[0_0_12px_var(--brand)]"
                 aria-hidden="true"
                 style={{
-                  backgroundImage: 'radial-gradient(circle 240px at var(--mx, -500px) var(--my, -500px), var(--ink) 10%, var(--brand) 50%, transparent 80%)',
+                  backgroundImage: `radial-gradient(circle ${isMobile ? '140px' : '240px'} at var(--mx, -500px) var(--my, -500px), var(--ink) 10%, var(--brand) 50%, transparent 80%)`,
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',
