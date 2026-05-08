@@ -592,10 +592,13 @@ interface ProjectsProps {
   errorMsg: string;
   BranchMergeBtn: React.ComponentType<{ label: string; href: string }>;
   onHoverProject: (proj: { name: string; color: string } | null) => void;
+  expandedIdx: number | null;
+  onToggleProject: (idx: number | null) => void;
 }
 
-export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeBtn, onHoverProject }: ProjectsProps) {
-  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+export function Projects({ 
+  t, top3, repos, load, offline, errorMsg, BranchMergeBtn, onHoverProject, expandedIdx, onToggleProject 
+}: ProjectsProps) {
   const [activeRepo,  setActiveRepo]  = useState<number | null>(null);
   const lineRefs   = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
@@ -617,8 +620,8 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
     const saved = loadNavState();
     if (!saved) return;
     isReturning.current = true;
-    setExpandedIdx(saved.openIdx);
-  }, [top3.length]);
+    onToggleProject(saved.openIdx);
+  }, [top3.length, onToggleProject]);
 
   useEffect(() => {
     if (!isReturning.current) return;
@@ -691,15 +694,13 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
   }, [load]);
 
   const handleToggle = (idx: number) => {
-    setExpandedIdx(prev => {
-      const next = prev === idx ? null : idx;
-      if (next !== null) {
-        saveNavState({ openIdx: next, scrollY: window.scrollY });
-      } else {
-        clearNavState();
-      }
-      return next;
-    });
+    const next = expandedIdx === idx ? null : idx;
+    if (next !== null) {
+      saveNavState({ openIdx: next, scrollY: window.scrollY });
+    } else {
+      clearNavState();
+    }
+    onToggleProject(next);
   };
 
   return (

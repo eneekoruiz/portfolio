@@ -92,6 +92,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const [menu, setMenu] = useState(false);
   const [cmd, setCmd] = useState(false);
   const [hoveredProject, setHoveredProject] = useState<{ name: string; color: string } | null>(null);
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   const isDark = mounted && theme === 'dark';
   const ready = phase === 'ready';
@@ -188,6 +189,34 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     } catch (_) {}
     ScrollTrigger.refresh();
   }, [ready]);
+
+  // Find the color of the currently expanded project
+  const expandedProjectColor = expandedIdx !== null && top3[expandedIdx] 
+    ? (top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'ana-peluquera' ? '#ff2d78' :
+       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'who-are-ya-backend' ? '#00c940' :
+       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'rides24ofiziala' ? '#e69400' :
+       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'spotshare-parking' ? '#00d4e8' :
+       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'pke_web' ? '#9b1fff' : null)
+    : null;
+
+  // ── DNA Color Sync ──
+  const [dnaColors, setDnaColors] = useState({ 
+    accent: isDark ? '#00A3FF' : '#000', 
+    secondary: isDark ? '#0066CC' : '#555' 
+  });
+
+  useEffect(() => {
+    const targetAccent = hoveredProject?.color || expandedProjectColor || (isDark ? '#00A3FF' : '#000');
+    const targetSecondary = hoveredProject ? `${hoveredProject.color}80` : (expandedProjectColor ? `${expandedProjectColor}60` : (isDark ? '#0066CC' : '#555'));
+
+    gsap.to(dnaColors, {
+      accent: targetAccent,
+      secondary: targetSecondary,
+      duration: 1.2,
+      ease: 'sine.inOut',
+      onUpdate: () => setDnaColors({ ...dnaColors })
+    });
+  }, [hoveredProject, expandedProjectColor, isDark]);
 
   useEffect(() => {
     if (!ready) return;
@@ -386,8 +415,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               }}
             >
               <DNAHelix 
-                accent={hoveredProject ? hoveredProject.color : (isDark ? '#00A3FF' : '#000')} 
-                secondary={hoveredProject ? `${hoveredProject.color}80` : (isDark ? '#0066CC' : '#555')} 
+                accent={dnaColors.accent} 
+                secondary={dnaColors.secondary} 
                 darkMode={isDark} 
               />
             </div>
@@ -446,6 +475,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           errorMsg={errorMsg} 
           BranchMergeBtn={BranchMergeBtn} 
           onHoverProject={setHoveredProject}
+          expandedIdx={expandedIdx}
+          onToggleProject={setExpandedIdx}
         />
         <MemoAbout t={t} />
         <MemoPhilosophy t={t} />

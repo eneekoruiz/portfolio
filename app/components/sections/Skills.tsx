@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { Server, MonitorSmartphone, Cpu, Database, Code } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { LANG_COLORS } from '../../lib/constants';
 import type { Tx } from '../../types';
 
@@ -88,8 +89,8 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
             >
               {/* Píldora ligeramente más pequeña para el nuevo tamaño */}
               <div 
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all hover:scale-110 bg-white/10 dark:bg-black/20 backdrop-blur-md shadow-lg"
-                style={{ borderColor: `${techColor}50` }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all hover:scale-110 bg-white/5 dark:bg-black/40 backdrop-blur-sm shadow-lg"
+                style={{ borderColor: `${techColor}30` }}
               >
                 <span 
                   className="w-2 h-2 rounded-full shadow-sm" 
@@ -120,7 +121,12 @@ const ICONS = [Server, MonitorSmartphone, Cpu, Database];
 interface SkillsProps { t: Tx; }
 
 export function Skills({ t }: SkillsProps) {
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
   const containerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useGSAP(() => {
     if (!containerRef.current) return;
@@ -216,11 +222,11 @@ export function Skills({ t }: SkillsProps) {
             <div key={card.h} className="skill-card-wrapper opacity-0" role="listitem">
               {/* TARJETA CHATA: h-[200px] y p-6 */}
               <div 
-                className="relative h-[200px] p-6 rounded-[28px] border shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden group backdrop-blur-2xl"
+                className="relative h-[200px] p-6 rounded-[28px] border shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-500 overflow-hidden group backdrop-blur-md"
                 style={{
-                  backgroundColor: 'transparent',
-                  backgroundImage: `linear-gradient(135deg, ${card.color}08 0%, transparent 100%)`,
-                  borderColor: `${card.color}35`,     
+                  backgroundColor: isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.4)',
+                  backgroundImage: `linear-gradient(135deg, ${card.color}15 0%, transparent 100%)`,
+                  borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
                 }}
               >
                 {/* Título de la tarjeta */}
