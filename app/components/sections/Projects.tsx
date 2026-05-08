@@ -190,10 +190,11 @@ interface WorkRowProps {
   idx: number;
   isExpanded: boolean;
   onToggle: () => void;
+  onHoverProject: (p: { name: string; color: string } | null) => void;
   skipAnimation?: boolean;
 }
 
-function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: WorkRowProps) {
+function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipAnimation }: WorkRowProps) {
   const [isNavigating, setIsNavigating] = useState(false);
   const [isPrefetched, setIsPrefetched] = useState(false);
   const rowRef   = useRef<HTMLDivElement>(null);
@@ -264,6 +265,16 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
     return () => mm.revert();
   }, [isExpanded, skipAnimation]);
 
+  const onMouseMove = useCallback((e: React.MouseEvent) => {
+    const el = rowRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    el.style.setProperty('--mouse-x', `${x}px`);
+    el.style.setProperty('--mouse-y', `${y}px`);
+  }, []);
+
   const handleNavigate = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -298,13 +309,18 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
       className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-colors duration-300"
       style={isExpanded ? { background: theme.gradient } : undefined}
     >
-      {/* Dynamic Hover Glow */}
+      {/* Premium Hover Spotlight — "Chula" way */}
       <div
-        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 pointer-events-none hidden md:block"
+        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-700 pointer-events-none"
         style={{ 
-          background: theme.img.replace('20%', '35%'), 
-          filter: 'blur(40px)'
+          background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${theme.color}0d 0%, transparent 100%)`,
         }}
+      />
+      
+      {/* Side Accent Line */}
+      <div 
+        className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 bg-[var(--theme-color)] group-hover/row:h-[65%] transition-all duration-500 ease-spring rounded-r-full z-20"
+        style={{ '--theme-color': theme.color } as React.CSSProperties}
       />
 
       {/* Top Border Glow on Hover */}
@@ -319,6 +335,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
         id={`btn-${safeId}`}
         aria-expanded={isExpanded}
         aria-controls={panelId}
+        onMouseMove={onMouseMove}
         onMouseEnter={() => {
           if (theme.hasAudit && !isPrefetched) {
             router.prefetch(`/work/${safeId}`);
@@ -349,7 +366,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
         <div className="flex-1 min-w-0 flex items-center gap-3 md:gap-5">
           {/* Project Name with Color & Translation Pop */}
           <h3
-            className="font-bold leading-tight tracking-tight min-w-0 transition-all duration-500 group-hover/row:translate-x-2"
+            className="font-bold leading-tight tracking-tight min-w-0 transition-all duration-500 group-hover/row:translate-x-3 group-hover/row:scale-[1.02] origin-left"
             style={{
               fontSize: 'clamp(0.92rem, 2.2vw, 1.42rem)',
               color:    isExpanded ? theme.color : 'var(--ink)',
@@ -360,7 +377,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
               WebkitBoxOrient: 'vertical',
             }}
           >
-            <span className="group-hover/row:text-[var(--theme-color)] transition-colors duration-300" style={{ '--theme-color': theme.color } as React.CSSProperties}>
+            <span className="group-hover/row:text-[var(--theme-color)] transition-colors duration-300 drop-shadow-[0_0_8px_var(--theme-glow)]" style={{ '--theme-color': theme.color, '--theme-glow': `${theme.color}30` } as React.CSSProperties}>
               {proj.name.replace(/-/g, ' ').replace(/_/g, ' ')}
             </span>
           </h3>
@@ -381,9 +398,9 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
           className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${
             isExpanded
               ? 'rotate-180 text-white shadow-lg'
-              : 'border border-black/10 dark:border-white/15 text-lead group-hover/row:border-[var(--theme-color)] group-hover/row:text-[var(--theme-color)]'
+              : 'border border-black/10 dark:border-white/15 text-lead group-hover/row:border-[var(--theme-color)] group-hover/row:text-[var(--theme-color)] group-hover/row:shadow-[0_0_10px_var(--theme-glow)]'
           }`}
-          style={isExpanded ? { backgroundColor: theme.color } : ({ '--theme-color': theme.color } as React.CSSProperties)}
+          style={isExpanded ? { backgroundColor: theme.color } : ({ '--theme-color': theme.color, '--theme-glow': `${theme.color}40` } as React.CSSProperties)}
         >
           <ChevronDown size={15} strokeWidth={2.5} />
         </div>
@@ -462,11 +479,13 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
                 href={`/work/${safeId}`}
                 onClick={handleNavigate}
                 onMouseEnter={() => {
+                  onHoverProject({ name: proj.name, color: theme.color });
                   if (!isPrefetched) {
                     router.prefetch(`/work/${safeId}`);
                     setIsPrefetched(true);
                   }
                 }}
+                onMouseLeave={() => onHoverProject(null)}
                 onFocus={() => {
                   if (!isPrefetched) {
                     router.prefetch(`/work/${safeId}`);
@@ -491,7 +510,8 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, skipAnimation }: Work
               <a
                 href={`https://github.com/eneekoruiz/${proj.name}`}
                 target="_blank" rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
+                onMouseEnter={() => onHoverProject({ name: proj.name, color: theme.color })}
+                onMouseLeave={() => onHoverProject(null)}
                 className="relative z-10 mt-4 flex items-center justify-between px-5 py-[11px] rounded-full border hover:scale-[1.025] active:scale-95 transition-all duration-200"
                 style={{
                   borderColor: `${theme.color}40`,
@@ -731,14 +751,13 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
                 <div 
                   key={p.n} 
                   className="work-row-anim"
-                  onMouseEnter={() => !isMobile && setHoveredProject({ name: p.name, color: PROJ_THEMES[p.name.toLowerCase().replace(/[\s_]+/g, '-')]?.color || '#888' })}
-                  onMouseLeave={() => !isMobile && setHoveredProject(null)}
                 >
                   <PremiumWorkRow
                     proj={p}
                     idx={i}
                     isExpanded={expandedIdx === i}
                     onToggle={() => handleToggle(i)}
+                    onHoverProject={setHoveredProject}
                     skipAnimation={isReturning.current && expandedIdx === i}
                   />
                 </div>

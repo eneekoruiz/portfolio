@@ -94,6 +94,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const isDark = mounted && theme === 'dark';
   const ready = phase === 'ready';
   const reduced = usePreferredMotion();
+  const isLite = mounted && (window as any).__LITE;
   const greeting = useGreeting(t.times, t.greetingFn);
   const { repos, top3, load, offline, errorMsg } = initialGitHubData;
 
@@ -224,7 +225,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           onComplete: () => {
             overlay.remove();
             try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
-            (window as any).__lenis?.start?.();
+            window.__lenis?.start?.();
             ScrollTrigger.refresh();
           },
         });
@@ -360,10 +361,14 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         </>
       )}
 
-      {ready && (
+      {ready && !isLite && !reduced && (
         <>
           {/* Enhanced DNA Helix Visibility */}
-          <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" style={{ perspective: '1200px' }}>
+          <div 
+            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" 
+            style={{ perspective: '1200px' }}
+            aria-hidden="true"
+          >
             <div
               className="helix-group will-change-transform"
               style={{
@@ -386,7 +391,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               />
             </div>
           </div>
-          <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.05]">
+          <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.05]" aria-hidden="true">
             <TerrainMesh accent={isDark ? '#00A3FF' : 'currentColor'} darkMode={isDark} />
           </div>
         </>

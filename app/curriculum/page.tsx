@@ -14,8 +14,10 @@ import { useTheme } from 'next-themes';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ChevronLeft, ExternalLink } from 'lucide-react';
+import { useTranslations } from '../hooks/useTranslations';
 
 export default function CurriculumPage() {
+  const { t } = useTranslations();
   const router = useRouter();
   const { theme, resolvedTheme } = useTheme();
   const [loading, setLoading] = useState(true);
@@ -139,11 +141,11 @@ export default function CurriculumPage() {
           className="group flex items-center gap-2 font-bold text-[11px] uppercase tracking-[0.2em] text-lead hover:text-ink transition-colors"
         >
           <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-          <span>Volver</span>
+          <span>{t.back}</span>
         </button>
 
         <h1 className="font-mono text-[10px] uppercase tracking-[0.4em] opacity-40 text-ink hidden md:block">
-          RESUME // ENEKO RUIZ
+          {t.ctaCv.toUpperCase()} {/* ENEKO RUIZ */}
         </h1>
 
         <div className="flex items-center gap-2">
@@ -154,7 +156,7 @@ export default function CurriculumPage() {
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-page text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
           >
             <ExternalLink size={14} />
-            <span className="hidden sm:inline">Abrir Directo</span>
+            <span className="hidden sm:inline">{t.openDirect}</span>
           </a>
         </div>
       </header>
@@ -215,10 +217,12 @@ export default function CurriculumPage() {
               <ExternalLink size={32} />
             </div>
             <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-4 text-ink">
-              Contenido Protegido
+              {t.back === 'Volver' ? 'Contenido Protegido' : 'Protected Content'}
             </h2>
             <p className="max-w-md text-lead text-sm leading-relaxed mb-8">
-              Por motivos de seguridad (X-Frame-Options), algunos navegadores bloquean la visualización incrustada. Pulsa el botón de arriba para ver el currículum a pantalla completa.
+              {t.back === 'Volver' 
+                ? 'Por motivos de seguridad (X-Frame-Options), algunos navegadores bloquean la visualización incrustada. Pulsa el botón de arriba para ver el currículum a pantalla completa.'
+                : 'For security reasons (X-Frame-Options), some browsers block embedded viewing. Click the button above to view the resume in full screen.'}
             </p>
             <div className="pointer-events-auto">
               <a
@@ -227,7 +231,7 @@ export default function CurriculumPage() {
                 rel="noopener noreferrer"
                 className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(0,102,255,0.2)]"
               >
-                Ver Currículum Original
+                {t.openDirect}
               </a>
             </div>
           </div>

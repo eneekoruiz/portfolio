@@ -228,7 +228,7 @@ export function Skills({ t }: SkillsProps) {
                     style={{ background: `${card.color}15`, color: card.color, borderColor: `${card.color}30` }}>
                     <Icon size={20} />
                   </div>
-                  <h3 className="font-black text-xl tracking-tight text-ink uppercase">{card.h}</h3>
+                  <h3 className="font-black text-xl tracking-tight text-ink uppercase">{t.skCats[i] || card.h}</h3>
                 </div>
 
                 {/* CARRUSEL 3D DE PÍLDORAS */}

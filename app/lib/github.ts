@@ -56,7 +56,7 @@ export async function getGitHubData(t: Tx) {
       const githubRepo = allRepos.find(r => r.name.toLowerCase() === id.toLowerCase());
       
       const getDesc = (id: string) => {
-        if (id === 'ana-peluquera') return 'Plataforma de reservas con Algoritmo Sandwich y sincronización atómica.';
+        if (id === 'ana-peluquera') return t?.projectServerDesc || 'Plataforma de reservas con Algoritmo Sandwich y sincronización atómica.';
         if (id === 'who-are-ya-backend') return t?.projectWhoDesc || 'Backend escalable para juego de fútbol con arquitectura MVC.';
         if (id === 'rides24ofiziala') return t?.projectRidesDesc || 'Sistema distribuido de ride-sharing con transacciones seguras.';
         if (id === 'spotshare-parking') return 'Gestión Cloud de aparcamientos con enfoque en calidad SonarCloud.';
@@ -64,10 +64,20 @@ export async function getGitHubData(t: Tx) {
         return '';
       };
 
+      const getTag = (id: string) => {
+        if (!t?.projectTags) return 'System Engineer';
+        if (id === 'ana-peluquera') return t.projectTags[0]; // Lead Architect
+        if (id === 'who-are-ya-backend') return t.projectTags[1]; // Backend / API
+        if (id === 'rides24ofiziala') return t.projectTags[2]; // System Engineer
+        if (id === 'spotshare-parking') return t.projectTags[3]; // Cloud Engineer
+        if (id === 'pke_web') return t.projectTags[4]; // A11y Specialist
+        return t.projectTags[2];
+      };
+
       return {
         n: `0${index + 1}`,
         name: id,
-        tag: id === 'ana-peluquera' ? 'Lead Architect' : id === 'who-are-ya-backend' ? 'Backend / API' : 'System Engineer',
+        tag: getTag(id),
         year: githubRepo ? new Date(githubRepo.pushed_at).getFullYear().toString() : '2026',
         size: githubRepo ? (githubRepo.size > 1024 ? `${(githubRepo.size / 1024).toFixed(1)} MB` : `${githubRepo.size} KB`) : 'Premium',
         desc: getDesc(id),

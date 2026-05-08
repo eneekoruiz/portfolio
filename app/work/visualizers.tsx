@@ -140,7 +140,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
       observer.disconnect();
       window.removeEventListener('resize', resize);
     };
-  }, [accent, secondary]);
+  }, [accent, secondary, darkMode]);
 
 
   return (

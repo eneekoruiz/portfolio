@@ -1,3 +1,4 @@
+import Lenis from 'lenis';
 import type { LucideIcon } from 'lucide-react';
 
 // Language types
@@ -48,6 +49,7 @@ export interface Tx {
   metrics: [string, string][];
   skLb: string;
   skH: string;
+  skCats: string[];
   woLb: string;
   woH: string;
   ghLb: string;
@@ -70,6 +72,9 @@ export interface Tx {
   projectWhoDesc: string;
   projectRidesDesc: string;
   projectServerDesc: string;
+  projectTags: string[];
+  back: string;
+  openDirect: string;
 }
 
 export interface ProjectCard {
@@ -89,7 +94,7 @@ export interface ProjectCard {
 // ── Global Window Interface ──────────────────────────────────────────────────
 declare global {
   interface Window {
-    __lenis?: any;
+    __lenis?: Lenis;
     __galaxy?: {
       setAttract: (v: boolean) => void;
       setSpeed: (v: number) => void;

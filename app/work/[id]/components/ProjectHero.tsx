@@ -360,7 +360,7 @@ export function ProjectHero({
                 <div className="flex items-center gap-2 md:gap-3 pr-4 md:pr-6 border-r border-white/10">
                   <div className="w-2 md:w-2.5 h-2 md:h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
                   <span className="font-mono text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[100px] md:max-w-none">
-                    {title} <span className="hidden xs:inline">// LIVE</span>
+                    {title} <span className="hidden xs:inline">{" // LIVE"}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-4 md:gap-6 text-white/40 font-mono text-[8px] md:text-[9px] uppercase tracking-widest">

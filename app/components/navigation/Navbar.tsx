@@ -49,6 +49,7 @@ export function Navbar({
           <div
             ref={indRef}
             className="nav-ind absolute top-0 left-0 h-9 bg-black/5 dark:bg-white/10 rounded-xl opacity-0"
+            aria-hidden="true"
           />
           {t.menu.map((link: string, i: number) => (
             <NavItem 

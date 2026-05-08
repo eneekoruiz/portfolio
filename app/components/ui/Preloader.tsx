@@ -30,52 +30,6 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
-  // ── Counter Logic (High precision) ──────────────────────────────────────
-  useEffect(() => {
-    let v = 0;
-    let rafId: number;
-
-    const tick = () => {
-      // Random but smooth increments
-      const inc = Math.random() * 2 + 0.5;
-      v += inc;
-      
-      if (v >= 100) {
-        setN(100);
-        // Delay before exit to emphasize the zoom
-        setTimeout(() => playExit(), 150);
-        return;
-      }
-      
-      setN(Math.round(v));
-      rafId = requestAnimationFrame(() => {
-        setTimeout(tick, 10 + Math.random() * 10);
-      });
-    };
-
-    tick();
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
-
-  // ── Spotlight Movement Animation ─────────────────────────────────────
-  useEffect(() => {
-    if (!spotlightRef.current) return;
-    
-    const moveSpotlight = () => {
-      gsap.to(spotlightRef.current, {
-        x: gsap.utils.random(-300, 300),
-        y: gsap.utils.random(-300, 300),
-        duration: gsap.utils.random(2, 4),
-        ease: 'sine.inOut',
-        onComplete: moveSpotlight
-      });
-    };
-    
-    moveSpotlight();
-  }, []);
-
   // ── Exit Animation (Cinematic & Premium Zoom) ──────────────────────────────
   const playExit = useCallback(() => {
     if (exitFired.current) return;
@@ -114,6 +68,52 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         ease: 'power2.inOut',
       }, 0.6);
   }, []);
+
+  // ── Spotlight Movement Animation ─────────────────────────────────────
+  useEffect(() => {
+    if (!spotlightRef.current) return;
+    
+    const moveSpotlight = () => {
+      gsap.to(spotlightRef.current, {
+        x: gsap.utils.random(-300, 300),
+        y: gsap.utils.random(-300, 300),
+        duration: gsap.utils.random(2, 4),
+        ease: 'sine.inOut',
+        onComplete: moveSpotlight
+      });
+    };
+    
+    moveSpotlight();
+  }, []);
+
+  // ── Counter Logic (High precision) ──────────────────────────────────────
+  useEffect(() => {
+    let v = 0;
+    let rafId: number;
+
+    const tick = () => {
+      // Random but smooth increments
+      const inc = Math.random() * 2 + 0.5;
+      v += inc;
+      
+      if (v >= 100) {
+        setN(100);
+        // Delay before exit to emphasize the zoom
+        setTimeout(() => playExit(), 150);
+        return;
+      }
+      
+      setN(Math.round(v));
+      rafId = requestAnimationFrame(() => {
+        setTimeout(tick, 10 + Math.random() * 10);
+      });
+    };
+
+    tick();
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [playExit]);
 
   return (
     <div

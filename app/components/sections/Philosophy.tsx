@@ -19,8 +19,8 @@ const SPANS = [
 ] as const;
 
 /* ── Bento card with Senior Glare & Physics ── */
-function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index, isMobileImportant }: {
-  val: Val; span: string; accent: boolean; index: number; isMobileImportant: boolean;
+function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index }: {
+  val: Val; span: string; accent: boolean; index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -85,8 +85,8 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index, isMo
       ref={ref}
       className={`
         ${span}
-        /* 📱 RESPONSIVE: Ocultamos en móvil si no es importante */
-        ${isMobileImportant ? 'flex' : 'hidden md:flex'}
+        /* 📱 RESPONSIVE: Visible en todos los tamaños, apilado en móvil */
+        flex
         relative overflow-hidden group rounded-[20px] p-7 flex-col gap-4
         transition-colors duration-500 will-change-transform
         focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none
@@ -141,10 +141,6 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index, isMo
 }
 
 export function Philosophy({ t }: { t: Tx }) {
-  // 💡 Define aquí qué índices (0 al 5) quieres que se vean en móvil.
-  // Ahora mismo he puesto el 0 y el 4 porque son los que tienen el "accent" (los más bonitos).
-  const mobileImportantIndices = [0, 3, 4];
-
   return (
     <section
       id="values"
@@ -170,7 +166,6 @@ export function Philosophy({ t }: { t: Tx }) {
             span={SPANS[i] ?? 'md:col-span-1'}
             accent={i === 0 || i === 4} 
             index={i}
-            isMobileImportant={mobileImportantIndices.includes(i)}
           />
         ))}
       </div>

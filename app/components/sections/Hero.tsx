@@ -52,7 +52,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
 
     // ── MODO DESKTOP: Mouse ────────────────────────────────────────────
     const onMove = (e: MouseEvent) => {
-      if (isMobile) return; // En móvil, ignorar mousemove
+      if (isMobile || reduced) return; 
       
       const rect = btn.getBoundingClientRect();
       const currentX = (gsap.getProperty(btn, 'x') as number) || 0;
@@ -112,8 +112,8 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         gsap.to(textContainerRef.current, {
           '--mx': `${x}px`,
           '--my': `${y}px`,
-          duration: 0.15,
-          ease: 'sine.out',
+          duration: 0.1, // Even faster for elite responsiveness
+          ease: 'none', // No ease for raw tracking
           overwrite: true
         });
 
@@ -121,9 +121,9 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         const xPercent = (x / tRect.width - 0.5) * 2;
         const yPercent = (y / tRect.height - 0.5) * 2;
         gsap.to(textContainerRef.current, {
-          rotateY: xPercent * 5,
-          rotateX: -yPercent * 5,
-          duration: 1,
+          rotateY: xPercent * 4, // Slightly subtler
+          rotateX: -yPercent * 4,
+          duration: 0.8,
           ease: 'power2.out',
           overwrite: 'auto'
         });
@@ -131,31 +131,8 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
     };
 
     const setupTouchFallback = () => {
-      const onTouchMove = (e: TouchEvent) => {
-        if (!textContainerRef.current || e.touches.length === 0) return;
-        const touch = e.touches[0];
-        const tRect = textContainerRef.current.getBoundingClientRect();
-        const x = touch.clientX - tRect.left;
-        const y = touch.clientY - tRect.top;
-        gsap.to(textContainerRef.current, { 
-          '--mx': `${x}px`, 
-          '--my': `${y}px`,
-          duration: 0.2,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      };
-      const onTouchEnd = () => {
-        if (textContainerRef.current) {
-          gsap.to(textContainerRef.current, { '--mx': `-500px`, '--my': `-500px`, duration: 0.6, ease: 'power2.out' });
-        }
-      };
-      window.addEventListener('touchmove', onTouchMove);
-      window.addEventListener('touchend', onTouchEnd);
-      return () => {
-        window.removeEventListener('touchmove', onTouchMove);
-        window.removeEventListener('touchend', onTouchEnd);
-      };
+      // Disabled: replaced by autonomous animation on mobile to prevent scroll collapse
+      return () => {};
     };
 
     const onLeave = () => {
@@ -205,35 +182,54 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       );
     }
 
+    // ── MODO MÓVIL: Animación Autónoma ───────────────────────────
+    let mobileAnim: gsap.core.Timeline | null = null;
+    if (isMobile && textContainerRef.current && !reduced) {
+      const tRect = textContainerRef.current.getBoundingClientRect();
+      mobileAnim = gsap.timeline({ repeat: -1, yoyo: true });
+      mobileAnim.to(textContainerRef.current, {
+        '--mx': `${tRect.width * 0.8}px`,
+        '--my': `${tRect.height * 0.2}px`,
+        rotateX: 2,
+        rotateY: -3,
+        duration: 4,
+        ease: 'sine.inOut'
+      }).to(textContainerRef.current, {
+        '--mx': `${tRect.width * 0.2}px`,
+        '--my': `${tRect.height * 0.8}px`,
+        rotateX: -2,
+        rotateY: 3,
+        duration: 4,
+        ease: 'sine.inOut'
+      });
+    }
+
     const touchCleanup = setupTouchFallback();
     return () => {
       if (!isMobile) {
         hero.removeEventListener('mousemove', onMove);
         hero.removeEventListener('mouseleave', onLeave);
       }
+      mobileAnim?.kill();
       touchCleanup();
     };
   }, [reduced, isMobile, phase]);
 
   // ── MODO MÓVIL: Giroscopio (vía hook) ────────────────────────
   useEffect(() => {
-    if (!isMobile || !textContainerRef.current) return;
+    // Only apply tilt to parallax if NOT mobile or if mobile-tilt is preferred
+    // For now, we disable tilt-to-spotlight on mobile to prevent scroll issues
+    if (!isMobile || !textContainerRef.current || reduced) return;
     
-    const tRect = textContainerRef.current.getBoundingClientRect();
-    // Apply tilt to spotlight position
-    const x = (tilt.x + 1) / 2 * tRect.width;
-    const y = (tilt.y + 1) / 2 * tRect.height;
-    
+    // We only use tilt for a VERY subtle parallax, not the light source
     gsap.to(textContainerRef.current, {
-      '--mx': `${x}px`,
-      '--my': `${y}px`,
-      rotateY: tilt.x * 9, 
-      rotateX: -tilt.y * 9,
-      duration: 0.12, // MUCH faster response
+      rotateY: tilt.x * 5, 
+      rotateX: -tilt.y * 5,
+      duration: 1.2, 
       ease: 'power2.out',
       overwrite: 'auto'
     });
-  }, [tilt, isMobile]);
+  }, [tilt, isMobile, reduced]);
 
   return (
     <section id="hero" aria-label="Hero" className="min-h-[100svh] flex flex-col overflow-hidden pt-[80px] relative snap-start">

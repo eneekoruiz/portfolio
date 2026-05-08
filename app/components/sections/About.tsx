@@ -81,8 +81,8 @@ export function About({ t }: { t: Tx }) {
           </p>
         </div>
 
-        {/* 🚀 LA CLAVE MÓVIL: hidden por defecto, grid en md */}
-        <div className="hidden md:grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 about-reveal">
+        {/* 🚀 LA CLAVE MÓVIL: Grid visible en todos los tamaños, 1 col en móvil, 3 en md */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 about-reveal">
           {t.metrics.map(([v, l]) => (
             <div 
               key={l} 
