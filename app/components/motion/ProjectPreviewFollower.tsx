@@ -24,7 +24,7 @@ export function ProjectPreviewFollower({ activeProject }: ProjectPreviewFollower
         gsap.to(containerRef.current, {
           x: e.clientX,
           y: e.clientY,
-          duration: 0.8,
+          duration: 1.0,
           ease: 'power3.out',
         });
         

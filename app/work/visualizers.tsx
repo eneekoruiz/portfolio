@@ -38,7 +38,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
 
     const draw = () => {
       if (!activeRef.current || document.visibilityState !== 'visible') {
-        frame = requestAnimationFrame(draw);
+        frame = 0;
         return;
       }
 
@@ -126,6 +126,9 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
     const observer = new IntersectionObserver(
       ([entry]) => {
         activeRef.current = entry.isIntersecting;
+        if (entry.isIntersecting && !frame) {
+           frame = requestAnimationFrame(draw);
+        }
       },
       { threshold: 0.01 }
     );
@@ -173,7 +176,7 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
 
     const draw = () => {
       if (!activeRef.current || document.visibilityState !== 'visible') {
-        animRef.current = requestAnimationFrame(draw);
+        animRef.current = 0;
         return;
       }
 
@@ -211,6 +214,9 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
     const visibilityHandler = () => {
       if (document.visibilityState === 'visible' && activeRef.current && !animRef.current) {
         animRef.current = requestAnimationFrame(draw);
+      } else if (document.visibilityState !== 'visible' && animRef.current) {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = 0;
       }
     };
 

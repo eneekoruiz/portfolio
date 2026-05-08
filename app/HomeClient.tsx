@@ -26,6 +26,7 @@ import { CmdModal } from './components/ui/CmdModal';
 import { BranchMergeBtn } from './components/ui/Buttons';
 import { Navbar } from './components/navigation/Navbar';
 import { MobileMenu } from './components/navigation/MobileMenu';
+import { ProjectPreviewFollower } from './components/motion/ProjectPreviewFollower';
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
 import { IdentitySplash } from './components/motion/IdentitySplash';
@@ -90,6 +91,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const tilt = useDeviceTilt();
   const [menu, setMenu] = useState(false);
   const [cmd, setCmd] = useState(false);
+  const [hoveredProject, setHoveredProject] = useState<{ name: string; color: string } | null>(null);
 
   const isDark = mounted && theme === 'dark';
   const ready = phase === 'ready';
@@ -373,8 +375,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               className="helix-group will-change-transform"
               style={{
                 width: 'clamp(200px, 40vw, 500px)', height: '240vh',
-                opacity: isDark ? 0.22 : 0.12,
-                filter: isDark ? 'blur(3px)' : 'blur(6px)',
+                opacity: hoveredProject ? 0.45 : (isDark ? 0.32 : 0.12),
                 transformStyle: 'preserve-3d',
                 transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)' // Smoother CSS transition
               }}
@@ -385,8 +386,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               }}
             >
               <DNAHelix 
-                accent={isDark ? '#00A3FF' : '#000'} 
-                secondary={isDark ? '#0066CC' : '#555'} 
+                accent={hoveredProject ? hoveredProject.color : (isDark ? '#00A3FF' : '#000')} 
+                secondary={hoveredProject ? `${hoveredProject.color}80` : (isDark ? '#0066CC' : '#555')} 
                 darkMode={isDark} 
               />
             </div>
@@ -436,11 +437,21 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
         <MemoHero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} phase={phase} />
         <MemoSkills t={t} />
-        <MemoProjects t={t} top3={top3} repos={repos} load={load} offline={offline} errorMsg={errorMsg} BranchMergeBtn={BranchMergeBtn} />
+        <MemoProjects 
+          t={t} 
+          top3={top3} 
+          repos={repos} 
+          load={load} 
+          offline={offline} 
+          errorMsg={errorMsg} 
+          BranchMergeBtn={BranchMergeBtn} 
+          onHoverProject={setHoveredProject}
+        />
         <MemoAbout t={t} />
         <MemoPhilosophy t={t} />
         <MemoContact t={t} />
         <MemoFooter t={t} />
+        <ProjectPreviewFollower activeProject={hoveredProject} />
       </main>
     </>
   );

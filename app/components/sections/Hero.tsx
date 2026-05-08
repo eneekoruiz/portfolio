@@ -109,13 +109,9 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         const y = e.clientY - tRect.top;
         
         // Spotlight
-        gsap.to(textContainerRef.current, {
-          '--mx': `${x}px`,
-          '--my': `${y}px`,
-          duration: 0.1, // Even faster for elite responsiveness
-          ease: 'none', // No ease for raw tracking
-          overwrite: true
-        });
+        // Spotlight - Using raw style set for absolute performance
+        textContainerRef.current.style.setProperty('--mx', `${x}px`);
+        textContainerRef.current.style.setProperty('--my', `${y}px`);
 
         // 3D Parallax Tilt for the title
         const xPercent = (x / tRect.width - 0.5) * 2;

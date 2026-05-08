@@ -42,10 +42,11 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     tl
       // 1. Zoom the number MASSIVELY to create a portal effect
       .to(numRef.current, {
-        scale: 45,
+        scale: 60,
         opacity: 0,
-        duration: 1.2,
-        ease: 'expo.inOut',
+        duration: 1.0,
+        ease: 'power4.inOut',
+        force3D: true, // GPU acceleration to avoid pixelation
       })
       // 2. Fade out UI elements
       .to([barContainerRef.current, spotlightRef.current], {
@@ -92,20 +93,21 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     let rafId: number;
 
     const tick = () => {
-      // Random but smooth increments
-      const inc = Math.random() * 2 + 0.5;
+      // Significantly faster increments
+      const inc = Math.random() * 4 + 2;
       v += inc;
       
       if (v >= 100) {
         setN(100);
-        // Delay before exit to emphasize the zoom
-        setTimeout(() => playExit(), 150);
+        // Instant exit to feel more snappy
+        setTimeout(() => playExit(), 80);
         return;
       }
       
       setN(Math.round(v));
       rafId = requestAnimationFrame(() => {
-        setTimeout(tick, 10 + Math.random() * 10);
+        // Reduced latency for faster feel
+        setTimeout(tick, 5);
       });
     };
 
@@ -164,11 +166,15 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       <div className="relative z-10 flex flex-col items-center">
         <div
           ref={numRef}
-          className="font-black text-[clamp(7rem,22vw,16rem)] tracking-[-0.08em] leading-none mb-4 select-none gpu-accelerated mix-blend-difference"
-          style={{ color: 'var(--ink)' }}
+          className="font-black text-[clamp(7rem,22vw,16rem)] tracking-[-0.08em] leading-none mb-4 select-none mix-blend-difference will-change-transform"
+          style={{ 
+            color: 'var(--ink)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden'
+          }}
           aria-label={`${n} percent loaded`}
         >
-          {n.toString().padStart(2, '0')}
+          {n}
         </div>
 
         {/* ── Progress Bar (Minimalist) ── */}

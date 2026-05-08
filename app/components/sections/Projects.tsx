@@ -21,7 +21,7 @@ import {
   createLiquidCurtain,
   animateLiquidCurtainIn,
 } from '../motion/LiquidCurtain';
-import { ProjectPreviewFollower } from '../motion/ProjectPreviewFollower';
+// Removed: ProjectPreviewFollower (moved to HomeClient)
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
@@ -591,12 +591,12 @@ interface ProjectsProps {
   offline: boolean;
   errorMsg: string;
   BranchMergeBtn: React.ComponentType<{ label: string; href: string }>;
+  onHoverProject: (proj: { name: string; color: string } | null) => void;
 }
 
-export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeBtn }: ProjectsProps) {
+export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeBtn, onHoverProject }: ProjectsProps) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [activeRepo,  setActiveRepo]  = useState<number | null>(null);
-  const [hoveredProject, setHoveredProject] = useState<{name: string, color: string} | null>(null);
   const lineRefs   = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -757,7 +757,7 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
                     idx={i}
                     isExpanded={expandedIdx === i}
                     onToggle={() => handleToggle(i)}
-                    onHoverProject={setHoveredProject}
+                    onHoverProject={onHoverProject}
                     skipAnimation={isReturning.current && expandedIdx === i}
                   />
                 </div>
@@ -765,7 +765,6 @@ export function Projects({ t, top3, repos, load, offline, errorMsg, BranchMergeB
           }
         </div>
 
-        <ProjectPreviewFollower activeProject={hoveredProject} />
       </section>
 
       <section
