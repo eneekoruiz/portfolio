@@ -375,7 +375,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               className="helix-group will-change-transform"
               style={{
                 width: 'clamp(200px, 40vw, 500px)', height: '240vh',
-                opacity: hoveredProject ? 0.45 : (isDark ? 0.32 : 0.12),
+                opacity: hoveredProject ? 0.6 : (isDark ? 0.45 : 0.2),
                 transformStyle: 'preserve-3d',
                 transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)' // Smoother CSS transition
               }}

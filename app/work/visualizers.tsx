@@ -72,8 +72,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           else ctx.lineTo(x, y);
         }
         ctx.strokeStyle = s === 0 ? accent : secondary;
-        ctx.lineWidth = darkMode ? 3.2 : 2.5;
-        ctx.globalAlpha = darkMode ? 0.75 : 0.45;
+        ctx.lineWidth = darkMode ? 4.5 : 3.5;
+        ctx.globalAlpha = darkMode ? 0.95 : 0.65;
         ctx.stroke();
       }
 
@@ -104,10 +104,10 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.beginPath();
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fillStyle = color;
-          ctx.globalAlpha = (darkMode ? 0.75 : 0.4) + (z + 1) * 0.5;
+          ctx.globalAlpha = (darkMode ? 0.9 : 0.6) + (z + 1) * 0.4;
           
-          if (z > 0.7) {
-            ctx.shadowBlur = darkMode ? 22 : 12;
+          if (z > 0.8) {
+            ctx.shadowBlur = darkMode ? 12 : 6;
             ctx.shadowColor = color;
           } else {
             ctx.shadowBlur = 0;
