@@ -35,21 +35,24 @@ const IntroContext = createContext<IntroContextValue | null>(null);
 let hasSeenGlobal = false;
 
 export function IntroProvider({ children }: { children: React.ReactNode }) {
-  const [phase, setPhase] = useState<IntroPhase>(() => {
-    if (typeof window === 'undefined') return 'checking';
-    try {
-      if (hasSeenGlobal || sessionStorage.getItem('hasSeenIntro') === 'true') {
-        return 'ready';
-      }
-    } catch (_) {}
-    return 'loading';
-  });
+  const [phase, setPhase] = useState<IntroPhase>('checking');
 
   useEffect(() => {
-    if (phase === 'checking') {
+    // Determine the initial phase on the client after hydration
+    const checkSeen = () => {
+      try {
+        return hasSeenGlobal || sessionStorage.getItem('hasSeenIntro') === 'true';
+      } catch (_) {
+        return false;
+      }
+    };
+
+    if (checkSeen()) {
+      setPhase('ready');
+    } else {
       setPhase('loading');
     }
-  }, [phase]);
+  }, []);
 
   const markSeen = useCallback(() => {
     hasSeenGlobal = true;

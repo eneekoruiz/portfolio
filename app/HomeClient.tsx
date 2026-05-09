@@ -156,7 +156,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   // Global Transition Cleanup
   useEffect(() => {
     const cleanup = () => {
-      document.querySelectorAll('[id^="return-overlay"]').forEach(el => {
+      // Clear any transition overlays that might have lingered from other projects/pages
+      document.querySelectorAll('[id*="overlay"], [id*="transition"], [id*="curtain"]').forEach(el => {
         gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => el.remove() });
       });
       window.__lenis?.start?.();
@@ -404,7 +405,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     markSeen();
   }, [setPhase, markSeen]);
 
-  if (phase === 'checking') return null;
+  // We no longer return null during 'checking' to avoid white screen flashes.
+  // Instead, the main content is hidden via CSS visibility/opacity until ready.
 
   return (
     <>
