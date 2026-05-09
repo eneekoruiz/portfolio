@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -85,7 +85,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   // ── Estado ──────────────────────────────────────────────────────────────
   const { phase, setPhase, markSeen } = useIntro();
-  const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { lang, setLang, t } = useTranslations();
   const tilt = useDeviceTilt();
@@ -94,11 +94,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const [hoveredProject, setHoveredProject] = useState<{ name: string; color: string } | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
-  const [isAboutVisible, setIsAboutVisible] = useState(false);
-  const [isPhilosophyVisible, setIsPhilosophyVisible] = useState(false);
-
   const isDark = mounted && theme === 'dark';
-  const ready = phase === 'ready';
+  // 🚀 FIX: Consider ready if phase is already 'ready' OR if we have the session flag,
+  // this prevents the "white screen" flash during the 'checking' phase on back-navigation.
+  const ready = phase === 'ready' || (typeof window !== 'undefined' && sessionStorage.getItem('hasSeenIntro') === 'true');
   const reduced = usePreferredMotion();
   const isLite = mounted && (window as any).__LITE;
   const [isMobile, setIsMobile] = useState(false);
@@ -108,36 +107,12 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     setIsMobile(window.matchMedia('(hover: none)').matches);
   }, [mounted]);
 
-  // ── Scroll Visibility for DNAHelix ──
-  useEffect(() => {
-    if (!mounted) return;
-    const handleScroll = () => {
-      const aboutSection = document.getElementById('about');
-      const valuesSection = document.getElementById('values'); // Was 'philosophy', updated to match ID
-      
-      const vh = window.innerHeight;
-
-      if (aboutSection) {
-        const rect = aboutSection.getBoundingClientRect();
-        // Hide if ANY part of the about section is visible
-        setIsAboutVisible(rect.top < vh && rect.bottom > 0);
-      }
-      
-      if (valuesSection) {
-        // We no longer hide the DNA in the Philosophy section
-        setIsPhilosophyVisible(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    // Initial call
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [mounted]);
+  const [activeSection, setActiveSection] = useState('hero');
   const greeting = useGreeting(t.times, t.greetingFn);
   const { repos, top3, load, offline, errorMsg } = initialGitHubData;
 
   // ── Custom Hooks ────────────────────────────────────────────────────────
-  useSectionObserver(ready, t, navInner, indRef, activeLinkRef);
+  useSectionObserver(ready, t, navInner, indRef, activeLinkRef, setActiveSection);
   useScrollReveal(ready);
 
   // ── Effects ─────────────────────────────────────────────────────────────
@@ -227,35 +202,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     ScrollTrigger.refresh();
   }, [ready]);
 
-  // Find the color of the currently expanded project
-  const expandedProjectColor = expandedIdx !== null && top3[expandedIdx] 
-    ? (top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'ana-peluquera' ? '#ff2d78' :
-       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'who-are-ya-backend' ? '#00c940' :
-       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'rides24ofiziala' ? '#e69400' :
-       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'spotshare-parking' ? '#00d4e8' :
-       top3[expandedIdx].name.toLowerCase().replace(/[\s_]+/g, '-') === 'pke_web' ? '#9b1fff' : null)
-    : null;
-
-  // ── DNA Color Sync ──
-  const [dnaColors, setDnaColors] = useState({ 
-    accent: isDark ? '#FFFFFF' : '#000', 
-    secondary: isDark ? '#E4E4E7' : '#555' 
-  });
-  const dnaRef = useRef(dnaColors);
-
-  useEffect(() => {
-    const targetAccent = expandedProjectColor || (isDark ? '#FFFFFF' : '#000');
-    // Maximum intensity for interactions
-    const targetSecondary = expandedProjectColor || (isDark ? '#E4E4E7' : '#555');
-
-    gsap.to(dnaRef.current, {
-      accent: targetAccent,
-      secondary: targetSecondary,
-      duration: 1.2,
-      ease: 'sine.inOut',
-      onUpdate: () => setDnaColors({ ...dnaRef.current })
-    });
-  }, [expandedProjectColor, isDark]);
 
   useEffect(() => {
     if (!ready) return;
@@ -399,15 +345,33 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     }
   }, []);
 
+  // ── DNA Colors Logic ──
+  const dnaColors = useMemo(() => {
+    const isDarkLocal = theme === 'dark' || resolvedTheme === 'dark';
+    const PROJ_COLORS: Record<string, string> = {
+      'ana-peluquera': '#ff2d78',
+      'who-are-ya-backend': '#00c940',
+      'rides24ofiziala': '#e69400',
+      'spotshare-parking': '#00d4e8',
+      'pke_web': '#9b1fff',
+    };
+
+    if (activeSection === 'work') {
+      if (hoveredProject) return { accent: hoveredProject.color, secondary: isDarkLocal ? '#111' : '#ccc' };
+      if (expandedIdx !== null && top3[expandedIdx]) {
+        const pColor = PROJ_COLORS[top3[expandedIdx].n] || (isDarkLocal ? '#0066ff' : '#0044cc');
+        return { accent: pColor, secondary: isDarkLocal ? '#111' : '#ccc' };
+      }
+    }
+    return { accent: isDarkLocal ? '#0066ff' : '#0044cc', secondary: isDarkLocal ? '#111' : '#ccc' };
+  }, [activeSection, hoveredProject, expandedIdx, top3, theme, resolvedTheme]);
+
   // ── Phase Handlers ──────────────────────────────────────────────────────
   const onPreloaderDone = useCallback(() => setPhase('splash'), [setPhase]);
   const onSplashComplete = useCallback(() => {
     setPhase('ready');
     markSeen();
   }, [setPhase, markSeen]);
-
-  // We no longer return null during 'checking' to avoid white screen flashes.
-  // Instead, the main content is hidden via CSS visibility/opacity until ready.
 
   return (
     <>
@@ -423,62 +387,40 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         </>
       )}
 
+      {/* 🧬 DNA Background — Deepest Layer */}
       {ready && !isLite && !reduced && (
-        <>
-          {/* Enhanced DNA Helix Visibility */}
-          <div 
-            className="fixed inset-0 pointer-events-none z-[30] flex items-center justify-center overflow-hidden transition-all duration-400" 
-            style={{ 
-              perspective: '1200px',
-              opacity: (isAboutVisible || isPhilosophyVisible) ? 0 : 1,
-              visibility: (isAboutVisible || isPhilosophyVisible) ? 'hidden' : 'visible'
+        <div className="fixed inset-0 pointer-events-none z-[10]">
+          <div
+            className="helix-group will-change-transform"
+            style={{
+              width: '100vw', height: '240vh',
+              opacity: expandedIdx !== null ? 1.0 : (hoveredProject ? 0.8 : (isDark ? 0.65 : 0.35)),
+              transformStyle: 'preserve-3d',
+              willChange: 'transform'
             }}
-            aria-hidden="true"
+            ref={(el) => {
+              if (el) {
+                el.style.transform = `rotateY(${tilt.x * 12}deg) rotateX(${-tilt.y * 12}deg)`;
+              }
+            }}
           >
-            <div
-              className="helix-group will-change-transform"
-              style={{
-                width: '100vw', height: '240vh',
-                // Full opacity only for expanded. Hover gets a subtle 0.8 boost.
-                opacity: expandedIdx !== null ? 1.0 : (hoveredProject ? 0.8 : (isDark ? 0.65 : 0.35)),
-                transformStyle: 'preserve-3d',
-                willChange: 'transform'
-              }}
-              ref={(el) => {
-                if (el) {
-                  // Direct manipulation for the tilt effect (performance optimized)
-                  el.style.transform = `rotateY(${tilt.x * 12}deg) rotateX(${-tilt.y * 12}deg)`;
-                }
-              }}
-            >
-              <DNAHelix 
-                accent={dnaColors.accent} 
-                secondary={dnaColors.secondary} 
-                darkMode={isDark} 
-              />
-            </div>
+            <DNAHelix 
+              accent={dnaColors.accent} 
+              secondary={dnaColors.secondary} 
+              darkMode={isDark} 
+            />
           </div>
-          <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.05]" aria-hidden="true">
-            <TerrainMesh accent={isDark ? '#00A3FF' : 'currentColor'} darkMode={isDark} />
-          </div>
-        </>
+        </div>
       )}
 
-      {cmd && (
-        <CmdModal lang={lang} setLang={setLang} onClose={() => setCmd(false)} t={t} />
-      )}
-
-
+      {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
         ref={main}
         id="main-content"
-        className="relative"
+        className="relative z-[50]"
         style={{
           visibility: ready ? 'visible' : 'hidden',
           opacity:    ready ? 1 : 0,
-          height:     ready ? 'auto' : 0,
-          overflow:   ready ? 'visible' : 'hidden',
-          pointerEvents: ready ? 'auto' : 'none',
         }}
       >
         <Navbar 
@@ -494,7 +436,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         />
 
         <MemoHero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} phase={phase} />
-        <MemoSkills t={t} />
+        <MemoAbout t={t} />
         <MemoProjects 
           t={t} 
           top3={top3} 
@@ -507,12 +449,16 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           expandedIdx={expandedIdx}
           onToggleProject={setExpandedIdx}
         />
-        <MemoAbout t={t} />
+        <MemoSkills t={t} />
         <MemoPhilosophy t={t} />
         <MemoContact t={t} />
         <MemoFooter t={t} />
         {!isMobile && <ProjectPreviewFollower activeProject={hoveredProject} />}
       </main>
+
+      {cmd && (
+        <CmdModal lang={lang} setLang={setLang} onClose={() => setCmd(false)} t={t} />
+      )}
 
       <MobileMenu 
         menu={menu} 

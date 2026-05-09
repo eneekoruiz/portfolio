@@ -494,18 +494,18 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                     setIsPrefetched(true);
                   }
                 }}
-                className={`relative z-10 mt-4 flex items-center justify-between px-5 py-[11px] rounded-full shadow-md transition-all duration-200 text-white ${
-                  isNavigating ? 'cursor-wait opacity-80' : 'hover:scale-[1.025] active:scale-95'
+                className={`relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.15)] transition-all duration-300 text-white font-black ${
+                  isNavigating ? 'cursor-wait opacity-70' : 'hover:scale-[1.05] hover:shadow-[0_12px_30px_rgba(0,0,0,0.2)] active:scale-95'
                 }`}
                 style={{ backgroundColor: theme.color }}
               >
-                <span className="font-bold text-[10px] uppercase tracking-[0.24em] flex items-center gap-2">
-                  <Activity size={12} className={isNavigating ? '' : 'animate-pulse'} />
+                <span className="text-[11px] uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Activity size={14} className={isNavigating ? '' : 'animate-pulse'} />
                   {isNavigating ? 'CARGANDO...' : theme.btnText}
                 </span>
                 {isNavigating
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  : <ArrowRight className="w-3.5 h-3.5" />
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <ArrowRight className="w-4 h-4" />
                 }
               </a>
             ) : (
@@ -514,16 +514,13 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                 target="_blank" rel="noopener noreferrer"
                 onMouseEnter={() => onHoverProject({ name: proj.name, color: theme.color })}
                 onMouseLeave={() => onHoverProject(null)}
-                className="relative z-10 mt-4 flex items-center justify-between px-5 py-[11px] rounded-full border hover:scale-[1.025] active:scale-95 transition-all duration-200"
-                style={{
-                  borderColor: `${theme.color}40`,
-                  color:       theme.color,
-                }}
+                className="relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.1)] hover:scale-[1.05] hover:shadow-[0_12px_30px_rgba(0,0,0,0.15)] active:scale-95 transition-all duration-300 text-white font-black"
+                style={{ backgroundColor: theme.color }}
               >
-                <span className="font-bold text-[10px] uppercase tracking-[0.24em] flex items-center gap-2">
-                  <Code2 size={12} /> {theme.btnText}
+                <span className="text-[11px] uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Code2 size={14} /> {theme.btnText}
                 </span>
-                <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
+                <ArrowUpRight className="w-4 h-4" />
               </a>
             )}
           </div>
@@ -671,24 +668,29 @@ export function Projects({
 
       const rows = gsap.utils.toArray<HTMLElement>('.work-row-anim');
       if (rows.length > 0) {
-        const skewSetter = gsap.quickTo(rows, 'skewY', {
-          duration: 0.4,
-          ease: 'power3.out',
-        });
+        // 🌊 EFECTO OLA: Más intenso y fluido
+        const skewSetter = gsap.quickTo(rows, 'skewY', { duration: 0.4, ease: 'power2.out' });
+        const ySetter = gsap.quickTo(rows, 'y', { duration: 0.5, ease: 'power2.out' });
 
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: 'top bottom',
           end: 'bottom top',
           onUpdate: (self) => {
-            const velocity = self.getVelocity();
-            const skew = gsap.utils.clamp(-2.5, 2.5, velocity / 400);
+            const v = self.getVelocity();
+            // Aumentamos la intensidad: de /400 a /180
+            const skew = gsap.utils.clamp(-6, 6, v / 180);
+            const yOffset = gsap.utils.clamp(-20, 20, v / 100);
+            
             skewSetter(skew);
+            ySetter(yOffset);
           },
         });
 
+        // Recuperación suave al detener el scroll
         ScrollTrigger.addEventListener('scrollEnd', () => {
           skewSetter(0);
+          ySetter(0);
         });
       }
     });

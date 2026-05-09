@@ -11,7 +11,7 @@ interface SectionMap {
   c: string;
 }
 
-export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.RefObject<HTMLDivElement>, indRef: React.RefObject<HTMLDivElement>, activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>) {
+export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.RefObject<HTMLDivElement>, indRef: React.RefObject<HTMLDivElement>, activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>, onSectionChange?: (id: string) => void) {
   useEffect(() => {
     if (!ready) return;
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
@@ -53,6 +53,9 @@ export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.Ref
         if (!link || !indRef.current || !navInnerRef.current) return;
 
         activeLinkRef.current = link;
+        const id = t.hrefs[idx].replace('#', '');
+        if (onSectionChange) onSectionChange(id);
+
         const r = link.getBoundingClientRect();
         const nr = navInnerRef.current.getBoundingClientRect();
         gsap.to(indRef.current, {

@@ -57,41 +57,37 @@ export function About({ t }: { t: Tx }) {
   };
 
   return (
-    // 📱 DIETA: Padding optimizado para móvil
-    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 px-6 md:py-40 md:px-8 max-w-[1200px] mx-auto overflow-hidden bg-[var(--page)]">
-      
-      <NetworkParticles />
+    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden bg-page">
+      <div className="px-6 md:px-8 max-w-[1200px] mx-auto relative z-10">
+        <NetworkParticles />
 
-      <div className="relative z-10">
-        <div className="about-reveal">
-          <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-brand mb-4">{t.abLb}</p>
-          <h2 className="font-black text-[clamp(2.5rem,6vw,4.5rem)] tracking-tight leading-none mb-8 md:mb-12 text-ink dark:text-white">
-            {t.abH}
-          </h2>
-        </div>
-        
-        {/* 📱 DIETA: Línea oculta en móvil */}
-        <hr className="about-reveal hidden md:block border-none h-px bg-black/10 dark:bg-white/10 mb-12 max-w-3xl" />
+        <div className="relative z-10">
+          <div className="about-reveal">
+            <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-brand mb-4">{t.abLb}</p>
+            <h2 className="font-black text-[clamp(2.5rem,6vw,4.5rem)] tracking-tight leading-none mb-8 md:mb-12 text-ink">
+              {t.abH}
+            </h2>
+          </div>
+          
+          <hr className="about-reveal hidden md:block border-none h-px bg-black/10 dark:bg-white/10 mb-12 max-w-3xl" />
 
-        {/* 📱 DIETA: Margen inferior reducido en móvil si no hay tarjetas debajo */}
-        <div ref={textContainerRef} className="max-w-4xl mb-0 md:mb-24">
-          <p className="font-medium text-[clamp(1.2rem,2.5vw,1.8rem)] leading-[1.4] text-slate-800 dark:text-slate-200">
-            {/* Llamamos a la nueva función de palabras */}
-            {renderMaskedWords(t.mf)}
-          </p>
-        </div>
+          <div ref={textContainerRef} className="max-w-4xl mb-0 md:mb-24">
+            <p className="font-medium text-[clamp(1.2rem,2.5vw,1.8rem)] leading-[1.4] text-slate-800 dark:text-slate-200">
+              {renderMaskedWords(t.mf)}
+            </p>
+          </div>
 
-        {/* 🚀 LA CLAVE MÓVIL: Grid visible en todos los tamaños, 1 col en móvil, 3 en md */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 about-reveal">
-          {t.metrics.map(([v, l]) => (
-            <div 
-              key={l} 
-              className="p-8 md:p-10 rounded-3xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-xl block"
-            >
-              <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">{v}</div>
-              <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{l}</p>
-            </div>
-          ))}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 about-reveal">
+            {t.metrics.map(([v, l]) => (
+              <div 
+                key={l} 
+                className="p-8 md:p-10 rounded-3xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-xl block"
+              >
+                <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">{v}</div>
+                <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{l}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

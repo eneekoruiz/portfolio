@@ -121,8 +121,8 @@ export function BinaryStreamBtn({
   useEffect(() => () => { clearInterval(ivRef.current); clearInterval(bvRef.current); clearTimeout(toRef.current); }, []);
 
   const baseIdle = variant === 'dark'
-    ? 'bg-ink text-page shadow-[0_10px_32px_rgba(0,0,0,.18)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,0,0,.25)]'
-    : 'bg-white/65 dark:bg-white/[0.06] border border-black/9 dark:border-white/10 text-ink hover:bg-ink hover:text-page backdrop-blur-[18px]';
+    ? 'bg-ink text-page shadow-[0_10px_32px_rgba(0,0,0,.2)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,0,0,.3)]'
+    : 'bg-brand text-white shadow-[0_10px_32px_rgba(0,102,255,.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,102,255,.45)]';
 
   return (
     <button
@@ -135,8 +135,8 @@ export function BinaryStreamBtn({
         'relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full',
         'font-bold text-[14px] tracking-[-0.2px] overflow-hidden',
         'transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]',
-        state === 'done'      ? 'bg-[#34c759] text-white border-none scale-[1.02]'
-        : state === 'animating' ? 'border border-brand/40 text-ink dark:text-page bg-transparent scale-[1.01]'
+        state === 'done'      ? 'bg-[#34c759] text-white scale-[1.02]'
+        : state === 'animating' ? 'bg-ink text-page scale-[1.01]'
         : [baseIdle, 'hover:scale-[1.05]'].join(' '),
         'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none',
         className ?? '',
@@ -145,17 +145,17 @@ export function BinaryStreamBtn({
       {state === 'animating' && (
         <div aria-hidden="true" className="absolute inset-0 rounded-full pointer-events-none"
           style={{ padding: '2px',
-            background: `conic-gradient(from -90deg, #0066ff ${progress * 3.6}deg, transparent ${progress * 3.6}deg)`,
+            background: `conic-gradient(from -90deg, #fff ${progress * 3.6}deg, transparent ${progress * 3.6}deg)`,
             WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
             WebkitMaskComposite: 'xor', maskComposite: 'exclude' }} />
       )}
       {bits.map(b => (
-        <span key={b.id} className="btn-bit" aria-hidden="true"
+        <span key={b.id} className="btn-bit !text-white" aria-hidden="true"
           style={{ left: `${b.x}%`, top: `${b.y}%`, animationDelay: '0ms' }}>{b.v}</span>
       ))}
       {showRipple && <span className="btn-done-ripple bg-[rgba(52,199,89,.35)]" aria-hidden="true" />}
       {state === 'idle'      && <><ArrowUpRight size={14} aria-hidden="true" />{label}</>}
-      {state === 'animating' && <><span className="font-mono text-[11px] tracking-wider text-brand animate-pulse">01</span>{label}…</>}
+      {state === 'animating' && <><span className="font-mono text-[11px] tracking-wider text-white animate-pulse">01</span>{label}…</>}
       {state === 'done'      && <><Check size={15} aria-hidden="true" />OK</>}
     </button>
   );
@@ -196,8 +196,8 @@ export function BranchMergeBtn({ label, href = 'https://github.com/eneekoruiz' }
         'font-bold text-[13px] tracking-[-0.2px]',
         'transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]',
         state === 'done'
-          ? 'bg-ink text-page scale-[1.02]'
-          : 'bg-white/65 dark:bg-white/[0.06] backdrop-blur-[18px] border border-black/9 dark:border-white/10 text-lead hover:bg-ink hover:text-page hover:scale-[1.02]',
+          ? 'bg-[#34c759] text-white scale-[1.02]'
+          : 'bg-ink text-page shadow-[0_8px_28px_rgba(0,0,0,.2)] hover:bg-black hover:text-white hover:scale-[1.02] hover:shadow-[0_12px_40px_rgba(0,0,0,.3)]',
         'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none',
       ].join(' ')}
     >
@@ -243,11 +243,11 @@ export function PortalWarpBtn({ className }: { className?: string }) {
       data-h
       aria-label="The Lab — Physics Playground"
       className={[
-        'relative flex items-center gap-1.5 px-[.85rem] py-[.45rem] rounded-[9px] overflow-hidden',
-        'border border-brand/20 bg-brand/5 dark:bg-brand/10',
-        'text-[11px] font-bold text-brand tracking-[.08em]',
-        'transition-all duration-200',
-        state === 'idle' ? 'hover:bg-brand/15 dark:hover:bg-brand/20 hover:shadow-[0_0_12px_rgba(0,102,255,0.3)]' : 'scale-[0.97]',
+        'relative flex items-center gap-1.5 px-[1.2rem] py-[.65rem] rounded-[12px] overflow-hidden',
+        'bg-brand text-white shadow-lg',
+        'text-[11px] font-black tracking-[.15em]',
+        'transition-all duration-300',
+        state === 'idle' ? 'hover:scale-105 hover:shadow-brand/30' : 'scale-[0.95]',
         'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none',
         className ?? '',
       ].join(' ')}
