@@ -240,21 +240,21 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     accent: isDark ? '#FFFFFF' : '#000', 
     secondary: isDark ? '#E4E4E7' : '#555' 
   });
+  const dnaRef = useRef(dnaColors);
 
   useEffect(() => {
-    // Only color the DNA if a project is actually EXPANDED. 
-    // Hovering now only gives a subtle opacity boost without changing the natural color.
     const targetAccent = expandedProjectColor || (isDark ? '#FFFFFF' : '#000');
+    // Maximum intensity for interactions
     const targetSecondary = expandedProjectColor || (isDark ? '#E4E4E7' : '#555');
 
-    gsap.to(dnaColors, {
+    gsap.to(dnaRef.current, {
       accent: targetAccent,
       secondary: targetSecondary,
       duration: 1.2,
       ease: 'sine.inOut',
-      onUpdate: () => setDnaColors({ ...dnaColors })
+      onUpdate: () => setDnaColors({ ...dnaRef.current })
     });
-  }, [hoveredProject, expandedProjectColor, isDark]);
+  }, [expandedProjectColor, isDark]);
 
   useEffect(() => {
     if (!ready) return;
