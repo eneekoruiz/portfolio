@@ -188,22 +188,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     return () => window.removeEventListener('keydown', h, { capture: true });
   }, []);
 
-  // Mobile menu items animation
-  useEffect(() => {
-    menuRefs.current.forEach((el, i) => {
-      if (!el) return;
-      if (reduced) {
-        gsap.set(el, { y: menu ? 0 : '112%' });
-        return;
-      }
-      gsap.to(el, {
-        y: menu ? 0 : '112%',
-        duration: 0.34,
-        delay: menu ? i * 0.04 : 0,
-        ease: 'power4.out',
-      });
-    });
-  }, [menu, reduced]);
+  // Mobile menu items animation (Handled by CSS in MobileMenu.tsx for better reliability)
 
   // Scroll restoration / Return transition
   useLayoutEffect(() => {
