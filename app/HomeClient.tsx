@@ -351,17 +351,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       .to('.h-fd', { opacity: 1, y: 0, duration: 0.24, stagger: 0.025 }, '-=0.18')
       .to('.memoji', { opacity: 1, x: 0, duration: 0.42, ease: 'power3.out' }, '-=0.3');
 
-    // DNA Helix rotation
-    gsap.to('.helix-group', {
-      rotateY: 360,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: main.current,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1.5,
-      }
-    });
+    // DNA Helix rotation (Now handled internally by DNAHelix component for better performance)
+    // Removed redundant GSAP scroll-bound rotation to avoid jitter
   }, { scope: main, dependencies: [ready, reduced] });
 
   useLayoutEffect(() => {
@@ -448,10 +439,11 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
                 // Full opacity only for expanded. Hover gets a subtle 0.8 boost.
                 opacity: expandedIdx !== null ? 1.0 : (hoveredProject ? 0.8 : (isDark ? 0.65 : 0.35)),
                 transformStyle: 'preserve-3d',
-                transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)' // Smoother CSS transition
+                willChange: 'transform'
               }}
               ref={(el) => {
                 if (el) {
+                  // Direct manipulation for the tilt effect (performance optimized)
                   el.style.transform = `rotateY(${tilt.x * 12}deg) rotateX(${-tilt.y * 12}deg)`;
                 }
               }}

@@ -13,6 +13,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
   const scrollRef = useRef(0);
   const rotationRef = useRef(0);
   const activeRef = useRef(false);
+  const smoothedScrollRef = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,10 +54,13 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
       
       const steps = 60;
       const speed = 0.008; 
-      const scrollImpact = scrollRef.current * 0.0012; 
-      rotationRef.current += speed;
       
-      const baseRotation = rotationRef.current + scrollImpact;
+      // Interpolate scroll for extra smoothness
+      const targetScrollImpact = scrollRef.current * 0.0012;
+      smoothedScrollRef.current += (targetScrollImpact - smoothedScrollRef.current) * 0.1;
+      
+      rotationRef.current += speed;
+      const baseRotation = rotationRef.current + smoothedScrollRef.current;
 
       // Draw Strands
       for (let s = 0; s < 2; s++) {
