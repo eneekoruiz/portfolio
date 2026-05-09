@@ -238,15 +238,15 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   // ── DNA Color Sync ──
   const [dnaColors, setDnaColors] = useState({ 
     accent: isDark ? '#FFFFFF' : '#000', 
-    secondary: isDark ? '#A1A1AA' : '#555' 
+    secondary: isDark ? '#E4E4E7' : '#555' 
   });
 
   useEffect(() => {
     const targetAccent = hoveredProject?.color || expandedProjectColor || (isDark ? '#FFFFFF' : '#000');
-    // Increased alpha for more intensity (CC = 80%, AA = 66%)
+    // Maximum intensity for interactions
     const targetSecondary = hoveredProject 
-      ? `${hoveredProject.color}CC` 
-      : (expandedProjectColor ? `${expandedProjectColor}AA` : (isDark ? '#A1A1AA' : '#555'));
+      ? hoveredProject.color 
+      : (expandedProjectColor ? expandedProjectColor : (isDark ? '#E4E4E7' : '#555'));
 
     gsap.to(dnaColors, {
       accent: targetAccent,
@@ -447,7 +447,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               className="helix-group will-change-transform"
               style={{
                 width: '100vw', height: '240vh',
-                opacity: (hoveredProject || expandedIdx !== null) ? 0.95 : (isDark ? 0.65 : 0.35),
+                opacity: (hoveredProject || expandedIdx !== null) ? 1.0 : (isDark ? 0.65 : 0.35),
                 transformStyle: 'preserve-3d',
                 transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)' // Smoother CSS transition
               }}
