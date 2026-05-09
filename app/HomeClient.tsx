@@ -242,11 +242,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   });
 
   useEffect(() => {
-    const targetAccent = hoveredProject?.color || expandedProjectColor || (isDark ? '#FFFFFF' : '#000');
-    // Maximum intensity for interactions
-    const targetSecondary = hoveredProject 
-      ? hoveredProject.color 
-      : (expandedProjectColor ? expandedProjectColor : (isDark ? '#E4E4E7' : '#555'));
+    // Only color the DNA if a project is actually EXPANDED. 
+    // Hovering now only gives a subtle opacity boost without changing the natural color.
+    const targetAccent = expandedProjectColor || (isDark ? '#FFFFFF' : '#000');
+    const targetSecondary = expandedProjectColor || (isDark ? '#E4E4E7' : '#555');
 
     gsap.to(dnaColors, {
       accent: targetAccent,
@@ -447,7 +446,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               className="helix-group will-change-transform"
               style={{
                 width: '100vw', height: '240vh',
-                opacity: (hoveredProject || expandedIdx !== null) ? 1.0 : (isDark ? 0.65 : 0.35),
+                // Full opacity only for expanded. Hover gets a subtle 0.8 boost.
+                opacity: expandedIdx !== null ? 1.0 : (hoveredProject ? 0.8 : (isDark ? 0.65 : 0.35)),
                 transformStyle: 'preserve-3d',
                 transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)' // Smoother CSS transition
               }}
