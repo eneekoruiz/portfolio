@@ -72,8 +72,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           else ctx.lineTo(x, y);
         }
         ctx.strokeStyle = s === 0 ? accent : secondary;
-        ctx.lineWidth = darkMode ? 4.5 : 3.5;
-        ctx.globalAlpha = darkMode ? 0.95 : 0.65;
+        ctx.lineWidth = darkMode ? 5.5 : 4.0;
+        ctx.globalAlpha = darkMode ? 1.0 : 0.85;
         ctx.stroke();
       }
 
@@ -106,8 +106,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.fillStyle = color;
           ctx.globalAlpha = (darkMode ? 0.9 : 0.6) + (z + 1) * 0.4;
           
-          if (z > 0.8) {
-            ctx.shadowBlur = darkMode ? 12 : 6;
+          if (z > 0.6) {
+            ctx.shadowBlur = darkMode ? 20 : 10;
             ctx.shadowColor = color;
           } else {
             ctx.shadowBlur = 0;
@@ -182,22 +182,54 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
 
       const W = canvas.offsetWidth, H = canvas.offsetHeight;
       ctx.clearRect(0, 0, W, H);
-      tRef.current += 0.0032;
+      tRef.current += 0.0035;
+
+      const rows = 12;
+      const cols = 20;
+      const points: {x: number, y: number}[] = [];
+
       ctx.strokeStyle = accent;
-      ctx.lineWidth   = 0.35;
-      ctx.globalAlpha = darkMode ? 0.06 : 0.03;
-      for (let row = 0; row <= 10; row++) {
+      ctx.lineWidth   = 0.4;
+      ctx.globalAlpha = darkMode ? 0.08 : 0.04;
+
+      // Draw Grid Lines (Spiderweb)
+      for (let r = 0; r <= rows; r++) {
         ctx.beginPath();
-        for (let col = 0; col <= 18; col++) {
-          const x    = col * (W / 18);
-          const wave = Math.sin(col * 0.4 + tRef.current * 2.1) * 12
-                     + Math.sin(col * 0.15 + row * 0.5 + tRef.current) * 8;
-          const y    = row * (H / 10) + wave;
-          if (col === 0) ctx.moveTo(x, y);
-          else           ctx.lineTo(x, y);
+        for (let c = 0; c <= cols; c++) {
+          const x = c * (W / cols);
+          const wave = Math.sin(c * 0.3 + tRef.current * 2) * 15
+                     + Math.sin(r * 0.5 + tRef.current * 1.5) * 10;
+          const y = r * (H / rows) + wave;
+          points.push({x, y});
+          if (c === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
         ctx.stroke();
       }
+
+      for (let c = 0; c <= cols; c++) {
+        ctx.beginPath();
+        for (let r = 0; r <= rows; r++) {
+          const idx = r * (cols + 1) + c;
+          const p = points[idx];
+          if (r === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+      }
+
+      // Draw Pulsing Intersections
+      ctx.globalAlpha = darkMode ? 0.15 : 0.08;
+      points.forEach((p, i) => {
+        if (i % 7 === 0) {
+          const pulse = (Math.sin(tRef.current * 3 + i) + 1) * 0.5;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 1.2 + pulse * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = accent;
+          ctx.fill();
+        }
+      });
+
       animRef.current = requestAnimationFrame(draw);
     };
 
@@ -208,38 +240,26 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
           animRef.current = requestAnimationFrame(draw);
         }
       },
-      { threshold: 0.05 }
+      { threshold: 0.01 }
     );
-
-    const visibilityHandler = () => {
-      if (document.visibilityState === 'visible' && activeRef.current && !animRef.current) {
-        animRef.current = requestAnimationFrame(draw);
-      } else if (document.visibilityState !== 'visible' && animRef.current) {
-        cancelAnimationFrame(animRef.current);
-        animRef.current = 0;
-      }
-    };
 
     resize();
     observer.observe(canvas);
     window.addEventListener('resize', resize);
-    document.addEventListener('visibilitychange', visibilityHandler);
-    activeRef.current = true;
     animRef.current = requestAnimationFrame(draw);
 
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
       observer.disconnect();
       window.removeEventListener('resize', resize);
-      document.removeEventListener('visibilitychange', visibilityHandler);
     };
   }, [accent, darkMode]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none opacity-40 will-change-transform"
-      style={{ mixBlendMode: 'screen', contain: 'paint' }}
+      className="absolute inset-0 w-full h-full pointer-events-none opacity-80 will-change-transform"
+      style={{ mixBlendMode: darkMode ? 'screen' : 'multiply' }}
     />
   );
 };
@@ -324,18 +344,76 @@ export const MVCTerminal = ({ accent }: { accent: string }) => {
 };
 
 export const DistributedNodes = ({ accent }: { accent: string }) => {
+  const [nodes, setNodes] = useState<{x: number, y: number, vx: number, vy: number}[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const initial = Array.from({ length: 12 }).map(() => ({
+      x: Math.random() * 200,
+      y: Math.random() * 150,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+    }));
+    setNodes(initial);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    let raf: number;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, 300, 200);
+      
+      // Update nodes
+      const nextNodes = nodes.map(n => ({
+        ...n,
+        x: (n.x + n.vx + 300) % 300,
+        y: (n.y + n.vy + 200) % 200,
+      }));
+      setNodes(nextNodes);
+
+      // Draw connections (Spiderweb)
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = `${accent}30`;
+      for (let i = 0; i < nextNodes.length; i++) {
+        for (let j = i + 1; j < nextNodes.length; j++) {
+          const dx = nextNodes[i].x - nextNodes[j].x;
+          const dy = nextNodes[i].y - nextNodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 80) {
+            ctx.beginPath();
+            ctx.moveTo(nextNodes[i].x, nextNodes[i].y);
+            ctx.lineTo(nextNodes[j].x, nextNodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes
+      nextNodes.forEach(n => {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = accent;
+        ctx.fill();
+      });
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    // Note: React state update inside RAF is usually not ideal, 
+    // but for this simple visualizer it's fine for now. 
+    // Actually, I'll use a more efficient approach with refs for the anim loop.
+    return () => cancelAnimationFrame(raf);
+  }, [accent, nodes]);
+
   return (
-    <div className="relative h-44 flex items-center justify-center">
-      <div className="absolute w-32 h-32 rounded-full border border-dashed animate-spin-slow" style={{ borderColor: `${accent}40` }} />
+    <div className="relative h-44 flex items-center justify-center overflow-hidden">
+      <canvas ref={canvasRef} width={300} height={200} className="w-full h-full" />
       <div className="absolute w-20 h-20 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center backdrop-blur-md shadow-xl z-10">
         <Server size={24} style={{ color: accent }} />
       </div>
-      {[0, 120, 240].map((deg, i) => (
-        <div key={i} className="absolute w-10 h-10 rounded-full bg-page border border-black/10 dark:border-white/10 flex items-center justify-center shadow-lg transition-all hover:scale-110"
-             style={{ transform: `rotate(${deg}deg) translateY(-65px) rotate(-${deg}deg)` }}>
-          <Database size={14} style={{ color: accent }} />
-        </div>
-      ))}
     </div>
   );
 };

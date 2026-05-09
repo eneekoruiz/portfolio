@@ -125,11 +125,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       aria-live="polite"
       aria-busy={n < 100}
     >
-      {/* ── Grid Background ── */}
+      {/* ── Grid Background (Linear) ── */}
       <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(var(--ink) 1px, transparent 1px)`,
+          backgroundImage: `
+            linear-gradient(var(--line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--line) 1px, transparent 1px)
+          `,
           backgroundSize: '40px 40px',
         }}
         aria-hidden="true"
@@ -162,25 +165,26 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         }}
       />
 
-      {/* ── Main Counter ── */}
-      <div className="relative z-10 flex flex-col items-center">
+      {/* ── Main Counter (Perfectly Centered) ── */}
+      <div className="relative z-10 flex flex-col items-center justify-center">
         <div
           ref={numRef}
-          className="font-black text-[clamp(7rem,22vw,16rem)] tracking-[-0.08em] leading-none mb-4 select-none mix-blend-difference will-change-transform"
+          className="font-black text-[clamp(7rem,22vw,16rem)] tracking-[-0.08em] leading-none select-none mix-blend-difference will-change-transform"
           style={{ 
             color: 'var(--ink)',
             backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden'
+            WebkitBackfaceVisibility: 'hidden',
+            transformOrigin: 'center center'
           }}
           aria-label={`${n} percent loaded`}
         >
           {n}
         </div>
 
-        {/* ── Progress Bar (Minimalist) ── */}
+        {/* ── Progress Bar (Positioned below center) ── */}
         <div 
           ref={barContainerRef}
-          className="flex flex-col items-center gap-4 opacity-40"
+          className="absolute top-[120%] flex flex-col items-center gap-4 opacity-40"
           role="progressbar"
           aria-valuenow={n}
           aria-valuemin={0}

@@ -58,7 +58,7 @@ export function About({ t }: { t: Tx }) {
 
   return (
     // 📱 DIETA: Padding optimizado para móvil
-    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 px-6 md:py-40 md:px-8 max-w-[1200px] mx-auto overflow-hidden">
+    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 px-6 md:py-40 md:px-8 max-w-[1200px] mx-auto overflow-hidden bg-[var(--page)]">
       
       <NetworkParticles />
 

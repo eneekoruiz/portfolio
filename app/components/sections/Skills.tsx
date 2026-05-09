@@ -222,11 +222,12 @@ export function Skills({ t }: SkillsProps) {
             <div key={card.h} className="skill-card-wrapper opacity-0" role="listitem">
               {/* TARJETA CHATA: h-[200px] y p-6 */}
               <div 
-                className="relative h-[200px] p-6 rounded-[28px] border shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-500 overflow-hidden group backdrop-blur-md"
+                className="relative h-[200px] p-6 rounded-[28px] border transition-all duration-500 overflow-hidden group backdrop-blur-[6px]"
                 style={{
-                  backgroundColor: isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.4)',
-                  backgroundImage: `linear-gradient(135deg, ${card.color}15 0%, transparent 100%)`,
-                  borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                  background: isDark 
+                    ? `linear-gradient(135deg, ${card.color}15 0%, rgba(0,0,0,0.2) 100%)` 
+                    : `linear-gradient(135deg, ${card.color}08 0%, rgba(255,255,255,0.4) 100%)`,
+                  borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
                 }}
               >
                 {/* Título de la tarjeta */}

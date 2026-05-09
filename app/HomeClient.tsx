@@ -94,10 +94,40 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const [hoveredProject, setHoveredProject] = useState<{ name: string; color: string } | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
+  const [isAboutVisible, setIsAboutVisible] = useState(false);
+  const [isPhilosophyVisible, setIsPhilosophyVisible] = useState(false);
+
   const isDark = mounted && theme === 'dark';
   const ready = phase === 'ready';
   const reduced = usePreferredMotion();
   const isLite = mounted && (window as any).__LITE;
+
+  // ── Scroll Visibility for DNAHelix ──
+  useEffect(() => {
+    if (!mounted) return;
+    const handleScroll = () => {
+      const aboutSection = document.getElementById('about');
+      const valuesSection = document.getElementById('values'); // Was 'philosophy', updated to match ID
+      
+      const vh = window.innerHeight;
+
+      if (aboutSection) {
+        const rect = aboutSection.getBoundingClientRect();
+        // Hide if ANY part of the about section is visible
+        setIsAboutVisible(rect.top < vh && rect.bottom > 0);
+      }
+      
+      if (valuesSection) {
+        const rect = valuesSection.getBoundingClientRect();
+        // Hide if ANY part of the values section is visible
+        setIsPhilosophyVisible(rect.top < vh && rect.bottom > 0);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Initial call
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [mounted]);
   const greeting = useGreeting(t.times, t.greetingFn);
   const { repos, top3, load, offline, errorMsg } = initialGitHubData;
 
@@ -201,13 +231,16 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   // ── DNA Color Sync ──
   const [dnaColors, setDnaColors] = useState({ 
-    accent: isDark ? '#00A3FF' : '#000', 
-    secondary: isDark ? '#0066CC' : '#555' 
+    accent: isDark ? '#FFFFFF' : '#000', 
+    secondary: isDark ? '#A1A1AA' : '#555' 
   });
 
   useEffect(() => {
-    const targetAccent = hoveredProject?.color || expandedProjectColor || (isDark ? '#00A3FF' : '#000');
-    const targetSecondary = hoveredProject ? `${hoveredProject.color}80` : (expandedProjectColor ? `${expandedProjectColor}60` : (isDark ? '#0066CC' : '#555'));
+    const targetAccent = hoveredProject?.color || expandedProjectColor || (isDark ? '#FFFFFF' : '#000');
+    // Increased alpha for more intensity (CC = 80%, AA = 66%)
+    const targetSecondary = hoveredProject 
+      ? `${hoveredProject.color}CC` 
+      : (expandedProjectColor ? `${expandedProjectColor}AA` : (isDark ? '#A1A1AA' : '#555'));
 
     gsap.to(dnaColors, {
       accent: targetAccent,
@@ -396,15 +429,19 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         <>
           {/* Enhanced DNA Helix Visibility */}
           <div 
-            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" 
-            style={{ perspective: '1200px' }}
+            className="fixed inset-0 pointer-events-none z-[30] flex items-center justify-center overflow-hidden transition-all duration-400" 
+            style={{ 
+              perspective: '1200px',
+              opacity: (isAboutVisible || isPhilosophyVisible) ? 0 : 1,
+              visibility: (isAboutVisible || isPhilosophyVisible) ? 'hidden' : 'visible'
+            }}
             aria-hidden="true"
           >
             <div
               className="helix-group will-change-transform"
               style={{
-                width: 'clamp(200px, 40vw, 500px)', height: '240vh',
-                opacity: hoveredProject ? 0.6 : (isDark ? 0.45 : 0.2),
+                width: '100vw', height: '240vh',
+                opacity: (hoveredProject || expandedIdx !== null) ? 0.95 : (isDark ? 0.65 : 0.35),
                 transformStyle: 'preserve-3d',
                 transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)' // Smoother CSS transition
               }}

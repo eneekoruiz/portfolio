@@ -54,12 +54,31 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef      = useRef<HTMLDivElement>(null);
   const lineRef      = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   // Stable refs to prevent stale closures in the timeline
   const onCompleteRef = useRef(onComplete);
   const onRevealRef   = useRef(onReveal);
   onCompleteRef.current = onComplete;
   onRevealRef.current   = onReveal;
+
+  // ── Spotlight Movement Animation ─────────────────────────────────────
+  useEffect(() => {
+    if (!spotlightRef.current || !active) return;
+    
+    const moveSpotlight = () => {
+      if (!spotlightRef.current) return;
+      gsap.to(spotlightRef.current, {
+        x: gsap.utils.random(-300, 300),
+        y: gsap.utils.random(-300, 300),
+        duration: gsap.utils.random(2, 4),
+        ease: 'sine.inOut',
+        onComplete: moveSpotlight
+      });
+    };
+    
+    moveSpotlight();
+  }, [active]);
 
   const word = WELCOME_TEXT[lang] ?? 'Welcome';
   useEffect(() => {
@@ -116,10 +135,36 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
     <div
       ref={containerRef}
       // z-[9998]: por encima de contenido
-      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center overflow-hidden"
       aria-hidden="true"
     >
-      <div className="flex flex-col items-center">
+      {/* ── Grid Background (Linear) ── */}
+      <div 
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(var(--line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--line) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* ── Moving Spotlight (Blue Flashlight) ── */}
+      <div
+        ref={spotlightRef}
+        className="absolute pointer-events-none z-0"
+        aria-hidden="true"
+        style={{
+          width: '500px',
+          height: '500px',
+          background: 'radial-gradient(circle, rgba(0,163,255,0.12) 0%, transparent 75%)',
+          filter: 'blur(70px)',
+        }}
+      />
+
+      <div className="flex flex-col items-center relative z-10">
         {/*
           Máscara de overflow: las letras "nacen" subiendo desde abajo
         */}

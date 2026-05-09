@@ -13,9 +13,10 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), []);
 
   const handleToggle = () => {
+    if (isAnimating) return;
     setIsAnimating(true);
     setTheme(theme === 'dark' ? 'light' : 'dark');
-    setTimeout(() => setIsAnimating(false), 450);
+    setTimeout(() => setIsAnimating(false), 500);
   };
 
   if (!mounted) return null;
@@ -25,42 +26,63 @@ export function ThemeToggle() {
       onClick={handleToggle}
       aria-label="Cambiar tema"
       data-h
-      className="relative flex items-center justify-center w-9 h-9 rounded-full bg-transparent hover:bg-black/5 dark:hover:bg-white/10 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black overflow-hidden"
+      className="group relative flex items-center justify-center w-9 h-9 rounded-xl bg-white/60 dark:bg-white/[0.06] border border-black/5 dark:border-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-110 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-brand overflow-hidden"
     >
+      {/* ── Background Glow Pulse ── */}
       <span
         aria-hidden="true"
-        className={`absolute inset-0 rounded-full transition-all duration-450 ${
-          isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+        className={`absolute inset-0 rounded-full transition-all duration-700 ${
+          isAnimating ? 'opacity-100 scale-150' : 'opacity-0 scale-50'
         }`}
         style={{
-          background: 'radial-gradient(circle, rgba(96,165,250,.22) 0%, rgba(96,165,250,0) 72%)',
+          background: isDark 
+            ? 'radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%)' 
+            : 'radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%)',
         }}
       />
-      <div className="relative w-4 h-4">
+
+      <div className="relative w-5 h-5 flex items-center justify-center">
+        {/* Sun Icon */}
         <Sun 
-          size={15} 
-          className={`absolute inset-0 transition-[opacity,transform] duration-300 drop-shadow-[0_0_10px_rgba(245,158,11,.22)] ${
+          size={16} 
+          strokeWidth={2.5}
+          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
             isDark
-              ? 'opacity-0 rotate-90 scale-90'
-              : 'opacity-100 rotate-0 scale-100'
+              ? 'opacity-0 -translate-y-8 rotate-45 scale-50'
+              : 'opacity-100 translate-y-0 rotate-0 scale-100 text-amber-500'
           }`}
           style={{
-            color: '#f59e0b',
-            transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+            filter: !isDark ? 'drop-shadow(0 0 8px rgba(245,158,11,0.6))' : 'none',
           }}
         />
+
+        {/* Moon Icon */}
         <Moon 
           size={15} 
-          className={`absolute inset-0 transition-[opacity,transform] duration-300 drop-shadow-[0_0_10px_rgba(255,255,255,.18)] ${
+          strokeWidth={2.5}
+          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
             isDark
-              ? 'opacity-100 rotate-0 scale-100'
-              : 'opacity-0 -rotate-90 scale-90'
+              ? 'opacity-100 translate-y-0 rotate-0 scale-100 text-blue-400'
+              : 'opacity-0 translate-y-8 -rotate-45 scale-50'
           }`}
           style={{
-            color: '#ffffff',
-            transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+            filter: isDark ? 'drop-shadow(0 0 8px rgba(56,189,248,0.5))' : 'none',
           }}
         />
+
+        {/* Decorative Rays for Sun (only visible in light mode) */}
+        <div 
+          className={`absolute inset-0 transition-opacity duration-300 ${isDark ? 'opacity-0' : 'opacity-20 group-hover:opacity-40 animate-spin-slow'}`}
+          aria-hidden="true"
+        >
+          {[...Array(6)].map((_, i) => (
+            <div 
+              key={i} 
+              className="absolute top-1/2 left-1/2 w-0.5 h-6 bg-amber-400 -translate-x-1/2 -translate-y-1/2" 
+              style={{ transform: `translate(-50%, -50%) rotate(${i * 60}deg)` }}
+            />
+          ))}
+        </div>
       </div>
     </button>
   );

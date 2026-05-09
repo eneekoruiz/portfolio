@@ -35,25 +35,27 @@ const IntroContext = createContext<IntroContextValue | null>(null);
 let hasSeenGlobal = false;
 
 export function IntroProvider({ children }: { children: React.ReactNode }) {
-  const [phase, setPhase] = useState<IntroPhase>('checking');
+  const [phase, setPhase] = useState<IntroPhase>(() => {
+    if (typeof window === 'undefined') return 'checking';
+    try {
+      if (hasSeenGlobal || sessionStorage.getItem('hasSeenIntro') === 'true') {
+        return 'ready';
+      }
+    } catch (_) {}
+    return 'loading';
+  });
 
   useEffect(() => {
-    if (phase !== 'checking') return;
-    
-    let hasSeenSession = false;
-    try {
-      hasSeenSession = sessionStorage.getItem('hasSeenIntro') === 'true';
-    } catch (_) {}
-
-    if (hasSeenGlobal || hasSeenSession) {
-      setPhase('ready');
-    } else {
+    if (phase === 'checking') {
       setPhase('loading');
     }
   }, [phase]);
 
   const markSeen = useCallback(() => {
     hasSeenGlobal = true;
+    try {
+      sessionStorage.setItem('hasSeenIntro', 'true');
+    } catch (_) {}
     setPhase('ready');
   }, []);
 

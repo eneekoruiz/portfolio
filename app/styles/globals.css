@@ -155,6 +155,7 @@ html[data-lite='1'] .will-gpu { will-change: auto !important; transform: none !i
 html {
   scroll-behavior: smooth;
   -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* ── 6. SCROLL REVEAL — Optimized for smooth entrance ── */
@@ -213,12 +214,8 @@ html {
 .helix-group {
   transform-style: preserve-3d;
 }
-.helix-strand-a,
-.helix-strand-b { }
-.helix-rung     { }
 
 /* ── 8. WORK PAGE: Terrain mesh canvas ── */
-canvas.terrain-mesh { }
 
 /* ── 9. WORK PAGE: Accordion ── */
 [data-accordion] { overflow: hidden; }
@@ -234,7 +231,6 @@ canvas.terrain-mesh { }
 }
 
 /* ── 12. CYLINDER CAROUSEL ── */
-.cyl-item { }
 
 /* ── 13. SKILLS: Bento Glare ── */
 .bento-glow { transform: translateZ(0); }

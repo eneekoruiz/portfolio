@@ -337,11 +337,13 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
         aria-controls={panelId}
         onMouseMove={onMouseMove}
         onMouseEnter={() => {
+          onHoverProject({ name: proj.name, color: theme.color });
           if (theme.hasAudit && !isPrefetched) {
             router.prefetch(`/work/${safeId}`);
             setIsPrefetched(true);
           }
         }}
+        onMouseLeave={() => onHoverProject(null)}
         onFocus={() => {
           if (theme.hasAudit && !isPrefetched) {
             router.prefetch(`/work/${safeId}`);

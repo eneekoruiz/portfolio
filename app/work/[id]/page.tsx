@@ -329,17 +329,19 @@ export default function ProjectPage() {
       {isReadyToAnimate && (
         <>
           <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" style={{ perspective: '900px' }}>
-            <div
-              className="helix-group will-change-transform"
-              style={{
-                width: 'clamp(140px, 40vw, 420px)', height: '210vh',
-                opacity: darkMode ? 0.55 : 0.3,
-                filter: `drop-shadow(0 0 25px ${theme.helixA}60)`,
-                transformStyle: 'preserve-3d',
-              }}
-            >
-              <DNAHelix accent={theme.helixA} secondary={theme.helixB} darkMode={darkMode} />
-            </div>
+            {(!isA11y && !isSpot) && (
+              <div
+                className="helix-group will-change-transform"
+                style={{
+                  width: 'clamp(140px, 40vw, 420px)', height: '210vh',
+                  opacity: darkMode ? 0.55 : 0.3,
+                  filter: `drop-shadow(0 0 25px ${theme.helixA}60)`,
+                  transformStyle: 'preserve-3d',
+                }}
+              >
+                <DNAHelix accent={theme.helixA} secondary={theme.helixB} darkMode={darkMode} />
+              </div>
+            )}
           </div>
           <div className="fixed inset-0 pointer-events-none z-0 opacity-60">
             <TerrainMesh accent={theme.helixA} darkMode={darkMode} />
