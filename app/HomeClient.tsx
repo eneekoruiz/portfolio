@@ -124,9 +124,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       }
       
       if (valuesSection) {
-        const rect = valuesSection.getBoundingClientRect();
-        // Hide if ANY part of the values section is visible
-        setIsPhilosophyVisible(rect.top < vh && rect.bottom > 0);
+        // We no longer hide the DNA in the Philosophy section
+        setIsPhilosophyVisible(false);
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });

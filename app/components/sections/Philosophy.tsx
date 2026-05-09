@@ -146,7 +146,7 @@ export function Philosophy({ t }: { t: Tx }) {
       id="values"
       data-section="values"
       aria-label="Filosofía"
-      className="border-t border-black/5 dark:border-white/10 py-24 px-6 md:px-8 max-w-[1200px] mx-auto overflow-hidden bg-[var(--page)]"
+      className="border-t border-black/5 dark:border-white/10 py-24 px-6 md:px-8 max-w-[1200px] mx-auto overflow-hidden"
     >
       <p className="sec-h text-xs font-bold tracking-[0.2em] uppercase text-slate-500 mb-4">
         {t.valLb}
