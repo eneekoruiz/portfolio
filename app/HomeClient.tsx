@@ -168,10 +168,22 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Bloquear scroll
+  // Bloquear scroll robusto para móviles
   useEffect(() => {
-    document.body.style.overflow = cmd || menu ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (cmd || menu) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.touchAction = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.touchAction = '';
+    };
   }, [cmd, menu]);
 
   // CMD+F & Escape
