@@ -191,7 +191,11 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   // Mobile menu items animation
   useEffect(() => {
     menuRefs.current.forEach((el, i) => {
-      if (!el || reduced) return;
+      if (!el) return;
+      if (reduced) {
+        gsap.set(el, { y: menu ? 0 : '112%' });
+        return;
+      }
       gsap.to(el, {
         y: menu ? 0 : '112%',
         duration: 0.34,
