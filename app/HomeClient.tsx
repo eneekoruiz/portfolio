@@ -471,14 +471,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         <CmdModal lang={lang} setLang={setLang} onClose={() => setCmd(false)} t={t} />
       )}
 
-      <MobileMenu 
-        menu={menu} 
-        setMenu={setMenu} 
-        lang={lang} 
-        setLang={setLang} 
-        t={t} 
-        menuRefs={menuRefs} 
-      />
 
       <main
         ref={main}
@@ -524,6 +516,15 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         <MemoFooter t={t} />
         {!isMobile && <ProjectPreviewFollower activeProject={hoveredProject} />}
       </main>
+
+      <MobileMenu 
+        menu={menu} 
+        setMenu={setMenu} 
+        lang={lang} 
+        setLang={setLang} 
+        t={t} 
+        menuRefs={menuRefs} 
+      />
     </>
   );
 }
