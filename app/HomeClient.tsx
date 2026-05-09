@@ -101,6 +101,12 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const ready = phase === 'ready';
   const reduced = usePreferredMotion();
   const isLite = mounted && (window as any).__LITE;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (!mounted) return;
+    setIsMobile(window.matchMedia('(hover: none)').matches);
+  }, [mounted]);
 
   // ── Scroll Visibility for DNAHelix ──
   useEffect(() => {
@@ -519,7 +525,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         <MemoPhilosophy t={t} />
         <MemoContact t={t} />
         <MemoFooter t={t} />
-        <ProjectPreviewFollower activeProject={hoveredProject} />
+        {!isMobile && <ProjectPreviewFollower activeProject={hoveredProject} />}
       </main>
     </>
   );
