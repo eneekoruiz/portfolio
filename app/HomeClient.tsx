@@ -353,7 +353,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       'who-are-ya-backend': '#00c940',
       'rides24ofiziala': '#e69400',
       'spotshare-parking': '#00d4e8',
-      'pke_web': '#9b1fff',
+      'pke-web': '#9b1fff',
     };
 
     if (activeSection === 'work') {
@@ -436,8 +436,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         />
 
         <MemoHero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} phase={phase} />
-        <MemoSkills t={t} />
         <MemoAbout t={t} />
+        <MemoSkills t={t} />
         <MemoProjects 
           t={t} 
           top3={top3} 
@@ -450,8 +450,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           expandedIdx={expandedIdx}
           onToggleProject={setExpandedIdx}
         />
-        <MemoPhilosophy t={t} />
         <MemoContact t={t} />
+        <MemoPhilosophy t={t} />
         <MemoFooter t={t} />
         {!isMobile && <ProjectPreviewFollower activeProject={hoveredProject} />}
       </main>

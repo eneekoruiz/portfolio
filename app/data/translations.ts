@@ -64,7 +64,7 @@ function mkTx(
   back: string,
   openDirect: string
 ): Tx {
-  const hrefs = ['#hero', '#skills', '#work', '#about', '#contact'];
+  const hrefs = ['#hero', '#skills', '#work', '#about', '#contact', '#values'];
   return {
     times, iam, greetingFn, role, tagline, status, ctaWork, ctaContact, ctaCv, scroll, menu, hrefs, 
     abLb, abH, mf, metrics, skLb, skH, skCats, woLb, woH, 
@@ -78,7 +78,7 @@ export const TX: Record<Lang, Tx> = {
   es: mkTx(
     ['Buenos días', 'Buenas tardes', 'Buenas noches'], 'soy', (t) => `${t}, soy`,
     'Ingeniero Informático · Full Stack Developer', 'Me obsesiono con los detalles que nadie nota pero todo el mundo siente.', 'Disponible',
-    'Ver proyectos', 'Contactar', 'Ver Currículum', 'DESPLAZA', ['Inicio', 'Stack', 'Proyectos', 'Sobre mí', 'Contacto'],
+    'Ver proyectos', 'Contactar', 'Ver Currículum', 'DESPLAZA', ['Inicio', 'Stack', 'Proyectos', 'Sobre mí', 'Contacto', 'Filosofía'],
     'Sobre mí', 'Entiendo lo\nque necesitas.', 'He aprendido que el código más valioso no es el más elegante — es el que resuelve exactamente el problema de quien lo usa. Backend sólido. Frontend que se siente bien. Sin dogmas.',
     [['5+', 'Proyectos activos'], ['100%', 'Foco en calidad'], ['∞', 'Arquitectura sólida']],
     'Stack', 'Tecnologías que domino.', ['Backend', 'Frontend', 'DevOps y Sistemas', 'Datos y Herramientas'],
@@ -96,7 +96,7 @@ export const TX: Record<Lang, Tx> = {
   en: mkTx(
     ['Good morning', 'Good afternoon', 'Good evening'], "I'm", (t) => `${t}, I'm`,
     'Computer Engineer · Full Stack Developer', 'I agonise over the details no one notices — and that everyone ends up feeling.', 'Available',
-    'See work', 'Contact', 'View Curriculum', 'SCROLL', ['Home', 'Stack', 'Projects', 'About', 'Contact'],
+    'See work', 'Contact', 'View Curriculum', 'SCROLL', ['Home', 'Stack', 'Projects', 'About', 'Contact', 'Philosophy'],
     'About', 'I understand\nwhat you need.', "The most valuable code is never the cleverest — it is the one that dissolves the precise frustration of the person using it. Robust backend. Frontend that feels alive. No dogma.",
     [['5+', 'Active projects'], ['100%', 'Quality focus'], ['∞', 'Solid architecture']],
     'Stack', 'Technologies I master.', ['Backend', 'Frontend', 'DevOps & Systems', 'Data & Tools'],

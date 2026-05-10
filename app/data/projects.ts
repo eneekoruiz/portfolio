@@ -469,7 +469,7 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
     }
   },
 
-  'pke_web': {
+  'pke-web': {
     es: {
       title: 'PKE Web', subtitle: 'Accessible Semantics by Default', role: 'UX/A11Y Developer',
       objective: 'Construir una interfaz donde la accesibilidad no sea una capa extra sino la propia arquitectura: teclado, lector de pantalla, contraste y movimiento reducido.',
@@ -643,7 +643,7 @@ export class ParkingService {
   }
 }`,
 
-  'pke_web': `// useFocusTrap.ts — WCAG 2.1 AA Hook
+  'pke-web': `// useFocusTrap.ts — WCAG 2.1 AA Hook
 export const useFocusTrap = (ref: RefObject<HTMLElement>, isActive: boolean) => {
   useEffect(() => {
     if (!isActive || !ref.current) return;

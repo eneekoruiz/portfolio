@@ -70,7 +70,7 @@ const PROJ_THEMES: Record<string, {
     gradient: 'linear-gradient(to bottom, #00d4e80a 0%, transparent 100%)',
     progress: 2, btnText: 'Source Code', hasAudit: false,
   },
-  'pke_web': {
+  'pke-web': {
     color: '#9b1fff',
     img: 'radial-gradient(ellipse at 50% 120%, #9b1fff20 0%, transparent 65%)',
     gradient: 'linear-gradient(to bottom, #9b1fff0a 0%, transparent 100%)',

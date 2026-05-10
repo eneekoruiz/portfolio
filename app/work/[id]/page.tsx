@@ -60,7 +60,7 @@ const THEMES: Record<string, {
   'who-are-ya-backend': { helixA: '#00ff41', helixB: '#00cc33', accent: '#00ff41', label: 'BACKEND / SYSTEM_CORE' },
   'rides24ofiziala':    { helixA: '#f59e0b', helixB: '#fbbf24', accent: '#f59e0b', label: 'DISTRIBUTED / JAX-WS' },
   'spotshare-parking':  { helixA: '#00f0ff', helixB: '#0ea5e9', accent: '#00f0ff', label: 'CLOUD / REAL_TIME' },
-  'pke_web':            { helixA: '#b026ff', helixB: '#d8b4fe', accent: '#b026ff', label: 'A11Y / UX_SEMANTIC' },
+  'pke-web':            { helixA: '#b026ff', helixB: '#d8b4fe', accent: '#b026ff', label: 'A11Y / UX_SEMANTIC' },
 };
 
 const DEFAULT_THEME = { helixA: '#888', helixB: '#aaa', accent: '#888', label: 'MODULE' };
@@ -70,7 +70,7 @@ const PROJECT_SUMMARIES: Record<string, { name: string; langs: string[] }> = {
   'who-are-ya-backend': { name: 'Who Are Ya Backend', langs: ['Node.js', 'Express', 'MongoDB', 'JWT'] },
   'rides24ofiziala': { name: 'Rides24 Ofiziala', langs: ['Java', 'JAX-WS', 'ObjectDB', 'Swing'] },
   'spotshare-parking': { name: 'Spotshare Parking', langs: ['TypeScript', 'SonarCloud', 'NestJS', 'Docker'] },
-  'pke_web': { name: 'PKE Web', langs: ['React', 'WCAG 2.1', 'Tailwind', 'A11y'] },
+  'pke-web': { name: 'PKE Web', langs: ['React', 'WCAG 2.1', 'Tailwind', 'A11y'] },
 };
 
 // ── GlareCard (Local Component) ───────────────────────────────────
@@ -162,7 +162,7 @@ export default function ProjectPage() {
   const isBackend = safeId === 'who-are-ya-backend';
   const isJava    = safeId === 'rides24ofiziala';
   const isSpot    = safeId === 'spotshare-parking';
-  const isA11y    = safeId === 'pke_web';
+  const isA11y    = safeId === 'pke-web';
 
   const projectData = PROJECTS_CONTENT[safeId as keyof typeof PROJECTS_CONTENT];
   const content = projectData ? (projectData[lang] ?? projectData['en'] ?? projectData['es']) : undefined;

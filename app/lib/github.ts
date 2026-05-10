@@ -6,7 +6,7 @@ const PROJECT_IDS = [
   'who-are-ya-backend',
   'rides24ofiziala',
   'spotshare-parking',
-  'pke_web'
+  'pke-web'
 ];
 
 const customStacks: Record<string, string[]> = {
@@ -14,7 +14,7 @@ const customStacks: Record<string, string[]> = {
   'who-are-ya-backend': ['Node.js', 'Express', 'MongoDB', 'JWT', 'REST API', 'GitHub Actions'],
   'rides24ofiziala': ['Java', 'JAX-WS', 'ObjectDB', 'Swing', 'SOAP', 'JUnit'],
   'spotshare-parking': ['TypeScript', 'SonarCloud', 'NestJS', 'Docker', 'PostgreSQL', 'CI/CD'],
-  'pke_web': ['React', 'WCAG 2.1', 'Tailwind', 'A11y', 'Semantic UI', 'Jest'],
+  'pke-web': ['React', 'WCAG 2.1', 'Tailwind', 'A11y', 'Semantic UI', 'Jest'],
 };
 
 export async function getGitHubData(t: Tx) {
@@ -68,7 +68,7 @@ export async function getGitHubData(t: Tx) {
         if (id === 'who-are-ya-backend') return t?.projectWhoDesc || 'Backend escalable para juego de fútbol con arquitectura MVC.';
         if (id === 'rides24ofiziala') return t?.projectRidesDesc || 'Sistema distribuido de ride-sharing con transacciones seguras.';
         if (id === 'spotshare-parking') return 'Gestión Cloud de aparcamientos con enfoque en calidad SonarCloud.';
-        if (id === 'pke_web') return 'Plataforma web semántica con cumplimiento estricto de accesibilidad WCAG.';
+        if (id === 'pke-web') return 'Plataforma web semántica con cumplimiento estricto de accesibilidad WCAG.';
         return '';
       };
 
@@ -78,7 +78,7 @@ export async function getGitHubData(t: Tx) {
         if (id === 'who-are-ya-backend') return t.projectTags[1]; // Backend / API
         if (id === 'rides24ofiziala') return t.projectTags[2]; // System Engineer
         if (id === 'spotshare-parking') return t.projectTags[3]; // Cloud Engineer
-        if (id === 'pke_web') return t.projectTags[4]; // A11y Specialist
+        if (id === 'pke-web') return t.projectTags[4]; // A11y Specialist
         return t.projectTags[2];
       };
 

@@ -187,7 +187,7 @@ export function Skills({ t }: SkillsProps) {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} id="skills" data-section="skills" aria-label="Habilidades" className="py-24 relative z-[60] border-t border-black/5 dark:border-white/10">
+    <section ref={containerRef} id="skills" data-section="skills" aria-label="Habilidades" className="py-24 relative z-[20] border-t border-black/5 dark:border-white/10">
       <div className="px-8 max-w-[1200px] mx-auto">
 
       {/* HEADER COMPACTO CON MÁS COLOR */}
@@ -211,30 +211,31 @@ export function Skills({ t }: SkillsProps) {
           
           return (
             <div key={card.g} className="skill-card-wrapper opacity-0" role="listitem">
-              <div 
-                className="relative h-[230px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[24px] shadow-xl hover:shadow-2xl hover:-translate-y-2"
-                style={{
-                  background: isDark 
-                    ? `linear-gradient(145deg, ${vibrantColor}28 0%, rgba(10,10,10,0.45) 100%)` 
-                    : `linear-gradient(145deg, ${vibrantColor}22 0%, rgba(255,255,255,0.7) 100%)`,
-                  borderColor: isDark ? `${vibrantColor}45` : `${vibrantColor}35`,
-                }}
-              >
-                {/* Título de la tarjeta con más presencia y COLOR */}
-                <div className="relative z-20 flex items-center gap-4">
-                  <div className="w-13 h-13 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
-                    style={{ 
-                      background: vibrantColor, 
-                      color: '#fff', 
-                      borderColor: 'transparent',
-                      boxShadow: `0 10px 30px ${vibrantColor}40`
-                    }}>
-                    <Icon size={26} />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-2xl tracking-tight uppercase leading-none" style={{ color: isDark ? 'white' : vibrantColor }}>
-                      {t.skCats[i] || card.g}
-                    </h3>
+                <div 
+                  className="relative h-[230px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[12px] bg-white/10 dark:bg-white/[0.02] shadow-xl hover:shadow-2xl hover:-translate-y-2 skill-card-dynamic"
+                  style={{
+                    '--card-color': vibrantColor,
+                    '--card-color-light-bg': `${vibrantColor}22`,
+                    '--card-color-dark-bg': `${vibrantColor}28`,
+                    '--card-border-light': `${vibrantColor}35`,
+                    '--card-border-dark': `${vibrantColor}45`,
+                  } as React.CSSProperties}
+                >
+                  {/* Título de la tarjeta con más presencia y COLOR */}
+                  <div className="relative z-20 flex items-center gap-4">
+                    <div className="w-13 h-13 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
+                      style={{ 
+                        background: vibrantColor, 
+                        color: '#fff', 
+                        borderColor: 'transparent',
+                        boxShadow: `0 10px 30px ${vibrantColor}40`
+                      }}>
+                      <Icon size={26} />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-2xl tracking-tight uppercase leading-none skill-card-title">
+                        {t.skCats[i] || card.g}
+                      </h3>
                     <div className="h-1.5 w-10 mt-1 rounded-full" style={{ background: vibrantColor, boxShadow: `0 0 15px ${vibrantColor}` }} />
                   </div>
                 </div>

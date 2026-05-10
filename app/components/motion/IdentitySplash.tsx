@@ -173,7 +173,7 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
             {word.split('').map((char: string, i: number) => (
               <span
                 key={i}
-                className="char font-black text-[clamp(4rem,10vw,8.5rem)] tracking-[-0.05em] leading-none inline-block gpu-accelerated"
+                className="char font-black text-[clamp(4rem,10vw,8.5rem)] tracking-[-0.05em] leading-none inline-block gpu-accelerated translate-y-[110%] opacity-0"
               >
                 {char === ' ' ? '\u00A0' : char}
               </span>
@@ -186,7 +186,7 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
           <div className="h-[1px] w-12 bg-ink/10 rounded-full overflow-hidden">
             <div
               ref={lineRef}
-              className="h-full w-full bg-brand origin-center"
+              className="h-full w-full bg-brand origin-center scale-x-0"
             />
           </div>
           <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-ink/40 font-bold">

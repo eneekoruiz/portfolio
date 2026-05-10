@@ -32,7 +32,7 @@ export function Navbar({
 }: NavbarProps) {
   return (
     <header
-      className="fixed top-3 left-1/2 -translate-x-1/2 z-[50] w-[calc(100%-2rem)] max-w-[940px]"
+      className="fixed top-3 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-2rem)] max-w-[940px]"
       data-noprint
     >
       <div className="flex items-center justify-between gap-2 md:gap-4 px-3 md:px-5 py-[.62rem] rounded-full bg-white/82 dark:bg-[#0a0a0a]/82 backdrop-blur-3xl border border-white/80 dark:border-white/10 shadow-glass">

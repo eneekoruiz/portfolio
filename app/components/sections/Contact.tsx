@@ -65,11 +65,13 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
       >
         <div className="flip-inner min-h-[180px]">
           <div
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} transition-all duration-300 backdrop-blur-md`}
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} transition-all duration-300 backdrop-blur-md contact-card-dynamic`}
             style={{ 
               boxShadow: `inset 0 0 60px ${c.glow}`,
-              background: isDark ? `${c.bg}12` : `${c.bg}08`
-            }}
+              '--contact-bg': c.bg,
+              '--contact-bg-light': `${c.bg}08`,
+              '--contact-bg-dark': `${c.bg}12`
+            } as React.CSSProperties}
           >
             <div ref={iconRef} className="transition-all duration-200">
               {copied
@@ -111,11 +113,13 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
       <a href={c.href} target="_blank" rel="noopener noreferrer" aria-label={c.label} data-h className="block h-full no-underline">
         <div className="flip-inner min-h-[180px]">
           <div 
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} backdrop-blur-md transition-all duration-300`} 
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} backdrop-blur-md transition-all duration-300 contact-card-dynamic`} 
             style={{ 
               boxShadow: `inset 0 0 60px ${c.glow}`,
-              background: isDark ? `${c.bg}12` : `${c.bg}08`
-            }}
+              '--contact-bg': c.bg,
+              '--contact-bg-light': `${c.bg}08`,
+              '--contact-bg-dark': `${c.bg}12`
+            } as React.CSSProperties}
           >
 
             <div ref={iconRef}>
@@ -141,7 +145,7 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
 
 export function Contact({ t }: { t: Tx }) {
   return (
-    <section id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-white dark:bg-[#0a0a0a] z-[60]">
+    <section id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-transparent z-[20]">
       <div className="px-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-12">
         <div className="max-w-[700px]">
           <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>

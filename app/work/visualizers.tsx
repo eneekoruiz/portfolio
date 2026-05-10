@@ -52,8 +52,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
 
       ctx.clearRect(0, 0, w, h);
       
-      const steps = 60;
-      const speed = 0.008; 
+      const steps = 80;
+      const speed = 0.012; // Smoother rotation
       
       rotationRef.current += speed;
       const baseRotation = rotationRef.current;
@@ -66,13 +66,13 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           const progress = i / steps;
           const y = progress * h;
           const angle = progress * Math.PI * 4 + baseRotation + offset;
-          const r = w * 0.35;
+          const r = Math.min(w * 0.15, 140);
           const x = w / 2 + Math.cos(angle) * r;
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
         ctx.strokeStyle = s === 0 ? accent : secondary;
-        ctx.lineWidth = darkMode ? 7.5 : 5.0;
+        ctx.lineWidth = darkMode ? 3.5 : 2.5; // Thinner, more elegant strands
         ctx.globalAlpha = 1.0;
         ctx.stroke();
       }
@@ -82,7 +82,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
         const y = progress * h;
         const angle = progress * Math.PI * 4 + baseRotation;
         
-        const r = w * 0.35;
+        const r = Math.min(w * 0.15, 140);
         const x1 = w / 2 + Math.cos(angle) * r;
         const x2 = w / 2 + Math.cos(angle + Math.PI) * r;
         
@@ -94,23 +94,25 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.moveTo(x1, y);
           ctx.lineTo(x2, y);
           ctx.strokeStyle = accent;
-          ctx.globalAlpha = (darkMode ? 0.15 : 0.08) * (z1 + z2 + 2) / 2;
+          ctx.globalAlpha = (darkMode ? 0.25 : 0.15) * (z1 + z2 + 2) / 2; // Brighter crossbars
           ctx.lineWidth = 0.5;
           ctx.stroke();
         }
 
         const drawNode = (x: number, z: number, color: string) => {
-          const size = 1.5 + (z + 1) * 2.2;
+          const size = 1.8 + (z + 1) * 2.2; // Refined node sizes
           ctx.beginPath();
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fillStyle = color;
           ctx.globalAlpha = 1.0;
           
+          // Enhanced glow effect
           if (z > 0.4) {
-            ctx.shadowBlur = darkMode ? 25 : 15;
+            ctx.shadowBlur = darkMode ? 35 : 25;
             ctx.shadowColor = color;
           } else {
-            ctx.shadowBlur = 0;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = color;
           }
           ctx.fill();
         };

@@ -40,8 +40,8 @@ export const baseMetadata: Metadata = {
   },
   icons: {
     icon: '/icon.png',
-    shortcut: '/shortcut-icon.png',
-    apple: '/apple-icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
   },
   alternates: {
     canonical: DOMAIN,
