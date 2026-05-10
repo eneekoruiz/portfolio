@@ -83,5 +83,5 @@ export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.Ref
     });
 
     return () => ctx.revert();
-  }, [ready, t, navInnerRef, indRef, activeLinkRef]);
+  }, [ready, t, navInnerRef, indRef, activeLinkRef, onSectionChange]);
 }

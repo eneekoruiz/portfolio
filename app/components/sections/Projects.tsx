@@ -713,7 +713,7 @@ export function Projects({
         ref={sectionRef}
         id="work"
         aria-label="Proyectos"
-        className="py-16 md:py-28 px-5 md:px-8 max-w-[1300px] mx-auto relative z-20"
+        className="py-16 md:py-28 px-5 md:px-8 max-w-[1300px] mx-auto relative z-[60]"
       >
         <div className="projects-header mb-10 md:mb-16">
           <div className="flex items-center gap-4 mb-4">

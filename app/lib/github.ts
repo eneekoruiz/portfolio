@@ -10,11 +10,11 @@ const PROJECT_IDS = [
 ];
 
 const customStacks: Record<string, string[]> = {
-  'ana-peluquera': ['React', 'Firebase', 'Node.js', 'Google Calendar API'],
-  'who-are-ya-backend': ['Node.js', 'Express', 'MongoDB', 'JWT'],
-  'rides24ofiziala': ['Java', 'JAX-WS', 'ObjectDB', 'Swing'],
-  'spotshare-parking': ['TypeScript', 'SonarCloud', 'NestJS', 'Docker'],
-  'pke_web': ['React', 'WCAG 2.1', 'Tailwind', 'A11y'],
+  'ana-peluquera': ['React', 'Firebase', 'Node.js', 'Google Calendar API', 'Tailwind', 'Vercel'],
+  'who-are-ya-backend': ['Node.js', 'Express', 'MongoDB', 'JWT', 'REST API', 'GitHub Actions'],
+  'rides24ofiziala': ['Java', 'JAX-WS', 'ObjectDB', 'Swing', 'SOAP', 'JUnit'],
+  'spotshare-parking': ['TypeScript', 'SonarCloud', 'NestJS', 'Docker', 'PostgreSQL', 'CI/CD'],
+  'pke_web': ['React', 'WCAG 2.1', 'Tailwind', 'A11y', 'Semantic UI', 'Jest'],
 };
 
 export async function getGitHubData(t: Tx) {
@@ -44,13 +44,21 @@ export async function getGitHubData(t: Tx) {
 
     const allRepos: Repo[] = await res.json();
     
-    const repos = allRepos
-      .filter(r => !r.fork)
-      .slice(0, 8)
-      .map(r => ({
-        ...r,
-        langs: r.language ? [r.language] : []
-      })) as RepoFull[];
+    const repos = await Promise.all(
+      allRepos
+        .filter(r => !r.fork)
+        .slice(0, 8)
+        .map(async r => {
+          try {
+            const langRes = await fetch(r.languages_url, { headers, next: { revalidate: 3600 } });
+            if (langRes.ok) {
+              const langData = await langRes.json();
+              return { ...r, langs: Object.keys(langData) };
+            }
+          } catch (e) {}
+          return { ...r, langs: r.language ? [r.language] : [] };
+        })
+    ) as RepoFull[];
 
     const top3 = PROJECT_IDS.map((id, index) => {
       const githubRepo = allRepos.find(r => r.name.toLowerCase() === id.toLowerCase());

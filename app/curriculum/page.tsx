@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ChevronLeft, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ExternalLink, Download } from 'lucide-react';
 import { useTranslations } from '../hooks/useTranslations';
 
 export default function CurriculumPage() {
@@ -149,6 +149,14 @@ export default function CurriculumPage() {
         </h1>
 
         <div className="flex items-center gap-2">
+          <a
+            href="https://eneko-ruiz-curriculum.vercel.app/api/pdf"
+            download="Eneko_Ruiz_CV.pdf"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand text-white text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
+          >
+            <Download size={14} />
+            <span className="hidden sm:inline">{t.ctaCv}</span>
+          </a>
           <a
             href="https://eneko-ruiz-curriculum.vercel.app"
             target="_blank"

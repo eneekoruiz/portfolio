@@ -92,7 +92,21 @@ export const LANG_COLORS: Record<string, string> = {
   'JWT': '#D62F9C',
   'Swing': '#5382a1',
   'ObjectDB': '#8B0000',
-  'JAX-WS': '#007396'  //Este se queda con el azul corporativo
+  'JAX-WS': '#007396',
+  'React': '#61DAFB',
+  'Next.js': '#000000',
+  'HTML5': '#E34C26',
+  'CSS3': '#1572B6',
+  'Docker': '#2496ED',
+  'Git': '#F05032',
+  'PostgreSQL': '#4169E1',
+  'MySQL': '#4479A1',
+  'Redis': '#DC382D',
+  'Prisma': '#2D3748',
+  'Spring': '#6DB33F',
+  'Linux': '#FCC624',
+  'Bash': '#4EAA25',
+  'CI/CD': '#0066cc'
 };
 
 /** Alias for backwards compat */

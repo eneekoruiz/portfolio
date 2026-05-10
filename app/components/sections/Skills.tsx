@@ -85,12 +85,12 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
               onMouseLeave={() => setPaused(false)}
             >
               <div 
-                className="flex items-center gap-2 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 bg-white/10 dark:bg-black/60 backdrop-blur-md shadow-xl"
+                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 bg-white/10 dark:bg-black/60 backdrop-blur-md shadow-xl"
                 style={{ borderColor: `${techColor}50` }}
               >
                 <span 
-                  className="w-2.5 h-2.5 rounded-full shadow-lg" 
-                  style={{ background: techColor, boxShadow: `0 0 10px ${techColor}` }} 
+                  className="w-3 h-3 rounded-full shadow-lg shrink-0" 
+                  style={{ background: techColor, boxShadow: `0 0 12px ${techColor}` }} 
                 />
                 <span className="text-[11px] font-black text-ink uppercase tracking-wider">
                   {tech}
@@ -187,7 +187,8 @@ export function Skills({ t }: SkillsProps) {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} id="skills" data-section="skills" aria-label="Habilidades" className="py-16 px-8 max-w-[1200px] mx-auto relative z-10 border-t border-black/5 dark:border-white/5">
+    <section ref={containerRef} id="skills" data-section="skills" aria-label="Habilidades" className="py-24 relative z-[60] border-t border-black/5 dark:border-white/10">
+      <div className="px-8 max-w-[1200px] mx-auto">
 
       {/* HEADER COMPACTO CON MÁS COLOR */}
       <div className="skills-header text-center mb-12 space-y-4 opacity-0">
@@ -211,22 +212,27 @@ export function Skills({ t }: SkillsProps) {
           return (
             <div key={card.g} className="skill-card-wrapper opacity-0" role="listitem">
               <div 
-                className="relative h-[230px] p-8 rounded-[32px] border-2 transition-all duration-500 overflow-hidden group backdrop-blur-[16px] shadow-xl hover:shadow-2xl hover:-translate-y-2"
+                className="relative h-[230px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[24px] shadow-xl hover:shadow-2xl hover:-translate-y-2"
                 style={{
                   background: isDark 
-                    ? `linear-gradient(145deg, ${vibrantColor}55 0%, rgba(0,0,0,0.45) 100%)` 
-                    : `linear-gradient(145deg, ${vibrantColor}35 0%, rgba(255,255,255,0.85) 100%)`,
-                  borderColor: isDark ? `${vibrantColor}65` : `${vibrantColor}45`,
+                    ? `linear-gradient(145deg, ${vibrantColor}28 0%, rgba(10,10,10,0.45) 100%)` 
+                    : `linear-gradient(145deg, ${vibrantColor}22 0%, rgba(255,255,255,0.7) 100%)`,
+                  borderColor: isDark ? `${vibrantColor}45` : `${vibrantColor}35`,
                 }}
               >
                 {/* Título de la tarjeta con más presencia y COLOR */}
                 <div className="relative z-20 flex items-center gap-4">
-                  <div className="w-13 h-13 rounded-2xl flex items-center justify-center border-2 shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 bg-white dark:bg-black"
-                    style={{ color: vibrantColor, borderColor: vibrantColor }}>
+                  <div className="w-13 h-13 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
+                    style={{ 
+                      background: vibrantColor, 
+                      color: '#fff', 
+                      borderColor: 'transparent',
+                      boxShadow: `0 10px 30px ${vibrantColor}40`
+                    }}>
                     <Icon size={26} />
                   </div>
                   <div>
-                    <h3 className="font-black text-2xl tracking-tight text-ink uppercase leading-none" style={{ color: isDark ? 'white' : vibrantColor }}>
+                    <h3 className="font-black text-2xl tracking-tight uppercase leading-none" style={{ color: isDark ? 'white' : vibrantColor }}>
                       {t.skCats[i] || card.g}
                     </h3>
                     <div className="h-1.5 w-10 mt-1 rounded-full" style={{ background: vibrantColor, boxShadow: `0 0 15px ${vibrantColor}` }} />
@@ -236,15 +242,16 @@ export function Skills({ t }: SkillsProps) {
                 {/* CARRUSEL 3D DE PÍLDORAS */}
                 <TextPillCylinder techs={Array.from(card.techs)} cardColor={vibrantColor} />
 
-                {/* Brillo ambiental mucho más potente */}
+                {/* Brillo ambiental — sutil pero presente */}
                 <div 
-                  className="absolute -bottom-12 -right-12 w-48 h-48 blur-[70px] opacity-50 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none"
+                  className="absolute -bottom-12 -right-12 w-48 h-48 blur-[70px] opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"
                   style={{ background: vibrantColor }}
                 />
               </div>
             </div>
           );
         })}
+        </div>
       </div>
     </section>
   );

@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { Mail, Github, Linkedin, ArrowUpRight, Check } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useMagnetic } from '../../hooks/useMagnetic';
 import { BinaryStreamBtn } from '../ui/Buttons';
 import type { Tx } from '../../types';
@@ -18,6 +19,11 @@ const CONTACTS = [
 /* ── Email copy card with clipboard UX ── */
 function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
   const [copied, setCopied] = useState(false);
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
+
   const cardRef  = useMagnetic<HTMLDivElement>({ strength: 0.015, innerStrength: 0.04 });
   const iconRef  = useRef<HTMLDivElement>(null);
 
@@ -40,11 +46,10 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
               gsap.to(el, { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.4)' }); 
             } 
           }
-        ); // <--- Este cierre es CRÍTICO. Cierra el gsap.fromTo
+        ); 
       }
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Fallback — open mail client
       window.location.href = c.href;
     }
   };
@@ -60,8 +65,11 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
       >
         <div className="flip-inner min-h-[180px]">
           <div
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} transition-all duration-300 dark:bg-[#111]/80`}
-            style={{ boxShadow: `inset 0 0 60px ${c.glow}` }}
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} transition-all duration-300 backdrop-blur-md`}
+            style={{ 
+              boxShadow: `inset 0 0 60px ${c.glow}`,
+              background: isDark ? `${c.bg}12` : `${c.bg}08`
+            }}
           >
             <div ref={iconRef} className="transition-all duration-200">
               {copied
@@ -93,12 +101,22 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
 function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
   const cardRef = useMagnetic<HTMLDivElement>({ strength: 0.015, innerStrength: 0.04 });
   const iconRef = useRef<HTMLDivElement>(null);
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
 
   return (
     <div ref={cardRef} className="flip-wrap sr">
       <a href={c.href} target="_blank" rel="noopener noreferrer" aria-label={c.label} data-h className="block h-full no-underline">
         <div className="flip-inner min-h-[180px]">
-          <div className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} dark:bg-[#111]/80`} style={{ boxShadow: `inset 0 0 60px ${c.glow}` }}>
+          <div 
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border ${c.bd} backdrop-blur-md transition-all duration-300`} 
+            style={{ 
+              boxShadow: `inset 0 0 60px ${c.glow}`,
+              background: isDark ? `${c.bg}12` : `${c.bg}08`
+            }}
+          >
 
             <div ref={iconRef}>
               <c.icon size={28} style={{ color: c.bg }} aria-hidden="true" />
@@ -123,7 +141,7 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
 
 export function Contact({ t }: { t: Tx }) {
   return (
-    <section id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-white/40 dark:bg-transparent">
+    <section id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-white dark:bg-[#0a0a0a] z-[60]">
       <div className="px-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-12">
         <div className="max-w-[700px]">
           <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>
