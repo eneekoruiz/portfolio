@@ -3,6 +3,8 @@
 import { Github, Linkedin } from 'lucide-react';
 import { useMagnetic } from '../../hooks/useMagnetic';
 import { useSound } from '../../hooks/useSound';
+import { LiveStatus } from '../ui/LiveStatus';
+import { PortalWarpBtn } from '../ui/Buttons';
 import type { Tx } from '../../types';
 
 export function SiteFooter({ t }: { t: Tx }) {

@@ -438,7 +438,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         />
 
         <MemoHero t={t} greeting={greeting} reduced={reduced} setMag={() => { }} phase={phase} />
-        <MemoAbout t={t} />
         <MemoSkills t={t} />
         <MemoProjects 
           t={t} 
@@ -452,8 +451,9 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           expandedIdx={expandedIdx}
           onToggleProject={setExpandedIdx}
         />
-        <MemoContact t={t} />
+        <MemoAbout t={t} />
         <MemoPhilosophy t={t} />
+        <MemoContact t={t} />
         <MemoFooter t={t} />
         {!isMobile && <ProjectPreviewFollower activeProject={hoveredProject} />}
       </main>
