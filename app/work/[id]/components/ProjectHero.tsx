@@ -355,48 +355,96 @@ export function ProjectHero({
 
           {/* Studio HUD */}
           {isInteracting && (
-            <div className="studio-bar absolute top-4 md:top-8 left-4 md:left-8 right-4 md:right-8 z-[110] flex items-center justify-between pointer-events-none">
-              <div className="flex items-center gap-3 md:gap-4 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 shadow-2xl pointer-events-auto">
-                <div className="flex items-center gap-2 md:gap-3 pr-4 md:pr-6 border-r border-white/10">
-                  <div className="w-2 md:w-2.5 h-2 md:h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
-                  <span className="font-mono text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[100px] md:max-w-none">
-                    {title} <span className="hidden xs:inline">{" // LIVE"}</span>
-                  </span>
+            <>
+              {/* 🌌 Scanning Lines / CRT Effect */}
+              <div className="absolute inset-0 z-[105] pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,210,0.06))] bg-[length:100%_2px,3px_100%] select-none" />
+
+              {/* 🛠️ Main Control Bar */}
+              <div className="studio-bar absolute top-4 md:top-8 left-4 md:left-8 right-4 md:right-8 z-[110] flex items-center justify-between pointer-events-none">
+                <div className="flex items-center gap-3 md:gap-4 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl bg-black/60 backdrop-blur-3xl border border-white/10 shadow-2xl pointer-events-auto">
+                  <div className="flex items-center gap-2 md:gap-3 pr-4 md:pr-6 border-r border-white/10">
+                    <div className="w-2 md:w-2.5 h-2 md:h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
+                    <span className="font-mono text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[120px] md:max-w-none">
+                      {title} <span className="hidden xs:inline">{" // SYSTEM.ACTIVE"}</span>
+                    </span>
+                  </div>
+                  
+                  {/* Real-time Telemetry (Decorative) */}
+                  <div className="hidden md:flex items-center gap-6 text-white/40 font-mono text-[8px] uppercase tracking-widest">
+                    <div className="flex flex-col">
+                      <span className="text-white/20">Latency</span>
+                      <span className="text-brand">24ms</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-white/20">Security</span>
+                      <span className="text-green-400">Hardened</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-white/20">Environment</span>
+                      <span className="text-white/60">Vercel.Edge</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 md:gap-6 text-white/40 font-mono text-[8px] md:text-[9px] uppercase tracking-widest">
-                   <span className="hidden sm:block">Status: Stable</span>
-                   <span className="hidden lg:block">Viewport: Fullscreen</span>
+
+                <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
+                  {/* External Access */}
+                  {liveUrl && (
+                    <a 
+                      href={liveUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-black/60 backdrop-blur-3xl border border-white/10 text-white/60 hover:text-white hover:bg-black/80 transition-all group"
+                      title="Open External"
+                    >
+                      <ExternalLink size={16} className="md:w-[18px] md:h-[18px] group-hover:scale-110" />
+                    </a>
+                  )}
+                  
+                  {/* Close Session */}
+                  <button 
+                    onClick={() => setIsInteracting(false)}
+                    className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group"
+                  >
+                    <X size={16} className="md:w-[18px] md:h-[18px] font-bold" />
+                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">Close Session</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
-                {liveUrl && (
-                  <a 
-                    href={liveUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all"
-                  >
-                    <ExternalLink size={16} className="md:w-[18px] md:h-[18px]" />
-                  </a>
-                )}
-                <button 
-                  onClick={() => setIsInteracting(false)}
-                  className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl bg-brand text-white shadow-[0_0_30px_rgba(0,163,255,0.3)] hover:scale-105 active:scale-95 transition-all group"
-                >
-                  <X size={16} className="md:w-[18px] md:h-[18px]" />
-                  <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">Close Studio</span>
-                </button>
+              {/* 📊 Bottom Telemetry & Controls */}
+              <div className="studio-bar absolute bottom-4 md:bottom-8 left-4 md:left-8 right-4 md:right-8 z-[110] flex items-center justify-between pointer-events-none">
+                <div className="px-4 py-2 rounded-lg bg-black/60 backdrop-blur-3xl border border-white/10 font-mono text-[8px] text-white/40 uppercase tracking-widest pointer-events-auto">
+                  Auth: <span className="text-brand">Developer_Privileges</span> // Root_Access: <span className="text-green-400">True</span>
+                </div>
+
+                <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-black/60 backdrop-blur-3xl border border-white/10 font-mono text-[8px] text-white/40 uppercase tracking-widest pointer-events-auto">
+                   <div className="flex items-center gap-2">
+                     <div className="w-1 h-1 rounded-full bg-white/20" />
+                     <span>Signal_Strength: 98%</span>
+                   </div>
+                   <div className="flex items-center gap-2">
+                     <div className="w-1 h-1 rounded-full bg-white/20" />
+                     <span>Data_integrity: Verified</span>
+                   </div>
+                </div>
               </div>
-            </div>
+            </>
           )}
 
           {liveUrl ? (
             <>
               {!iframeLoaded && (
-                <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black gap-4">
-                  <div className="w-10 h-10 border-2 border-white/10 border-t-brand rounded-full animate-spin" />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30">Booting Environment...</span>
+                <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black gap-6">
+                  <div className="relative">
+                    <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">Initializing Studio</span>
+                    <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">Mounting remote environment...</span>
+                  </div>
                 </div>
               )}
               <iframe 
@@ -404,16 +452,17 @@ export function ProjectHero({
                 src={liveUrl} 
                 onLoad={() => setIframeLoaded(true)}
                 title={iframeTitle}
-                className={`w-full h-full border-none transition-opacity duration-1000 ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? 'opacity-100' : 'opacity-0'} ${isInteracting ? 'scale-100' : 'scale-[1.05]'}`}
                 style={{ 
                   background: '#000',
-                  filter: (canInteract && !isInteracting) ? 'blur(10px) brightness(0.5)' : 'none',
+                  filter: (canInteract && !isInteracting) ? 'blur(15px) brightness(0.4) saturate(0.5)' : 'none',
                 }}
               />
             </>
           ) : (
-             <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
+             <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-4">
                 <Activity size={48} className="text-white/10 animate-pulse" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-white/20">No Environment Mapped</span>
              </div>
           )}
           
