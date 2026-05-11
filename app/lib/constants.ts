@@ -1,4 +1,4 @@
-import { Server, Monitor, Cpu, Database } from 'lucide-react';
+import { Server, Monitor, Cpu, Database, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Lang } from '../types';
 
