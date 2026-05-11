@@ -260,7 +260,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
               
               {/* Texto Iluminado por la linterna */}
               <div 
-                className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full drop-shadow-[0_0_20px_rgba(var(--brand-rgb),0.4)]"
+                className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full"
                 aria-hidden="true"
                 style={{
                   backgroundImage: `radial-gradient(circle ${isMobile ? '180px' : '320px'} at var(--mx, -500px) var(--my, -500px), #ffffff 0%, var(--brand) 45%, transparent 75%)`,
@@ -268,7 +268,6 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                   backgroundClip: 'text',
                   color: 'transparent',
                   WebkitTextFillColor: 'transparent',
-                  filter: 'brightness(1.15) contrast(1.1)',
                 }}
               >
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Eneko</h1>
@@ -294,7 +293,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
               <a
                 href="#contact"
                 aria-label={t.ctaContact}
-                className="relative flex items-center justify-center gap-2 px-[1.85rem] py-[.85rem] rounded-full bg-ink text-white font-bold text-[14px] tracking-[-0.2px] no-underline transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] shadow-[0_8px_28px_rgba(0,0,0,0.2)]"
+                className="relative flex items-center justify-center gap-2 px-[1.85rem] py-[.85rem] rounded-full bg-ink text-page font-bold text-[14px] tracking-[-0.2px] no-underline transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] shadow-[0_8px_28px_rgba(0,0,0,0.2)]"
               >
                 <span>{t.ctaContact}</span>
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
