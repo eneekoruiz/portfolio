@@ -215,20 +215,17 @@ export function Skills({ t }: SkillsProps) {
                   className="relative h-[230px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[12px] bg-white/10 dark:bg-white/[0.02] shadow-xl hover:shadow-2xl hover:-translate-y-2 skill-card-dynamic"
                   style={{
                     '--card-color': vibrantColor,
-                    '--card-color-light-bg': `${vibrantColor}22`,
-                    '--card-color-dark-bg': `${vibrantColor}28`,
-                    '--card-border-light': `${vibrantColor}35`,
-                    '--card-border-dark': `${vibrantColor}45`,
+                    '--card-color-rgb': card.rgb,
                   } as React.CSSProperties}
                 >
                   {/* Título de la tarjeta con más presencia y COLOR */}
                   <div className="relative z-20 flex items-center gap-4">
-                    <div className="w-13 h-13 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
                       style={{ 
                         background: vibrantColor, 
                         color: '#fff', 
                         borderColor: 'transparent',
-                        boxShadow: `0 10px 30px ${vibrantColor}40`
+                        boxShadow: `0 10px 30px rgba(${card.rgb}, 0.25)`
                       }}>
                       <Icon size={26} />
                     </div>

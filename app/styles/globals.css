@@ -259,14 +259,14 @@ html {
 }
 .bento-glare:hover::before { opacity: 1; }
 
-/* ── 13.5. DYNAMIC COLOR FIXES (No-FOUC) ── */
+/* ── 13.5. DYNAMIC COLOR FIXES (No-FOUC & Glassmorphism) ── */
 .skill-card-dynamic {
-  background: linear-gradient(145deg, var(--card-color-light-bg) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
-  border-color: var(--card-border-light) !important;
+  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+  border-color: rgba(var(--card-color-rgb), 0.2) !important;
 }
 .dark .skill-card-dynamic {
-  background: linear-gradient(145deg, var(--card-color-dark-bg) 0%, rgba(0, 0, 0, 0.1) 100%) !important;
-  border-color: var(--card-border-dark) !important;
+  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.15) 0%, rgba(0, 0, 0, 0.1) 100%) !important;
+  border-color: rgba(var(--card-color-rgb), 0.25) !important;
 }
 
 .skill-card-title {
@@ -277,10 +277,10 @@ html {
 }
 
 .contact-card-dynamic {
-  background: linear-gradient(145deg, var(--contact-bg-light), rgba(255, 255, 255, 0.1)) !important;
+  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.08), rgba(255, 255, 255, 0.05)) !important;
 }
 .dark .contact-card-dynamic {
-  background: linear-gradient(145deg, var(--contact-bg-dark), rgba(0, 0, 0, 0.1)) !important;
+  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.12), rgba(0, 0, 0, 0.1)) !important;
 }
 
 /* ── 14. PRINT / PDF CV (Dossier Edition) ── */

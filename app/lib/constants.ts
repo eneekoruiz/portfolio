@@ -9,6 +9,7 @@ export interface SkillCategory {
   g: string;
   I: LucideIcon;
   c: string;
+  rgb: string;
   tint: string;
   border: string;
   techs: readonly string[];
@@ -22,6 +23,7 @@ export const SKILLS: readonly SkillCategory[] = [
     g: 'Backend',
     I: Server,
     c: '#0066cc',
+    rgb: '0, 102, 204',
     tint: 'from-blue-500/10',
     border: 'border-blue-500/20',
     techs: ['Python', 'Java', 'C/C++', 'Node.js', 'Express', 'Spring', 'Rust'],
@@ -30,6 +32,7 @@ export const SKILLS: readonly SkillCategory[] = [
     g: 'Frontend',
     I: Monitor,
     c: '#34a853',
+    rgb: '52, 168, 83',
     tint: 'from-green-500/10',
     border: 'border-green-500/20',
     techs: ['JavaScript', 'TypeScript', 'HTML5', 'CSS3', 'React', 'Next.js'],
@@ -38,6 +41,7 @@ export const SKILLS: readonly SkillCategory[] = [
     g: 'Sistemas',
     I: Cpu,
     c: '#ff9500',
+    rgb: '255, 149, 0',
     tint: 'from-orange-500/10',
     border: 'border-orange-500/20',
     techs: ['Linux', 'Docker', 'Git', 'Bash', 'SSH', 'Make', 'CI/CD'],
@@ -46,6 +50,7 @@ export const SKILLS: readonly SkillCategory[] = [
     g: 'DB',
     I: Database,
     c: '#af52de',
+    rgb: '175, 82, 222',
     tint: 'from-purple-500/10',
     border: 'border-purple-500/20',
     techs: ['PostgreSQL', 'MySQL', 'SQLite', 'MongoDB', 'Redis', 'Prisma'],
