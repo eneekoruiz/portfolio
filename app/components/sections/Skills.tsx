@@ -212,37 +212,42 @@ export function Skills({ t }: SkillsProps) {
           return (
             <div key={card.g} className="skill-card-wrapper opacity-0" role="listitem">
                 <div 
-                  className="relative h-[230px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[12px] bg-white/10 dark:bg-white/[0.02] shadow-xl hover:shadow-2xl hover:-translate-y-2 skill-card-dynamic"
+                  className="relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/5 dark:bg-white/[0.01] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.15)] hover:-translate-y-2 skill-card-dynamic"
                   style={{
-                    '--card-color': vibrantColor,
+                    '--card-color': (card.g === 'Frontend' && isDark) ? '#fff' : vibrantColor,
                     '--card-color-rgb': card.rgb,
                   } as React.CSSProperties}
                 >
                   {/* Título de la tarjeta con más presencia y COLOR */}
-                  <div className="relative z-20 flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
+                  <div className="relative z-20 flex items-center gap-5">
+                    <div className="w-16 h-14 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-[0_10px_30px_rgba(var(--card-color-rgb),0.4)]"
                       style={{ 
                         background: vibrantColor, 
                         color: '#fff', 
-                        borderColor: 'transparent',
-                        boxShadow: `0 10px 30px rgba(${card.rgb}, 0.25)`
+                        borderColor: 'rgba(255,255,255,0.2)',
+                        boxShadow: `0 8px 25px rgba(${card.rgb}, 0.3)`
                       }}>
-                      <Icon size={26} />
+                      <Icon size={28} />
                     </div>
                     <div>
-                      <h3 className="font-black text-2xl tracking-tight uppercase leading-none skill-card-title">
+                      <h3 className="font-black text-2xl tracking-tight uppercase leading-none skill-card-title drop-shadow-sm">
                         {t.skCats[i] || card.g}
                       </h3>
-                    <div className="h-1.5 w-10 mt-1 rounded-full" style={{ background: vibrantColor, boxShadow: `0 0 15px ${vibrantColor}` }} />
+                    <div className="h-1.5 w-12 mt-2 rounded-full transition-all duration-500 group-hover:w-20" 
+                      style={{ 
+                        background: vibrantColor, 
+                        boxShadow: `0 0 15px ${vibrantColor}` 
+                      }} 
+                    />
                   </div>
                 </div>
 
-                {/* CARRUSEL 3D DE PÍLDORAS */}
+                {/* CARRUSEL 3D DE PÍLDORAS — Enhanced with color boost */}
                 <TextPillCylinder techs={Array.from(card.techs)} cardColor={vibrantColor} />
 
-                {/* Brillo ambiental — sutil pero presente */}
+                {/* Brillo ambiental — Más intenso en el hover */}
                 <div 
-                  className="absolute -bottom-12 -right-12 w-48 h-48 blur-[70px] opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"
+                  className="absolute -bottom-16 -right-16 w-64 h-64 blur-[80px] opacity-10 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none"
                   style={{ background: vibrantColor }}
                 />
               </div>

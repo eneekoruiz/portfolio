@@ -181,24 +181,27 @@ export function InfallibleCursor() {
 
   return (
     <>
-      {/* El Cursor */}
+      {/* El Cursor — Refined for Visibility & Premium Feel */}
       <div
         ref={cursorRef}
         aria-hidden="true"
         data-noprint // No sale al imprimir
         style={{
           // Layout fijo cubriendo toda la pantalla
-          position: 'fixed', top: 0, left: 0,
-          zIndex: 999999, // Por encima de todo
+          position: 'fixed', 
+          top: 0, 
+          left: 0,
+          zIndex: 9999999, // Truly on top of everything
           pointerEvents: 'none', // No interfiere con los clics
           
           // Estética Base
-          width: '20px', height: '20px',
+          width: '20px', 
+          height: '20px',
           borderRadius: '9999px', // Círculo perfecto
           backgroundColor: 'white',
-          borderColor: 'rgba(255,255,255,0.2)',
-          borderStyle: 'solid',
-          borderWidth: '0px',
+          
+          // Subtly visible border even on white backgrounds to prevent "invisible" feel
+          border: '1px solid rgba(128,128,128,0.2)',
           
           // 🗝️ CLAVE: Inversión de color
           mixBlendMode: 'difference',

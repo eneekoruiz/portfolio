@@ -110,10 +110,10 @@ body {
 }
 
 .glass-premium {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
 .dark .glass-premium {
@@ -261,12 +261,12 @@ html {
 
 /* ── 13.5. DYNAMIC COLOR FIXES (No-FOUC & Glassmorphism) ── */
 .skill-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
-  border-color: rgba(var(--card-color-rgb), 0.2) !important;
+  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.12) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+  border-color: rgba(var(--card-color-rgb), 0.25) !important;
 }
 .dark .skill-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.15) 0%, rgba(0, 0, 0, 0.1) 100%) !important;
-  border-color: rgba(var(--card-color-rgb), 0.25) !important;
+  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.18) 0%, rgba(0, 0, 0, 0.2) 100%) !important;
+  border-color: rgba(var(--card-color-rgb), 0.35) !important;
 }
 
 .skill-card-title {

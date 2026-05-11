@@ -79,7 +79,12 @@ const PROJ_THEMES: Record<string, {
 };
 
 const DEFAULT_THEME = {
-  color: '#888', img: 'none', gradient: 'none', progress: 1, btnText: 'Source Code', hasAudit: false,
+  color: '#0066cc', 
+  img: 'radial-gradient(ellipse at 50% 120%, rgba(0,102,204,0.1) 0%, transparent 65%)', 
+  gradient: 'linear-gradient(to bottom, rgba(0,102,204,0.03) 0%, transparent 100%)', 
+  progress: 1, 
+  btnText: 'Source Code', 
+  hasAudit: false,
 };
 
 // ── Helpers de persistencia ───────────────────────────────────────────────────

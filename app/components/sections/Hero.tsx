@@ -252,18 +252,18 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
             <p className="h-ln text-[clamp(1.1rem,2.2vw,1.65rem)] font-medium text-lead mb-1">{greeting}</p>
             
             <div className="relative">
-              {/* Texto Base (Ahora más visible: opacity-60) */}
-              <div className="h-ln opacity-60 dark:opacity-50 pointer-events-none">
+              {/* Texto Base — Enhanced visibility to avoid "broken" look */}
+              <div className="h-ln opacity-[0.8] dark:opacity-[0.6] pointer-events-none transition-opacity duration-500">
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Eneko</h1>
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Ruiz.</h1>
               </div>
               
-              {/* Texto Iluminado por la linterna */}
+              {/* Texto Iluminado por la linterna — Refined gradient for smoother transition */}
               <div 
-                className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full"
+                className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full select-none"
                 aria-hidden="true"
                 style={{
-                  backgroundImage: `radial-gradient(circle ${isMobile ? '180px' : '320px'} at var(--mx, -500px) var(--my, -500px), #ffffff 0%, var(--brand) 45%, transparent 75%)`,
+                  backgroundImage: `radial-gradient(circle ${isMobile ? '220px' : '400px'} at var(--mx, -1000px) var(--my, -1000px), #ffffff 0%, var(--brand) 30%, transparent 70%)`,
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',
