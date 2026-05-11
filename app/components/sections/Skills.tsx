@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { Server, MonitorSmartphone, Cpu, Database, Code } from 'lucide-react';
+import { Server, MonitorSmartphone, Cpu, Database, Code, Sparkles } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { LANG_COLORS, SKILLS } from '../../lib/constants';
 import type { Tx } from '../../types';
@@ -105,7 +105,7 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
 }
 
 // ── DATOS DE LAS TARJETAS ──
-const ICONS = [Server, MonitorSmartphone, Cpu, Database];
+const ICONS = [Server, MonitorSmartphone, Cpu, Database, Sparkles];
 
 interface SkillsProps { t: Tx; }
 

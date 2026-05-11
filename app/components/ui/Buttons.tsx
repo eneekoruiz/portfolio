@@ -68,7 +68,7 @@ export function BinaryStreamBtn({
   href = '/curriculum',
 }: {
   label: string;
-  variant?: 'light' | 'dark';
+  variant?: 'light' | 'dark' | 'ghost';
   className?: string;
   href?: string;
 }) {

@@ -55,6 +55,15 @@ export const SKILLS: readonly SkillCategory[] = [
     border: 'border-purple-500/20',
     techs: ['PostgreSQL', 'MySQL', 'SQLite', 'MongoDB', 'Redis', 'Prisma'],
   },
+  {
+    g: 'AI & LLM',
+    I: Zap,
+    c: '#ff2d55',
+    rgb: '255, 45, 85',
+    tint: 'from-pink-500/10',
+    border: 'border-pink-500/20',
+    techs: ['Antigravity', 'GeminiChat', 'Claude', 'GPT-4', 'Cursor', 'LLMs'],
+  },
 ] as const;
 
 /**
