@@ -2,18 +2,38 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { NetworkParticles } from '../motion/Particles'; 
+import { NetworkParticles } from '../motion/Particles';
+import { useMagnetic } from '../../hooks/useMagnetic';
 import type { Tx } from '../../types';
 
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
 
 export function About({ t }: { t: Tx }) {
+  return (
+    <AboutContent t={t} />
+  );
+}
+
+function MetricCard({ v, l }: { v: string, l: string }) {
+  const ref = useMagnetic<HTMLDivElement>({ strength: 0.02, innerStrength: 0.05 });
+  return (
+    <div
+      ref={ref}
+      className="p-8 md:p-10 rounded-3xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-xl block will-change-transform"
+    >
+      <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">{v}</div>
+      <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{l}</p>
+    </div>
+  );
+}
+
+function AboutContent({ t }: { t: Tx }) {
   const sectionRef = useRef<HTMLElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      
+
       // 1. Entrada de títulos y métricas
       gsap.from('.about-reveal', {
         y: 30, opacity: 0, stagger: 0.06, duration: 0.48, ease: 'power3.out',
@@ -24,16 +44,16 @@ export function About({ t }: { t: Tx }) {
       if (textContainerRef.current) {
         gsap.fromTo('.word-inner',
           { y: '110%', opacity: 0 }, // Empieza escondido hacia abajo
-          { 
-            y: '0%', 
+          {
+            y: '0%',
             opacity: 1,
-            duration: 0.3, 
+            duration: 0.3,
             stagger: 0.012,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: textContainerRef.current,
               start: 'top 85%',
-              toggleActions: 'play none none reverse' 
+              toggleActions: 'play none none reverse'
             }
           }
         );
@@ -68,7 +88,7 @@ export function About({ t }: { t: Tx }) {
               {t.abH}
             </h2>
           </div>
-          
+
           <hr className="about-reveal hidden md:block border-none h-px bg-black/10 dark:bg-white/10 mb-12 max-w-3xl" />
 
           <div ref={textContainerRef} className="max-w-4xl mb-0 md:mb-24">
@@ -79,13 +99,7 @@ export function About({ t }: { t: Tx }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 about-reveal">
             {t.metrics.map(([v, l]) => (
-              <div 
-                key={l} 
-                className="p-8 md:p-10 rounded-3xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-xl block"
-              >
-                <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">{v}</div>
-                <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{l}</p>
-              </div>
+              <MetricCard key={l} v={v} l={l} />
             ))}
           </div>
         </div>

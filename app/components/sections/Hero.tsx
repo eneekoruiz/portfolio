@@ -23,6 +23,8 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
   const rightBtnRef = useRef<HTMLDivElement>(null);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
+  const memojiRef = useRef<HTMLDivElement>(null);
+
   const [isMobile, setIsMobile] = useState(false);
   const tilt = useDeviceTilt();
   const hasRequestedPermission = useRef(false);
@@ -102,24 +104,68 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         });
       }
 
-      // --- LÓGICA DE LINTERNA (SPOTLIGHT) & 3D PARALLAX ────────────────────────────
+      // --- LÓGICA DE LINTERNA (SPOTLIGHT) & SNAPPING ────────────────────────────
       if (textContainerRef.current) {
         const tRect = textContainerRef.current.getBoundingClientRect();
-        const x = e.clientX - tRect.left;
-        const y = e.clientY - tRect.top;
         
-        // Spotlight
-        // Spotlight - Using raw style set for absolute performance
-        textContainerRef.current.style.setProperty('--mx', `${x}px`);
-        textContainerRef.current.style.setProperty('--my', `${y}px`);
+        // Find if we should snap to any button
+        let snapX: number | null = null;
+        let snapY: number | null = null;
+        const snapRange = 160;
+        const ctas = [leftBtnRef.current, contactBtnRef.current, rightBtnRef.current];
+        
+        ctas.forEach(cta => {
+          if (!cta) return;
+          const cRect = cta.getBoundingClientRect();
+          const cx = cRect.left + cRect.width / 2;
+          const cy = cRect.top + cRect.height / 2;
+          const distToCta = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2));
+          
+          if (distToCta < snapRange) {
+            snapX = cx - tRect.left;
+            snapY = cy - tRect.top;
+          }
+        });
 
-        // 3D Parallax Tilt for the title
-        const xPercent = (x / tRect.width - 0.5) * 2;
-        const yPercent = (y / tRect.height - 0.5) * 2;
+        const targetX = snapX !== null ? snapX : (e.clientX - tRect.left);
+        const targetY = snapY !== null ? snapY : (e.clientY - tRect.top);
+        const targetSize = snapX !== null ? (isMobile ? '350px' : '650px') : (isMobile ? '220px' : '400px');
+        
+        // Spotlight Smooth Follow
         gsap.to(textContainerRef.current, {
-          rotateY: xPercent * 4, // Slightly subtler
+          '--mx': `${targetX}px`,
+          '--my': `${targetY}px`,
+          '--msize': targetSize,
+          duration: snapX !== null ? 0.4 : 0.1,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+
+        // 3D Parallax Tilt
+        const xPercent = ((e.clientX - tRect.left) / tRect.width - 0.5) * 2;
+        const yPercent = ((e.clientY - tRect.top) / tRect.height - 0.5) * 2;
+        gsap.to(textContainerRef.current, {
+          rotateY: xPercent * 4,
           rotateX: -yPercent * 4,
           duration: 0.8,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+      }
+
+      if (memojiRef.current) {
+        const mRect = memojiRef.current.getBoundingClientRect();
+        const mx = e.clientX - mRect.left;
+        const my = e.clientY - mRect.top;
+        const mxPercent = (mx / mRect.width - 0.5) * 2;
+        const myPercent = (my / mRect.height - 0.5) * 2;
+
+        gsap.to(memojiRef.current, {
+          x: mxPercent * 15,
+          y: myPercent * 10,
+          rotateY: mxPercent * 5,
+          rotateX: -myPercent * 3,
+          duration: 1.2,
           ease: 'power2.out',
           overwrite: 'auto'
         });
@@ -139,10 +185,22 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         gsap.to(textContainerRef.current, {
           '--mx': `-500px`,
           '--my': `-500px`,
+          '--msize': `0px`,
           rotateX: 0,
           rotateY: 0,
           duration: 1.5,
           ease: 'elastic.out(1, 0.3)'
+        });
+      }
+
+      if (memojiRef.current) {
+        gsap.to(memojiRef.current, {
+          x: 0,
+          y: 0,
+          rotateX: 0,
+          rotateY: 0,
+          duration: 1.5,
+          ease: 'power2.out'
         });
       }
     };
@@ -225,13 +283,25 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       ease: 'power2.out',
       overwrite: 'auto'
     });
+
+    if (memojiRef.current) {
+      gsap.to(memojiRef.current, {
+        rotateY: tilt.x * 8,
+        rotateX: -tilt.y * 4,
+        x: tilt.x * 10,
+        y: tilt.y * 5,
+        duration: 1.5,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+    }
   }, [tilt, isMobile, reduced]);
 
   return (
     <section id="hero" aria-label="Hero" className="min-h-[100svh] flex flex-col overflow-hidden pt-[80px] relative snap-start">
       
       {/* Memoji + Pill */}
-      <div className="memoji hidden lg:flex lg:flex-col items-center justify-start absolute right-0 top-0 w-1/2 h-full pb-20 z-0 pointer-events-none" aria-hidden="true">
+      <div ref={memojiRef} className="memoji hidden lg:flex lg:flex-col items-center justify-start absolute right-0 top-0 w-1/2 h-full pb-20 z-0 pointer-events-none" aria-hidden="true">
         <div className="flex flex-col items-center w-full max-w-[500px] mt-[110px] h-full">
           <div className="mb-6 z-10 pointer-events-auto h-fd shrink-0">
             <LiveStatus label={t.status} />
@@ -263,7 +333,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                 className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full select-none"
                 aria-hidden="true"
                 style={{
-                  backgroundImage: `radial-gradient(circle ${isMobile ? '220px' : '400px'} at var(--mx, -1000px) var(--my, -1000px), #ffffff 0%, var(--brand) 30%, transparent 70%)`,
+                  backgroundImage: `radial-gradient(circle var(--msize, ${isMobile ? '220px' : '400px'}) at var(--mx, -1000px) var(--my, -1000px), #ffffff 0%, var(--brand) 30%, transparent 70%)`,
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',

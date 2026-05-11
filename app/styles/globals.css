@@ -448,3 +448,28 @@ html {
 .dark .cmd-box {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
+
+/* ── 21. VIEW TRANSITIONS (Eclipse Theme) ── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2147483647;
+}
+
+/* Custom clip-path animation for the "Eclipse" effect */
+@keyframes eclipse-in {
+  from { clip-path: circle(0% at var(--x) var(--y)); }
+  to   { clip-path: circle(150% at var(--x) var(--y)); }
+}
+
+[data-transition='eclipse']::view-transition-new(root) {
+  animation: eclipse-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

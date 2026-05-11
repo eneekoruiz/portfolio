@@ -3,20 +3,43 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
+import { useSound } from '../../hooks/useSound';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const { playClick } = useSound();
   const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const isDark = theme === 'dark';
 
   useEffect(() => setMounted(true), []);
 
-  const handleToggle = () => {
+  const handleToggle = (e: React.MouseEvent) => {
     if (isAnimating) return;
+    
+    const x = e.clientX;
+    const y = e.clientY;
+
+    playClick();
+
+    if (!document.startViewTransition) {
+      setTheme(theme === 'dark' ? 'light' : 'dark');
+      return;
+    }
+
     setIsAnimating(true);
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-    setTimeout(() => setIsAnimating(false), 500);
+    document.documentElement.style.setProperty('--x', `${x}px`);
+    document.documentElement.style.setProperty('--y', `${y}px`);
+    document.documentElement.setAttribute('data-transition', 'eclipse');
+
+    const transition = document.startViewTransition(() => {
+      setTheme(theme === 'dark' ? 'light' : 'dark');
+    });
+
+    transition.finished.then(() => {
+      setIsAnimating(false);
+      document.documentElement.removeAttribute('data-transition');
+    });
   };
 
   if (!mounted) return null;

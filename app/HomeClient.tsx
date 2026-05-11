@@ -27,6 +27,8 @@ import { BranchMergeBtn } from './components/ui/Buttons';
 import { Navbar } from './components/navigation/Navbar';
 import { MobileMenu } from './components/navigation/MobileMenu';
 import { ProjectPreviewFollower } from './components/motion/ProjectPreviewFollower';
+import { DebugHUD } from './components/ui/DebugHUD';
+import { PortalTransition } from './components/ui/PortalTransition';
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
 import { IdentitySplash } from './components/motion/IdentitySplash';
@@ -468,6 +470,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         t={t} 
         menuRefs={menuRefs} 
       />
+
+      {/* 🛠️ Masterclass Utilities */}
+      <DebugHUD />
+      <PortalTransition />
     </>
   );
 }

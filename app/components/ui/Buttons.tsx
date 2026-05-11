@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Check, ArrowUpRight, Github, Zap } from 'lucide-react';
 import { useMagnetic } from '../../hooks/useMagnetic';
+import { triggerPortal } from './PortalTransition';
 
 type BtnState = 'idle' | 'animating' | 'done';
 
@@ -100,14 +101,10 @@ export function BinaryStreamBtn({
         clearInterval(ivRef.current); clearInterval(bvRef.current);
         setBits([]); setProgress(100); setState('done'); setShowRipple(true);
         
-        // Navigate faster after animation
+        // Navigate using the cinematic portal
         toRef.current = setTimeout(() => {
-          if (href.startsWith('http')) {
-            window.location.assign(href);
-          } else {
-            router.push(href);
-          }
-        }, 150); // 150ms instead of 500ms
+          triggerPortal(href);
+        }, 150);
       } else { setProgress(p); }
     }, 30);
   };
