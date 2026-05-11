@@ -167,7 +167,15 @@ export default function ProjectPage() {
   const projectData = PROJECTS_CONTENT[safeId as keyof typeof PROJECTS_CONTENT];
   const content = projectData ? (projectData[lang] ?? projectData['en'] ?? projectData['es']) : undefined;
   const snippet = CODE_SNIPPETS[safeId as keyof typeof CODE_SNIPPETS];
-  const liveUrl = isBackend ? 'https://whoareya.vercel.app' : (isJava || isSpot || isA11y) ? null : 'https://agpeluqueria.vercel.app';
+  const LIVE_URLS: Record<string, string | null> = {
+    'ana-peluquera':      'https://ana-peluquera.vercel.app',
+    'who-are-ya-backend': 'https://whoareya.vercel.app',
+    'pke-web':            'https://pke-web.vercel.app',
+    'rides24ofiziala':    null,
+    'spotshare-parking':  null,
+  };
+
+  const liveUrl = LIVE_URLS[safeId] ?? null;
   const videoUrl = isJava ? '/loginjsf.mp4' : null;
 
   // 🎯 Punto 6 — Magnetic buttons
@@ -272,11 +280,8 @@ export default function ProjectPage() {
     document.body.appendChild(svg);
 
     animateLiquidCurtainIn(svg, {
-      duration: 0.45,
-      onMidway: navigate,
-      onComplete: () => {
-        setTimeout(() => svg.remove(), 100);
-      },
+      duration: 0.4,
+      onComplete: navigate, // Navigate only when fully covered
     });
 
     // Hard fallback
