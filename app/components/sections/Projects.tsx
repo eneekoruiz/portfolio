@@ -146,8 +146,8 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
                     <span
                       className="w-[5px] h-[5px] rounded-full shrink-0"
                       style={{
-                        background: LANG_COLORS[l] ?? '#999',
-                        filter: isActive ? `drop-shadow(0 0 4px ${LANG_COLORS[l] ?? '#999'})` : 'none',
+                        background: 'var(--brand)',
+                        filter: isActive ? `drop-shadow(0 0 4px var(--brand))` : 'none',
                         transition: 'filter .2s',
                       }}
                     />

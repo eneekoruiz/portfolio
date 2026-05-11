@@ -73,8 +73,8 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
     >
       <div ref={containerRef} className="relative" style={{ width: 0, height: 0, transformStyle: 'preserve-3d', transform: 'rotateX(-6deg)' }}>
         {techs.map((tech) => {
-          // Restauramos los colores individuales vibrantes usando LANG_COLORS
-          const techColor = LANG_COLORS[tech] || cardColor;
+          // Unified monochromatic approach: use cardColor for all pills in this category
+          const techColor = cardColor; 
 
           return (
             <div
@@ -85,12 +85,12 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
               onMouseLeave={() => setPaused(false)}
             >
               <div 
-                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 bg-white/10 dark:bg-black/60 backdrop-blur-md shadow-xl"
-                style={{ borderColor: `${techColor}50` }}
+                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 bg-white/5 dark:bg-black/40 backdrop-blur-md shadow-xl"
+                style={{ borderColor: `${techColor}30` }}
               >
                 <span 
-                  className="w-3 h-3 rounded-full shadow-lg shrink-0" 
-                  style={{ background: techColor, boxShadow: `0 0 12px ${techColor}` }} 
+                  className="w-2.5 h-2.5 rounded-full shadow-lg shrink-0" 
+                  style={{ background: techColor, boxShadow: `0 0 8px ${techColor}80` }} 
                 />
                 <span className="text-[11px] font-black text-ink uppercase tracking-wider">
                   {tech}
