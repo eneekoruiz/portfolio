@@ -134,14 +134,16 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   useEffect(() => {
     const cleanup = () => {
       // Clear any transition overlays that might have lingered from other projects/pages
+      // EXCEPT the active transition layers which we handle separately via reveal effect
       document.querySelectorAll('[id*="overlay"], [id*="transition"], [id*="curtain"]').forEach(el => {
+        if (el.id === RETURN_OVERLAY_ID || el.id === 'project-transition-layer') return;
         gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => el.remove() });
       });
       window.__lenis?.start?.();
     };
     cleanup();
     setMounted(true);
-    const timer = setTimeout(cleanup, 500);
+    const timer = setTimeout(cleanup, 800); // Increased safety margin
     return () => clearTimeout(timer);
   }, []);
 
