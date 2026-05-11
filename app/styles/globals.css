@@ -473,3 +473,20 @@ html {
 [data-transition='eclipse']::view-transition-new(root) {
   animation: eclipse-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+/* -- BINARY STREAM BUTTON ANIMATIONS -- */
+@keyframes btnStream {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+.btn-bit-stream {
+  position: absolute;
+  font-family: monospace;
+  font-size: 10px;
+  pointer-events: none;
+  user-select: none;
+  animation: btnStream linear infinite;
+  will-change: transform, opacity;
+}

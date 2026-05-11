@@ -414,7 +414,7 @@ export function ProjectHero({
               {/* 📊 Bottom Telemetry & Controls */}
               <div className="studio-bar absolute bottom-4 md:bottom-8 left-4 md:left-8 right-4 md:right-8 z-[110] flex items-center justify-between pointer-events-none">
                 <div className="px-4 py-2 rounded-lg bg-black/60 backdrop-blur-3xl border border-white/10 font-mono text-[8px] text-white/40 uppercase tracking-widest pointer-events-auto">
-                  Auth: <span className="text-brand">Developer_Privileges</span> // Root_Access: <span className="text-green-400">True</span>
+                  Auth: <span className="text-brand">Developer_Privileges</span> {" // "} Root_Access: <span className="text-green-400">True</span>
                 </div>
 
                 <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-black/60 backdrop-blur-3xl border border-white/10 font-mono text-[8px] text-white/40 uppercase tracking-widest pointer-events-auto">

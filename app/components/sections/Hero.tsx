@@ -352,18 +352,18 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
           {/* CTAs */}
           <div className="h-fd flex flex-wrap items-center gap-3 mt-4">
             
-            {/* BOTÓN IZQUIERDO (CON ESCUDO) */}
+            {/* BOTÓN IZQUIERDO (CON ESCUDO) - SECONDARY ACTION (WHITE/BLACK) */}
             <div ref={leftBtnRef} className="flex">
               <WorkScrollBtn label={t.ctaWork} />
             </div>
             
-            {/* BOTÓN CONTACTAR (MAGNÉTICO) */}
+            {/* BOTÓN CONTACTAR (MAGNÉTICO) - PRIMARY ACTION (BLUE) */}
             <div ref={contactBtnRef} className="relative group z-10 flex">
-              <div className="absolute inset-0 bg-ink rounded-full blur-xl opacity-20 group-hover:opacity-40 animate-pulse pointer-events-none transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-brand rounded-full blur-xl opacity-20 group-hover:opacity-40 animate-pulse pointer-events-none transition-opacity duration-500" />
               <a
                 href="#contact"
                 aria-label={t.ctaContact}
-                className="relative flex items-center justify-center gap-2 px-[1.85rem] py-[.85rem] rounded-full bg-ink text-page font-bold text-[14px] tracking-[-0.2px] no-underline transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] shadow-[0_8px_28px_rgba(0,0,0,0.2)]"
+                className="relative flex items-center justify-center gap-2 px-[1.85rem] py-[.85rem] rounded-full bg-brand text-white font-bold text-[14px] tracking-[-0.2px] no-underline transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_12px_40px_rgba(0,102,255,0.3)] shadow-[0_8px_28px_rgba(0,102,255,0.2)]"
               >
                 <span>{t.ctaContact}</span>
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -372,9 +372,9 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
               </a>
             </div>
 
-            {/* BOTÓN DERECHO (CON ESCUDO) */}
+            {/* BOTÓN DERECHO (CON ESCUDO) - SECONDARY ACTION (WHITE/BLACK) */}
             <div ref={rightBtnRef} className="flex">
-              <BinaryStreamBtn label={t.ctaCv} variant="light" />
+              <BinaryStreamBtn label={t.ctaCv} variant="dark" />
             </div>
             
           </div>

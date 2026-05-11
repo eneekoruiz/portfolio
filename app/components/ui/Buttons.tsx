@@ -33,7 +33,7 @@ export function WorkScrollBtn({ label }: { label: string }) {
       className={[
         'relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full overflow-hidden',
         'font-bold text-[14px] tracking-[-0.2px] transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]',
-        state === 'done'     ? 'bg-brand text-white scale-[1.02] shadow-[0_8px_28px_rgba(0,102,255,.35)]'
+        state === 'done'     ? 'bg-[#34c759] text-white scale-[1.02] shadow-[0_8px_28px_rgba(52,199,89,.35)]'
         : state === 'animating' ? 'bg-ink text-page scale-[1.01] shadow-[0_8px_28px_rgba(0,0,0,.25)]'
         : 'bg-ink text-page shadow-[0_8px_28px_rgba(0,0,0,.2)] hover:scale-[1.05] hover:shadow-[0_12px_40px_rgba(0,0,0,.3)]',
         'focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-black outline-none'
@@ -118,7 +118,9 @@ export function BinaryStreamBtn({
   useEffect(() => () => { clearInterval(ivRef.current); clearInterval(bvRef.current); clearTimeout(toRef.current); }, []);
 
   const baseIdle = variant === 'dark'
-    ? 'bg-ink text-page shadow-[0_10px_32px_rgba(0,0,0,.2)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,0,0,.3)]'
+    ? 'bg-ink text-page shadow-[0_10px_32px_rgba(0,0,0,.15)] border border-ink/10 dark:border-white/10 hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,0,0,.25)]'
+    : variant === 'ghost'
+    ? 'bg-transparent text-lead border border-lead/20 hover:border-brand hover:text-brand hover:bg-brand/5 shadow-none'
     : 'bg-brand text-white shadow-[0_10px_32px_rgba(0,102,255,.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,102,255,.45)]';
 
   return (
@@ -140,20 +142,32 @@ export function BinaryStreamBtn({
       ].join(' ')}
     >
       {state === 'animating' && (
-        <div aria-hidden="true" className="absolute inset-0 rounded-full pointer-events-none"
-          style={{ padding: '2px',
-            background: `conic-gradient(from -90deg, #fff ${progress * 3.6}deg, transparent ${progress * 3.6}deg)`,
-            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            WebkitMaskComposite: 'xor', maskComposite: 'exclude' }} />
+        <>
+          {/* 🔍 Scanline / Matrix Overlay */}
+          <div aria-hidden="true" className="absolute inset-0 z-10 opacity-[0.08] pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,210,0.06))] bg-[length:100%_2px,3px_100%]" />
+          
+          {/* ⚡ Progress Ring */}
+          <div aria-hidden="true" className="absolute inset-0 rounded-full pointer-events-none z-20"
+            style={{ padding: '2px',
+              background: `conic-gradient(from -90deg, var(--brand) ${progress * 3.6}deg, transparent ${progress * 3.6}deg)`,
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor', maskComposite: 'exclude' }} />
+        </>
       )}
+      
+      {/* 🌌 Streaming Bits */}
       {bits.map(b => (
-        <span key={b.id} className="btn-bit !text-white" aria-hidden="true"
-          style={{ left: `${b.x}%`, top: `${b.y}%`, animationDelay: '0ms' }}>{b.v}</span>
+        <span key={b.id} className="btn-bit-stream !text-white/40" aria-hidden="true"
+          style={{ left: `${b.x}%`, bottom: '-10px', animationDuration: `${0.8 + Math.random()}s` }}>{b.v}</span>
       ))}
+
       {showRipple && <span className="btn-done-ripple bg-[rgba(52,199,89,.35)]" aria-hidden="true" />}
-      {state === 'idle'      && <><ArrowUpRight size={14} aria-hidden="true" />{label}</>}
-      {state === 'animating' && <><span className="font-mono text-[11px] tracking-wider text-white animate-pulse">01</span>{label}…</>}
-      {state === 'done'      && <><Check size={15} aria-hidden="true" />OK</>}
+      
+      <span className="relative z-30 flex items-center gap-2">
+        {state === 'idle'      && <><ArrowUpRight size={14} aria-hidden="true" />{label}</>}
+        {state === 'animating' && <><span className="font-mono text-[11px] tracking-wider text-white animate-pulse">01</span>{label}…</>}
+        {state === 'done'      && <><Check size={15} aria-hidden="true" />OK</>}
+      </span>
     </button>
   );
 }
