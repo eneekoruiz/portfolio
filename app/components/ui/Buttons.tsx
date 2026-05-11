@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Download, Check, ArrowUpRight, Github, Zap } from 'lucide-react';
+import { Check, ArrowUpRight, Github, Zap } from 'lucide-react';
 import { useMagnetic } from '../../hooks/useMagnetic';
 import { triggerPortal } from './PortalTransition';
 
