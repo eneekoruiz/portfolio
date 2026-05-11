@@ -277,10 +277,10 @@ html {
 }
 
 .contact-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.08), rgba(255, 255, 255, 0.05)) !important;
+  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.12), rgba(255, 255, 255, 0.05)) !important;
 }
 .dark .contact-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.12), rgba(0, 0, 0, 0.1)) !important;
+  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.2), rgba(0, 0, 0, 0.1)) !important;
 }
 
 /* ── 14. PRINT / PDF CV (Dossier Edition) ── */

@@ -11,9 +11,9 @@ import type { Tx } from '../../types';
 const EMAIL = 'eneekoruiz@gmail.com';
 
 const CONTACTS = [
-  { href: `mailto:${EMAIL}`,                    icon: Mail,     label: 'Gmail',    val: EMAIL,                        bg: '#EA4335', rgb: '234, 67, 53', glow: 'rgba(234,67,53,.1)',  bd: 'border-[rgba(234,67,53,.2)]', isEmail: true  },
-  { href: 'https://github.com/eneekoruiz',      icon: Github,   label: 'GitHub',   val: 'github.com/eneekoruiz',      bg: '#24292F', rgb: '36, 41, 47',  glow: 'rgba(0,0,0,.07)',     bd: 'border-[rgba(0,0,0,.14)]',    isEmail: false },
-  { href: 'https://linkedin.com/in/eneekoruiz', icon: Linkedin, label: 'LinkedIn', val: 'linkedin.com/in/eneekoruiz', bg: '#0077B5', rgb: '0, 119, 181', glow: 'rgba(0,119,181,.1)', bd: 'border-[rgba(0,119,181,.2)]', isEmail: false },
+  { href: `mailto:${EMAIL}`,                    icon: Mail,     label: 'Gmail',    val: EMAIL,                        bg: '#EA4335', rgb: '234, 67, 53', glow: 'rgba(234,67,53,.15)',  bd: 'border-[rgba(234,67,53,.35)]', isEmail: true  },
+  { href: 'https://github.com/eneekoruiz',      icon: Github,   label: 'GitHub',   val: 'github.com/eneekoruiz',      bg: '#24292F', rgb: '36, 41, 47',  glow: 'rgba(0,0,0,.15)',      bd: 'border-[rgba(0,0,0,.25)]',    isEmail: false },
+  { href: 'https://linkedin.com/in/eneekoruiz', icon: Linkedin, label: 'LinkedIn', val: 'linkedin.com/in/eneekoruiz', bg: '#0077B5', rgb: '0, 119, 181', glow: 'rgba(0,119,181,.15)',  bd: 'border-[rgba(0,119,181,.35)]', isEmail: false },
 ];
 
 /* ── Email copy card with clipboard UX ── */

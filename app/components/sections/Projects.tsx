@@ -48,32 +48,32 @@ const PROJ_THEMES: Record<string, {
 }> = {
   'ana-peluquera': {
     color: '#ff2d78',
-    img: 'radial-gradient(ellipse at 50% 120%, #ff2d7820 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, #ff2d780a 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(255,45,120,0.125) 0%, transparent 65%)',
+    gradient: 'linear-gradient(to bottom, rgba(255,45,120,0.04) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'who-are-ya-backend': {
     color: '#00c940',
-    img: 'radial-gradient(ellipse at 50% 120%, #00c94020 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, #00c9400a 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(0,201,64,0.125) 0%, transparent 65%)',
+    gradient: 'linear-gradient(to bottom, rgba(0,201,64,0.04) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'rides24ofiziala': {
     color: '#e69400',
-    img: 'radial-gradient(ellipse at 50% 120%, #e6940020 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, #e694000a 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(230,148,0,0.125) 0%, transparent 65%)',
+    gradient: 'linear-gradient(to bottom, rgba(230,148,0,0.04) 0%, transparent 100%)',
     progress: 3, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'spotshare-parking': {
     color: '#00d4e8',
-    img: 'radial-gradient(ellipse at 50% 120%, #00d4e820 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, #00d4e80a 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(0,212,232,0.125) 0%, transparent 65%)',
+    gradient: 'linear-gradient(to bottom, rgba(0,212,232,0.04) 0%, transparent 100%)',
     progress: 2, btnText: 'Source Code', hasAudit: false,
   },
   'pke-web': {
     color: '#9b1fff',
-    img: 'radial-gradient(ellipse at 50% 120%, #9b1fff20 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, #9b1fff0a 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(155,31,255,0.125) 0%, transparent 65%)',
+    gradient: 'linear-gradient(to bottom, rgba(155,31,255,0.04) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
 };
