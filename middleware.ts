@@ -8,8 +8,11 @@ export function middleware(request: NextRequest) {
   // Eliminating 'unsafe-inline' from script-src and style-src
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
-    style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com;
+     script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
+     /* Allow inline styles because Next/Tailwind inject critical CSS into style tags
+       which are treated as 'unsafe-inline' by the browser. We still restrict fonts
+       to Google Fonts. */
+     style-src 'self' 'unsafe-inline' 'nonce-${nonce}' https://fonts.googleapis.com;
     img-src 'self' blob: data: https://avatars.githubusercontent.com https://raw.githubusercontent.com https://eneko-ruiz.vercel.app;
     font-src 'self' https://fonts.gstatic.com;
     connect-src 'self' https://api.github.com https://eneko-ruiz-curriculum.vercel.app https://vercel.live https://*.vercel.live;
