@@ -1,5 +1,5 @@
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from 'next-themes';
+import { ClientThemeProvider } from './components/ui/ClientThemeProvider';
 import { headers } from 'next/headers';
 import { SkipLink } from './components/ui/SkipLink';
 import './styles/globals.css';
@@ -65,12 +65,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <SkipLink />
         <div id="scroll-progress" className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0" />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+        <ClientThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
           <SmoothScroll />
           <EasterEgg />
           <InfallibleCursor />
           <IntroProvider>{children}</IntroProvider>
-        </ThemeProvider>
+        </ClientThemeProvider>
       </body>
     </html>
   );
