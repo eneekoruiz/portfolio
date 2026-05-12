@@ -73,8 +73,8 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
     >
       <div ref={containerRef} className="relative" style={{ width: 0, height: 0, transformStyle: 'preserve-3d', transform: 'rotateX(-6deg)' }}>
         {techs.map((tech) => {
-          // Unified monochromatic approach: use cardColor for all pills in this category
-          const techColor = cardColor; 
+          // Restore individual tech colors from constants for maximum vibrancy
+          const techColor = LANG_COLORS[tech] || cardColor; 
 
           return (
             <div
@@ -85,12 +85,12 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
               onMouseLeave={() => setPaused(false)}
             >
               <div 
-                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 bg-white/5 dark:bg-black/40 backdrop-blur-md shadow-xl"
-                style={{ borderColor: `${techColor}30` }}
+                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 bg-white/10 dark:bg-black/60 backdrop-blur-md shadow-xl"
+                style={{ borderColor: `${techColor}60` }}
               >
                 <span 
                   className="w-2.5 h-2.5 rounded-full shadow-lg shrink-0" 
-                  style={{ background: techColor, boxShadow: `0 0 8px ${techColor}80` }} 
+                  style={{ background: techColor, boxShadow: `0 0 10px ${techColor}` }} 
                 />
                 <span className="text-[11px] font-black text-ink uppercase tracking-wider">
                   {tech}
@@ -110,9 +110,9 @@ const ICONS = [Server, MonitorSmartphone, Cpu, Database, Sparkles];
 interface SkillsProps { t: Tx; }
 
 export function Skills({ t }: SkillsProps) {
-  const { theme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
+  const isDark = mounted && resolvedTheme === 'dark';
   const containerRef = useRef<HTMLElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -214,7 +214,7 @@ export function Skills({ t }: SkillsProps) {
                 <div 
                   className="relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/5 dark:bg-white/[0.01] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.15)] hover:-translate-y-2 skill-card-dynamic"
                   style={{
-                    '--card-color': (card.g === 'Frontend' && isDark) ? '#fff' : vibrantColor,
+                    '--card-color': vibrantColor,
                     '--card-color-rgb': card.rgb,
                   } as React.CSSProperties}
                 >

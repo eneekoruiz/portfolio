@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   // Eliminating 'unsafe-inline' from script-src and style-src
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http:;
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
     style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com;
     img-src 'self' blob: data: https://avatars.githubusercontent.com https://raw.githubusercontent.com https://eneko-ruiz.vercel.app;
     font-src 'self' https://fonts.gstatic.com;

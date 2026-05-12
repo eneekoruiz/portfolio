@@ -117,11 +117,14 @@ export function BinaryStreamBtn({
 
   useEffect(() => () => { clearInterval(ivRef.current); clearInterval(bvRef.current); clearTimeout(toRef.current); }, []);
 
-  const baseIdle = variant === 'dark'
-    ? 'bg-ink text-page shadow-[0_10px_32px_rgba(0,0,0,.15)] border border-ink/10 dark:border-white/10 hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,0,0,.25)]'
-    : variant === 'ghost'
-    ? 'bg-transparent text-lead border border-lead/20 hover:border-brand hover:text-brand hover:bg-brand/5 shadow-none'
-    : 'bg-brand text-white shadow-[0_10px_32px_rgba(0,102,255,.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,102,255,.45)]';
+  type ButtonVariant = 'light' | 'dark' | 'ghost';
+  const variantClasses: Record<ButtonVariant, string> = {
+    dark: 'bg-ink text-page shadow-[0_10px_32px_rgba(0,0,0,.15)] border border-ink/10 dark:border-white/10 hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,0,0,.25)]',
+    ghost: 'bg-transparent text-lead border border-lead/20 hover:border-brand hover:text-brand hover:bg-brand/5 shadow-none',
+    light: 'bg-brand text-white shadow-[0_10px_32px_rgba(0,102,255,.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,102,255,.45)]',
+  };
+
+  const baseIdle = variantClasses[variant];
 
   return (
     <button

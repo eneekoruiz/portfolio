@@ -27,7 +27,7 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import type { Lang } from '@/app/types';
+import type { Lang } from '../../types';
 
 const WELCOME_TEXT: Record<Lang, string> = {
   es: 'Bienvenido',

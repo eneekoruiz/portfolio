@@ -6,11 +6,11 @@ import { Sun, Moon } from 'lucide-react';
 import { useSound } from '../../hooks/useSound';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const { playClick } = useSound();
   const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const isDark = theme === 'dark';
+  const isDark = resolvedTheme === 'dark';
 
   useEffect(() => setMounted(true), []);
 

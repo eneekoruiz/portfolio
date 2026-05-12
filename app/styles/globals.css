@@ -261,12 +261,12 @@ html {
 
 /* ── 13.5. DYNAMIC COLOR FIXES (No-FOUC & Glassmorphism) ── */
 .skill-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.12) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
-  border-color: rgba(var(--card-color-rgb), 0.25) !important;
+  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.2) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+  border-color: rgba(var(--card-color-rgb), 0.4) !important;
 }
 .dark .skill-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.18) 0%, rgba(0, 0, 0, 0.2) 100%) !important;
-  border-color: rgba(var(--card-color-rgb), 0.35) !important;
+  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.25) 0%, rgba(0, 0, 0, 0.3) 100%) !important;
+  border-color: rgba(var(--card-color-rgb), 0.5) !important;
 }
 
 .skill-card-title {
