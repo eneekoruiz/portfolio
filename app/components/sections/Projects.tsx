@@ -531,7 +531,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
           </div>
 
           <div
-            className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.05] flex flex-col justify-between gap-6"
+            className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.08] flex flex-col justify-between gap-6"
           >
             <p className="text-sm md:text-[15px] font-light leading-relaxed text-ink/78">
               {proj.desc}
