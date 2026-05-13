@@ -160,7 +160,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
 
 export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef   = useRef<number>();
+  const animRef   = useRef<number>(undefined);
   const tRef      = useRef(0);
   const activeRef = useRef(false);
 
@@ -270,7 +270,7 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
 
 export const FloatingArtifact = ({ accent, idx }: { accent: string; idx: number }) => {
   const ref    = useRef<HTMLDivElement>(null);
-  const ctxRef = useRef<gsap.Context>();
+  const ctxRef = useRef<gsap.Context>(undefined);
 
   useEffect(() => {
     if (!ref.current) return;

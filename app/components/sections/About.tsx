@@ -17,6 +17,7 @@ export function About({ t }: { t: Tx }) {
 interface MetricCardProps {
   v: string;
   l: string;
+  key?: string | number;
 }
 
 function MetricCard({ v, l }: MetricCardProps) {

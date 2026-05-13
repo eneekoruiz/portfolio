@@ -94,7 +94,7 @@ export interface ProjectCard {
 // ── Global Window Interface ──────────────────────────────────────────────────
 declare global {
   interface Window {
-    __lenis?: Lenis;
+    __lenis?: any;
     __galaxy?: {
       setAttract: (v: boolean) => void;
       setSpeed: (v: number) => void;

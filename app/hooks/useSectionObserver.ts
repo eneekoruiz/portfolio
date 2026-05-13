@@ -11,7 +11,7 @@ interface SectionMap {
   c: string;
 }
 
-export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.RefObject<HTMLDivElement>, indRef: React.RefObject<HTMLDivElement>, activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>, onSectionChange?: (id: string) => void) {
+export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.RefObject<HTMLDivElement | null>, indRef: React.RefObject<HTMLDivElement | null>, activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>, onSectionChange?: (id: string) => void) {
   useEffect(() => {
     if (!ready) return;
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');

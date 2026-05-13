@@ -18,16 +18,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install
 
       - name: Typecheck
-        run: npm run typecheck
+        run: yarn typecheck
 
       - name: Build
-        run: npm run build
+        run: yarn build
 
       - name: Lint (if configured)
-        run: npm run lint --if-present
+        run: yarn lint --if-present

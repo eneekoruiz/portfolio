@@ -26,7 +26,7 @@ export function InfallibleCursor() {
   // Refs de control
   const isHover = useRef(false);
   const isMagnetic = useRef(false);
-  const shakeTO = useRef<ReturnType<typeof setTimeout>>();
+  const shakeTO = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => { setMounted(true); }, []);
 

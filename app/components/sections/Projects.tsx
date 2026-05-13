@@ -204,7 +204,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
   const [isPrefetched, setIsPrefetched] = useState(false);
   const rowRef   = useRef<HTMLDivElement>(null);
   const bodyRef  = useRef<HTMLDivElement>(null);
-  const ctxRef   = useRef<gsap.Context>();
+  const ctxRef   = useRef<gsap.Context>(undefined);
   const router   = useRouter();
 
   const safeId = proj.name.toLowerCase().replace(/[\s_]+/g, '-');

@@ -13,8 +13,8 @@ interface NavbarProps {
   setLang: (l: Lang) => void;
   setCmd: (open: boolean) => void;
   setMenu: (open: boolean) => void;
-  navInnerRef: React.RefObject<HTMLDivElement>;
-  indRef: React.RefObject<HTMLDivElement>;
+  navInnerRef: React.RefObject<HTMLDivElement | null>;
+  indRef: React.RefObject<HTMLDivElement | null>;
   onNavEnter: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   onNavContainerLeave: () => void;
 }

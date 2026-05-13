@@ -11,7 +11,7 @@ type BtnState = 'idle' | 'animating' | 'done';
 /* ── WorkScrollBtn ─────────────────────────────────────────────── */
 export function WorkScrollBtn({ label }: { label: string }) {
   const [state, setState] = useState<BtnState>('idle');
-  const toRef = useRef<ReturnType<typeof setTimeout>>();
+  const toRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const handleClick = () => {
     if (state !== 'idle') return;
@@ -77,9 +77,9 @@ export function BinaryStreamBtn({
   const [progress, setProgress] = useState(0);
   const [bits, setBits]         = useState<{ id: number; x: number; y: number; v: string }[]>([]);
   const [showRipple, setShowRipple] = useState(false);
-  const ivRef = useRef<ReturnType<typeof setInterval>>();
-  const bvRef = useRef<ReturnType<typeof setInterval>>();
-  const toRef = useRef<ReturnType<typeof setTimeout>>();
+  const ivRef = useRef<ReturnType<typeof setInterval>>(undefined);
+  const bvRef = useRef<ReturnType<typeof setInterval>>(undefined);
+  const toRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const bitId = useRef(0);
 
   const handleClick = () => {
@@ -179,7 +179,7 @@ export function BinaryStreamBtn({
 export function BranchMergeBtn({ label, href = 'https://github.com/eneekoruiz' }: { label: string; href?: string }) {
   const [state, setState] = useState<BtnState>('idle');
   const [drawn, setDrawn] = useState(false);
-  const toRef = useRef<ReturnType<typeof setTimeout>>();
+  const toRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const magnetRef = useMagnetic<HTMLButtonElement>({ strength: 0.3, innerStrength: 0.12 });
 
   const handleClick = () => {
@@ -241,7 +241,7 @@ export function BranchMergeBtn({ label, href = 'https://github.com/eneekoruiz' }
 /* ── PortalWarpBtn ─────────────────────────────────────────────── */
 export function PortalWarpBtn({ className }: { className?: string }) {
   const [state, setState] = useState<BtnState>('idle');
-  const toRef = useRef<ReturnType<typeof setTimeout>>();
+  const toRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const handleClick = () => {
     if (state !== 'idle') return;

@@ -16,7 +16,7 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
   const containerRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
   const angleRef = useRef(Math.random() * Math.PI); 
-  const animRef = useRef<number>();
+  const animRef = useRef<number>(undefined);
   
   const N = techs.length;
   const angleStep = (2 * Math.PI) / N;
