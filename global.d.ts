@@ -9,4 +9,10 @@ declare module '*.jpeg';
 
 interface Window {
   __NEXT_DATA__?: any;
+  __LITE?: boolean;
+  __galaxy?: {
+    setAttract: (v: boolean) => void;
+    setSpeed: (v: number) => void;
+  };
+  __lenis?: any;
 }

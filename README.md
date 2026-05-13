@@ -1,6 +1,6 @@
 # ENEKO RUIZ | SOFTWARE ENGINEER
 
-A high-performance portfolio focusing on motion design and hardened React architecture. Built with **Next.js 14 (App Router)**, utilizing **Server Components (RSC)** for optimized rendering and data integrity.
+A high-performance portfolio focusing on motion design and hardened React architecture. Built with **Next.js 16 (App Router)**, utilizing **Server Components (RSC)** and **React 19** for optimized rendering and data integrity.
 
 ---
 
@@ -18,10 +18,11 @@ A high-performance portfolio focusing on motion design and hardened React archit
 
 | Layer | Technology |
 | :--- | :--- |
-| **Framework** | Next.js 14 (App Router) |
-| **Logic** | TypeScript |
+| **Framework** | Next.js 16 (App Router) |
+| **Runtime** | React 19 + Node 22 |
+| **Logic** | TypeScript 6 |
 | **Motion** | GSAP (GreenSock) |
-| **Styling** | Tailwind CSS |
+| **Styling** | Tailwind CSS 3.4 |
 | **Infrastructure** | Vercel |
 
 ---

@@ -212,7 +212,7 @@ export function Skills({ t }: SkillsProps) {
           return (
             <div key={card.g} className="skill-card-wrapper opacity-0" role="listitem">
                 <div 
-                  className="relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/5 dark:bg-white/[0.01] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.15)] hover:-translate-y-2 skill-card-dynamic"
+                  className="relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/5 dark:bg-white/[0.08] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.15)] hover:-translate-y-2 skill-card-dynamic"
                   style={{
                     '--card-color': vibrantColor,
                     '--card-color-rgb': card.rgb,

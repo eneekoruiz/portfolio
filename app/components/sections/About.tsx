@@ -14,12 +14,17 @@ export function About({ t }: { t: Tx }) {
   );
 }
 
-function MetricCard({ v, l }: { v: string, l: string }) {
+interface MetricCardProps {
+  v: string;
+  l: string;
+}
+
+function MetricCard({ v, l }: MetricCardProps) {
   const ref = useMagnetic<HTMLDivElement>({ strength: 0.02, innerStrength: 0.05 });
   return (
     <div
       ref={ref}
-      className="p-8 md:p-10 rounded-3xl border border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/[0.06] backdrop-blur-xl block will-change-transform"
+      className="p-8 md:p-10 rounded-3xl border border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/[0.1] backdrop-blur-xl block will-change-transform"
     >
       <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">{v}</div>
       <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{l}</p>
@@ -43,13 +48,13 @@ function AboutContent({ t }: { t: Tx }) {
       // 2. EFECTO TELÓN (MASKED REVEAL) - La nueva manera
       if (textContainerRef.current) {
         gsap.fromTo('.word-inner',
-          { y: '110%', opacity: 0 }, // Empieza escondido hacia abajo
+          { y: '110%', opacity: 0 },
           {
             y: '0%',
             opacity: 1,
-            duration: 0.3,
-            stagger: 0.012,
-            ease: 'power3.out',
+            duration: 0.42,
+            stagger: 0.015,
+            ease: 'expo.out',
             scrollTrigger: {
               trigger: textContainerRef.current,
               start: 'top 85%',
