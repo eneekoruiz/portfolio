@@ -62,13 +62,18 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
 
       ctx.clearRect(0, 0, w, h);
       
-      const steps = 80;
-      const speed = 0.012; // Smoother rotation
+      const steps = 60; // Reduced from 80 for performance
+      const speed = 0.012;
       
       rotationRef.current += speed;
       const baseRotation = rotationRef.current;
+      const accentColor = colorsRef.current.accent;
 
       // Draw Strands
+      ctx.lineWidth = darkMode ? 5 : 4;
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = accentColor;
+      
       for (let s = 0; s < 2; s++) {
         const offset = s === 0 ? 0 : Math.PI;
         ctx.beginPath();
@@ -81,12 +86,10 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = colorsRef.current.accent; // Both strands now use the accent color for symmetry
-        ctx.lineWidth = darkMode ? 5 : 4; // Thicker lines for more visibility
-        ctx.globalAlpha = 0.8;
         ctx.stroke();
       }
 
+      // Draw Crossbars and Nodes
       for (let i = 0; i <= steps; i++) {
         const progress = i / steps;
         const y = progress * h;
@@ -103,30 +106,32 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.beginPath();
           ctx.moveTo(x1, y);
           ctx.lineTo(x2, y);
-          ctx.strokeStyle = colorsRef.current.accent;
-          ctx.globalAlpha = (darkMode ? 0.4 : 0.25) * (z1 + z2 + 2) / 2; // More visible crossbars
-          ctx.lineWidth = 1.5; // Thicker crossbars
+          ctx.strokeStyle = accentColor;
+          ctx.globalAlpha = (darkMode ? 0.35 : 0.2) * (z1 + z2 + 2) / 2;
+          ctx.lineWidth = 1.5;
           ctx.stroke();
         }
 
-        const drawNode = (x: number, z: number, color: string) => {
-          const size = 3 + (z + 1) * 3; // Larger nodes
+        const drawNode = (x: number, z: number) => {
+          const size = 3 + (z + 1) * 3;
+          
+          // Fast Pseudo-Glow (much cheaper than shadowBlur)
+          ctx.globalAlpha = darkMode ? 0.15 : 0.1;
+          ctx.beginPath();
+          ctx.arc(x, y, size * 2.2, 0, Math.PI * 2);
+          ctx.fillStyle = accentColor;
+          ctx.fill();
+          
+          ctx.globalAlpha = 1.0;
           ctx.beginPath();
           ctx.arc(x, y, size, 0, Math.PI * 2);
-          ctx.fillStyle = color;
-          ctx.globalAlpha = 1.0;
-          
-          // Enhanced glow effect
-          ctx.shadowBlur = darkMode ? 45 : 30;
-          ctx.shadowColor = color;
           ctx.fill();
         };
 
-        drawNode(x1, z1, colorsRef.current.accent);
-        drawNode(x2, z2, colorsRef.current.accent); // Both sides use the same color
+        drawNode(x1, z1);
+        drawNode(x2, z2);
       }
       
-      ctx.shadowBlur = 0;
       frame = requestAnimationFrame(draw);
     };
 

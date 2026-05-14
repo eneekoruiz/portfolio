@@ -298,6 +298,11 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
     }
   }, [tilt, isMobile, reduced]);
 
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
+
   return (
     <section id="hero" aria-label="Hero" className="min-h-[100svh] flex flex-col overflow-hidden pt-[80px] relative snap-start">
       
@@ -323,18 +328,24 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
             <p className="h-ln text-[clamp(1.1rem,2.2vw,1.65rem)] font-medium text-lead mb-1">{greeting}</p>
             
             <div className="h-ln relative">
-              {/* Texto Base — Enhanced visibility to avoid "broken" look */}
-              <div className="opacity-[0.8] dark:opacity-[0.12] pointer-events-none transition-opacity duration-500">
-                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Eneko</h1>
-                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Ruiz.</h1>
+              {/* Texto Base — Hardened color and opacity to avoid "broken" grayscale look */}
+              <div 
+                className="pointer-events-none transition-opacity duration-500"
+                style={{ 
+                  opacity: isDark ? 0.12 : 0.8,
+                  color: '#6e6e73' // Hardened lead color
+                }}
+              >
+                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Eneko</h1>
+                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Ruiz.</h1>
               </div>
               
-              {/* Texto Iluminado por la linterna — Refined gradient for smoother transition */}
+              {/* Texto Iluminado por la linterna — Hardened brand color for consistent rendering */}
               <div 
                 className="absolute top-0 left-0 pointer-events-none w-full h-full select-none gpu-accelerated"
                 aria-hidden="true"
                 style={{
-                  backgroundImage: `radial-gradient(circle var(--msize, ${isMobile ? '220px' : '400px'}) at var(--mx, -1000px) var(--my, -1000px), rgba(255,255,255,0.9) 0%, var(--brand) 45%, transparent 85%)`,
+                  backgroundImage: `radial-gradient(circle var(--msize, ${isMobile ? '220px' : '400px'}) at var(--mx, -1000px) var(--my, -1000px), rgba(255,255,255,0.9) 0%, #0066ff 45%, transparent 85%)`,
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',

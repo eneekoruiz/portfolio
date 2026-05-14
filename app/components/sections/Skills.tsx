@@ -296,11 +296,15 @@ export function Skills({ t }: SkillsProps) {
               role="listitem"
             >
                 <div 
-                  className={`relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/10 dark:bg-white/[0.08] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.2)] hover:-translate-y-2 skill-card-dynamic ${isLast ? 'w-full md:w-[calc(50%-1rem)]' : 'w-full'}`}
+                  className={`relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] shadow-2xl hover:-translate-y-2 ${isLast ? 'w-full md:w-[calc(50%-1rem)]' : 'w-full'}`}
                   style={{
-                    '--card-color': vibrantColor,
-                    '--card-color-rgb': card.rgb,
-                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'
+                    background: isDark 
+                      ? `linear-gradient(145deg, rgba(${card.rgb}, 0.35) 0%, rgba(${card.rgb}, 0.05) 100%)` 
+                      : `linear-gradient(145deg, rgba(${card.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
+                    borderColor: isDark 
+                      ? `rgba(${card.rgb}, 0.55)` 
+                      : `rgba(${card.rgb}, 0.4)`,
+                    boxShadow: `0 20px 50px rgba(${card.rgb}, ${isDark ? '0.25' : '0.15'})`
                   } as React.CSSProperties}
                 >
                   {/* Título de la tarjeta con más presencia y COLOR */}
@@ -315,7 +319,10 @@ export function Skills({ t }: SkillsProps) {
                       <Icon size={28} />
                     </div>
                     <div>
-                      <h3 className="font-black text-2xl tracking-tight uppercase leading-none skill-card-title drop-shadow-sm">
+                      <h3 
+                        className="font-black text-2xl tracking-tight uppercase leading-none drop-shadow-sm"
+                        style={{ color: isDark ? 'white' : vibrantColor }}
+                      >
                         {t.skCats[i] || card.g}
                       </h3>
                     <div className="h-1.5 w-12 mt-2 rounded-full transition-all duration-500 group-hover:w-20" 

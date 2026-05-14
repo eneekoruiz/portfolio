@@ -259,30 +259,7 @@ html {
 }
 .bento-glare:hover::before { opacity: 1; }
 
-/* ── 13.5. DYNAMIC COLOR FIXES (No-FOUC & Glassmorphism) ── */
-.skill-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.2) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
-  border-color: rgba(var(--card-color-rgb), 0.4) !important;
-}
-.dark .skill-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--card-color-rgb), 0.35) 0%, rgba(var(--card-color-rgb), 0.05) 100%) !important;
-  border-color: rgba(var(--card-color-rgb), 0.55) !important;
-}
 
-.skill-card-title {
-  color: var(--card-color) !important;
-}
-.dark .skill-card-title {
-  color: white !important;
-}
-
-.contact-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.25), rgba(255, 255, 255, 0.05)) !important;
-}
-.dark .contact-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.4), rgba(var(--contact-bg-rgb), 0.05)) !important;
-  border-color: rgba(var(--contact-bg-rgb), 0.6) !important;
-}
 
 /* ── 14. PRINT / PDF CV (Dossier Edition) ── */
 @media print {
