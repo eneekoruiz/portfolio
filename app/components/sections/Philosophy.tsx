@@ -149,7 +149,6 @@ export function Philosophy({ t }: { t: Tx }) {
       aria-label="Filosofía"
       className="border-t border-black/5 dark:border-white/10 py-24 relative z-[20] bg-transparent"
     >
-      <NetworkParticles />
       <div className="px-6 md:px-8 max-w-[1200px] mx-auto overflow-hidden">
       <p className="sec-h text-xs font-bold tracking-[0.2em] uppercase text-slate-500 mb-4">
         {t.valLb}

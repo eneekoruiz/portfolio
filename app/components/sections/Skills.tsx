@@ -17,6 +17,9 @@ function TextPillCylinder({ techs, cardColor, isDark }: { techs: string[], cardC
   const [paused, setPaused] = useState(false);
   const angleRef = useRef(Math.random() * Math.PI); 
   const animRef = useRef<number>(undefined);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startAngle = useRef(0);
   
   const N = techs.length;
   const angleStep = (2 * Math.PI) / N;
@@ -32,68 +35,141 @@ function TextPillCylinder({ techs, cardColor, isDark }: { techs: string[], cardC
       if (!paused && isVisible) angleRef.current += 0.004; 
       const a = angleRef.current;
       
+      // We always run the positioning loop even if isVisible is briefly false during first frame
+      // to ensure they are never clumped in the center.
+      items.forEach((el: HTMLDivElement, i: number) => {
+        const theta = i * angleStep + a;
+        const x = Math.sin(theta) * radius;
+        const z = Math.cos(theta) * radius;
+        
+        const scale = 0.5 + ((z + radius) / (2 * radius)) * 0.5;
+        const opacity = 0.25 + ((z + radius) / (2 * radius)) * 0.75;
+        
+        el.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, 0, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+        el.style.opacity = String(opacity.toFixed(3));
+        el.style.zIndex = String(Math.round(z + radius));
+      });
+
       if (isVisible) {
-        items.forEach((el: HTMLDivElement, i: number) => {
-          const theta = i * angleStep + a;
-          const x = Math.sin(theta) * radius;
-          const z = Math.cos(theta) * radius;
-          
-          const scale = 0.5 + ((z + radius) / (2 * radius)) * 0.5;
-          const opacity = 0.25 + ((z + radius) / (2 * radius)) * 0.75;
-          
-          el.style.transform = `translate(-50%, -50%) translateX(${x.toFixed(1)}px) translateZ(${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
-          el.style.opacity = String(opacity.toFixed(3));
-          el.style.zIndex = String(Math.round(z + radius));
-        });
+        animRef.current = requestAnimationFrame(animate);
+      } else {
+        // Stop loop if not visible, but keep requestAnimationFrame available for next check
+        animRef.current = requestAnimationFrame(animate);
       }
-      animRef.current = requestAnimationFrame(animate);
     };
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;
       },
-      { threshold: 0.05 }
+      { threshold: 0.01 } // Lower threshold for faster activation
     );
 
     if (containerRef.current) observer.observe(containerRef.current);
+
+    const handleWheel = (e: WheelEvent) => {
+      // Sensitivity factor
+      angleRef.current += e.deltaY * 0.001;
+    };
+
+    const handleMouseDown = (e: MouseEvent) => {
+      isDragging.current = true;
+      startX.current = e.clientX;
+      startAngle.current = angleRef.current;
+      setPaused(true);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.clientX - startX.current;
+      // Map drag distance to angle
+      angleRef.current = startAngle.current + dx * 0.01;
+    };
+
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      setPaused(false);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      isDragging.current = true;
+      startX.current = e.touches[0].clientX;
+      startAngle.current = angleRef.current;
+      setPaused(true);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.touches[0].clientX - startX.current;
+      angleRef.current = startAngle.current + dx * 0.01;
+    };
+
+    const el = containerRef.current?.parentElement;
+    if (el) {
+      el.addEventListener('wheel', handleWheel, { passive: true });
+      el.addEventListener('mousedown', handleMouseDown);
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      el.addEventListener('touchstart', handleTouchStart, { passive: true });
+      window.addEventListener('touchmove', handleTouchMove, { passive: true });
+      window.addEventListener('touchend', handleMouseUp);
+    }
 
     animate();
     return () => { 
       if (animRef.current) cancelAnimationFrame(animRef.current); 
       observer.disconnect();
+      if (el) {
+        el.removeEventListener('wheel', handleWheel);
+        el.removeEventListener('mousedown', handleMouseDown);
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+        el.removeEventListener('touchstart', handleTouchStart);
+        window.removeEventListener('touchmove', handleTouchMove);
+        window.removeEventListener('touchend', handleMouseUp);
+      }
     };
   }, [paused, N, radius, angleStep]);
 
   return (
     <div 
-      className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden rounded-[32px] pt-12" 
+      className="absolute inset-0 flex items-center justify-center pointer-events-auto overflow-hidden rounded-[32px] pt-12 cursor-grab active:cursor-grabbing" 
       style={{ perspective: '1000px' }}
       aria-hidden="true"
     >
       <div ref={containerRef} className="relative" style={{ width: 0, height: 0, transformStyle: 'preserve-3d', transform: 'rotateX(-6deg)' }}>
-        {techs.map((tech) => {
+        {techs.map((tech, i) => {
           // Restore individual tech colors from constants for maximum vibrancy
           const techColor = LANG_COLORS[tech] || cardColor; 
+          const initialTheta = i * angleStep + angleRef.current;
+          const ix = Math.sin(initialTheta) * radius;
+          const iz = Math.cos(initialTheta) * radius;
 
           return (
             <div
               key={tech}
-              className="mini-cyl-item absolute pointer-events-auto cursor-default"
-              style={{ left: 0, top: 0, transformStyle: 'preserve-3d' }}
+              className="mini-cyl-item absolute pointer-events-auto cursor-default will-change-transform"
+              style={{ 
+                left: 0, 
+                top: 0, 
+                transformStyle: 'preserve-3d',
+                transform: `translate(-50%, -50%) translate3d(${ix.toFixed(1)}px, 0, ${iz.toFixed(1)}px) scale(0.8)`,
+                opacity: 0 // Start hidden but positioned to avoid flash-clump
+              }}
               onMouseEnter={() => setPaused(true)}
               onMouseLeave={() => setPaused(false)}
             >
               <div 
-                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 backdrop-blur-md shadow-xl"
+                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 backdrop-blur-md shadow-2xl"
                 style={{ 
-                  borderColor: `${techColor}60`,
-                  background: isDark ? `${techColor}25` : `${techColor}12`
+                  borderColor: `${techColor}B0`, // even more opaque border
+                  background: isDark ? `${techColor}40` : `${techColor}25`, // higher opacity background
+                  boxShadow: `0 10px 40px -10px ${techColor}60`
                 }}
               >
                 <span 
-                  className="w-2.5 h-2.5 rounded-full shadow-lg shrink-0" 
-                  style={{ background: techColor, boxShadow: `0 0 10px ${techColor}` }} 
+                  className="w-3.5 h-3.5 rounded-full shadow-lg shrink-0" 
+                  style={{ background: techColor, boxShadow: `0 0 18px ${techColor}` }} 
                 />
                 <span className="text-[11px] font-black text-ink uppercase tracking-wider">
                   {tech}
@@ -215,10 +291,11 @@ export function Skills({ t }: SkillsProps) {
           return (
             <div key={card.g} className="skill-card-wrapper opacity-0" role="listitem">
                 <div 
-                  className="relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/5 dark:bg-white/[0.08] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.15)] hover:-translate-y-2 skill-card-dynamic"
+                  className="relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/10 dark:bg-white/[0.08] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.2)] hover:-translate-y-2 skill-card-dynamic"
                   style={{
                     '--card-color': vibrantColor,
                     '--card-color-rgb': card.rgb,
+                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'
                   } as React.CSSProperties}
                 >
                   {/* Título de la tarjeta con más presencia y COLOR */}

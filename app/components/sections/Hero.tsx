@@ -138,7 +138,8 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
           '--msize': targetSize,
           duration: snapX !== null ? 0.4 : 0.1,
           ease: 'power2.out',
-          overwrite: 'auto'
+          overwrite: 'auto',
+          force3D: true // Ensure hardware acceleration
         });
 
         // 3D Parallax Tilt
@@ -223,7 +224,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       });
 
       tl.fromTo(textContainerRef.current,
-        { '--mx': '-200px', '--my': '100px', rotateX: 5, rotateY: -10 },
+        { '--mx': '-500px', '--my': '100px', rotateX: 5, rotateY: -10 },
         { 
           '--mx': '1200px', 
           '--my': '150px', 
@@ -318,19 +319,19 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       <div className="h-txt flex-1 flex flex-col justify-center max-w-[1200px] mx-auto w-full px-8 py-8 relative z-[1]">
         <div className="max-w-full lg:max-w-[54%]">
           
-          <div className="mb-5 overflow-hidden pb-2" ref={textContainerRef}>
+          <div className="mb-5 overflow-hidden pb-2" ref={textContainerRef} style={{ isolation: 'isolate' }}>
             <p className="h-ln text-[clamp(1.1rem,2.2vw,1.65rem)] font-medium text-lead mb-1">{greeting}</p>
             
-            <div className="relative">
+            <div className="h-ln relative">
               {/* Texto Base — Enhanced visibility to avoid "broken" look */}
-              <div className="h-ln opacity-[0.8] dark:opacity-[0.12] pointer-events-none transition-opacity duration-500">
+              <div className="opacity-[0.8] dark:opacity-[0.12] pointer-events-none transition-opacity duration-500">
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Eneko</h1>
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Ruiz.</h1>
               </div>
               
               {/* Texto Iluminado por la linterna — Refined gradient for smoother transition */}
               <div 
-                className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full select-none"
+                className="absolute top-0 left-0 pointer-events-none w-full h-full select-none gpu-accelerated"
                 aria-hidden="true"
                 style={{
                   backgroundImage: `radial-gradient(circle var(--msize, ${isMobile ? '220px' : '400px'}) at var(--mx, -1000px) var(--my, -1000px), rgba(255,255,255,0.9) 0%, var(--brand) 45%, transparent 85%)`,
@@ -338,6 +339,8 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                   backgroundClip: 'text',
                   color: 'transparent',
                   WebkitTextFillColor: 'transparent',
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden'
                 }}
               >
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Eneko</h1>

@@ -277,11 +277,11 @@ html {
 }
 
 .contact-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.12), rgba(255, 255, 255, 0.05)) !important;
+  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.25), rgba(255, 255, 255, 0.05)) !important;
 }
 .dark .contact-card-dynamic {
-  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.25), rgba(var(--contact-bg-rgb), 0.05)) !important;
-  border-color: rgba(var(--contact-bg-rgb), 0.45) !important;
+  background: linear-gradient(145deg, rgba(var(--contact-bg-rgb), 0.4), rgba(var(--contact-bg-rgb), 0.05)) !important;
+  border-color: rgba(var(--contact-bg-rgb), 0.6) !important;
 }
 
 /* ── 14. PRINT / PDF CV (Dossier Edition) ── */

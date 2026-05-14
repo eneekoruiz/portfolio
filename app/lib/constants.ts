@@ -113,14 +113,23 @@ export const LANG_COLORS: Record<string, string> = {
   'CSS3': '#1572B6',
   'Docker': '#2496ED',
   'Git': '#F05032',
-  'PostgreSQL': '#4169E1',
+  'PostgreSQL': '#336791',
   'MySQL': '#4479A1',
-  'Redis': '#DC382D',
+  'Redis': '#D82C20',
   'Prisma': '#2D3748',
   'Spring': '#6DB33F',
   'Linux': '#FCC624',
   'Bash': '#4EAA25',
-  'CI/CD': '#0066cc'
+  'SSH': '#000000',
+  'Make': '#427819',
+  'CI/CD': '#0066cc',
+  'C/C++': '#00599C',
+  'SQLite': '#003B57',
+  'Antigravity': '#0066ff',
+  'GeminiChat': '#0066ff',
+  'Claude': '#D97757',
+  'GPT-4': '#10a37f',
+  'LLMs': '#af52de'
 };
 
 /** Alias for backwards compat */
