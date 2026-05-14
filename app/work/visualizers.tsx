@@ -14,6 +14,16 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
   const rotationRef = useRef(0);
   const activeRef = useRef(false);
   const smoothedScrollRef = useRef(0);
+  const colorsRef = useRef({ accent, secondary });
+
+  useEffect(() => {
+    gsap.to(colorsRef.current, {
+      accent,
+      secondary,
+      duration: 0.8,
+      ease: 'power2.out',
+    });
+  }, [accent, secondary]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,7 +81,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = accent; // Both strands now use the accent color for symmetry
+        ctx.strokeStyle = colorsRef.current.accent; // Both strands now use the accent color for symmetry
         ctx.lineWidth = darkMode ? 5 : 4; // Thicker lines for more visibility
         ctx.globalAlpha = 0.8;
         ctx.stroke();
@@ -93,7 +103,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.beginPath();
           ctx.moveTo(x1, y);
           ctx.lineTo(x2, y);
-          ctx.strokeStyle = accent;
+          ctx.strokeStyle = colorsRef.current.accent;
           ctx.globalAlpha = (darkMode ? 0.4 : 0.25) * (z1 + z2 + 2) / 2; // More visible crossbars
           ctx.lineWidth = 1.5; // Thicker crossbars
           ctx.stroke();
@@ -112,8 +122,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.fill();
         };
 
-        drawNode(x1, z1, accent);
-        drawNode(x2, z2, accent); // Both sides use the same color
+        drawNode(x1, z1, colorsRef.current.accent);
+        drawNode(x2, z2, colorsRef.current.accent); // Both sides use the same color
       }
       
       ctx.shadowBlur = 0;
@@ -140,7 +150,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
       observer.disconnect();
       window.removeEventListener('resize', resize);
     };
-  }, [accent, secondary, darkMode]);
+  }, [darkMode]);
 
 
   return (
