@@ -168,8 +168,8 @@ export default function ProjectPage() {
   const content = projectData ? (projectData[lang] ?? projectData['en'] ?? projectData['es']) : undefined;
   const snippet = CODE_SNIPPETS[safeId as keyof typeof CODE_SNIPPETS];
   const LIVE_URLS: Record<string, string | null> = {
-    'ana-peluquera':      'https://ana-peluquera.vercel.app',
-    'who-are-ya-backend': 'https://whoareya.vercel.app',
+    'ana-peluquera':      'https://agpeluqueria.vercel.app',
+    'who-are-ya-backend': 'https://who-are-ya-backend.onrender.com',
     'pke-web':            'https://pke-web.vercel.app',
     'rides24ofiziala':    null,
     'spotshare-parking':  null,

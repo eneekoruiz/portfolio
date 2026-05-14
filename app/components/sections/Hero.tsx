@@ -323,7 +323,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
             
             <div className="relative">
               {/* Texto Base — Enhanced visibility to avoid "broken" look */}
-              <div className="h-ln opacity-[0.8] dark:opacity-[0.6] pointer-events-none transition-opacity duration-500">
+              <div className="h-ln opacity-[0.8] dark:opacity-[0.12] pointer-events-none transition-opacity duration-500">
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Eneko</h1>
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] text-lead">Ruiz.</h1>
               </div>
@@ -333,7 +333,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                 className="absolute top-0 left-0 h-ln pointer-events-none w-full h-full select-none"
                 aria-hidden="true"
                 style={{
-                  backgroundImage: `radial-gradient(circle var(--msize, ${isMobile ? '220px' : '400px'}) at var(--mx, -1000px) var(--my, -1000px), #ffffff 0%, var(--brand) 30%, transparent 70%)`,
+                  backgroundImage: `radial-gradient(circle var(--msize, ${isMobile ? '220px' : '400px'}) at var(--mx, -1000px) var(--my, -1000px), rgba(255,255,255,0.9) 0%, var(--brand) 45%, transparent 85%)`,
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',

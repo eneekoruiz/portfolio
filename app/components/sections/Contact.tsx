@@ -12,7 +12,7 @@ const EMAIL = 'eneekoruiz@gmail.com';
 
 const CONTACTS = [
   { href: `mailto:${EMAIL}`,                    icon: Mail,     label: 'Gmail',    val: EMAIL,                        bg: '#EA4335', rgb: '234, 67, 53', glow: 'rgba(234,67,53,.15)',  bd: 'border-[rgba(234,67,53,.35)]', isEmail: true  },
-  { href: 'https://github.com/eneekoruiz',      icon: Github,   label: 'GitHub',   val: 'github.com/eneekoruiz',      bg: '#24292F', rgb: '36, 41, 47',  glow: 'rgba(0,0,0,.15)',      bd: 'border-[rgba(0,0,0,.25)]',    isEmail: false },
+  { href: 'https://github.com/eneekoruiz',      icon: Github,   label: 'GitHub',   val: 'github.com/eneekoruiz',      bg: '#24292F', rgb: '36, 41, 47',  glow: 'rgba(120,120,120,.15)',     bd: 'border-[rgba(120,120,120,.3)]', isEmail: false },
   { href: 'https://linkedin.com/in/eneekoruiz', icon: Linkedin, label: 'LinkedIn', val: 'linkedin.com/in/eneekoruiz', bg: '#0077B5', rgb: '0, 119, 181', glow: 'rgba(0,119,181,.15)',  bd: 'border-[rgba(0,119,181,.35)]', isEmail: false },
 ];
 
@@ -75,7 +75,7 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
             <div ref={iconRef} className="transition-all duration-200">
               {copied
                 ? <Check size={28} className="text-[#34c759]" aria-hidden="true" />
-                : <c.icon size={28} style={{ color: c.bg }} aria-hidden="true" />
+                : <c.icon size={28} style={{ color: (isDark && c.label === 'GitHub') ? '#fff' : c.bg }} aria-hidden="true" />
               }
             </div>
             <div>
@@ -84,7 +84,7 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
                 {copied ? '¡Copiado al portapapeles!' : c.val}
               </p>
             </div>
-            <div className="mt-auto flex items-center gap-1.5 text-[12px] font-bold" style={{ color: copied ? '#34c759' : c.bg }}>
+            <div className="mt-auto flex items-center gap-1.5 text-[12px] font-bold" style={{ color: copied ? '#34c759' : ((isDark && c.label === 'GitHub') ? '#fff' : c.bg) }}>
               {copied ? 'Pegalo donde quieras' : 'Copiar email'} <ArrowUpRight size={13} />
             </div>
           </div>
@@ -121,13 +121,13 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
           >
 
             <div ref={iconRef}>
-              <c.icon size={28} style={{ color: c.bg }} aria-hidden="true" />
+              <c.icon size={28} style={{ color: (isDark && c.label === 'GitHub') ? '#fff' : c.bg }} aria-hidden="true" />
             </div>
             <div>
               <p className="font-black text-[1.1rem] tracking-[-0.4px] text-ink mb-1">{c.label}</p>
               <p className="font-mono text-[12px] text-lead">{c.val}</p>
             </div>
-            <div className="mt-auto flex items-center gap-1.5 text-[12px] font-bold" style={{ color: c.bg }}>
+            <div className="mt-auto flex items-center gap-1.5 text-[12px] font-bold" style={{ color: (isDark && c.label === 'GitHub') ? '#fff' : c.bg }}>
               Contactar <ArrowUpRight size={13} />
             </div>
           </div>

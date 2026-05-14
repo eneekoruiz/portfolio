@@ -48,32 +48,32 @@ const PROJ_THEMES: Record<string, {
 }> = {
   'ana-peluquera': {
     color: '#ff2d78',
-    img: 'radial-gradient(ellipse at 50% 120%, rgba(255,45,120,0.125) 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, rgba(255,45,120,0.04) 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(255,45,120,0.2) 0%, transparent 75%)',
+    gradient: 'linear-gradient(to bottom, rgba(255,45,120,0.12) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'who-are-ya-backend': {
     color: '#00c940',
-    img: 'radial-gradient(ellipse at 50% 120%, rgba(0,201,64,0.125) 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, rgba(0,201,64,0.04) 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(0,201,64,0.2) 0%, transparent 75%)',
+    gradient: 'linear-gradient(to bottom, rgba(0,201,64,0.12) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'rides24ofiziala': {
     color: '#e69400',
-    img: 'radial-gradient(ellipse at 50% 120%, rgba(230,148,0,0.125) 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, rgba(230,148,0,0.04) 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(230,148,0,0.2) 0%, transparent 75%)',
+    gradient: 'linear-gradient(to bottom, rgba(230,148,0,0.12) 0%, transparent 100%)',
     progress: 3, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'spotshare-parking': {
     color: '#00d4e8',
-    img: 'radial-gradient(ellipse at 50% 120%, rgba(0,212,232,0.125) 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, rgba(0,212,232,0.04) 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(0,212,232,0.2) 0%, transparent 75%)',
+    gradient: 'linear-gradient(to bottom, rgba(0,212,232,0.12) 0%, transparent 100%)',
     progress: 2, btnText: 'Source Code', hasAudit: false,
   },
   'pke-web': {
     color: '#9b1fff',
-    img: 'radial-gradient(ellipse at 50% 120%, rgba(155,31,255,0.125) 0%, transparent 65%)',
-    gradient: 'linear-gradient(to bottom, rgba(155,31,255,0.04) 0%, transparent 100%)',
+    img: 'radial-gradient(ellipse at 50% 120%, rgba(155,31,255,0.2) 0%, transparent 75%)',
+    gradient: 'linear-gradient(to bottom, rgba(155,31,255,0.12) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
 };
@@ -81,7 +81,7 @@ const PROJ_THEMES: Record<string, {
 const DEFAULT_THEME = {
   color: '#0066cc', 
   img: 'radial-gradient(ellipse at 50% 120%, rgba(0,102,204,0.1) 0%, transparent 65%)', 
-  gradient: 'linear-gradient(to bottom, rgba(0,102,204,0.03) 0%, transparent 100%)', 
+  gradient: 'linear-gradient(to bottom, rgba(0,102,204,0.08) 0%, transparent 100%)', 
   progress: 1, 
   btnText: 'Source Code', 
   hasAudit: false,
@@ -142,12 +142,20 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
               </span>
               <div className="flex flex-wrap gap-[0.3rem]">
                 {r.langs?.map(l => (
-                  <span key={l} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-medium bg-black/[0.035] dark:bg-white/[0.035] border border-black/8 dark:border-white/10 text-lead whitespace-nowrap">
+                  <span 
+                    key={l} 
+                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap transition-all"
+                    style={{
+                      background: (LANG_COLORS[l] || '#888888') + '15',
+                      borderColor: (LANG_COLORS[l] || '#888888') + '35',
+                      color: LANG_COLORS[l] || 'var(--lead)'
+                    }}
+                  >
                     <span
                       className="w-[5px] h-[5px] rounded-full shrink-0"
                       style={{
-                        background: 'var(--brand)',
-                        filter: isActive ? `drop-shadow(0 0 4px var(--brand))` : 'none',
+                        background: LANG_COLORS[l] || 'var(--brand)',
+                        filter: isActive ? `drop-shadow(0 0 4px ${LANG_COLORS[l] || 'var(--brand)'})` : 'none',
                         transition: 'filter .2s',
                       }}
                     />
@@ -312,13 +320,19 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
     <div
       ref={rowRef}
       className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-colors duration-300"
-      style={isExpanded ? { background: theme.gradient } : undefined}
+      style={{
+        background: isExpanded ? theme.gradient : undefined,
+        backdropFilter: isExpanded ? 'blur(12px) saturate(1.2)' : 'none',
+        WebkitBackdropFilter: isExpanded ? 'blur(12px) saturate(1.2)' : 'none',
+      }}
     >
-      {/* Premium Hover Spotlight — "Chula" way */}
-      <div
-        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-700 pointer-events-none"
-        style={{ 
-          background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${theme.color}0d 0%, transparent 100%)`,
+      {/* Dynamic Background Layer (Glass + Color) */}
+      <div 
+        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{
+          background: `${theme.img}, radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${theme.color}20 0%, transparent 100%)`,
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)',
         }}
       />
       
@@ -552,7 +566,12 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                   {proj.langs.map(l => (
                     <span
                       key={l}
-                      className="px-2 py-0.5 rounded-full border border-black/10 dark:border-white/10 text-[8px] md:text-[9px] font-medium tracking-wide bg-black/[0.018] dark:bg-white/[0.018] text-ink"
+                      className="px-2 py-0.5 rounded-full border text-[8px] md:text-[9px] font-bold tracking-wide transition-all"
+                      style={{
+                        background: (LANG_COLORS[l] || '#888888') + '15',
+                        borderColor: (LANG_COLORS[l] || '#888888') + '35',
+                        color: LANG_COLORS[l] || 'var(--ink)'
+                      }}
                     >
                       {l}
                     </span>

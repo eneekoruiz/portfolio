@@ -361,14 +361,15 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     };
 
     if (activeSection === 'work') {
-      if (hoveredProject) return { accent: hoveredProject.color, secondary: isDarkLocal ? '#111' : '#ccc' };
       if (expandedIdx !== null && top3[expandedIdx]) {
-        const pColor = PROJ_COLORS[top3[expandedIdx].n] || (isDarkLocal ? '#0066ff' : '#0044cc');
+        const pColor = PROJ_COLORS[top3[expandedIdx].name] || (isDarkLocal ? '#0066ff' : '#0044cc');
         return { accent: pColor, secondary: isDarkLocal ? '#111' : '#ccc' };
       }
     }
+    
+    // Natural color fallback
     return { accent: isDarkLocal ? '#0066ff' : '#0044cc', secondary: isDarkLocal ? '#111' : '#ccc' };
-  }, [activeSection, hoveredProject, expandedIdx, top3, theme, resolvedTheme]);
+  }, [activeSection, expandedIdx, top3, theme, resolvedTheme]);
 
   // ── Phase Handlers ──────────────────────────────────────────────────────
   const onPreloaderDone = useCallback(() => setPhase('splash'), [setPhase]);
@@ -398,7 +399,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
             className="helix-group will-change-transform"
             style={{
               width: '100vw', height: '240vh',
-              opacity: expandedIdx !== null ? 1.0 : (hoveredProject ? 0.8 : (isDark ? 0.65 : 0.35)),
+              opacity: expandedIdx !== null ? 1.0 : (hoveredProject ? 0.95 : (isDark ? 0.85 : 0.65)),
               transformStyle: 'preserve-3d',
               willChange: 'transform'
             }}

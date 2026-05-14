@@ -12,7 +12,7 @@ import type { Tx } from '../../types';
 if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // ── EL CARRUSEL 3D (COMPACTO) ──
-function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: string }) {
+function TextPillCylinder({ techs, cardColor, isDark }: { techs: string[], cardColor: string, isDark: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
   const angleRef = useRef(Math.random() * Math.PI); 
@@ -85,8 +85,11 @@ function TextPillCylinder({ techs, cardColor }: { techs: string[], cardColor: st
               onMouseLeave={() => setPaused(false)}
             >
               <div 
-                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 bg-white/10 dark:bg-black/60 backdrop-blur-md shadow-xl"
-                style={{ borderColor: `${techColor}60` }}
+                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 transition-all hover:scale-110 backdrop-blur-md shadow-xl"
+                style={{ 
+                  borderColor: `${techColor}60`,
+                  background: isDark ? `${techColor}25` : `${techColor}12`
+                }}
               >
                 <span 
                   className="w-2.5 h-2.5 rounded-full shadow-lg shrink-0" 
@@ -243,7 +246,7 @@ export function Skills({ t }: SkillsProps) {
                 </div>
 
                 {/* CARRUSEL 3D DE PÍLDORAS — Enhanced with color boost */}
-                <TextPillCylinder techs={Array.from(card.techs)} cardColor={vibrantColor} />
+                <TextPillCylinder techs={Array.from(card.techs)} cardColor={vibrantColor} isDark={isDark} />
 
                 {/* Brillo ambiental — Más intenso en el hover */}
                 <div 

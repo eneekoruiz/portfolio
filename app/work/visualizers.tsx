@@ -71,9 +71,9 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = s === 0 ? accent : secondary;
-        ctx.lineWidth = darkMode ? 3.5 : 2.5; // Thinner, more elegant strands
-        ctx.globalAlpha = 1.0;
+        ctx.strokeStyle = accent; // Both strands now use the accent color for symmetry
+        ctx.lineWidth = darkMode ? 5 : 4; // Thicker lines for more visibility
+        ctx.globalAlpha = 0.8;
         ctx.stroke();
       }
 
@@ -94,31 +94,26 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.moveTo(x1, y);
           ctx.lineTo(x2, y);
           ctx.strokeStyle = accent;
-          ctx.globalAlpha = (darkMode ? 0.25 : 0.15) * (z1 + z2 + 2) / 2; // Brighter crossbars
-          ctx.lineWidth = 0.5;
+          ctx.globalAlpha = (darkMode ? 0.4 : 0.25) * (z1 + z2 + 2) / 2; // More visible crossbars
+          ctx.lineWidth = 1.5; // Thicker crossbars
           ctx.stroke();
         }
 
         const drawNode = (x: number, z: number, color: string) => {
-          const size = 1.8 + (z + 1) * 2.2; // Refined node sizes
+          const size = 3 + (z + 1) * 3; // Larger nodes
           ctx.beginPath();
           ctx.arc(x, y, size, 0, Math.PI * 2);
           ctx.fillStyle = color;
           ctx.globalAlpha = 1.0;
           
           // Enhanced glow effect
-          if (z > 0.4) {
-            ctx.shadowBlur = darkMode ? 35 : 25;
-            ctx.shadowColor = color;
-          } else {
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = color;
-          }
+          ctx.shadowBlur = darkMode ? 45 : 30;
+          ctx.shadowColor = color;
           ctx.fill();
         };
 
         drawNode(x1, z1, accent);
-        drawNode(x2, z2, secondary);
+        drawNode(x2, z2, accent); // Both sides use the same color
       }
       
       ctx.shadowBlur = 0;

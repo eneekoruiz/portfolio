@@ -460,9 +460,20 @@ export function ProjectHero({
               />
             </>
           ) : (
-             <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-4">
-                <Activity size={48} className="text-white/10 animate-pulse" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-white/20">No Environment Mapped</span>
+             <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-6 p-10 text-center">
+                <div className="relative">
+                  <Activity size={48} className="text-white/20 animate-pulse" />
+                  <div className="absolute inset-0 blur-2xl bg-white/5 animate-pulse" />
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
+                    {projectId === 'rides24ofiziala' ? 'Estamos trabajando en la demo todavía' : 'Próximamente'}
+                  </span>
+                  <div className="w-12 h-px bg-white/10" />
+                  <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
+                    Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.
+                  </span>
+                </div>
              </div>
           )}
           

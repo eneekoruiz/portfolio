@@ -43,43 +43,50 @@ export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.Ref
 
   useEffect(() => {
     if (!ready) return;
-    const sections = t.hrefs.map((h: string) => document.querySelector(h)).filter(Boolean) as HTMLElement[];
+    
+    // Combine navbar sections with internal sections we want to track (like #github)
+    const trackedIds = [...t.hrefs, '#github'];
+    const sections = trackedIds.map((h: string) => document.querySelector(h)).filter(Boolean) as HTMLElement[];
     const navLinks = navInnerRef.current?.querySelectorAll<HTMLAnchorElement>('a');
-    if (!sections.length || !navLinks?.length) return;
+    
+    if (!sections.length) return;
 
     const ctx = gsap.context(() => {
-      function setActive(idx: number) {
-        const link = navLinks![idx];
-        if (!link || !indRef.current || !navInnerRef.current) return;
+      function setActive(id: string, idx: number) {
+        // Only update navbar indicator if the section has a corresponding nav link
+        if (navLinks && idx < navLinks.length && indRef.current && navInnerRef.current) {
+          const link = navLinks[idx];
+          if (link) {
+            activeLinkRef.current = link;
+            const r = link.getBoundingClientRect();
+            const nr = navInnerRef.current.getBoundingClientRect();
+            gsap.to(indRef.current, {
+              x: r.left - nr.left,
+              width: r.width,
+              height: r.height,
+              opacity: 0.65,
+              duration: 0.3,
+              ease: 'power3.out',
+              overwrite: 'auto',
+            });
+          }
+        }
 
-        activeLinkRef.current = link;
-        const id = t.hrefs[idx].replace('#', '');
         if (onSectionChange) onSectionChange(id);
-
-        const r = link.getBoundingClientRect();
-        const nr = navInnerRef.current.getBoundingClientRect();
-        gsap.to(indRef.current, {
-          x: r.left - nr.left,
-          width: r.width,
-          height: r.height,
-          opacity: 0.65,
-          duration: 0.3,
-          ease: 'power3.out',
-          overwrite: 'auto',
-        });
       }
 
       sections.forEach((sec, idx) => {
+        const id = trackedIds[idx].replace('#', '');
         ScrollTrigger.create({
           trigger: sec,
           start: 'top 50%',
           end: 'bottom 50%',
-          onEnter: () => setActive(idx),
-          onEnterBack: () => setActive(idx),
+          onEnter: () => setActive(id, idx),
+          onEnterBack: () => setActive(id, idx),
         });
       });
 
-      if (window.scrollY < 100) setActive(0);
+      if (window.scrollY < 100) setActive('hero', 0);
     });
 
     return () => ctx.revert();
