@@ -287,11 +287,16 @@ export function Skills({ t }: SkillsProps) {
         {SKILLS.map((card, i) => {
           const Icon = ICONS[i] || Code;
           const vibrantColor = card.c; // Using 'c' from constants.ts (the brand color)
+          const isLast = i === SKILLS.length - 1 && SKILLS.length % 2 !== 0;
           
           return (
-            <div key={card.g} className="skill-card-wrapper opacity-0" role="listitem">
+            <div 
+              key={card.g} 
+              className={`skill-card-wrapper opacity-0 ${isLast ? 'md:col-span-2 flex justify-center' : ''}`} 
+              role="listitem"
+            >
                 <div 
-                  className="relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/10 dark:bg-white/[0.08] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.2)] hover:-translate-y-2 skill-card-dynamic"
+                  className={`relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] bg-white/10 dark:bg-white/[0.08] shadow-2xl hover:shadow-[0_20px_50px_rgba(var(--card-color-rgb),0.2)] hover:-translate-y-2 skill-card-dynamic ${isLast ? 'w-full md:w-[calc(50%-1rem)]' : 'w-full'}`}
                   style={{
                     '--card-color': vibrantColor,
                     '--card-color-rgb': card.rgb,
