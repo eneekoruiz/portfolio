@@ -154,8 +154,8 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
                     key={l} 
                     className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap transition-all"
                     style={{
-                      background: (LANG_COLORS[l] || '#888888') + '25',
-                      borderColor: (LANG_COLORS[l] || '#888888') + 'B0', // More opaque border
+                      background: (LANG_COLORS[l] || '#888888') + '35',
+                      borderColor: (LANG_COLORS[l] || '#888888') + 'E0', // Much more vivid border
                       color: LANG_COLORS[l] || 'var(--ink)' // Always colored text
                     }}
                   >
