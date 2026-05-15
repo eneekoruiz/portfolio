@@ -52,35 +52,35 @@ const PROJ_THEMES: Record<string, {
     color: '#ff2d78',
     rgb: '255, 45, 120',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(255,45,120,0.2) 0%, transparent 75%)',
-    gradient: 'linear-gradient(to bottom, rgba(255,45,120,0.12) 0%, transparent 100%)',
+    gradient: 'radial-gradient(at 0% 0%, rgba(255,45,120,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(255,45,120,0.08) 0px, transparent 50%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'who-are-ya-backend': {
     color: '#00c940',
     rgb: '0, 201, 64',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(0,201,64,0.2) 0%, transparent 75%)',
-    gradient: 'linear-gradient(to bottom, rgba(0,201,64,0.12) 0%, transparent 100%)',
+    gradient: 'radial-gradient(at 0% 0%, rgba(0,201,64,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(0,201,64,0.08) 0px, transparent 50%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'rides24ofiziala': {
     color: '#e69400',
     rgb: '230, 148, 0',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(230,148,0,0.2) 0%, transparent 75%)',
-    gradient: 'linear-gradient(to bottom, rgba(230,148,0,0.12) 0%, transparent 100%)',
+    gradient: 'radial-gradient(at 0% 0%, rgba(230,148,0,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(230,148,0,0.08) 0px, transparent 50%)',
     progress: 3, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'spotshare-parking': {
     color: '#00d4e8',
     rgb: '0, 212, 232',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(0,212,232,0.2) 0%, transparent 75%)',
-    gradient: 'linear-gradient(to bottom, rgba(0,212,232,0.12) 0%, transparent 100%)',
+    gradient: 'radial-gradient(at 0% 0%, rgba(0,212,232,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(0,212,232,0.08) 0px, transparent 50%)',
     progress: 2, btnText: 'Source Code', hasAudit: false,
   },
   'pke-web': {
     color: '#9b1fff',
     rgb: '155, 31, 255',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(155,31,255,0.2) 0%, transparent 75%)',
-    gradient: 'linear-gradient(to bottom, rgba(155,31,255,0.12) 0%, transparent 100%)',
+    gradient: 'radial-gradient(at 0% 0%, rgba(155,31,255,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(155,31,255,0.08) 0px, transparent 50%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
 };
@@ -342,8 +342,9 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
       className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-colors duration-300"
       style={{
         background: isExpanded ? theme.gradient : undefined,
-        backdropFilter: isExpanded ? 'blur(12px) saturate(1.2)' : 'none',
-        WebkitBackdropFilter: isExpanded ? 'blur(12px) saturate(1.2)' : 'none',
+        backdropFilter: isExpanded ? 'blur(20px) saturate(1.4)' : 'none',
+        WebkitBackdropFilter: isExpanded ? 'blur(20px) saturate(1.4)' : 'none',
+        boxShadow: isExpanded ? `inset 0 1px 0 0 rgba(255,255,255,${isDark ? '0.05' : '0.1'}), inset 0 -1px 0 0 rgba(0,0,0,${isDark ? '0.1' : '0.05'})` : 'none',
       }}
     >
       {/* Dynamic Background Layer (Glass + Color) */}
@@ -358,8 +359,8 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
       
       {/* Side Accent Line */}
       <div 
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 bg-[var(--theme-color)] group-hover/row:h-[65%] transition-all duration-500 ease-spring rounded-r-full z-20"
-        style={{ '--theme-color': theme.color } as React.CSSProperties}
+        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] transition-all duration-500 ease-spring rounded-r-full z-20 ${isExpanded ? 'h-full translate-y-0 top-0' : 'h-0 group-hover/row:h-[65%]'}`}
+        style={{ backgroundColor: theme.color } as React.CSSProperties}
       />
 
       {/* Top Border Glow on Hover */}
