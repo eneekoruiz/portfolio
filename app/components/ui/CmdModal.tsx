@@ -127,7 +127,14 @@ export function CmdModal({
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)}
             aria-label="Buscar"
           />
-          <kbd className="font-mono text-[10px] text-lead px-[7px] py-[2px] border border-black/10 dark:border-white/10 rounded-[5px] shrink-0">ESC</kbd>
+          <button 
+            onClick={onClose}
+            type="button"
+            className="font-mono text-[10px] text-lead/50 hover:text-ink px-[7px] py-[2px] border border-black/10 dark:border-white/10 rounded-[5px] shrink-0 hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all"
+            aria-label="Cerrar buscador"
+          >
+            ESC
+          </button>
         </div>
 
         {/* ── Results ── */}
