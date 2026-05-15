@@ -186,8 +186,8 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white text-[9px] font-black uppercase tracking-[0.22em] hover:scale-105 transition-all shadow-lg border backdrop-blur-md"
                 style={{
                   background: isDark 
-                    ? `linear-gradient(145deg, rgba(${LANG_COLORS[r.langs[0]] ? (LANG_COLORS[r.langs[0]].match(/\d+/g)?.join(',') || '120,120,120') : '120,120,120'}, 0.5) 0%, rgba(0,0,0,0) 100%)` 
-                    : `linear-gradient(145deg, ${LANG_COLORS[r.langs[0]] || '#24292F'} 0%, ${LANG_COLORS[r.langs[0]] || '#24292F'}ee 100%)`,
+                    ? `linear-gradient(145deg, ${(LANG_COLORS[r.langs?.[0]] || '#666666')}80 0%, transparent 100%)` 
+                    : `linear-gradient(145deg, ${(LANG_COLORS[r.langs?.[0]] || '#24292F')} 0%, ${(LANG_COLORS[r.langs?.[0]] || '#24292F')}ee 100%)`,
                   borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'transparent',
                   boxShadow: `0 8px 20px rgba(0,0,0,0.15)`
                 }}
