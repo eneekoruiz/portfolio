@@ -83,7 +83,7 @@ function AboutContent({ t }: { t: Tx }) {
   };
 
   return (
-    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden bg-transparent z-[20]">
+    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden bg-page z-[20]">
       <div className="px-6 md:px-8 max-w-[1200px] mx-auto relative z-10">
         <NetworkParticles />
 
