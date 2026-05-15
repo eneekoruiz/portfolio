@@ -179,7 +179,14 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
               <a
                 href={r.html_url} target="_blank" rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-page text-[9px] font-bold uppercase tracking-[0.22em] hover:scale-105 transition-transform"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white text-[9px] font-black uppercase tracking-[0.22em] hover:scale-105 transition-all shadow-lg border backdrop-blur-md"
+                style={{
+                  background: isDark 
+                    ? `linear-gradient(145deg, rgba(${LANG_COLORS[r.langs[0]] ? (LANG_COLORS[r.langs[0]].match(/\d+/g)?.join(',') || '120,120,120') : '120,120,120'}, 0.5) 0%, rgba(0,0,0,0) 100%)` 
+                    : `linear-gradient(145deg, ${LANG_COLORS[r.langs[0]] || '#24292F'} 0%, ${LANG_COLORS[r.langs[0]] || '#24292F'}ee 100%)`,
+                  borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  boxShadow: `0 8px 20px rgba(0,0,0,0.15)`
+                }}
               >
                 Visitar Repo <ArrowUpRight size={12} />
               </a>
@@ -531,12 +538,12 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                 }`}
                 style={{ 
                   background: isDark 
-                    ? `linear-gradient(145deg, rgba(${theme.rgb}, 0.55) 0%, rgba(${theme.rgb}, 0.25) 100%)` 
-                    : `linear-gradient(145deg, rgba(${theme.rgb}, 0.8) 0%, rgba(${theme.rgb}, 0.6) 100%)`,
+                    ? `linear-gradient(145deg, rgba(${theme.rgb}, 0.7) 0%, rgba(${theme.rgb}, 0.3) 100%)` 
+                    : `linear-gradient(145deg, rgba(${theme.rgb}, 0.95) 0%, rgba(${theme.rgb}, 0.8) 100%)`,
                   borderColor: isDark 
-                    ? `rgba(${theme.rgb}, 0.7)` 
-                    : `rgba(${theme.rgb}, 0.5)`,
-                  boxShadow: `0 15px 35px rgba(${theme.rgb}, ${isDark ? '0.4' : '0.25'})`
+                    ? `rgba(${theme.rgb}, 0.8)` 
+                    : `rgba(${theme.rgb}, 0.6)`,
+                  boxShadow: `0 15px 35px rgba(${theme.rgb}, ${isDark ? '0.5' : '0.35'})`
                 }}
               >
                 <span className="text-[11px] uppercase tracking-[0.2em] flex items-center gap-2">
@@ -557,12 +564,12 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                 className="relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full transition-all duration-300 text-white font-black border backdrop-blur-md hover:scale-[1.05] hover:shadow-[0_12px_30px_rgba(0,0,0,0.15)] active:scale-95"
                 style={{ 
                   background: isDark 
-                    ? `linear-gradient(145deg, rgba(${theme.rgb}, 0.55) 0%, rgba(${theme.rgb}, 0.25) 100%)` 
-                    : `linear-gradient(145deg, rgba(${theme.rgb}, 0.8) 0%, rgba(${theme.rgb}, 0.6) 100%)`,
+                    ? `linear-gradient(145deg, rgba(${theme.rgb}, 0.7) 0%, rgba(${theme.rgb}, 0.3) 100%)` 
+                    : `linear-gradient(145deg, rgba(${theme.rgb}, 0.95) 0%, rgba(${theme.rgb}, 0.8) 100%)`,
                   borderColor: isDark 
-                    ? `rgba(${theme.rgb}, 0.7)` 
-                    : `rgba(${theme.rgb}, 0.5)`,
-                  boxShadow: `0 15px 35px rgba(${theme.rgb}, ${isDark ? '0.4' : '0.25'})`
+                    ? `rgba(${theme.rgb}, 0.8)` 
+                    : `rgba(${theme.rgb}, 0.6)`,
+                  boxShadow: `0 15px 35px rgba(${theme.rgb}, ${isDark ? '0.5' : '0.35'})`
                 }}
               >
                 <span className="text-[11px] uppercase tracking-[0.2em] flex items-center gap-2">
@@ -597,8 +604,8 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                       key={l}
                       className="px-2 py-0.5 rounded-full border text-[8px] md:text-[9px] font-bold tracking-wide transition-all"
                       style={{
-                        background: (LANG_COLORS[l] || '#888888') + '25',
-                        borderColor: (LANG_COLORS[l] || '#888888') + 'B0',
+                        background: (LANG_COLORS[l] || '#888888') + '35',
+                        borderColor: (LANG_COLORS[l] || '#888888') + 'E0', // Much more vivid border
                         color: LANG_COLORS[l] || 'var(--ink)'
                       }}
                     >
