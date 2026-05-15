@@ -70,7 +70,7 @@ export function ProjectPreviewFollower({ activeProject }: ProjectPreviewFollower
   return (
     <div
       ref={containerRef}
-      className="fixed top-0 left-0 z-[100] pointer-events-none will-change-transform flex items-center justify-center"
+      className="fixed top-0 left-0 z-[30] pointer-events-none will-change-transform flex items-center justify-center"
       style={{ 
         width: '280px', 
         height: '180px', 
