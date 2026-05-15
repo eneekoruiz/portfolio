@@ -127,6 +127,10 @@ interface RepoRowProps {
 
 function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoRowProps) {
   const isActive = activeRepo === idx;
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === 'dark';
 
   return (
     <div
