@@ -80,6 +80,15 @@ export function ProjectHero({
   useEffect(() => { interRef.current = isInteracting; }, [isInteracting]);
   useEffect(() => { canRef.current   = canInteract;   }, [canInteract]);
 
+  // Iframe loading safety fallback
+  useEffect(() => {
+    if (!liveUrl || iframeLoaded) return;
+    const timer = setTimeout(() => {
+      setIframeLoaded(true);
+    }, 6000); // 6s fallback for heavy sites
+    return () => clearTimeout(timer);
+  }, [liveUrl, iframeLoaded]);
+
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
   useGSAP(() => {
     if (!isReady || !heroRef.current || !bgImageRef.current || !titleRef.current || !screenRef.current) return;
@@ -459,6 +468,24 @@ export function ProjectHero({
                 }}
               />
             </>
+          ) : videoUrl ? (
+             <div className="w-full h-full bg-black relative">
+                <video
+                  src={videoUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? 'scale-100' : 'scale-[1.05]'}`}
+                  style={{ 
+                    filter: (canInteract && !isInteracting) ? 'blur(15px) brightness(0.4) saturate(0.5)' : 'none',
+                  }}
+                />
+                {/* HUD Overlay for Video */}
+                {!isInteracting && (
+                  <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+                )}
+             </div>
           ) : (
              <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-6 p-10 text-center">
                 <div className="relative">

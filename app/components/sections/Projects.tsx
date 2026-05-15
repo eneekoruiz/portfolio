@@ -15,6 +15,7 @@ import {
   ArrowUpRight, ArrowRight,
   Activity, Code2, Loader2, ChevronDown,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { LANG_COLORS } from '../../lib/constants';
 import type { ProjectCard, RepoFull, Tx } from '../../types';
 import {
@@ -40,6 +41,7 @@ const SESSION_KEY      = 'projects_nav_state';
  */
 const PROJ_THEMES: Record<string, {
   color: string;
+  rgb: string;
   img: string;
   gradient: string;  // Gradiente para el fondo del row expandido
   progress: number;
@@ -48,30 +50,35 @@ const PROJ_THEMES: Record<string, {
 }> = {
   'ana-peluquera': {
     color: '#ff2d78',
+    rgb: '255, 45, 120',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(255,45,120,0.2) 0%, transparent 75%)',
     gradient: 'linear-gradient(to bottom, rgba(255,45,120,0.12) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'who-are-ya-backend': {
     color: '#00c940',
+    rgb: '0, 201, 64',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(0,201,64,0.2) 0%, transparent 75%)',
     gradient: 'linear-gradient(to bottom, rgba(0,201,64,0.12) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'rides24ofiziala': {
     color: '#e69400',
+    rgb: '230, 148, 0',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(230,148,0,0.2) 0%, transparent 75%)',
     gradient: 'linear-gradient(to bottom, rgba(230,148,0,0.12) 0%, transparent 100%)',
     progress: 3, btnText: 'Ver Auditoría', hasAudit: true,
   },
   'spotshare-parking': {
     color: '#00d4e8',
+    rgb: '0, 212, 232',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(0,212,232,0.2) 0%, transparent 75%)',
     gradient: 'linear-gradient(to bottom, rgba(0,212,232,0.12) 0%, transparent 100%)',
     progress: 2, btnText: 'Source Code', hasAudit: false,
   },
   'pke-web': {
     color: '#9b1fff',
+    rgb: '155, 31, 255',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(155,31,255,0.2) 0%, transparent 75%)',
     gradient: 'linear-gradient(to bottom, rgba(155,31,255,0.12) 0%, transparent 100%)',
     progress: 4, btnText: 'Ver Auditoría', hasAudit: true,
@@ -80,6 +87,7 @@ const PROJ_THEMES: Record<string, {
 
 const DEFAULT_THEME = {
   color: '#0066cc', 
+  rgb: '0, 102, 204',
   img: 'radial-gradient(ellipse at 50% 120%, rgba(0,102,204,0.1) 0%, transparent 65%)', 
   gradient: 'linear-gradient(to bottom, rgba(0,102,204,0.08) 0%, transparent 100%)', 
   progress: 1, 
@@ -214,6 +222,11 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
   const bodyRef  = useRef<HTMLDivElement>(null);
   const ctxRef   = useRef<gsap.Context>(undefined);
   const router   = useRouter();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+  const isDark = mounted && resolvedTheme === 'dark';
 
   const safeId = proj.name.toLowerCase().replace(/[\s_]+/g, '-');
   const panelId = `panel-${safeId}`;
@@ -513,10 +526,18 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                     setIsPrefetched(true);
                   }
                 }}
-                className={`relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.15)] transition-all duration-300 text-white font-black ${
+                className={`relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full transition-all duration-300 text-white font-black border backdrop-blur-md ${
                   isNavigating ? 'cursor-wait opacity-70' : 'hover:scale-[1.05] hover:shadow-[0_12px_30px_rgba(0,0,0,0.2)] active:scale-95'
                 }`}
-                style={{ backgroundColor: theme.color }}
+                style={{ 
+                  background: isDark 
+                    ? `linear-gradient(145deg, rgba(${theme.rgb}, 0.55) 0%, rgba(${theme.rgb}, 0.25) 100%)` 
+                    : `linear-gradient(145deg, rgba(${theme.rgb}, 0.8) 0%, rgba(${theme.rgb}, 0.6) 100%)`,
+                  borderColor: isDark 
+                    ? `rgba(${theme.rgb}, 0.7)` 
+                    : `rgba(${theme.rgb}, 0.5)`,
+                  boxShadow: `0 15px 35px rgba(${theme.rgb}, ${isDark ? '0.4' : '0.25'})`
+                }}
               >
                 <span className="text-[11px] uppercase tracking-[0.2em] flex items-center gap-2">
                   <Activity size={14} className={isNavigating ? '' : 'animate-pulse'} />
@@ -533,8 +554,16 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
                 target="_blank" rel="noopener noreferrer"
                 onMouseEnter={() => onHoverProject({ name: proj.name, color: theme.color })}
                 onMouseLeave={() => onHoverProject(null)}
-                className="relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.1)] hover:scale-[1.05] hover:shadow-[0_12px_30px_rgba(0,0,0,0.15)] active:scale-95 transition-all duration-300 text-white font-black"
-                style={{ backgroundColor: theme.color }}
+                className="relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full transition-all duration-300 text-white font-black border backdrop-blur-md hover:scale-[1.05] hover:shadow-[0_12px_30px_rgba(0,0,0,0.15)] active:scale-95"
+                style={{ 
+                  background: isDark 
+                    ? `linear-gradient(145deg, rgba(${theme.rgb}, 0.55) 0%, rgba(${theme.rgb}, 0.25) 100%)` 
+                    : `linear-gradient(145deg, rgba(${theme.rgb}, 0.8) 0%, rgba(${theme.rgb}, 0.6) 100%)`,
+                  borderColor: isDark 
+                    ? `rgba(${theme.rgb}, 0.7)` 
+                    : `rgba(${theme.rgb}, 0.5)`,
+                  boxShadow: `0 15px 35px rgba(${theme.rgb}, ${isDark ? '0.4' : '0.25'})`
+                }}
               >
                 <span className="text-[11px] uppercase tracking-[0.2em] flex items-center gap-2">
                   <Code2 size={14} /> {theme.btnText}

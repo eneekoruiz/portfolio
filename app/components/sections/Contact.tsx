@@ -65,15 +65,15 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
       >
         <div className="flip-inner min-h-[180px]">
           <div
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border transition-all duration-300 backdrop-blur-md`}
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border transition-all duration-300 backdrop-blur-md rounded-[32px] overflow-hidden`}
             style={{ 
               background: isDark 
-                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.4), rgba(${c.rgb}, 0.05))` 
-                : `linear-gradient(145deg, rgba(${c.rgb}, 0.25), rgba(255, 255, 255, 0.05))`,
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)` 
+                : `linear-gradient(145deg, rgba(${c.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
               borderColor: isDark 
-                ? `rgba(${c.rgb}, 0.6)` 
-                : `rgba(${c.rgb}, 0.45)`,
-              boxShadow: `inset 0 0 60px ${c.glow}`
+                ? `rgba(${c.rgb}, 0.55)` 
+                : `rgba(${c.rgb}, 0.4)`,
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.25' : '0.15'})`
             } as React.CSSProperties}
           >
             <div ref={iconRef} className="transition-all duration-200">
@@ -116,15 +116,15 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
       <a href={c.href} target="_blank" rel="noopener noreferrer" aria-label={c.label} data-h className="block h-full no-underline">
         <div className="flip-inner min-h-[180px]">
           <div 
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border backdrop-blur-md transition-all duration-300`} 
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border backdrop-blur-md transition-all duration-300 rounded-[32px] overflow-hidden`} 
             style={{ 
               background: isDark 
-                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.4), rgba(${c.rgb}, 0.05))` 
-                : `linear-gradient(145deg, rgba(${c.rgb}, 0.25), rgba(255, 255, 255, 0.05))`,
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)` 
+                : `linear-gradient(145deg, rgba(${c.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
               borderColor: isDark 
-                ? `rgba(${c.rgb}, 0.6)` 
-                : `rgba(${c.rgb}, 0.45)`,
-              boxShadow: `inset 0 0 60px ${c.glow}`
+                ? `rgba(${c.rgb}, 0.55)` 
+                : `rgba(${c.rgb}, 0.4)`,
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.25' : '0.15'})`
             } as React.CSSProperties}
           >
 
