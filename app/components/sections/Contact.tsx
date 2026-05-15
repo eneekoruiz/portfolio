@@ -92,9 +92,20 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
               {copied ? 'Pegalo donde quieras' : 'Copiar email'} <ArrowUpRight size={13} />
             </div>
           </div>
-          <div className="flip-back flex flex-col items-center justify-center gap-3" style={{ background: c.bg }}>
-            <c.icon size={42} className="text-white opacity-90" aria-hidden="true" />
-            <span className="text-white/85 font-bold text-[14px]">Copiar email</span>
+          <div 
+            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-md transition-all duration-300 rounded-[32px] overflow-hidden" 
+            style={{ 
+              background: isDark 
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.45) 0%, rgba(${c.rgb}, 0.1) 100%)` 
+                : `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)`,
+              borderColor: isDark 
+                ? `rgba(${c.rgb}, 0.65)` 
+                : `rgba(${c.rgb}, 0.5)`,
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.3' : '0.2'})`
+            } as React.CSSProperties}
+          >
+            <c.icon size={42} style={{ color: (isDark && c.label === 'GitHub') ? '#fff' : c.bg }} aria-hidden="true" />
+            <span className="text-ink font-bold text-[14px]">Copiar email</span>
           </div>
         </div>
       </button>
@@ -139,9 +150,20 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
               Contactar <ArrowUpRight size={13} />
             </div>
           </div>
-          <div className="flip-back flex flex-col items-center justify-center gap-3" style={{ background: c.bg }}>
-            <c.icon size={42} className="text-white opacity-90" aria-hidden="true" />
-            <span className="text-white/85 font-bold text-[14px]">Escribir</span>
+          <div 
+            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-md transition-all duration-300 rounded-[32px] overflow-hidden" 
+            style={{ 
+              background: isDark 
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.45) 0%, rgba(${c.rgb}, 0.1) 100%)` 
+                : `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)`,
+              borderColor: isDark 
+                ? `rgba(${c.rgb}, 0.65)` 
+                : `rgba(${c.rgb}, 0.5)`,
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.3' : '0.2'})`
+            } as React.CSSProperties}
+          >
+            <c.icon size={42} style={{ color: (isDark && c.label === 'GitHub') ? '#fff' : c.bg }} aria-hidden="true" />
+            <span className="text-ink font-bold text-[14px]">Escribir</span>
           </div>
         </div>
       </a>
