@@ -106,13 +106,15 @@ function GlareCard({ children, accent, className = '', style }: {
   };
 
   const onLeave = () => {
-    gsap.to(cardRef.current, {
-      rotateY: 0,
-      rotateX: 0,
-      duration: 1,
-      ease: 'power2.out',
-      overwrite: 'auto'
-    });
+    if (cardRef.current) {
+      gsap.to(cardRef.current, {
+        rotateY: 0,
+        rotateX: 0,
+        duration: 1,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+    }
   };
 
   return (

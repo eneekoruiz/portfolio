@@ -217,23 +217,24 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
 
     // ── Animación inicial: barrido de la linterna ───────────────────
     if (phase === 'ready' && textContainerRef.current && !isMobile && !reduced) {
+      const target = textContainerRef.current;
       const tl = gsap.timeline({
         onComplete: () => {
           // Asegurarse de que el hover tome el control total después de la animación
-          gsap.set(textContainerRef.current, { clearProps: 'all' });
+          if (target) gsap.set(target, { clearProps: 'all' });
         }
       });
 
-      tl.fromTo(textContainerRef.current,
+      tl.fromTo(target,
         { '--mx': '-500px', '--my': '100px', rotateX: 5, rotateY: -10 },
         { 
           '--mx': '1200px', 
           '--my': '150px', 
           rotateX: 0,
           rotateY: 0,
-          duration: 2.2, 
-          ease: 'power3.inOut', 
-          delay: 0.4
+          duration: 1.2, 
+          ease: 'power3.out', 
+          delay: 0
         }
       );
     }
@@ -337,8 +338,10 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                   color: '#6e6e73' // Hardened lead color
                 }}
               >
-                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Eneko</h1>
-                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Ruiz.</h1>
+                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">
+                  <span>Eneko</span><br />
+                  <span>Ruiz.</span>
+                </h1>
               </div>
               
               {/* Texto Iluminado por la linterna — Hardened brand color for consistent rendering */}
@@ -355,8 +358,10 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                   backfaceVisibility: 'hidden'
                 }}
               >
-                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Eneko</h1>
-                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">Ruiz.</h1>
+                <div className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">
+                  <span>Eneko</span><br />
+                  <span>Ruiz.</span>
+                </div>
               </div>
             </div>
           </div>

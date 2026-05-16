@@ -42,13 +42,13 @@ export function MobileMenu({ menu, setMenu, lang, setLang, t, menuRefs }: Mobile
       </button>
 
       <div className="relative z-10 h-full flex flex-col justify-center px-8">
-        <nav className="flex flex-col gap-6">
+        <nav className="flex flex-col gap-4">
           {t.menu.map((link: string, i: number) => (
             <a
               key={link}
               href={t.hrefs[i]}
               onClick={() => setMenu(false)}
-              className="font-black text-[2.8rem] tracking-tight text-ink no-underline block active:text-brand"
+              className="font-black text-[2.2rem] tracking-tight text-ink no-underline block active:text-brand"
             >
               {link}
             </a>

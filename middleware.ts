@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const nonce = btoa(crypto.randomUUID());
-  
-  // CSP for Production
-  // Eliminating 'unsafe-inline' from script-src and style-src
+  // CSP for Production:
+  // We explicitly permit 'unsafe-inline' for style-src and script-src to support 
+  // GSAP animations and dynamic styles. Nonces have been removed to ensure 
+  // that 'unsafe-inline' is properly respected by the browser.
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
-    style-src 'self' 'unsafe-inline' 'nonce-${nonce}' https://fonts.googleapis.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https://avatars.githubusercontent.com https://raw.githubusercontent.com https://eneko-ruiz.vercel.app;
     font-src 'self' https://fonts.gstatic.com;
     connect-src 'self' https://api.github.com https://eneko-ruiz-curriculum.vercel.app https://vercel.live https://*.vercel.live;
@@ -23,7 +23,6 @@ export function middleware(request: NextRequest) {
   `.replace(/\s{2,}/g, ' ').trim();
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
   requestHeaders.set('Content-Security-Policy', cspHeader);
 
   const response = NextResponse.next({
@@ -39,13 +38,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     {
       source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
       missing: [

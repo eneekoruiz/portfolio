@@ -205,55 +205,60 @@ export function Skills({ t }: SkillsProps) {
     const ctx = gsap.context(() => {
       
       // 1. Animación del Título (Igual para todos)
-      gsap.fromTo('.skills-header',
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 0.58, ease: 'power3.out',
-          scrollTrigger: { trigger: containerRef.current, start: 'top 75%', once: true } }
-      );
+      if (document.querySelector('.skills-header')) {
+        gsap.fromTo('.skills-header',
+          { opacity: 0, y: -20 },
+          { opacity: 1, y: 0, duration: 0.58, ease: 'power3.out',
+            scrollTrigger: { trigger: containerRef.current, start: 'top 75%', once: true } }
+        );
+      }
 
       // ── ESCRITORIO (Desktop / Tablet) >= 768px ──
       mm.add("(min-width: 768px)", () => {
         // La animación de la Semilla (Explosión desde el centro)
-        gsap.fromTo('.skill-card-wrapper',
-          { 
-            scale: 0.2, 
-            opacity: 0, 
-            x: (i: number) => (i % 2 === 0 ? 150 : -150),
-            y: (i: number) => (i < 2 ? 150 : -150),
-          },
-          { 
-            scale: 1, 
-            opacity: 1, 
-            x: 0, 
-            y: 0, 
-            duration: 0.72, 
-            stagger: 0.05, 
-            ease: 'back.out(1.2)', 
-            scrollTrigger: { trigger: '.skill-cards-grid', start: 'top 80%', once: true } 
-          }
-        );
+        if (document.querySelector('.skill-card-wrapper')) {
+          gsap.fromTo('.skill-card-wrapper',
+            { 
+              scale: 0.2, 
+              opacity: 0, 
+              x: (i: number) => (i % 2 === 0 ? 150 : -150),
+              y: (i: number) => (i < 2 ? 150 : -150),
+            },
+            { 
+              scale: 1, 
+              opacity: 1, 
+              x: 0, 
+              y: 0, 
+              duration: 0.72, 
+              stagger: 0.05, 
+              ease: 'back.out(1.2)', 
+              scrollTrigger: { trigger: '.skill-cards-grid', start: 'top 80%', once: true } 
+            }
+          );
+        }
       });
 
       // ── MÓVIL (Mobile) < 768px ──
       mm.add("(max-width: 767px)", () => {
         // En móvil hacemos una "Cascada Vertical" (Fade Up) muy elegante
-        // Es mucho más natural al hacer scroll en vertical y no sobrecarga el procesador
-        gsap.fromTo('.skill-card-wrapper',
-          { 
-            scale: 0.9, 
-            opacity: 0, 
-            y: 60 
-          },
-          { 
-            scale: 1, 
-            opacity: 1, 
-            y: 0, 
-            duration: 0.46, 
-            stagger: 0.08,
-            ease: 'power3.out', 
-            scrollTrigger: { trigger: '.skill-cards-grid', start: 'top 85%', once: true } 
-          }
-        );
+        if (document.querySelector('.skill-card-wrapper')) {
+          gsap.fromTo('.skill-card-wrapper',
+            { 
+              scale: 0.9, 
+              opacity: 0, 
+              y: 60 
+            },
+            { 
+              scale: 1, 
+              opacity: 1, 
+              y: 0, 
+              duration: 0.46, 
+              stagger: 0.08,
+              ease: 'power3.out', 
+              scrollTrigger: { trigger: '.skill-cards-grid', start: 'top 85%', once: true } 
+            }
+          );
+        }
       });
 
     });

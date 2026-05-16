@@ -9,8 +9,8 @@ A high-performance portfolio focusing on motion design and hardened React archit
 - **Rendering Strategy**: hybrid approach using Server Components for data pre-fetching and specialized Client Components for GSAP-driven interactions.
 - **Motion Engine**: custom proximity-based interaction system using GSAP and Lenis for smooth, physics-based scrolling.
 - **Data Integrity**: direct integration with GitHub REST API with server-side caching and atomic fallback states.
-- **Security**: strict Content-Security-Policy (CSP), hardened API routes, and zero-public-token architecture.
-- **A11Y**: WCAG-compliant semantic structure, full keyboard navigation, and `prefers-reduced-motion` support.
+- **Security**: hardened Content-Security-Policy (CSP), sanitized API routes, and zero-public-token architecture.
+- **A11Y**: WCAG 2.2 AA targeted / validated checks, full keyboard navigation, and `prefers-reduced-motion` support.
 
 ---
 

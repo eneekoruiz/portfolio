@@ -91,10 +91,10 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index }: {
         relative overflow-hidden group rounded-[20px] p-7 flex-col gap-4
         transition-colors duration-500 will-change-transform
         focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none
-        backdrop-blur-md shadow-sm hover:shadow-xl
+        backdrop-blur-xl shadow-sm hover:shadow-xl
         ${accent 
           ? 'bg-gradient-to-br from-brand/10 via-brand/5 to-transparent dark:from-brand/[0.12] dark:via-brand/[0.06] shadow-brand/5' 
-          : 'bg-white/80 dark:bg-[#0A0A0A]/80 hover:dark:bg-[#111111]/90 shadow-black/5'
+          : 'bg-black/[0.03] dark:bg-[#0A0A0A]/80 hover:dark:bg-[#111111]/90 shadow-black/5'
         }
       `}
       data-h
@@ -147,7 +147,7 @@ export function Philosophy({ t }: { t: Tx }) {
       id="values"
       data-section="values"
       aria-label="Filosofía"
-      className="border-t border-black/5 dark:border-white/10 py-24 relative z-[20] bg-page"
+      className="border-t border-black/5 dark:border-white/10 py-24 relative z-[20]"
     >
       <div className="px-6 md:px-8 max-w-[1200px] mx-auto overflow-hidden">
       <p className="sec-h text-xs font-bold tracking-[0.2em] uppercase text-slate-500 mb-4">

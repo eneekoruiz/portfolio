@@ -60,15 +60,17 @@ export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.Ref
             activeLinkRef.current = link;
             const r = link.getBoundingClientRect();
             const nr = navInnerRef.current.getBoundingClientRect();
-            gsap.to(indRef.current, {
-              x: r.left - nr.left,
-              width: r.width,
-              height: r.height,
-              opacity: 0.65,
-              duration: 0.3,
-              ease: 'power3.out',
-              overwrite: 'auto',
-            });
+            if (indRef.current) {
+              gsap.to(indRef.current, {
+                x: r.left - nr.left,
+                width: r.width,
+                height: r.height,
+                opacity: 0.65,
+                duration: 0.3,
+                ease: 'power3.out',
+                overwrite: 'auto',
+              });
+            }
           }
         }
 

@@ -19,8 +19,6 @@ const inter = Inter({
 export const metadata = baseMetadata;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const nonce = (await headers()).get('x-nonce') || '';
-
   return (
     <html lang="es" className={`${inter.variable}`} suppressHydrationWarning>
       <head>
@@ -28,13 +26,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="color-scheme" content="light dark" />
         <link rel="preconnect" href="https://eneko-ruiz-curriculum.vercel.app" />
         <script
-          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {/* Lite mode / Device memory detection script */}
         <script
-          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -65,7 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <SkipLink />
         <div id="scroll-progress" className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0" />
-        <ClientThemeProvider attribute="class" defaultTheme="system" enableSystem={true} nonce={nonce}>
+        <ClientThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
           <SmoothScroll />
           <EasterEgg />
           <InfallibleCursor />

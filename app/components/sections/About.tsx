@@ -41,13 +41,15 @@ function AboutContent({ t }: { t: Tx }) {
     const ctx = gsap.context(() => {
 
       // 1. Entrada de títulos y métricas
-      gsap.from('.about-reveal', {
-        y: 30, opacity: 0, stagger: 0.06, duration: 0.48, ease: 'power3.out',
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' }
-      });
+      if (document.querySelector('.about-reveal')) {
+        gsap.from('.about-reveal', {
+          y: 30, opacity: 0, stagger: 0.06, duration: 0.48, ease: 'power3.out',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' }
+        });
+      }
 
       // 2. EFECTO TELÓN (MASKED REVEAL) - La nueva manera
-      if (textContainerRef.current) {
+      if (textContainerRef.current && document.querySelector('.word-inner')) {
         gsap.fromTo('.word-inner',
           { y: '110%', opacity: 0 },
           {

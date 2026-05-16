@@ -48,20 +48,26 @@ export function ProjectPreviewFollower({ activeProject }: ProjectPreviewFollower
   useEffect(() => {
     if (activeProject) {
       setIsVisible(true);
-      gsap.to(containerRef.current, {
-        scale: 1,
-        opacity: 1,
-        duration: 0.4,
-        ease: 'back.out(1.7)',
-      });
+      if (containerRef.current) {
+        gsap.to(containerRef.current, {
+          scale: 1,
+          opacity: 1,
+          duration: 0.4,
+          ease: 'back.out(1.7)',
+        });
+      }
     } else {
-      gsap.to(containerRef.current, {
-        scale: 0.5,
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.in',
-        onComplete: () => setIsVisible(false),
-      });
+      if (containerRef.current) {
+        gsap.to(containerRef.current, {
+          scale: 0.5,
+          opacity: 0,
+          duration: 0.3,
+          ease: 'power2.in',
+          onComplete: () => setIsVisible(false),
+        });
+      } else {
+        setIsVisible(false);
+      }
     }
   }, [activeProject]);
 

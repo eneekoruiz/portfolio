@@ -41,6 +41,15 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
     // Determine the initial phase on the client after hydration
     const checkSeen = () => {
       try {
+        // If it's a reload (F5), we ignore the session flag to show the preloader again
+        const isReload = typeof window !== 'undefined' && 
+                         (window.performance?.getEntriesByType('navigation')[0] as PerformanceNavigationTiming)?.type === 'reload';
+        
+        if (isReload) {
+          sessionStorage.removeItem('hasSeenIntro');
+          return false;
+        }
+
         return hasSeenGlobal || sessionStorage.getItem('hasSeenIntro') === 'true';
       } catch (_) {
         return false;

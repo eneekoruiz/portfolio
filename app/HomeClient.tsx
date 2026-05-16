@@ -47,9 +47,11 @@ const MemoHero = memo(Hero);
 const MemoAbout = memo(About);
 const MemoSkills = memo(Skills);
 const MemoProjects = memo(Projects);
-const MemoPhilosophy = memo(Philosophy);
-const MemoContact = memo(Contact);
-const MemoFooter = memo(SiteFooter);
+
+// Dynamic below-the-fold sections
+const MemoPhilosophy = dynamic(() => import('./components/sections/Philosophy').then(m => m.Philosophy), { ssr: false });
+const MemoContact = dynamic(() => import('./components/sections/Contact').then(m => m.Contact), { ssr: false });
+const MemoFooter = dynamic(() => import('./components/sections/SiteFooter').then(m => m.SiteFooter), { ssr: false });
 
 // ── Dynamic Visualizers ──
 const DNAHelix = dynamic<{ accent: string; secondary: string; darkMode: boolean }>(
@@ -275,33 +277,43 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     if (reduced) return;
 
     // Parallax hero
-    gsap.to('.h-txt', {
-      yPercent: -6, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
-    });
-    gsap.to('.memoji', {
-      yPercent: -10, ease: 'none',
-      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
-    });
+    if (document.querySelector('.h-txt')) {
+      gsap.to('.h-txt', {
+        yPercent: -6, ease: 'none',
+        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
+      });
+    }
+
+    if (document.querySelector('.memoji')) {
+      gsap.to('.memoji', {
+        yPercent: -10, ease: 'none',
+        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
+      });
+    }
 
     // Section headings reveal
-    document.querySelectorAll<HTMLElement>('.sec-h').forEach(el => {
-      gsap.fromTo(el,
-        { opacity: 0, y: 24 },
-        {
-          opacity: 1, y: 0, duration: 0.24, ease: 'power2.out',
-          scrollTrigger: { trigger: el, start: 'top 83%', once: true }
-        }
-      );
-    });
+    const headings = document.querySelectorAll<HTMLElement>('.sec-h');
+    if (headings.length) {
+      headings.forEach(el => {
+        gsap.fromTo(el,
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1, y: 0, duration: 0.24, ease: 'power2.out',
+            scrollTrigger: { trigger: el, start: 'top 83%', once: true }
+          }
+        );
+      });
+    }
 
     // Intro timeline
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl
-      .to('.n-el', { opacity: 1, y: 0, duration: 0.16, stagger: 0.02 })
-      .to('.h-ln', { yPercent: 0, duration: 0.38, stagger: 0.03 }, '-=0.12')
-      .to('.h-fd', { opacity: 1, y: 0, duration: 0.24, stagger: 0.025 }, '-=0.18')
-      .to('.memoji', { opacity: 1, x: 0, duration: 0.42, ease: 'power3.out' }, '-=0.3');
+    if (document.querySelectorAll('.n-el, .h-ln, .h-fd, .memoji').length) {
+      tl
+        .to('.n-el', { opacity: 1, y: 0, duration: 0.12, stagger: 0.015 })
+        .to('.h-ln', { yPercent: 0, duration: 0.25, stagger: 0.02 }, '-=0.1')
+        .to('.h-fd', { opacity: 1, y: 0, duration: 0.18, stagger: 0.02 }, '-=0.15')
+        .to('.memoji', { opacity: 1, x: 0, duration: 0.3, ease: 'power3.out' }, '-=0.25');
+    }
 
     // DNA Helix rotation (Now handled internally by DNAHelix component for better performance)
     // Removed redundant GSAP scroll-bound rotation to avoid jitter
@@ -326,6 +338,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     const distance = Math.abs(targetX - currentX);
     const stretch = Math.min(1.4, 1 + distance / 200);
 
+    if (!indRef.current || !navInner.current) return;
     const tl = gsap.timeline();
     tl.to(indRef.current, {
       x: targetX, width: r.width, scaleX: stretch, height: r.height,
@@ -344,7 +357,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         x: r.left - nr.left, width: r.width, height: r.height,
         opacity: 0.65, duration: 0.24, ease: 'power3.out',
       });
-    } else {
+    } else if (indRef.current) {
       gsap.to(indRef.current, { opacity: 0, duration: 0.12 });
     }
   }, []);
@@ -399,7 +412,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
             className="helix-group will-change-transform"
             style={{
               width: '100vw', height: '240vh',
-              opacity: expandedIdx !== null ? 1.0 : (hoveredProject ? 0.95 : (isDark ? 0.85 : 0.65)),
+              opacity: expandedIdx !== null ? 1.0 : (isDark ? 0.9 : 0.8),
               transformStyle: 'preserve-3d',
               willChange: 'transform'
             }}

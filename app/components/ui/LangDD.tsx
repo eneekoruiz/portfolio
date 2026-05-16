@@ -43,13 +43,18 @@ export function LangDD({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => vo
                 key={k}
                 type="button"
                 role="menuitem"
-                className={`flex items-center justify-between px-[.9rem] py-[.55rem] rounded-[11px] text-[13px] text-left transition-all duration-100 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset outline-none ${
+                className={`group relative flex items-center justify-between pl-[1.1rem] pr-[.9rem] py-[.55rem] rounded-[11px] text-[13px] text-left transition-all duration-100 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset outline-none ${
                   lang === k 
                     ? 'font-bold text-brand bg-brand/10 dark:bg-brand/20' 
                     : 'font-medium text-ink hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5'
                 }`}
                 onClick={() => { setLang(k as Lang); setOpen(false); }}
               >
+                {/* ── Indicador: Raya de color a la izquierda ── */}
+                {lang === k && (
+                  <span className="absolute left-[4px] top-1/2 -translate-y-1/2 w-[3px] h-[16px] bg-brand rounded-full animate-in slide-in-from-left-1 duration-300" />
+                )}
+                
                 <span>{label}</span>
                 {lang === k && <Check size={13} className="text-brand" />}
               </button>

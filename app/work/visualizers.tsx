@@ -13,7 +13,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
   const scrollRef = useRef(0);
   const rotationRef = useRef(0);
   const activeRef = useRef(false);
-  const smoothedScrollRef = useRef(0);
+  const mouseRef = useRef({ x: -2000, y: -2000 });
   const colorsRef = useRef({ accent, secondary });
 
   useEffect(() => {
@@ -26,11 +26,17 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
   }, [accent, secondary]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      scrollRef.current = window.scrollY;
+    const handleScroll = () => { scrollRef.current = window.scrollY; };
+    const handleMouse = (e: MouseEvent) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouse, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouse);
+    };
   }, []);
 
   useEffect(() => {
@@ -62,12 +68,26 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
 
       ctx.clearRect(0, 0, w, h);
       
-      const steps = 60; // Reduced from 80 for performance
+      const steps = 60;
       const speed = 0.012;
-      
       rotationRef.current += speed;
       const baseRotation = rotationRef.current;
       const accentColor = colorsRef.current.accent;
+
+      const applyRepulsion = (x: number, y: number) => {
+        const dx = x - mouseRef.current.x;
+        const dy = y - mouseRef.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const range = 180;
+        if (dist < range) {
+          const force = (range - dist) / range;
+          return {
+            rx: x + (dx / dist) * force * 30,
+            ry: y + (dy / dist) * force * 15
+          };
+        }
+        return { rx: x, ry: y };
+      };
 
       // Draw Strands
       ctx.lineWidth = darkMode ? 5 : 4;
@@ -83,8 +103,10 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           const angle = progress * Math.PI * 4 + baseRotation + offset;
           const r = Math.min(w * 0.15, 140);
           const x = w / 2 + Math.cos(angle) * r;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+          
+          const { rx, ry } = applyRepulsion(x, y);
+          if (i === 0) ctx.moveTo(rx, ry);
+          else ctx.lineTo(rx, ry);
         }
         ctx.stroke();
       }
@@ -101,35 +123,36 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
         
         const z1 = Math.sin(angle);
         const z2 = Math.sin(angle + Math.PI);
+
+        const { rx: r1x, ry: r1y } = applyRepulsion(x1, y);
+        const { rx: r2x, ry: r2y } = applyRepulsion(x2, y);
         
         if (i % 3 === 0) {
           ctx.beginPath();
-          ctx.moveTo(x1, y);
-          ctx.lineTo(x2, y);
+          ctx.moveTo(r1x, r1y);
+          ctx.lineTo(r2x, r2y);
           ctx.strokeStyle = accentColor;
           ctx.globalAlpha = (darkMode ? 0.35 : 0.2) * (z1 + z2 + 2) / 2;
           ctx.lineWidth = 1.5;
           ctx.stroke();
         }
 
-        const drawNode = (x: number, z: number) => {
+        const drawNode = (rx: number, ry: number, z: number) => {
           const size = 3 + (z + 1) * 3;
-          
-          // Fast Pseudo-Glow (much cheaper than shadowBlur)
           ctx.globalAlpha = darkMode ? 0.15 : 0.1;
           ctx.beginPath();
-          ctx.arc(x, y, size * 2.2, 0, Math.PI * 2);
+          ctx.arc(rx, ry, size * 2.2, 0, Math.PI * 2);
           ctx.fillStyle = accentColor;
           ctx.fill();
           
           ctx.globalAlpha = 1.0;
           ctx.beginPath();
-          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.arc(rx, ry, size, 0, Math.PI * 2);
           ctx.fill();
         };
 
-        drawNode(x1, z1);
-        drawNode(x2, z2);
+        drawNode(r1x, r1y, z1);
+        drawNode(r2x, r2y, z2);
       }
       
       frame = requestAnimationFrame(draw);
@@ -138,9 +161,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
     const observer = new IntersectionObserver(
       ([entry]) => {
         activeRef.current = entry.isIntersecting;
-        if (entry.isIntersecting && !frame) {
-           frame = requestAnimationFrame(draw);
-        }
+        if (entry.isIntersecting && !frame) frame = requestAnimationFrame(draw);
       },
       { threshold: 0.01 }
     );
@@ -157,7 +178,6 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
     };
   }, [darkMode]);
 
-
   return (
     <canvas
       ref={canvasRef}
@@ -166,6 +186,7 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
     />
   );
 };
+
 // ── TerrainMesh ───────────────────────────────────────────────────────────────
 
 export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: boolean }) => {
@@ -361,8 +382,8 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
 
   useEffect(() => {
     const initial = Array.from({ length: 12 }).map(() => ({
-      x: Math.random() * 200,
-      y: Math.random() * 150,
+      x: Math.random() * 300,
+      y: Math.random() * 200,
       vx: (Math.random() - 0.5) * 0.5,
       vy: (Math.random() - 0.5) * 0.5,
     }));
@@ -379,32 +400,31 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
       ctx.clearRect(0, 0, 300, 200);
       
       // Update nodes
-      const nextNodes = nodes.map(n => ({
+      setNodes(prev => prev.map(n => ({
         ...n,
         x: (n.x + n.vx + 300) % 300,
         y: (n.y + n.vy + 200) % 200,
-      }));
-      setNodes(nextNodes);
+      })));
 
-      // Draw connections (Spiderweb)
+      // Draw connections
       ctx.lineWidth = 0.5;
       ctx.strokeStyle = `${accent}30`;
-      for (let i = 0; i < nextNodes.length; i++) {
-        for (let j = i + 1; j < nextNodes.length; j++) {
-          const dx = nextNodes[i].x - nextNodes[j].x;
-          const dy = nextNodes[i].y - nextNodes[j].y;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 80) {
             ctx.beginPath();
-            ctx.moveTo(nextNodes[i].x, nextNodes[i].y);
-            ctx.lineTo(nextNodes[j].x, nextNodes[j].y);
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
             ctx.stroke();
           }
         }
       }
 
       // Draw nodes
-      nextNodes.forEach(n => {
+      nodes.forEach(n => {
         ctx.beginPath();
         ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = accent;
@@ -414,9 +434,7 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
       raf = requestAnimationFrame(draw);
     };
 
-    // Note: React state update inside RAF is usually not ideal, 
-    // but for this simple visualizer it's fine for now. 
-    // Actually, I'll use a more efficient approach with refs for the anim loop.
+    raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
   }, [accent, nodes]);
 

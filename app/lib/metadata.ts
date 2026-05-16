@@ -8,18 +8,22 @@ export const baseMetadata: Metadata = {
     default: 'Eneko Ruiz — Ingeniero Informático & Full Stack Developer',
     template: '%s · Eneko Ruiz',
   },
-  description: 'Ingeniero Informático & Full Stack Developer desde Donostia. Especializado en Next.js, React, Python y Java. Enfoque en calidad, arquitectura y performance.',
-  keywords: ['Eneko Ruiz', 'Full Stack', 'Donostia', 'Software Engineer', 'React', 'Next.js', 'TypeScript', 'Node.js'],
+  description: 'Ingeniero Informático & Full Stack Developer. Especializado en arquitecturas escalables, Next.js, Python y performance web. Resolviendo problemas complejos con diseño premium.',
+  keywords: [
+    'Eneko Ruiz', 'Software Engineer', 'Full Stack Developer', 'Next.js Expert', 'React Developer', 
+    'Python Engineer', 'Java Backend', 'UI/UX Performance', 'Donostia Software', 'San Sebastian Developer',
+    'TypeScript', 'Supabase', 'TailwindCSS', 'GSAP Animations'
+  ],
   authors: [{ name: 'Eneko Ruiz', url: DOMAIN }],
   creator: 'Eneko Ruiz',
   openGraph: {
     type: 'website',
     locale: 'es_ES',
     url: DOMAIN,
-    siteName: 'Eneko Ruiz',
-    title: 'Eneko Ruiz — Full Stack Developer',
+    siteName: 'Eneko Ruiz Portfolio',
+    title: 'Eneko Ruiz — Full Stack Developer & Software Engineer',
     description: 'Ingeniero Informático desde Donostia. Me obsesiono con los detalles que nadie nota pero todo el mundo siente.',
-    images: [{ url: `${DOMAIN}/og.png`, width: 1200, height: 630, alt: 'Eneko Ruiz — Full Stack Developer' }],
+    images: [{ url: `${DOMAIN}/og.png`, width: 1200, height: 630, alt: 'Eneko Ruiz Portfolio' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -58,7 +62,7 @@ export const jsonLd = {
       url: DOMAIN,
       email: 'eneekoruiz@gmail.com',
       jobTitle: 'Ingeniero Informático · Full Stack Developer',
-      description: 'Full Stack Developer desde Donostia especializado en React, Next.js, Python y Java.',
+      description: 'Ingeniero Informático especializado en desarrollo Full Stack, arquitecturas reactivas y experiencias web de alto rendimiento.',
       image: `${DOMAIN}/og.png`,
       address: {
         '@type': 'PostalAddress',
@@ -67,14 +71,18 @@ export const jsonLd = {
         addressCountry: 'ES',
       },
       sameAs: ['https://github.com/eneekoruiz', 'https://linkedin.com/in/eneekoruiz'],
-      knowsAbout: ['JavaScript', 'TypeScript', 'React', 'Next.js', 'Python', 'Java', 'Node.js', 'PostgreSQL', 'Docker', 'CI/CD'],
+      knowsAbout: [
+        'JavaScript', 'TypeScript', 'React', 'Next.js', 'Python', 'Java', 'Node.js', 
+        'PostgreSQL', 'Docker', 'CI/CD', 'GSAP', 'Framer Motion', 'Cloud Architecture',
+        'Performance Optimization', 'Responsive Design'
+      ],
     },
     {
       '@type': 'WebSite',
       '@id': `${DOMAIN}/#website`,
       url: DOMAIN,
-      name: 'Eneko Ruiz — Portfolio',
-      description: 'Ingeniero Informático & Full Stack Developer desde Donostia.',
+      name: 'Eneko Ruiz — Portfolio Personal',
+      description: 'Explora los proyectos y la filosofía de desarrollo de Eneko Ruiz, Ingeniero Informático.',
       author: { '@id': `${DOMAIN}/#person` },
       inLanguage: ['es', 'en', 'eu'],
     },

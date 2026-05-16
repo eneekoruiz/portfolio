@@ -1,6 +1,7 @@
 {
   "name": "eneko-portfolio",
   "version": "1.0.0",
+  "description": "High-performance portfolio built with Next.js 16, React 19, and GSAP. Features hardened security (CSP) and WCAG 2.2 AA targeted accessibility.",
   "private": true,
   "engines": {
     "node": ">=22.0.0"

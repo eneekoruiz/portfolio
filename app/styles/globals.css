@@ -167,6 +167,15 @@ html[data-lite='1'] .will-gpu { will-change: auto !important; transform: none !i
   will-change: transform, opacity;
 }
 
+/* ── 22. PLATFORM OVERLAYS — Clean Mode ── */
+#vercel-toolbar,
+.vercel-toolbar,
+[id^="vercel-toolbar"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* Optimization: Smooth scroll but snappy response */
 html {
   scroll-behavior: smooth;
@@ -467,4 +476,12 @@ html {
   user-select: none;
   animation: btnStream linear infinite;
   will-change: transform, opacity;
+}
+/* ── 22. PLATFORM OVERLAYS — Clean Mode ── */
+#vercel-toolbar,
+.vercel-toolbar,
+[id^="vercel-toolbar"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

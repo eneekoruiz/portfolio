@@ -20,49 +20,40 @@ export default function CurriculumPage() {
   const { t } = useTranslations();
   const router = useRouter();
   const { theme, resolvedTheme } = useTheme();
+  const [iframeHeight, setIframeHeight] = useState('100%');
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
-  
-  const containerRef = useRef<HTMLDivElement>(null);
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
-  // ── THEME SYNC ──────────────────────────────────────────────────────
   useEffect(() => {
-    const targetTheme = theme === 'system' ? resolvedTheme : theme;
-    if (iframeRef.current && iframeRef.current.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({
-        type: 'set-theme',
-        theme: targetTheme
-      }, '*');
-    }
-  }, [theme, resolvedTheme, loading]); // Also trigger when loading ends
-
-  // Send theme again shortly after load to ensure iframe receives it
-  useEffect(() => {
-    if (!loading && iframeRef.current?.contentWindow) {
-      const targetTheme = theme === 'system' ? resolvedTheme : theme;
-      // Small delay to let iframe's own scripts initialize
-      const timer = setTimeout(() => {
-        iframeRef.current?.contentWindow?.postMessage({
-          type: 'set-theme',
-          theme: targetTheme
-        }, '*');
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [loading, theme, resolvedTheme]);
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data.type === 'trigger-cv-print') {
+        const iframe = iframeRef.current;
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        }
+      }
+      if (e.data.type === 'set-cv-height') {
+        setIframeHeight(`${e.data.height}px`);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   useEffect(() => {
     document.title = 'Currículum | Eneko Ruiz';
     return () => {
-      document.title = 'Eneko Ruiz — Portfolio'; // Fallback on unmount
+      document.title = 'Eneko Ruiz — Portfolio';
     };
   }, []);
 
   useEffect(() => {
-    // Safety timeout: if after 8s it hasn't loaded, show the fallback
     const timer = setTimeout(() => {
       if (loading) {
         setHasError(true);
@@ -76,65 +67,39 @@ export default function CurriculumPage() {
   // ── ENTRANCE ANIMATION ──────────────────────────────────────────────
   useGSAP(() => {
     if (!containerRef.current || !headerRef.current) return;
-
     const tl = gsap.timeline();
-    
     tl
-      .from(headerRef.current, {
-        opacity: 0,
-        y: -30,
-        duration: 0.6,
-        ease: 'power3.out',
-      }, 0)
-      .from('.curriculum-content', {
-        opacity: 0,
-        scale: 0.98,
-        duration: 0.8,
-        ease: 'power3.out',
-      }, 0.2);
+      .from(headerRef.current, { opacity: 0, y: -30, duration: 0.6, ease: 'power3.out' }, 0)
+      .from('.curriculum-content', { opacity: 0, scale: 0.98, duration: 0.8, ease: 'power3.out' }, 0.2);
   }, { scope: containerRef });
 
-  // ── CINEMATIC REVEAL ──
   useGSAP(() => {
     if (!loading && iframeRef.current) {
       gsap.fromTo(iframeRef.current, 
-        { 
-          opacity: 0, 
-          y: 30, 
-          scale: 0.98,
-          filter: 'blur(10px)' 
-        },
-        { 
-          opacity: 1, 
-          y: 0, 
-          scale: 1,
-          filter: 'blur(0px)',
-          duration: 1.2, 
-          ease: 'expo.out',
-          delay: 0.1
-        }
+        { opacity: 0, y: 30, scale: 0.98, filter: 'blur(10px)' },
+        { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.2, ease: 'expo.out', delay: 0.1 }
       );
     }
   }, [loading]);
 
   const handleReturn = () => {
-    gsap.to(containerRef.current, {
-      opacity: 0,
-      duration: 0.25,
-      ease: 'expo.in',
-      onComplete: () => router.back(),
-    });
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'leaving' }, '*');
+    }
+    const tl = gsap.timeline({ onComplete: () => { router.push('/#hero'); } });
+    tl.to(headerRef.current, { opacity: 0, y: -20, duration: 0.4, ease: 'power2.in' });
+    tl.to(containerRef.current, { opacity: 0, scale: 0.98, filter: 'blur(10px)', duration: 0.6, ease: 'power2.inOut' }, '-=0.2');
   };
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 w-full h-screen bg-page flex flex-col overflow-hidden z-[999]"
+      className="fixed inset-0 w-full h-screen bg-page flex flex-col z-[999]"
     >
       {/* ── HEADER ── */}
       <header
         ref={headerRef}
-        className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-page/90 backdrop-blur-2xl border-b border-black/5 dark:border-white/10"
+        className="flex-shrink-0 sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-page/90 backdrop-blur-2xl border-b border-black/5 dark:border-white/10"
       >
         <button
           onClick={handleReturn}
@@ -145,18 +110,10 @@ export default function CurriculumPage() {
         </button>
 
         <h1 className="font-mono text-[10px] uppercase tracking-[0.4em] opacity-40 text-ink hidden md:block">
-          {t.ctaCv.toUpperCase()} {/* ENEKO RUIZ */}
+          {t.ctaCv.toUpperCase()}
         </h1>
 
         <div className="flex items-center gap-2">
-          <a
-            href="https://eneko-ruiz-curriculum.vercel.app/api/pdf"
-            download="Eneko_Ruiz_CV.pdf"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand text-white text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
-          >
-            <Download size={14} />
-            <span className="hidden sm:inline">{t.ctaCv}</span>
-          </a>
           <a
             href="https://eneko-ruiz-curriculum.vercel.app"
             target="_blank"
@@ -170,17 +127,15 @@ export default function CurriculumPage() {
       </header>
 
       {/* ── CONTENT AREA ── */}
-      <main className="flex-1 relative bg-page overflow-hidden">
+      <main className="flex-1 relative bg-page overflow-y-auto overflow-x-hidden scroll-smooth">
         {loading && (
           <div className="absolute inset-0 z-10 bg-page flex items-center justify-center p-8">
             <div className="w-full max-w-5xl h-full flex gap-8 animate-pulse">
-              {/* Sidebar Skeleton */}
               <div className="hidden lg:flex flex-col gap-6 w-72">
                 <div className="w-32 h-32 rounded-2xl bg-ink/5" />
                 <div className="w-full h-40 rounded-2xl bg-ink/5" />
                 <div className="w-full h-64 rounded-2xl bg-ink/5" />
               </div>
-              {/* Main Content Skeleton */}
               <div className="flex-1 flex flex-col gap-8">
                 <div className="w-3/4 h-12 rounded-xl bg-ink/5" />
                 <div className="w-full h-24 rounded-xl bg-ink/5" />
@@ -191,19 +146,18 @@ export default function CurriculumPage() {
                 </div>
               </div>
             </div>
-            {/* Minimal Spinner Overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
                <div className="w-6 h-6 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
             </div>
           </div>
         )}
 
-        {/* El Iframe */}
         <iframe
           ref={iframeRef}
           src="https://eneko-ruiz-curriculum.vercel.app"
           title="Eneko Ruiz Curriculum"
-          className={`w-full h-full border-none transition-all duration-1000 ${loading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+          style={{ height: iframeHeight }}
+          className={`w-full border-none transition-all duration-1000 ${loading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
           allow="web-share; clipboard-write; print"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
           onLoad={() => {

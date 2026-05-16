@@ -11,9 +11,21 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   
   // Hardened param validation
-  const sort = searchParams.get('sort') || 'updated';
-  const direction = searchParams.get('direction') || 'desc';
-  const per_page = Math.min(parseInt(searchParams.get('per_page') || '30', 10), 100);
+  const sortParam = searchParams.get('sort');
+  const sort = ['created', 'updated', 'pushed', 'full_name'].includes(sortParam || '') 
+    ? sortParam! 
+    : 'updated';
+
+  const dirParam = searchParams.get('direction');
+  const direction = ['asc', 'desc'].includes(dirParam || '') 
+    ? dirParam! 
+    : 'desc';
+
+  const rawPerPage = searchParams.get('per_page');
+  const parsedPerPage = parseInt(rawPerPage || '30', 10);
+  const per_page = (Number.isFinite(parsedPerPage) && !isNaN(parsedPerPage))
+    ? Math.max(1, Math.min(parsedPerPage, 100))
+    : 30;
 
   const cleanParams = new URLSearchParams({
     sort,
@@ -50,8 +62,10 @@ export async function GET(request: NextRequest) {
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
+      console.error(`GitHub upstream error [${res.status}]:`, errorData.message || res.statusText);
+      
       return NextResponse.json(
-        { error: `GitHub API error: ${errorData.message || res.statusText}` },
+        { error: 'Failed to fetch repositories from GitHub' },
         { status: res.status, headers: { 'Cache-Control': 'no-store' } }
       );
     }

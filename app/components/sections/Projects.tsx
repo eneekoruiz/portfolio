@@ -67,7 +67,7 @@ const PROJ_THEMES: Record<string, {
     rgb: '230, 148, 0',
     img: 'radial-gradient(ellipse at 50% 120%, rgba(230,148,0,0.2) 0%, transparent 75%)',
     gradient: 'radial-gradient(at 0% 0%, rgba(230,148,0,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(230,148,0,0.08) 0px, transparent 50%)',
-    progress: 3, btnText: 'Ver Auditoría', hasAudit: true,
+    progress: 3, btnText: 'Ver Detalles', hasAudit: true,
   },
   'spotshare-parking': {
     color: '#00d4e8',
@@ -263,13 +263,13 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
     ctxRef.current = gsap.context(() => {
       if (isExpanded) {
         gsap.fromTo(body, 
-          { height: 0, opacity: 0, y: -20 },
+          { height: 0, opacity: 0, y: -10 },
           {
             height: 'auto',
             opacity: 1,
             y: 0,
-            duration: 0.6,
-            ease: 'elastic.out(1, 0.8)',
+            duration: 0.7,
+            ease: 'expo.out',
             clearProps: 'transform',
           }
         );
@@ -277,9 +277,9 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
         gsap.to(body, {
           height: 0,
           opacity: 0,
-          y: -10,
-          duration: 0.3,
-          ease: 'power2.inOut',
+          y: -5,
+          duration: 0.5,
+          ease: 'expo.inOut',
         });
       }
     });
@@ -343,7 +343,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
   return (
     <div
       ref={rowRef}
-      className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-colors duration-300"
+      className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-all duration-700"
       style={{
         background: isExpanded ? theme.gradient : undefined,
         backdropFilter: isExpanded ? 'blur(20px) saturate(1.4)' : 'none',
@@ -353,7 +353,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
     >
       {/* Dynamic Background Layer (Glass + Color) */}
       <div 
-        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 pointer-events-none"
+        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-700 pointer-events-none"
         style={{
           background: `${theme.img}, radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${theme.color}20 0%, transparent 100%)`,
           backdropFilter: 'blur(4px)',
@@ -361,18 +361,12 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
         }}
       />
       
-      {/* Side Accent Line */}
-      <div 
-        className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] transition-all duration-500 ease-spring rounded-r-full z-20 ${isExpanded ? 'h-full translate-y-0 top-0' : 'h-0 group-hover/row:h-[65%]'}`}
-        style={{ backgroundColor: theme.color } as React.CSSProperties}
-      />
-
       {/* Top Border Glow on Hover */}
       <div 
-        className="absolute top-0 left-0 w-full h-[1px] opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 z-20"
+        className="absolute top-0 left-0 w-full h-[1px] opacity-0 group-hover/row:opacity-100 transition-opacity duration-700 z-20"
         style={{ background: `linear-gradient(90deg, transparent, ${theme.color}40, transparent)` }}
       />
-
+      
       {/* ── CABECERA DEL ACORDEÓN ── */}
       <button
         onClick={onToggle}
@@ -394,17 +388,19 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
             setIsPrefetched(true);
           }
         }}
-        className="relative z-10 w-full text-left py-[16px] md:py-[22px] px-0 md:px-6 flex items-center justify-between gap-4 cursor-pointer group/btn"
+        className="relative z-10 w-full text-left py-[16px] md:py-[22px] px-5 md:px-6 flex items-center justify-between gap-4 cursor-pointer group/btn"
+        data-cursor-plus={isExpanded ? undefined : "true"}
+        data-cursor-minus={isExpanded ? "true" : undefined}
       >
         {/* Order Number with Theme Color Shift */}
         <span
-          className="font-mono text-[10px] md:text-[11px] w-7 shrink-0 tabular-nums transition-all duration-300 font-semibold group-hover/row:scale-110 origin-left"
+          className="font-mono text-[10px] md:text-[11px] w-7 shrink-0 tabular-nums transition-all duration-700 font-semibold group-hover/row:scale-110 origin-left"
           style={{
             color:   isExpanded ? theme.color : 'var(--lead)',
             opacity: isExpanded ? 1 : 0.4,
           }}
         >
-          <span className="group-hover/row:opacity-100 group-hover/row:text-[var(--theme-color)] transition-colors duration-300" style={{ '--theme-color': theme.color } as React.CSSProperties}>
+          <span className="group-hover/row:opacity-100 group-hover/row:text-[var(--theme-color)] transition-colors duration-700" style={{ '--theme-color': theme.color } as React.CSSProperties}>
             {String(idx + 1).padStart(2, '0')}
           </span>
         </span>
@@ -412,7 +408,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
         <div className="flex-1 min-w-0 flex items-center gap-3 md:gap-5">
           {/* Project Name with Color & Translation Pop */}
           <h3
-            className="font-bold leading-tight tracking-tight min-w-0 transition-all duration-500 group-hover/row:translate-x-3 group-hover/row:scale-[1.02] origin-left"
+            className="font-bold leading-tight tracking-tight min-w-0 transition-all duration-700 group-hover/row:translate-x-3 group-hover/row:scale-[1.02] origin-left"
             style={{
               fontSize: 'clamp(0.92rem, 2.2vw, 1.42rem)',
               color:    isExpanded ? theme.color : 'var(--ink)',
@@ -423,25 +419,25 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
               WebkitBoxOrient: 'vertical',
             }}
           >
-            <span className="group-hover/row:text-[var(--theme-color)] transition-colors duration-300 drop-shadow-[0_0_8px_var(--theme-glow)]" style={{ '--theme-color': theme.color, '--theme-glow': `${theme.color}30` } as React.CSSProperties}>
+            <span className="group-hover/row:text-[var(--theme-color)] transition-colors duration-700 drop-shadow-[0_0_8px_var(--theme-glow)]" style={{ '--theme-color': theme.color, '--theme-glow': `${theme.color}30` } as React.CSSProperties}>
               {proj.name.replace(/-/g, ' ').replace(/_/g, ' ')}
             </span>
           </h3>
 
           <span
-            className="hidden sm:block font-mono text-[8px] md:text-[9px] uppercase tracking-[0.28em] md:tracking-[0.3em] opacity-0 group-hover/btn:opacity-100 transition-all duration-300 whitespace-nowrap shrink-0 translate-x-4 group-hover/btn:translate-x-0"
+            className="hidden sm:block font-mono text-[8px] md:text-[9px] uppercase tracking-[0.28em] md:tracking-[0.3em] opacity-0 group-hover/btn:opacity-100 transition-all duration-700 whitespace-nowrap shrink-0 translate-x-4 group-hover/btn:translate-x-0"
             style={{ color: theme.color, letterSpacing: '0.28em' }}
           >
             {proj.tag}
           </span>
         </div>
 
-        <span className="hidden lg:block font-mono text-[11px] text-lead/35 shrink-0 tabular-nums group-hover/row:opacity-100 transition-opacity">
+        <span className="hidden lg:block font-mono text-[11px] text-lead/35 shrink-0 tabular-nums group-hover/row:opacity-100 transition-opacity duration-700">
           {proj.year}
         </span>
 
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${
+          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-700 ${
             isExpanded
               ? 'rotate-180 text-white shadow-lg'
               : 'border border-black/10 dark:border-white/15 text-lead group-hover/row:border-[var(--theme-color)] group-hover/row:text-[var(--theme-color)] group-hover/row:shadow-[0_0_10px_var(--theme-glow)]'
@@ -586,7 +582,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
           </div>
 
           <div
-            className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.08] flex flex-col justify-between gap-6"
+            className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.08] backdrop-blur-xl flex flex-col justify-between gap-6"
           >
             <p className="text-sm md:text-[15px] font-light leading-relaxed text-ink/78">
               {proj.desc}

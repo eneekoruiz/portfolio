@@ -65,7 +65,7 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
       >
         <div className="flip-inner min-h-[180px]">
           <div
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border transition-all duration-300 backdrop-blur-md rounded-[32px] overflow-hidden`}
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border transition-all duration-300 backdrop-blur-xl rounded-[32px] overflow-hidden`}
             style={{ 
               background: isDark 
                 ? `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)` 
@@ -93,7 +93,7 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
             </div>
           </div>
           <div 
-            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-md transition-all duration-300 rounded-[32px] overflow-hidden" 
+            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden" 
             style={{ 
               background: isDark 
                 ? `linear-gradient(145deg, rgba(${c.rgb}, 0.45) 0%, rgba(${c.rgb}, 0.1) 100%)` 
@@ -127,7 +127,7 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
       <a href={c.href} target="_blank" rel="noopener noreferrer" aria-label={c.label} data-h className="block h-full no-underline">
         <div className="flip-inner min-h-[180px]">
           <div 
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border backdrop-blur-md transition-all duration-300 rounded-[32px] overflow-hidden`} 
+            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden`} 
             style={{ 
               background: isDark 
                 ? `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)` 
@@ -151,7 +151,7 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
             </div>
           </div>
           <div 
-            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-md transition-all duration-300 rounded-[32px] overflow-hidden" 
+            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden" 
             style={{ 
               background: isDark 
                 ? `linear-gradient(145deg, rgba(${c.rgb}, 0.45) 0%, rgba(${c.rgb}, 0.1) 100%)` 
@@ -178,19 +178,24 @@ export function Contact({ t }: { t: Tx }) {
         <div className="max-w-[700px]">
           <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>
           <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3">{t.coH}</h2>
-          <p className="sec-h text-[15px] text-lead [text-wrap:balance]">{t.coP}</p>
+          <p className="sec-h text-[15px] md:text-[18px] text-lead max-w-[500px] leading-relaxed">
+            {t.coP}
+          </p>
         </div>
-        <div className="shrink-0 mb-1 w-full md:w-auto sr">
-           <BinaryStreamBtn label={t.ctaCv} variant="dark" />
+
+        <div className="sec-h flex flex-col items-start md:items-end gap-5">
+          <BinaryStreamBtn label={t.ctaCv} />
+          <div className="flex items-center gap-6 px-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#34c759] animate-pulse shadow-[0_0_10px_#34c759]" />
+            <span className="text-[11px] font-bold tracking-widest uppercase text-lead/50">{t.status}</span>
+          </div>
         </div>
       </div>
 
-      <div className="w-full px-8 max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-5">
-        {CONTACTS.map(c =>
-          c.isEmail
-            ? <EmailCard key={c.label} c={c} />
-            : <SocialCard key={c.label} c={c} />
-        )}
+      <div className="px-8 max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative z-10">
+        <EmailCard c={CONTACTS[0]} />
+        <SocialCard c={CONTACTS[1]} />
+        <SocialCard c={CONTACTS[2]} />
       </div>
     </section>
   );

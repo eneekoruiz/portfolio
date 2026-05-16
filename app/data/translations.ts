@@ -89,7 +89,7 @@ export const TX: Record<Lang, Tx> = {
     ['Arquitecto Lead', 'Backend / API', 'Ingeniero de Sistemas', 'Ingeniero Cloud', 'Especialista A11y'],
     'GitHub · Actividad reciente', 'Más en GitHub', 'Cargando repos…', 'Contacto', 'Hablemos.', 'Busco prácticas o posición junior. Si construyes algo que valga la pena, me interesa.',
     'Filosofía', 'Más allá del código.', VALS_ES, 'Buscar secciones…', 'IDIOMA', 'NAVEGAR', 'Vuelve pronto | Eneko Ruiz', 'Eneko Ruiz | Full Stack Developer',
-    'Diseñado y desarrollado con obsesión en Donostia. Next.js 14, Tailwind CSS y GSAP.', 'Ver código fuente', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Diseñado y desarrollado con obsesión en Donostia. Next.js 16, Tailwind CSS y GSAP.', 'Ver código fuente', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Volver', 'Abrir Directo'
   ),
 
@@ -107,7 +107,7 @@ export const TX: Record<Lang, Tx> = {
     ['Lead Architect', 'Backend / API', 'System Engineer', 'Cloud Engineer', 'A11y Specialist'],
     'GitHub · Recent activity', 'More on GitHub', 'Loading…', 'Contact', "Let's talk.", "Looking for internship or junior position. If you're building something worth building, I'm in.",
     'Philosophy', 'Beyond the code.', VALS_EN, 'Search sections…', 'LANGUAGE', 'NAVIGATE', 'Come back soon | Eneko Ruiz', 'Eneko Ruiz | Full Stack Developer',
-    'Designed and built with obsession in Donostia. Next.js 14, Tailwind CSS and GSAP.', 'View source code', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Designed and built with obsession in Donostia. Next.js 16, Tailwind CSS and GSAP.', 'View source code', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Back', 'Open Direct'
   ),
 
@@ -125,7 +125,7 @@ export const TX: Record<Lang, Tx> = {
     ['Arkitekto Burua', 'Backend / API', 'Sistemen Ingeniaria', 'Cloud Ingeniaria', 'A11y Espezialista'],
     'GitHub · Azken jarduera', 'Gehiago GitHuben', 'Kargatzen…', 'Kontaktua', 'Elkarrizketatu gaitezen.', 'Praktikak edo junior lanpostua bilatzen ari naiz. Merezi duen zerbait eraikitzen ari bazara, ni prest nago.',
     'Filosofia', 'Kodearen harantzago.', VALS_ES, 'Bilatu…', 'HIZKUNTZA', 'NABIGATU', 'Laster itzuli | Eneko Ruiz', 'Eneko Ruiz | Full Stack Developer',
-    'Donostian obsesioz diseinatua eta garatua. Next.js 14, Tailwind CSS eta GSAP.', 'Iturburu-kodea ikusi', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Donostian obsesioz diseinatua eta garatua. Next.js 16, Tailwind CSS eta GSAP.', 'Iturburu-kodea ikusi', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Itzuli', 'Ireki Zuzenean'
   ),
 
@@ -143,7 +143,7 @@ export const TX: Record<Lang, Tx> = {
     ['Architecte Lead', 'Backend / API', 'Ingénieur Systèmes', 'Ingénieur Cloud', 'Spécialiste A11y'],
     'GitHub · Activité récente', 'Plus sur GitHub', 'Chargement…', 'Contact', 'Parlons-en.', "Je cherche un stage ou un poste junior. Si vous construisez quelque chose qui en vaut la peine, je suis partant.",
     'Philosophie', 'Au-delà du code.', VALS_EN, 'Rechercher…', 'LANGUE', 'NAVIGUER', 'À bientôt | Eneko Ruiz', 'Eneko Ruiz | Développeur Full Stack',
-    'Conçu et développé à Donostia avec obsession. Next.js 14, Tailwind CSS et GSAP.', 'Voir le code source', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Conçu et développé à Donostia avec obsession. Next.js 16, Tailwind CSS et GSAP.', 'Voir le code source', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Retour', 'Ouvrir en direct'
   ),
 
@@ -161,7 +161,7 @@ export const TX: Record<Lang, Tx> = {
     ['Architetto Lead', 'Backend / API', 'Ingegnere di Sistemi', 'Ingegnere Cloud', 'Specialista A11y'],
     'GitHub · Attività recente', 'Altro su GitHub', 'Caricamento…', 'Contatto', 'Parliamone.', "Cerco uno stage o una posizione junior. Se stai costruendo qualcosa di valore, sono dei vostri.",
     'Filosofia', 'Oltre il codice.', VALS_EN, 'Cerca…', 'LINGUA', 'NAVIGA', 'Torna presto | Eneko Ruiz', 'Eneko Ruiz | Sviluppatore Full Stack',
-    'Progettato e sviluppato a Donostia con ossessione. Next.js 14, Tailwind CSS e GSAP.', 'Vedi il codice sorgente', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Progettato e sviluppato a Donostia con ossessione. Next.js 16, Tailwind CSS e GSAP.', 'Vedi il codice sorgente', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Indietro', 'Apri Direttamente'
   ),
 
@@ -179,7 +179,7 @@ export const TX: Record<Lang, Tx> = {
     ['Lead Architekt', 'Backend / API', 'Systemingenieur', 'Cloud Ingenieur', 'A11y Spezialist'],
     'GitHub · Letzte Aktivität', 'Mehr auf GitHub', 'Lädt…', 'Kontakt', 'Sprechen wir.', "Ich suche ein Praktikum oder eine Junior-Stelle. Wenn Sie etwas bauen, das es wert ist, bin ich dabei.",
     'Filosofia', 'Über den Code hinaus.', VALS_EN, 'Suchen…', 'SPRACHE', 'NAVIGIEREN', 'Bis bald | Eneko Ruiz', 'Eneko Ruiz | Full Stack Entwickler',
-    'In Donostia mit Leidenschaft entworfen und entwickelt. Next.js 14, Tailwind CSS und GSAP.', 'Quellcode ansehen', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'In Donostia mit Leidenschaft entworfen und entwickelt. Next.js 16, Tailwind CSS und GSAP.', 'Quellcode ansehen', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Zurück', 'Direkt öffnen'
   ),
 
@@ -197,7 +197,7 @@ export const TX: Record<Lang, Tx> = {
     ['Arquiteto Lead', 'Backend / API', 'Engenheiro de Sistemas', 'Engenheiro Cloud', 'Especialista A11y'],
     'GitHub · Atividade recente', 'Mais no GitHub', 'Carregando…', 'Contato', 'Vamos conversar.', "Procuro estágio ou posição júnior. Se está a construir algo que valha a pena, conte comigo.",
     'Filosofia', 'Além do código.', VALS_EN, 'Pesquisar…', 'IDIOMA', 'NAVEGAR', 'Volte em breve | Eneko Ruiz', 'Eneko Ruiz | Desenvolvedor Full Stack',
-    'Desenhado e desarrollado em Donostia con obsessão. Next.js 14, Tailwind CSS e GSAP.', 'Ver código fonte', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Desenhado e desarrollado em Donostia con obsessão. Next.js 16, Tailwind CSS e GSAP.', 'Ver código fonte', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Voltar', 'Abrir Direto'
   ),
 
@@ -215,7 +215,7 @@ export const TX: Record<Lang, Tx> = {
     ['Arquitecte Lead', 'Backend / API', 'Enginyer de Sistemes', 'Enginyer Cloud', 'Especialista A11y'],
     'GitHub · Activitat recent', 'Més a GitHub', 'Carregant…', 'Contacte', 'Parlem-ne.', "Busco pràctiques o posició júnior. Si construeixes alguna cosa que valgui la pena, m'interessa.",
     'Filosofia', 'Més enllà del codi.', VALS_EN, 'Cercar…', 'IDIOMA', 'NAVEGAR', 'Torna aviat | Eneko Ruiz', 'Eneko Ruiz | Desenvolupador Full Stack',
-    'Dissenyat i desenvolupat a Donostia amb obsessió. Next.js 14, Tailwind CSS i GSAP.', 'Veure codi font', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Dissenyat i desenvolupat a Donostia amb obsessió. Next.js 16, Tailwind CSS i GSAP.', 'Veure codi font', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Tornar', 'Obrir Directe'
   ),
 
@@ -233,7 +233,7 @@ export const TX: Record<Lang, Tx> = {
     ['Arquitecto Lead', 'Backend / API', 'Enxeñeiro de Sistemas', 'Enxeñeiro Cloud', 'Especialista A11y'],
     'GitHub · Actividade recente', 'Máis en GitHub', 'Cargando…', 'Contacto', 'Falemos.', "Busco prácticas ou posición junior. Se constrúes algo que valla a pena, conta comigo.",
     'Filosofia', 'Máis alá do código.', VALS_EN, 'Buscar…', 'IDIOMA', 'NAVEGAR', 'Volve pronto | Eneko Ruiz', 'Eneko Ruiz | Desenvolvedor Full Stack',
-    'Deseñado e desenvolvido en Donostia con obsesión. Next.js 14, Tailwind CSS e GSAP.', 'Ver código fonte', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'Deseñado e desenvolvido en Donostia con obsesión. Next.js 16, Tailwind CSS e GSAP.', 'Ver código fonte', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     'Voltar', 'Abrir Directo'
   ),
 
@@ -251,7 +251,7 @@ export const TX: Record<Lang, Tx> = {
     ['リードアーキテクト', 'バックエンド / API', 'システムエンジニア', 'クラウドエンジニア', 'アクセシビリティスペシャリスト'],
     'GitHub · 最新の活動', 'GitHubでもっと見る', '取得中…', 'お問い合わせ', 'ぜひお話しましょう。', 'インターンまたはジュニアポジションを探しています。価値ある挑戦をお待ちしています。',
     'エンジニアとしての信条', 'コードを超えた世界観。', VALS_EN, 'セクションを検索…', '言語', 'ナビゲート', 'またお越しください | Eneko Ruiz', 'Eneko Ruiz | フルスタック開発者',
-    'ドノスティアで、こだわり抜いて設計・開発。Next.js 14, Tailwind CSS & GSAP。', 'ソースコードを見る', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
+    'ドノスティアで、こだわり抜いて設計・開発。Next.js 16, Tailwind CSS & GSAP。', 'ソースコードを見る', 'eneekoruiz@gmail.com · github.com/eneekoruiz · linkedin.com/in/eneekoruiz',
     '戻る', '直接開く'
   ),
 };

@@ -86,44 +86,60 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
 
     if (!active) {
       const ctx = gsap.context(() => {
-        const chars = textRef.current!.querySelectorAll<HTMLElement>('.char');
-        gsap.set(chars,           { yPercent: 110, opacity: 0 });
-        gsap.set(lineRef.current, { scaleX: 0 });
+        const chars = textRef.current?.querySelectorAll<HTMLElement>('.char');
+        if (chars && chars.length > 0) gsap.set(chars, { yPercent: 110, opacity: 0 });
+        if (lineRef.current) gsap.set(lineRef.current, { scaleX: 0 });
       }, containerRef.current);
       return () => ctx.revert();
     }
 
     const ctx = gsap.context(() => {
-      const chars = textRef.current!.querySelectorAll<HTMLElement>('.char');
+      const chars = textRef.current?.querySelectorAll<HTMLElement>('.char');
 
       // ── Timeline de entrada + salida ───────────────────────────────────
       const tl = gsap.timeline();
 
-      tl
-        .to(lineRef.current, {
+      if (lineRef.current) {
+        tl.to(lineRef.current, {
           scaleX: 1, duration: 0.35, ease: 'power3.out',
-        })
-        .to(chars, {
+        });
+      }
+
+      if (chars && chars.length > 0) {
+        tl.to(chars, {
           yPercent: 0, opacity: 1,
           stagger: 0.025, duration: 0.48, ease: 'power3.out',
-        }, '-=0.15')
-        .to(lineRef.current, {
+        }, '-=0.15');
+      }
+
+      if (lineRef.current) {
+        tl.to(lineRef.current, {
           scaleX: 0, duration: 0.3, ease: 'power3.in',
-        }, '-=0.40')
-        .to({}, { duration: 0.35 })
-        .to(chars, {
+        }, '-=0.40');
+      }
+
+      tl.to({}, { duration: 0.35 });
+
+      if (chars && chars.length > 0) {
+        tl.to(chars, {
           yPercent: -120, opacity: 0,
           stagger: 0.02, duration: 0.3, ease: 'power3.in',
-        })
-        .add(() => {
-          onRevealRef.current?.();
-        }, '-=0.1')
-        .to(containerRef.current, {
-          yPercent: -100, duration: 0.65, ease: 'power3.out',
-        }, '<')
-        .add(() => {
-          onCompleteRef.current?.();
         });
+      }
+
+      tl.add(() => {
+        onRevealRef.current?.();
+      }, '-=0.1');
+
+      if (containerRef.current) {
+        tl.to(containerRef.current, {
+          yPercent: -100, duration: 0.65, ease: 'power3.out',
+        }, '<');
+      }
+
+      tl.add(() => {
+        onCompleteRef.current?.();
+      });
 
     }, containerRef.current || undefined);
 

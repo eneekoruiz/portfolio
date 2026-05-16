@@ -119,25 +119,27 @@ export function ProjectHero({
       },
     });
 
-    tl
-      // Phase 1: Background & Content Fade
-      .to(contentRef.current, {
-        y: -120,
-        opacity: 0,
-        scale: 0.9,
-        force3D: true,
-        ease: 'power2.in',
-        duration: 1.2,
-      }, 0)
-      .to(bgImageRef.current, {
-        scale: disableStudio ? 1.4 : 2.2,
-        opacity: disableStudio ? 0.3 : 0.1,
-        force3D: true,
-        ease: 'power2.inOut',
-        duration: 2.5,
-      }, 0);
+    if (contentRef.current && bgImageRef.current) {
+      tl
+        // Phase 1: Background & Content Fade
+        .to(contentRef.current, {
+          y: -120,
+          opacity: 0,
+          scale: 0.9,
+          force3D: true,
+          ease: 'power2.in',
+          duration: 1.2,
+        }, 0)
+        .to(bgImageRef.current, {
+          scale: disableStudio ? 1.4 : 2.2,
+          opacity: disableStudio ? 0.3 : 0.1,
+          force3D: true,
+          ease: 'power2.inOut',
+          duration: 2.5,
+        }, 0);
+    }
 
-    if (!disableStudio) {
+    if (!disableStudio && screenRef.current && overlayRef.current) {
       tl
         // Phase 2: Screen reveals with a "Window" effect
         .fromTo(screenRef.current,
@@ -178,14 +180,16 @@ export function ProjectHero({
     }
 
     // 2. Idle floating
-    gsap.to(titleRef.current, {
-      y: '+=12',
-      duration: 4,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-      force3D: true,
-    });
+    if (titleRef.current) {
+      gsap.to(titleRef.current, {
+        y: '+=12',
+        duration: 4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        force3D: true,
+      });
+    }
 
     // 3. Mouse Interaction (Optimized)
     const onMove = (e: MouseEvent) => {
@@ -195,14 +199,16 @@ export function ProjectHero({
       const mx = (clientX / innerWidth - 0.5) * 2;
       const my = (clientY / innerHeight - 0.5) * 2;
       
-      gsap.to(titleRef.current, {
-        rotateY: mx * 10,
-        rotateX: -my * 10,
-        scale: 1.01,
-        duration: 0.8,
-        ease: 'power2.out',
-        overwrite: 'auto',
-      });
+      if (titleRef.current) {
+        gsap.to(titleRef.current, {
+          rotateY: mx * 10,
+          rotateX: -my * 10,
+          scale: 1.01,
+          duration: 0.8,
+          ease: 'power2.out',
+          overwrite: 'auto',
+        });
+      }
       
       if (glareRef.current) {
         gsap.to(glareRef.current, {
