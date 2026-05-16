@@ -88,7 +88,7 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index }: {
         ${span}
         /* 📱 RESPONSIVE: Visible en todos los tamaños, apilado en móvil */
         flex
-        relative overflow-hidden group rounded-[20px] p-7 flex-col gap-4
+        relative overflow-hidden group rounded-[20px] p-7 flex-col gap-4 border-beam
         transition-colors duration-500 will-change-transform
         focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none
         backdrop-blur-xl shadow-sm hover:shadow-xl
@@ -142,8 +142,30 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index }: {
 }
 
 export function Philosophy({ t }: { t: Tx }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const titleChars = containerRef.current?.querySelectorAll('.title-char');
+      if (titleChars) {
+        gsap.fromTo(titleChars,
+          { y: '100%', rotateX: -90, opacity: 0 },
+          {
+            y: 0, rotateX: 0, opacity: 1,
+            duration: 1.2,
+            stagger: 0.02,
+            ease: 'expo.out',
+            scrollTrigger: { trigger: containerRef.current, start: 'top 85%' }
+          }
+        );
+      }
+    });
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
+      ref={containerRef}
       id="values"
       data-section="values"
       aria-label="Filosofía"
@@ -155,8 +177,10 @@ export function Philosophy({ t }: { t: Tx }) {
       </p>
       
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
-        <h2 className="sec-h font-black text-4xl md:text-5xl lg:text-6xl tracking-tight leading-none text-slate-900 dark:text-white max-w-2xl drop-shadow-sm">
-          {t.valH}
+        <h2 className="sec-h font-black text-4xl md:text-5xl lg:text-6xl tracking-tight leading-none text-slate-900 dark:text-white max-w-2xl drop-shadow-sm perspective-1000">
+          {t.valH.split('').map((c, i) => (
+            <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+          ))}
         </h2>
       </div>
 

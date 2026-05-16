@@ -141,7 +141,8 @@ export function CmdModal({
         <div className="overflow-y-auto overscroll-contain flex-1 pb-3">
           {!q && (
             <div className="px-5 pt-4 pb-2 flex items-center justify-between text-[11px] text-lead/70">
-              <span>Usa ↑ ↓ y Enter para navegar</span>
+              <span className="hidden md:inline">Usa ↑ ↓ y Enter para navegar</span>
+              <span className="md:hidden">Selecciona una opción</span>
               <span>{flatAll.length} opciones</span>
             </div>
           )}

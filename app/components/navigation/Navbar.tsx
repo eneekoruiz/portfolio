@@ -4,6 +4,7 @@ import React from 'react';
 import { Search, Menu as MenuIcon } from 'lucide-react';
 import { LangDD } from '../ui/LangDD';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { MotionToggle } from '../ui/MotionToggle';
 import { useMagnetic } from '../../hooks/useMagnetic';
 import type { Lang, Tx } from '../../types';
 
@@ -30,13 +31,18 @@ export function Navbar({
   onNavEnter,
   onNavContainerLeave
 }: NavbarProps) {
+  const logoRef = useMagnetic<HTMLAnchorElement>({ strength: 0.15 });
   return (
     <header
       className="fixed top-3 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-2rem)] max-w-[940px]"
       data-noprint
     >
       <div className="flex items-center justify-between gap-2 md:gap-4 px-3 md:px-5 py-[.62rem] rounded-full bg-white/82 dark:bg-[#0a0a0a]/82 backdrop-blur-3xl border border-white/80 dark:border-white/10 shadow-glass">
-        <a href="#hero" className="n-el font-black text-[1rem] tracking-[-0.8px] text-ink no-underline shrink-0">
+        <a 
+          ref={logoRef}
+          href="#hero" 
+          className="n-el font-black text-[1rem] tracking-[-0.8px] text-ink no-underline shrink-0"
+        >
           <span className="hidden min-[380px]:inline">Eneko.</span>
           <span className="inline min-[380px]:hidden">E.</span>
         </a>
@@ -65,9 +71,11 @@ export function Navbar({
         <div className="n-el flex items-center gap-2 shrink-0">
           <LangDD lang={lang} setLang={setLang} />
           <ThemeToggle />
+          <MotionToggle />
           <button
             onClick={() => setCmd(true)}
             aria-label="Buscar"
+            title="Buscar (⌘K)"
             className="p-2 border border-black/10 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <Search size={14} />

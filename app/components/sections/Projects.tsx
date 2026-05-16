@@ -141,7 +141,13 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
         className="py-[18px] md:py-5 cursor-pointer relative z-10"
         onMouseEnter={() => !isMobile && setActiveRepo(idx)}
         onMouseLeave={() => !isMobile && setActiveRepo(null)}
-        onClick={() => isMobile && setActiveRepo(isActive ? null : idx)}
+        onClick={() => {
+          if (isMobile) {
+            setActiveRepo(isActive ? null : idx);
+          } else {
+            window.open(r.html_url, '_blank', 'noopener,noreferrer');
+          }
+        }}
       >
         <div className="flex items-start md:items-center gap-4 md:gap-5">
           <span className="font-mono text-[10px] text-lead/40 w-6 shrink-0 pt-1 md:pt-0">
@@ -183,7 +189,7 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
               <a
                 href={r.html_url} target="_blank" rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white text-[9px] font-black uppercase tracking-[0.22em] hover:scale-105 transition-all shadow-lg border backdrop-blur-md"
+                className="inline-flex md:hidden items-center gap-2 px-4 py-2 rounded-full text-white text-[9px] font-black uppercase tracking-[0.22em] hover:scale-105 transition-all shadow-lg border backdrop-blur-md"
                 style={{
                   background: isDark 
                     ? `linear-gradient(145deg, ${(LANG_COLORS[r.langs?.[0]] || '#666666')}80 0%, transparent 100%)` 
@@ -202,12 +208,38 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
               <span className="text-[10px] text-lead/40">★{r.stargazers_count}</span>
             )}
             <span className="font-mono text-[10px] text-lead/30">
-              {new Date(r.pushed_at).getFullYear()}
+              {r.pushed_at.split('-')[0]}
             </span>
-            <ArrowUpRight
-              size={14}
-              className={`transition-all duration-200 ${isActive ? 'text-brand opacity-100' : 'text-lead opacity-30'}`}
-            />
+            <div
+              className={`flex items-center justify-center gap-2 rounded-full border transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+                isActive
+                  ? 'px-4 py-2 text-white shadow-md'
+                  : 'w-7 h-7 border-transparent text-lead opacity-30'
+              }`}
+              style={
+                isActive
+                  ? {
+                      background: isDark
+                        ? `linear-gradient(145deg, ${(LANG_COLORS[r.langs?.[0]] || '#666666')}80 0%, transparent 100%)`
+                        : `linear-gradient(145deg, ${(LANG_COLORS[r.langs?.[0]] || '#24292F')} 0%, ${(LANG_COLORS[r.langs?.[0]] || '#24292F')}ee 100%)`,
+                      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'transparent',
+                      boxShadow: `0 8px 20px rgba(0,0,0,0.12)`,
+                    }
+                  : undefined
+              }
+            >
+              <span
+                className={`font-mono text-[8px] font-black uppercase tracking-[0.22em] transition-all duration-500 overflow-hidden whitespace-nowrap ${
+                  isActive ? 'max-w-[120px] opacity-100' : 'max-w-0 opacity-0'
+                }`}
+              >
+                Visitar Repo
+              </span>
+              <ArrowUpRight
+                size={12}
+                className={`transition-colors duration-300 shrink-0 ${isActive ? 'text-white' : 'text-lead'}`}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -343,6 +375,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
   return (
     <div
       ref={rowRef}
+      onMouseMove={onMouseMove}
       className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-all duration-700"
       style={{
         background: isExpanded ? theme.gradient : undefined,
@@ -351,20 +384,42 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
         boxShadow: isExpanded ? `inset 0 1px 0 0 rgba(255,255,255,${isDark ? '0.05' : '0.1'}), inset 0 -1px 0 0 rgba(0,0,0,${isDark ? '0.1' : '0.05'})` : 'none',
       }}
     >
-      {/* Dynamic Background Layer (Glass + Color) */}
+      {/* ── Apple-Style Premium Satin Glass Overlay ── */}
       <div 
-        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-700 pointer-events-none"
+        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-all duration-500 ease-out pointer-events-none"
         style={{
-          background: `${theme.img}, radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${theme.color}20 0%, transparent 100%)`,
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)',
+          background: isDark
+            ? `linear-gradient(to bottom, rgba(${theme.rgb}, 0.03) 0%, transparent 100%), rgba(255, 255, 255, 0.015)`
+            : `linear-gradient(to bottom, rgba(${theme.rgb}, 0.04) 0%, transparent 100%), rgba(0, 0, 0, 0.006)`,
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
+      />
+
+      {/* ── Apple-Style Interactive Radial Glow Spot ── */}
+      <div 
+        className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ease-out pointer-events-none"
+        style={{
+          background: isDark
+            ? `radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(${theme.rgb}, 0.16) 0%, rgba(${theme.rgb}, 0.04) 50%, transparent 80%)`
+            : `radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(${theme.rgb}, 0.11) 0%, rgba(${theme.rgb}, 0.02) 60%, transparent 80%)`,
         }}
       />
       
-      {/* Top Border Glow on Hover */}
+      {/* ── Top Border Glow Reflect (follows mouse X) ── */}
       <div 
-        className="absolute top-0 left-0 w-full h-[1px] opacity-0 group-hover/row:opacity-100 transition-opacity duration-700 z-20"
-        style={{ background: `linear-gradient(90deg, transparent, ${theme.color}40, transparent)` }}
+        className="absolute top-0 left-0 w-full h-[1.5px] opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 z-20 pointer-events-none"
+        style={{
+          background: `radial-gradient(180px circle at var(--mouse-x, 50%) 0px, rgba(${theme.rgb}, 0.65) 0%, transparent 100%)`,
+        }}
+      />
+
+      {/* ── Bottom Border Glow Reflect (follows mouse X) ── */}
+      <div 
+        className="absolute bottom-0 left-0 w-full h-[1.5px] opacity-0 group-hover/row:opacity-100 transition-opacity duration-500 z-20 pointer-events-none"
+        style={{
+          background: `radial-gradient(180px circle at var(--mouse-x, 50%) 100%, rgba(${theme.rgb}, 0.65) 0%, transparent 100%)`,
+        }}
       />
       
       {/* ── CABECERA DEL ACORDEÓN ── */}
@@ -373,7 +428,6 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
         id={`btn-${safeId}`}
         aria-expanded={isExpanded}
         aria-controls={panelId}
-        onMouseMove={onMouseMove}
         onMouseEnter={() => {
           onHoverProject({ name: proj.name, color: theme.color });
           if (theme.hasAudit && !isPrefetched) {
@@ -396,8 +450,8 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
         <span
           className="font-mono text-[10px] md:text-[11px] w-7 shrink-0 tabular-nums transition-all duration-700 font-semibold group-hover/row:scale-110 origin-left"
           style={{
-            color:   isExpanded ? theme.color : 'var(--lead)',
-            opacity: isExpanded ? 1 : 0.4,
+            color:   theme.color,
+            opacity: isExpanded ? 1 : 0.6,
           }}
         >
           <span className="group-hover/row:opacity-100 group-hover/row:text-[var(--theme-color)] transition-colors duration-700" style={{ '--theme-color': theme.color } as React.CSSProperties}>
@@ -675,7 +729,7 @@ export function Projects({
 
   const isReturning = useRef(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (top3.length === 0) return;
     const saved = loadNavState();
     if (!saved) return;
@@ -788,17 +842,17 @@ export function Projects({
               className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.95] text-ink uppercase italic perspective-1000"
               aria-label="Selected Works"
             >
-              <div className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
+              <span className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
                 { "Selected".split('').map((c, i) => (
                   <span key={i} className="title-char inline-block will-change-transform">{c}</span>
                 ))}
-              </div>
+              </span>
               <br/>
-              <div className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
+              <span className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
                 { "Works.".split('').map((c, i) => (
                   <span key={i} className="title-char inline-block will-change-transform">{c}</span>
                 ))}
-              </div>
+              </span>
             </h2>
             <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.22em] text-lead/30 mb-1">
               Click to expand ↓

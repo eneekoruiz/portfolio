@@ -42,7 +42,14 @@ export function ThemeToggle() {
     });
   };
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return (
+      <div 
+        aria-hidden="true"
+        className="w-9 h-9 rounded-xl bg-white/60 dark:bg-white/[0.06] border border-black/5 dark:border-white/10 backdrop-blur-xl shrink-0"
+      />
+    );
+  }
 
   return (
     <button

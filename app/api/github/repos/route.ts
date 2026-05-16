@@ -1,48 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * GitHub API Route - Hardened Error Handling & Security Audit Ready
+ * Provides generic, professional error messages without leaking upstream details.
+ */
+
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
-
-export const revalidate = 3600; // 1 hour
-
 const GITHUB_USER = 'eneekoruiz';
 const CACHE_TTL = 3600; // 1 hour
+
+// 1. Whitelists
+const ALLOWED_SORT = ['updated', 'pushed', 'created', 'full_name'] as const;
+const ALLOWED_DIRECTION = ['asc', 'desc'] as const;
+
+type SortOption = (typeof ALLOWED_SORT)[number];
+type DirectionOption = (typeof ALLOWED_DIRECTION)[number];
+
+// 2. Generic Error Messages
+const ERRORS = {
+  INVALID_PARAMS: 'Invalid request parameters',
+  RATE_LIMIT: 'GitHub rate limit reached',
+  FETCH_FAILED: 'Unable to fetch repositories',
+  INTERNAL: 'Internal Server Error',
+} as const;
+
+interface GitHubRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  html_url: string;
+  description: string | null;
+  fork: boolean;
+  languages_url: string;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  updated_at: string;
+  all_languages?: string[];
+  [key: string]: unknown;
+}
+
+export const revalidate = 3600;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   
-  // Hardened param validation
-  const sortParam = searchParams.get('sort');
-  const sort = ['created', 'updated', 'pushed', 'full_name'].includes(sortParam || '') 
-    ? sortParam! 
-    : 'updated';
+  // 3. Strict Whitelist Validation (Return 400 instead of silent fallback for audit readiness)
+  const s = searchParams.get('sort') || 'updated';
+  if (!ALLOWED_SORT.includes(s as SortOption)) {
+    return NextResponse.json({ error: ERRORS.INVALID_PARAMS }, { status: 400 });
+  }
+  const sort = s as SortOption;
 
-  const dirParam = searchParams.get('direction');
-  const direction = ['asc', 'desc'].includes(dirParam || '') 
-    ? dirParam! 
-    : 'desc';
+  const d = searchParams.get('direction') || 'desc';
+  if (!ALLOWED_DIRECTION.includes(d as DirectionOption)) {
+    return NextResponse.json({ error: ERRORS.INVALID_PARAMS }, { status: 400 });
+  }
+  const direction = d as DirectionOption;
 
-  const rawPerPage = searchParams.get('per_page');
-  const parsedPerPage = parseInt(rawPerPage || '30', 10);
-  const per_page = (Number.isFinite(parsedPerPage) && !isNaN(parsedPerPage))
-    ? Math.max(1, Math.min(parsedPerPage, 100))
-    : 30;
+  const p = searchParams.get('per_page') || '30';
+  const parsedP = parseInt(p, 10);
+  if (isNaN(parsedP) || parsedP < 1 || parsedP > 100) {
+    return NextResponse.json({ error: ERRORS.INVALID_PARAMS }, { status: 400 });
+  }
+  const perPage = parsedP;
 
+  // 4. Manual URL Construction
   const cleanParams = new URLSearchParams({
     sort,
     direction,
-    per_page: per_page.toString(),
+    per_page: perPage.toString(),
+    type: 'owner',
   });
 
   const endpoint = `https://api.github.com/users/${GITHUB_USER}/repos?${cleanParams.toString()}`;
-  const token = GITHUB_TOKEN;
-
   const requestHeaders: HeadersInit = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'Eneko-Portfolio-Backend',
   };
 
-  if (token) {
-    requestHeaders.Authorization = `Bearer ${token}`;
+  if (GITHUB_TOKEN) {
+    requestHeaders.Authorization = `Bearer ${GITHUB_TOKEN}`;
   }
 
   try {
@@ -51,33 +89,42 @@ export async function GET(request: NextRequest) {
       next: { revalidate: CACHE_TTL },
     });
 
-    // Handle Rate Limiting
-    if (res.status === 403) {
+    // 5. Handle Rate Limiting (403/429)
+    if (res.status === 403 || res.status === 429) {
       const resetTime = res.headers.get('X-RateLimit-Reset');
-      return NextResponse.json(
-        { error: 'GitHub API rate limit exceeded', resetAt: resetTime },
-        { status: 429, headers: { 'Retry-After': resetTime || '3600' } }
-      );
-    }
-
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      console.error(`GitHub upstream error [${res.status}]:`, errorData.message || res.statusText);
+      console.warn(`GitHub Rate Limit hit. Reset at: ${resetTime}`);
       
       return NextResponse.json(
-        { error: 'Failed to fetch repositories from GitHub' },
-        { status: res.status, headers: { 'Cache-Control': 'no-store' } }
+        { error: ERRORS.RATE_LIMIT },
+        { 
+          status: 429, 
+          headers: { 
+            'Retry-After': resetTime ?? '3600',
+            'Cache-Control': 'no-store'
+          } 
+        }
       );
     }
 
-    const repos = await res.json();
+    // 6. Generic Upstream Error Handling
+    if (!res.ok) {
+      // Log technical details internally
+      console.error(`Upstream GitHub Error: ${res.status} ${res.statusText}`);
+      
+      return NextResponse.json(
+        { error: ERRORS.FETCH_FAILED },
+        { status: res.status === 404 ? 404 : 502, headers: { 'Cache-Control': 'no-store' } }
+      );
+    }
 
-    // Enrich the first 8 non-fork repos with all languages in parallel
+    const repos: GitHubRepo[] = await res.json();
+
+    // 7. Parallel Enrichment (Hardened)
     const enrichedRepos = await Promise.all(
       repos
-        .filter((r: { fork: boolean }) => !r.fork)
+        .filter(r => !r.fork)
         .slice(0, 8)
-        .map(async (repo: { id: number; languages_url: string; language: string | null }) => {
+        .map(async (repo) => {
           try {
             const langRes = await fetch(repo.languages_url, {
               headers: requestHeaders,
@@ -88,27 +135,33 @@ export async function GET(request: NextRequest) {
               return { ...repo, all_languages: Object.keys(langData) };
             }
           } catch (e) {
-            console.error(`Failed to enrich repo ${repo.id}:`, e);
+            // Silently log enrichment failures to avoid breaking main response
+            console.error(`Enrichment failed for repo ${repo.id}:`, e);
           }
           return { ...repo, all_languages: repo.language ? [repo.language] : [] };
         })
     );
 
-    const finalData = repos.map((r: { id: number }) => {
+    const finalData = repos.map(r => {
       const enriched = enrichedRepos.find(er => er.id === r.id);
-      return enriched || r;
+      return enriched ?? r;
     });
 
+    // 8. Secure Response
     return NextResponse.json(finalData, {
       status: 200,
       headers: {
         'Cache-Control': `public, s-maxage=${CACHE_TTL}, stale-while-revalidate=${CACHE_TTL / 2}`,
+        'X-Content-Type-Options': 'nosniff',
       },
     });
   } catch (err) {
-    console.error('GitHub API Route error:', err);
+    // 9. Final Fallback for critical failures
+    const logMsg = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Critical GitHub Route Failure:', logMsg);
+    
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: ERRORS.INTERNAL },
       { status: 500 }
     );
   }

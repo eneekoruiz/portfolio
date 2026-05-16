@@ -15,6 +15,32 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
   const activeRef = useRef(false);
   const mouseRef = useRef({ x: -2000, y: -2000 });
   const colorsRef = useRef({ accent, secondary });
+  const motionEnabledRef = useRef(true);
+
+  // Spring physics states for both strands (61 points each) to achieve organic elastic wiggling/damping
+  const physicsRef = useRef<{
+    strandA: { x: number; y: number; vx: number; vy: number }[];
+    strandB: { x: number; y: number; vx: number; vy: number }[];
+  }>({
+    strandA: Array.from({ length: 61 }, () => ({ x: 0, y: 0, vx: 0, vy: 0 })),
+    strandB: Array.from({ length: 61 }, () => ({ x: 0, y: 0, vx: 0, vy: 0 })),
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const initial = localStorage.getItem('portfolio-motion-enabled') !== 'false';
+    motionEnabledRef.current = initial;
+
+    const handleMotionChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      motionEnabledRef.current = customEvent.detail.enabled;
+    };
+
+    window.addEventListener('portfolio-motion-changed', handleMotionChange);
+    return () => {
+      window.removeEventListener('portfolio-motion-changed', handleMotionChange);
+    };
+  }, []);
 
   useEffect(() => {
     gsap.to(colorsRef.current, {
@@ -46,6 +72,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
     if (!ctx) return;
 
     let frame = 0;
+    let hoverIntensity = 0;
+
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = canvas.offsetWidth * dpr;
@@ -69,90 +97,156 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
       ctx.clearRect(0, 0, w, h);
       
       const steps = 60;
-      const speed = 0.012;
-      rotationRef.current += speed;
+      const baseSpeed = 0.012;
+      
+      // Calculate scroll velocity
+      const currentScroll = scrollRef.current;
+      const scrollVelocity = Math.abs(currentScroll - (canvas.dataset.lastScroll ? parseFloat(canvas.dataset.lastScroll) : currentScroll));
+      canvas.dataset.lastScroll = currentScroll.toString();
+      
+      // Get mouse position in local canvas space
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = mouseRef.current.x - rect.left;
+      const mouseY = mouseRef.current.y - rect.top;
+      
+      // Calculate closest distance to the helix in local space
+      let minDistance = 999999;
       const baseRotation = rotationRef.current;
+
+      for (let i = 0; i <= steps; i += 2) {
+        const progress = i / steps;
+        const y = progress * h;
+        const angle = progress * Math.PI * 4 + baseRotation;
+        const r = Math.min(w * 0.15, 140);
+        
+        const x1 = w / 2 + Math.cos(angle) * r;
+        const x2 = w / 2 + Math.cos(angle + Math.PI) * r;
+        
+        const d1 = Math.sqrt((x1 - mouseX) ** 2 + (y - mouseY) ** 2);
+        const d2 = Math.sqrt((x2 - mouseX) ** 2 + (y - mouseY) ** 2);
+        
+        if (d1 < minDistance) minDistance = d1;
+        if (d2 < minDistance) minDistance = d2;
+      }
+
+      // Smoothly interpolate hover speed boost
+      const hoverRange = 220;
+      let targetHover = 0;
+      if (minDistance < hoverRange) {
+        targetHover = (hoverRange - minDistance) / hoverRange;
+      }
+      
+      hoverIntensity += (targetHover - hoverIntensity) * 0.08;
+
+      if (motionEnabledRef.current) {
+        const hoverSpeedBoost = hoverIntensity * 0.048;
+        rotationRef.current += baseSpeed + (scrollVelocity * 0.002) + hoverSpeedBoost;
+      }
+
+      const activeRotation = rotationRef.current;
       const accentColor = colorsRef.current.accent;
+      const secondaryColor = colorsRef.current.secondary;
 
-      const applyRepulsion = (x: number, y: number) => {
-        const dx = x - mouseRef.current.x;
-        const dy = y - mouseRef.current.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const range = 180;
-        if (dist < range) {
-          const force = (range - dist) / range;
-          return {
-            rx: x + (dx / dist) * force * 30,
-            ry: y + (dy / dist) * force * 15
-          };
-        }
-        return { rx: x, ry: y };
-      };
+      const range = 220;
+      const physics = physicsRef.current;
+      const strandPoints: { x: number; y: number }[][] = [[], []];
 
-      // Draw Strands
-      ctx.lineWidth = darkMode ? 5 : 4;
-      ctx.globalAlpha = 0.8;
-      ctx.strokeStyle = accentColor;
+      // Update Physics & Draw Strands
+      ctx.lineWidth = darkMode ? 6 : 4;
+      ctx.globalAlpha = darkMode ? 0.95 : 0.8;
       
       for (let s = 0; s < 2; s++) {
         const offset = s === 0 ? 0 : Math.PI;
+        ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
         ctx.beginPath();
+        
+        const nodes = s === 0 ? physics.strandA : physics.strandB;
+
         for (let i = 0; i <= steps; i++) {
           const progress = i / steps;
           const y = progress * h;
-          const angle = progress * Math.PI * 4 + baseRotation + offset;
+          const angle = progress * Math.PI * 4 + activeRotation + offset;
           const r = Math.min(w * 0.15, 140);
           const x = w / 2 + Math.cos(angle) * r;
           
-          const { rx, ry } = applyRepulsion(x, y);
+          // Calculate elastic attraction vector to mouse (spider web stick)
+          const dx = mouseX - x;
+          const dy = mouseY - y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          let targetX = 0;
+          let targetY = 0;
+          if (dist < range) {
+            const force = Math.pow((range - dist) / range, 1.8);
+            targetX = dx * force * 0.65;
+            targetY = dy * force * 0.35;
+          }
+          
+          // Spring Physics Integration
+          const node = nodes[i];
+          const stiffness = 0.06;
+          const damping = 0.84;
+          
+          const ax = (targetX - node.x) * stiffness;
+          const ay = (targetY - node.y) * stiffness;
+          
+          node.vx = (node.vx + ax) * damping;
+          node.vy = (node.vy + ay) * damping;
+          
+          node.x += node.vx;
+          node.y += node.vy;
+          
+          const rx = x + node.x;
+          const ry = y + node.y;
+          
+          strandPoints[s].push({ x: rx, y: ry });
+          
           if (i === 0) ctx.moveTo(rx, ry);
           else ctx.lineTo(rx, ry);
         }
         ctx.stroke();
       }
 
-      // Draw Crossbars and Nodes
+      // Draw Crossbars and Nodes using physical coordinates
       for (let i = 0; i <= steps; i++) {
         const progress = i / steps;
-        const y = progress * h;
-        const angle = progress * Math.PI * 4 + baseRotation;
+        const angle = progress * Math.PI * 4 + activeRotation;
         
-        const r = Math.min(w * 0.15, 140);
-        const x1 = w / 2 + Math.cos(angle) * r;
-        const x2 = w / 2 + Math.cos(angle + Math.PI) * r;
+        const pt1 = strandPoints[0][i];
+        const pt2 = strandPoints[1][i];
         
         const z1 = Math.sin(angle);
         const z2 = Math.sin(angle + Math.PI);
 
-        const { rx: r1x, ry: r1y } = applyRepulsion(x1, y);
-        const { rx: r2x, ry: r2y } = applyRepulsion(x2, y);
-        
         if (i % 3 === 0) {
           ctx.beginPath();
-          ctx.moveTo(r1x, r1y);
-          ctx.lineTo(r2x, r2y);
-          ctx.strokeStyle = accentColor;
-          ctx.globalAlpha = (darkMode ? 0.35 : 0.2) * (z1 + z2 + 2) / 2;
-          ctx.lineWidth = 1.5;
+          ctx.moveTo(pt1.x, pt1.y);
+          ctx.lineTo(pt2.x, pt2.y);
+          ctx.strokeStyle = secondaryColor;
+          ctx.globalAlpha = (darkMode ? 0.4 : 0.18) * (z1 + z2 + 2) / 2;
+          ctx.lineWidth = darkMode ? 2 : 1.5;
           ctx.stroke();
         }
 
-        const drawNode = (rx: number, ry: number, z: number) => {
+        const drawNode = (rx: number, ry: number, z: number, isSecondaryStrand: boolean) => {
           const size = 3 + (z + 1) * 3;
-          ctx.globalAlpha = darkMode ? 0.15 : 0.1;
+          const nodeColor = isSecondaryStrand ? secondaryColor : accentColor;
+          
+          ctx.globalAlpha = darkMode ? 0.25 : 0.1;
           ctx.beginPath();
           ctx.arc(rx, ry, size * 2.2, 0, Math.PI * 2);
-          ctx.fillStyle = accentColor;
+          ctx.fillStyle = nodeColor;
           ctx.fill();
           
           ctx.globalAlpha = 1.0;
           ctx.beginPath();
           ctx.arc(rx, ry, size, 0, Math.PI * 2);
+          ctx.fillStyle = nodeColor;
           ctx.fill();
         };
 
-        drawNode(r1x, r1y, z1);
-        drawNode(r2x, r2y, z2);
+        drawNode(pt1.x, pt1.y, z1, false); // Strand A
+        drawNode(pt2.x, pt2.y, z2, true);  // Strand B
       }
       
       frame = requestAnimationFrame(draw);

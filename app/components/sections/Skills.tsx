@@ -15,7 +15,7 @@ if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger, useGSAP);
 function TextPillCylinder({ techs, cardColor, isDark }: { techs: string[], cardColor: string, isDark: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
-  const angleRef = useRef(Math.random() * Math.PI); 
+  const angleRef = useRef(0); // Stable initial value for hydration (Error #418)
   const animRef = useRef<number>(undefined);
   const isDragging = useRef(false);
   const startX = useRef(0);
@@ -140,7 +140,7 @@ function TextPillCylinder({ techs, cardColor, isDark }: { techs: string[], cardC
       <div ref={containerRef} className="relative" style={{ width: 0, height: 0, transformStyle: 'preserve-3d', transform: 'rotateX(-6deg)' }}>
         {techs.map((tech, i) => {
           // Restore individual tech colors from constants for maximum vibrancy
-          const techColor = LANG_COLORS[tech] || cardColor; 
+          const techColor = cardColor; 
           const initialTheta = i * angleStep + angleRef.current;
           const ix = Math.sin(initialTheta) * radius;
           const iz = Math.cos(initialTheta) * radius;
@@ -205,8 +205,22 @@ export function Skills({ t }: SkillsProps) {
     const ctx = gsap.context(() => {
       
       // 1. Animación del Título (Igual para todos)
-      if (document.querySelector('.skills-header')) {
-        gsap.fromTo('.skills-header',
+      const titleChars = containerRef.current?.querySelectorAll('.title-char');
+      if (titleChars) {
+        gsap.fromTo(titleChars,
+          { y: '100%', rotateX: -90, opacity: 0 },
+          {
+            y: 0, rotateX: 0, opacity: 1,
+            duration: 1.2,
+            stagger: 0.02,
+            ease: 'expo.out',
+            scrollTrigger: { trigger: containerRef.current, start: 'top 85%' }
+          }
+        );
+      }
+
+      if (document.querySelector('.skills-header-label')) {
+        gsap.fromTo('.skills-header-label',
           { opacity: 0, y: -20 },
           { opacity: 1, y: 0, duration: 0.58, ease: 'power3.out',
             scrollTrigger: { trigger: containerRef.current, start: 'top 75%', once: true } }
@@ -275,15 +289,17 @@ export function Skills({ t }: SkillsProps) {
       <div className="px-8 max-w-[1200px] mx-auto">
 
       {/* HEADER COMPACTO CON MÁS COLOR */}
-      <div className="skills-header text-center mb-12 space-y-4 opacity-0">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/10 dark:bg-brand/20 border border-brand/20 dark:border-brand/30">
+      <div className="skills-header text-center mb-12 space-y-4">
+        <div className="skills-header-label inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/10 dark:bg-brand/20 border border-brand/20 dark:border-brand/30 opacity-0">
            <Code size={14} className="text-brand" />
            <span className="text-[10px] font-black tracking-[0.25em] uppercase text-brand">
              {t.skLb || 'TECH STACK'}
            </span>
         </div>
-        <h2 className="font-black text-[clamp(2.2rem,6vw,4.5rem)] tracking-tighter leading-none text-ink">
-          {t.skH || 'Tecnologías que domino.'}
+        <h2 className="font-black text-[clamp(2.2rem,6vw,4.5rem)] tracking-tighter leading-none text-ink perspective-1000">
+          {(t.skH || 'Tecnologías que domino.').split('').map((c, i) => (
+            <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+          ))}
         </h2>
       </div>
 
@@ -301,7 +317,7 @@ export function Skills({ t }: SkillsProps) {
               role="listitem"
             >
                 <div 
-                  className={`relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] shadow-2xl hover:-translate-y-2 ${isLast ? 'w-full md:w-[calc(50%-1rem)]' : 'w-full'}`}
+                  className={`relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] shadow-2xl hover:-translate-y-2 border-beam ${isLast ? 'w-full md:w-[calc(50%-1rem)]' : 'w-full'}`}
                   style={{
                     background: isDark 
                       ? `linear-gradient(145deg, rgba(${card.rgb}, 0.35) 0%, rgba(${card.rgb}, 0.05) 100%)` 

@@ -95,25 +95,54 @@ export function ProjectPreviewFollower({ activeProject }: ProjectPreviewFollower
       >
         {/* Decorative elements to make it look "techy" */}
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_transparent_0%,_black_100%)]" />
+        
+        {/* Actual Video Preview */}
+        {activeProject && (
+          <video
+            src={`/projects/${activeProject.name}.webm`}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen"
+          />
+        )}
+
         <div className="absolute inset-0 mix-blend-overlay opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
         
         <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-white/20 animate-pulse mb-3 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+          <div className="w-10 h-10 rounded-full border border-white/20 mb-3 flex items-center justify-center relative">
+            <div className="absolute inset-0 rounded-full border border-white/40 animate-ping" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white" />
           </div>
-          <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/40 mb-1">
-            Project Preview
+          <span className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/50 mb-1">
+            ENK_DATA_STREAM
           </span>
-          <h4 className="font-black text-white text-lg uppercase italic tracking-tighter leading-tight">
+          <h4 className="font-black text-white text-base uppercase tracking-tighter leading-tight drop-shadow-lg">
             {activeProject?.name.replace(/-/g, ' ')}
           </h4>
+          <div className="mt-4 flex gap-1.5 items-center">
+             <div className="w-1 h-1 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+             <div className="w-1 h-1 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+             <div className="w-1 h-1 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+          </div>
+        </div>
+
+        {/* Digital HUD Elements */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1">
+          <div className="w-8 h-[1px] bg-white/30" />
+          <div className="w-4 h-[1px] bg-white/30" />
+        </div>
+        <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1">
+          <div className="w-4 h-[1px] bg-white/30" />
+          <div className="w-8 h-[1px] bg-white/30" />
         </div>
 
         {/* Floating geometric lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-10">
-           <line x1="0" y1="0" x2="100%" y2="100%" stroke="white" strokeWidth="1" />
-           <line x1="100%" y1="0" x2="0" y2="100%" stroke="white" strokeWidth="1" />
-           <circle cx="50%" cy="50%" r="40%" fill="none" stroke="white" strokeWidth="1" strokeDasharray="4 4" />
+        <svg className="absolute inset-0 w-full h-full opacity-20">
+           <line x1="0" y1="0" x2="100%" y2="100%" stroke="white" strokeWidth="0.5" strokeDasharray="4 4" />
+           <line x1="100%" y1="0" x2="0" y2="100%" stroke="white" strokeWidth="0.5" strokeDasharray="4 4" />
+           <circle cx="50%" cy="50%" r="35%" fill="none" stroke="white" strokeWidth="0.5" strokeDasharray="10 5" className="animate-spin-slow" />
         </svg>
       </div>
     </div>

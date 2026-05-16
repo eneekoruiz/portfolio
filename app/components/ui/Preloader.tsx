@@ -216,7 +216,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">Terminal_Auth</span>
       </div>
       <div className="absolute bottom-12 right-12 flex flex-col items-end gap-2 opacity-15">
-        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">Node_01 // {new Date().getFullYear()}</span>
+        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">Node_01 // 2026</span>
         <div className="w-10 h-[1px] bg-ink" />
       </div>
     </div>

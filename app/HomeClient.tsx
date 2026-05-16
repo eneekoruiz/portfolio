@@ -101,7 +101,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const isDark = mounted && theme === 'dark';
   // 🚀 FIX: Consider ready if phase is already 'ready' OR if we have the session flag,
   // this prevents the "white screen" flash during the 'checking' phase on back-navigation.
-  const ready = phase === 'ready' || (typeof window !== 'undefined' && sessionStorage.getItem('hasSeenIntro') === 'true');
+  // CRITICAL: Must use 'mounted' to avoid hydration mismatch (Error #418).
+  const ready = phase === 'ready' || (mounted && typeof window !== 'undefined' && sessionStorage.getItem('hasSeenIntro') === 'true');
   const reduced = usePreferredMotion();
   const isLite = mounted && (window as any).__LITE;
   const [isMobile, setIsMobile] = useState(false);
@@ -167,10 +168,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     };
   }, [cmd, menu]);
 
-  // CMD+F & Escape
+  // CMD+K & Escape
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault(); e.stopPropagation();
         setCmd(c => !c);
         return;
@@ -376,12 +377,12 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     if (activeSection === 'work') {
       if (expandedIdx !== null && top3[expandedIdx]) {
         const pColor = PROJ_COLORS[top3[expandedIdx].name] || (isDarkLocal ? '#0066ff' : '#0044cc');
-        return { accent: pColor, secondary: isDarkLocal ? '#111' : '#ccc' };
+        return { accent: pColor, secondary: isDarkLocal ? '#444444' : '#cccccc' };
       }
     }
     
     // Natural color fallback
-    return { accent: isDarkLocal ? '#0066ff' : '#0044cc', secondary: isDarkLocal ? '#111' : '#ccc' };
+    return { accent: isDarkLocal ? '#ffffff' : '#1a1a1a', secondary: isDarkLocal ? '#666666' : '#b3b3b3' };
   }, [activeSection, expandedIdx, top3, theme, resolvedTheme]);
 
   // ── Phase Handlers ──────────────────────────────────────────────────────
@@ -407,7 +408,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
       {/* 🧬 DNA Background — Deepest Layer */}
       {ready && !isLite && !reduced && (
-        <div className="fixed inset-0 pointer-events-none z-[10]">
+        <div className="fixed inset-0 pointer-events-none z-[1]">
           <div
             className="helix-group will-change-transform"
             style={{
@@ -435,7 +436,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       <main
         ref={main}
         id="main-content"
-        className="relative z-[50]"
+        className="relative z-[10]"
         style={{
           visibility: ready ? 'visible' : 'hidden',
           opacity:    ready ? 1 : 0,
@@ -488,6 +489,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       />
 
       {/* 🛠️ Masterclass Utilities */}
+      <div className="hud-scanline" aria-hidden="true" />
+      <div className="hud-vignette" aria-hidden="true" />
       <DebugHUD />
       <PortalTransition />
     </>

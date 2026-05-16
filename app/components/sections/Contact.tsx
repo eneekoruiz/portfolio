@@ -172,12 +172,37 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
 }
 
 export function Contact({ t }: { t: Tx }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const titleChars = containerRef.current?.querySelectorAll('.title-char');
+      if (titleChars) {
+        gsap.fromTo(titleChars,
+          { y: '100%', rotateX: -90, opacity: 0 },
+          {
+            y: 0, rotateX: 0, opacity: 1,
+            duration: 1.2,
+            stagger: 0.02,
+            ease: 'expo.out',
+            scrollTrigger: { trigger: containerRef.current, start: 'top 85%' }
+          }
+        );
+      }
+    });
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-transparent z-[20]">
+    <section ref={containerRef} id="contact" data-section="contact" aria-label="Contacto" className="border-t border-black/7 dark:border-white/10 py-24 relative bg-transparent z-[20]">
       <div className="px-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-12">
         <div className="max-w-[700px]">
           <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>
-          <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3">{t.coH}</h2>
+          <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3 perspective-1000">
+            {t.coH.split('').map((c, i) => (
+              <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+            ))}
+          </h2>
           <p className="sec-h text-[15px] md:text-[18px] text-lead max-w-[500px] leading-relaxed">
             {t.coP}
           </p>

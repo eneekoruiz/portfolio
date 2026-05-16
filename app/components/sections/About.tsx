@@ -25,7 +25,7 @@ function MetricCard({ v, l }: MetricCardProps) {
   return (
     <div
       ref={ref}
-      className="p-8 md:p-10 rounded-3xl border border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/[0.1] backdrop-blur-xl block will-change-transform"
+      className="p-8 md:p-10 rounded-3xl border border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/[0.1] backdrop-blur-xl block will-change-transform border-beam"
     >
       <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">{v}</div>
       <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{l}</p>
@@ -40,7 +40,22 @@ function AboutContent({ t }: { t: Tx }) {
   useEffect(() => {
     const ctx = gsap.context(() => {
 
-      // 1. Entrada de títulos y métricas
+      // 1. Título con animación de caracteres
+      const titleChars = sectionRef.current?.querySelectorAll('.title-char');
+      if (titleChars) {
+        gsap.fromTo(titleChars,
+          { y: '100%', rotateX: -90, opacity: 0 },
+          {
+            y: 0, rotateX: 0, opacity: 1,
+            duration: 1.2,
+            stagger: 0.02,
+            ease: 'expo.out',
+            scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' }
+          }
+        );
+      }
+
+      // 2. Entrada de métricas
       if (document.querySelector('.about-reveal')) {
         gsap.from('.about-reveal', {
           y: 30, opacity: 0, stagger: 0.06, duration: 0.48, ease: 'power3.out',
@@ -48,7 +63,7 @@ function AboutContent({ t }: { t: Tx }) {
         });
       }
 
-      // 2. EFECTO TELÓN (MASKED REVEAL) - La nueva manera
+      // 3. EFECTO TELÓN (MASKED REVEAL)
       if (textContainerRef.current && document.querySelector('.word-inner')) {
         gsap.fromTo('.word-inner',
           { y: '110%', opacity: 0 },
@@ -74,9 +89,7 @@ function AboutContent({ t }: { t: Tx }) {
   // Función para crear la "máscara" palabra por palabra
   const renderMaskedWords = (text: string) => {
     return text.split(' ').map((word, i) => (
-      // Span exterior: crea el "límite" invisible (overflow-hidden)
       <span key={i} className="inline-block overflow-hidden align-bottom mr-[0.25em] pb-[0.1em]">
-        {/* Span interior: es el que realmente se mueve */}
         <span className="word-inner inline-block will-change-transform">
           {word}
         </span>
@@ -85,15 +98,17 @@ function AboutContent({ t }: { t: Tx }) {
   };
 
   return (
-    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden bg-page z-[20]">
+    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden z-[20]">
       <div className="px-6 md:px-8 max-w-[1200px] mx-auto relative z-10">
         <NetworkParticles />
 
         <div className="relative z-10">
-          <div className="about-reveal">
-            <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-brand mb-4">{t.abLb}</p>
-            <h2 className="font-black text-[clamp(2.5rem,6vw,4.5rem)] tracking-tight leading-none mb-8 md:mb-12 text-ink">
-              {t.abH}
+          <div>
+            <p className="about-reveal text-[11px] font-bold tracking-[0.2em] uppercase text-brand mb-4">{t.abLb}</p>
+            <h2 className="font-black text-[clamp(2.5rem,6vw,4.5rem)] tracking-tight leading-none mb-8 md:mb-12 text-ink perspective-1000">
+              {t.abH.split('').map((c, i) => (
+                <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+              ))}
             </h2>
           </div>
 
