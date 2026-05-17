@@ -101,7 +101,7 @@ export const LANG_COLORS: Record<string, string> = {
   Rust: '#DEA584',
   Makefile: '#427819',
   'Node.js': '#339933',
-  'Express': '#000000',
+  'Express': '#353535',
   'Spring': '#6DB33F',
   'React': '#61DAFB',
   'Next.js': '#000000',
@@ -124,7 +124,36 @@ export const LANG_COLORS: Record<string, string> = {
   'GeminiChat': '#ff2d55',
   'Claude': '#ff2d55',
   'GPT-4': '#ff2d55',
-  'LLMs': '#ff2d55'
+  'LLMs': '#ff2d55',
+  
+  // Project specific tech stack brand colors
+  Firebase: '#FFCA28',
+  'Google Calendar API': '#4285F4',
+  Vercel: '#000000',
+  'REST API': '#0055ff',
+  'GitHub Actions': '#2088FF',
+  'JAX-WS': '#E65100',
+  ObjectDB: '#4A148C',
+  Swing: '#5382a1',
+  'Java Swing': '#5382a1',
+  SOAP: '#8E24AA',
+  JUnit: '#25A162',
+  SonarCloud: '#F3702A',
+  'SonarCloud A': '#F3702A',
+  NestJS: '#E0234E',
+  A11y: '#1976D2',
+  A11Y: '#1976D2',
+  'Semantic HTML': '#E34C26',
+  'Semantic UI': '#35BDB2',
+  Jest: '#C21325',
+  'Atomic Transactions': '#00C853',
+  Bcrypt: '#37474F',
+  'Focus Trap': '#E040FB',
+  'WCAG-conscious': '#00E676',
+  'Thread-Safe': '#4CAF50',
+  'Cloud Native': '#0080FF',
+  'Optimistic Locking': '#00E676',
+  Cloud: '#0080FF'
 };
 
 /** Alias for backwards compat */

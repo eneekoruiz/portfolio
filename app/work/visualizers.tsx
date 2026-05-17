@@ -152,14 +152,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
       const strandPoints: { x: number; y: number }[][] = [[], []];
 
       // Update Physics & Draw Strands
-      ctx.lineWidth = darkMode ? 6 : 4;
-      ctx.globalAlpha = darkMode ? 0.95 : 0.8;
-      
       for (let s = 0; s < 2; s++) {
         const offset = s === 0 ? 0 : Math.PI;
-        ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
-        ctx.beginPath();
-        
         const nodes = s === 0 ? physics.strandA : physics.strandB;
 
         for (let i = 0; i <= steps; i++) {
@@ -200,10 +194,30 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           const ry = y + node.y;
           
           strandPoints[s].push({ x: rx, y: ry });
-          
-          if (i === 0) ctx.moveTo(rx, ry);
-          else ctx.lineTo(rx, ry);
         }
+
+        // Draw Glow Line (Only in Dark Mode for that beautiful outer neon glow)
+        if (darkMode) {
+          ctx.beginPath();
+          strandPoints[s].forEach((pt, idx) => {
+            if (idx === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          });
+          ctx.lineWidth = 10;
+          ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
+          ctx.globalAlpha = 0.45;
+          ctx.stroke();
+        }
+
+        // Draw Main/Core Line
+        ctx.beginPath();
+        strandPoints[s].forEach((pt, idx) => {
+          if (idx === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.lineWidth = darkMode ? 3.5 : 4;
+        ctx.strokeStyle = darkMode ? '#ffffff' : (s === 0 ? accentColor : secondaryColor);
+        ctx.globalAlpha = darkMode ? 0.98 : 0.8;
         ctx.stroke();
       }
 
@@ -222,8 +236,8 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           ctx.beginPath();
           ctx.moveTo(pt1.x, pt1.y);
           ctx.lineTo(pt2.x, pt2.y);
-          ctx.strokeStyle = secondaryColor;
-          ctx.globalAlpha = (darkMode ? 0.4 : 0.18) * (z1 + z2 + 2) / 2;
+          ctx.strokeStyle = darkMode ? '#ffffff' : secondaryColor;
+          ctx.globalAlpha = (darkMode ? 0.45 : 0.18) * (z1 + z2 + 2) / 2;
           ctx.lineWidth = darkMode ? 2 : 1.5;
           ctx.stroke();
         }
@@ -232,17 +246,28 @@ export const DNAHelix = ({ accent, secondary, darkMode }: {
           const size = 3 + (z + 1) * 3;
           const nodeColor = isSecondaryStrand ? secondaryColor : accentColor;
           
-          ctx.globalAlpha = darkMode ? 0.25 : 0.1;
+          // Outer Glow
+          ctx.globalAlpha = darkMode ? 0.45 : 0.1;
           ctx.beginPath();
-          ctx.arc(rx, ry, size * 2.2, 0, Math.PI * 2);
+          ctx.arc(rx, ry, size * 2.5, 0, Math.PI * 2);
           ctx.fillStyle = nodeColor;
           ctx.fill();
           
+          // Solid Core
           ctx.globalAlpha = 1.0;
           ctx.beginPath();
           ctx.arc(rx, ry, size, 0, Math.PI * 2);
-          ctx.fillStyle = nodeColor;
+          ctx.fillStyle = darkMode ? '#ffffff' : nodeColor;
           ctx.fill();
+
+          // Outermost brand stroke for styling in dark mode
+          if (darkMode) {
+            ctx.beginPath();
+            ctx.arc(rx, ry, size, 0, Math.PI * 2);
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = nodeColor;
+            ctx.stroke();
+          }
         };
 
         drawNode(pt1.x, pt1.y, z1, false); // Strand A
