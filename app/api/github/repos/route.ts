@@ -9,14 +9,12 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
 const GITHUB_USER = 'eneekoruiz';
 const CACHE_TTL = 3600; // 1 hour
 
-// 1. Whitelists
 const ALLOWED_SORT = ['updated', 'pushed', 'created', 'full_name'] as const;
 const ALLOWED_DIRECTION = ['asc', 'desc'] as const;
 
 type SortOption = (typeof ALLOWED_SORT)[number];
 type DirectionOption = (typeof ALLOWED_DIRECTION)[number];
 
-// 2. Generic Error Messages
 const ERRORS = {
   INVALID_PARAMS: 'Invalid request parameters',
   RATE_LIMIT: 'GitHub rate limit reached',
@@ -40,32 +38,74 @@ interface GitHubRepo {
   [key: string]: unknown;
 }
 
+interface ValidatedParams {
+  sort: SortOption;
+  direction: DirectionOption;
+  perPage: number;
+}
+
 export const revalidate = 3600;
 
+/**
+ * Validates and parses query parameters cleanly.
+ */
+function parseRequestParams(urlStr: string): ValidatedParams | null {
+  try {
+    const { searchParams } = new URL(urlStr);
+
+    const sortParam = searchParams.get('sort') ?? 'updated';
+    if (!ALLOWED_SORT.includes(sortParam as SortOption)) {
+      return null;
+    }
+
+    const directionParam = searchParams.get('direction') ?? 'desc';
+    if (!ALLOWED_DIRECTION.includes(directionParam as DirectionOption)) {
+      return null;
+    }
+
+    const perPageParam = searchParams.get('per_page') ?? '30';
+    const parsed = Number.parseInt(perPageParam, 10);
+    if (!Number.isInteger(parsed) || !Number.isFinite(parsed) || parsed < 1 || parsed > 100) {
+      return null;
+    }
+
+    return {
+      sort: sortParam as SortOption,
+      direction: directionParam as DirectionOption,
+      perPage: parsed,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Enriches a repository with its language details.
+ */
+async function enrichRepoLanguages(repo: GitHubRepo, headers: HeadersInit): Promise<GitHubRepo> {
+  try {
+    const langRes = await fetch(repo.languages_url, {
+      headers,
+      next: { revalidate: CACHE_TTL },
+    });
+    if (langRes.ok) {
+      const langData: Record<string, number> = await langRes.json();
+      return { ...repo, all_languages: Object.keys(langData) };
+    }
+  } catch (e) {
+    console.error(`Enrichment failed for repo ${repo.id}:`, e);
+  }
+  return { ...repo, all_languages: repo.language ? [repo.language] : [] };
+}
+
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  
-  // 3. Strict Whitelist Validation (Return 400 instead of silent fallback for audit readiness)
-  const s = searchParams.get('sort') || 'updated';
-  if (!ALLOWED_SORT.includes(s as SortOption)) {
+  const validated = parseRequestParams(request.url);
+  if (!validated) {
     return NextResponse.json({ error: ERRORS.INVALID_PARAMS }, { status: 400 });
   }
-  const sort = s as SortOption;
 
-  const d = searchParams.get('direction') || 'desc';
-  if (!ALLOWED_DIRECTION.includes(d as DirectionOption)) {
-    return NextResponse.json({ error: ERRORS.INVALID_PARAMS }, { status: 400 });
-  }
-  const direction = d as DirectionOption;
+  const { sort, direction, perPage } = validated;
 
-  const p = searchParams.get('per_page') || '30';
-  const parsedP = parseInt(p, 10);
-  if (isNaN(parsedP) || parsedP < 1 || parsedP > 100) {
-    return NextResponse.json({ error: ERRORS.INVALID_PARAMS }, { status: 400 });
-  }
-  const perPage = parsedP;
-
-  // 4. Manual URL Construction
   const cleanParams = new URLSearchParams({
     sort,
     direction,
@@ -89,65 +129,50 @@ export async function GET(request: NextRequest) {
       next: { revalidate: CACHE_TTL },
     });
 
-    // 5. Handle Rate Limiting (403/429)
+    // Handle Rate Limiting (403/429)
     if (res.status === 403 || res.status === 429) {
       const resetTime = res.headers.get('X-RateLimit-Reset');
       console.warn(`GitHub Rate Limit hit. Reset at: ${resetTime}`);
-      
+
       return NextResponse.json(
         { error: ERRORS.RATE_LIMIT },
-        { 
-          status: 429, 
-          headers: { 
+        {
+          status: 429,
+          headers: {
             'Retry-After': resetTime ?? '3600',
-            'Cache-Control': 'no-store'
-          } 
+            'Cache-Control': 'no-store',
+          },
         }
       );
     }
 
-    // 6. Generic Upstream Error Handling
+    // Generic Upstream Error Handling
     if (!res.ok) {
-      // Log technical details internally
       console.error(`Upstream GitHub Error: ${res.status} ${res.statusText}`);
-      
       return NextResponse.json(
         { error: ERRORS.FETCH_FAILED },
-        { status: res.status === 404 ? 404 : 502, headers: { 'Cache-Control': 'no-store' } }
+        {
+          status: res.status === 404 ? 404 : 502,
+          headers: { 'Cache-Control': 'no-store' },
+        }
       );
     }
 
     const repos: GitHubRepo[] = await res.json();
 
-    // 7. Parallel Enrichment (Hardened)
+    // Parallel Enrichment (Hardened)
     const enrichedRepos = await Promise.all(
       repos
-        .filter(r => !r.fork)
+        .filter((r) => !r.fork)
         .slice(0, 8)
-        .map(async (repo) => {
-          try {
-            const langRes = await fetch(repo.languages_url, {
-              headers: requestHeaders,
-              next: { revalidate: CACHE_TTL },
-            });
-            if (langRes.ok) {
-              const langData: Record<string, number> = await langRes.json();
-              return { ...repo, all_languages: Object.keys(langData) };
-            }
-          } catch (e) {
-            // Silently log enrichment failures to avoid breaking main response
-            console.error(`Enrichment failed for repo ${repo.id}:`, e);
-          }
-          return { ...repo, all_languages: repo.language ? [repo.language] : [] };
-        })
+        .map((repo) => enrichRepoLanguages(repo, requestHeaders))
     );
 
-    const finalData = repos.map(r => {
-      const enriched = enrichedRepos.find(er => er.id === r.id);
+    const finalData = repos.map((r) => {
+      const enriched = enrichedRepos.find((er) => er.id === r.id);
       return enriched ?? r;
     });
 
-    // 8. Secure Response
     return NextResponse.json(finalData, {
       status: 200,
       headers: {
@@ -156,10 +181,9 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (err) {
-    // 9. Final Fallback for critical failures
     const logMsg = err instanceof Error ? err.message : 'Unknown error';
     console.error('Critical GitHub Route Failure:', logMsg);
-    
+
     return NextResponse.json(
       { error: ERRORS.INTERNAL },
       { status: 500 }

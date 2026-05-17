@@ -1,24 +1,34 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import dynamic from 'next/dynamic';
 
 // ── Data & Types ────────────────────────────────────────────────────────────
-import { TX } from './data/translations';
-import type { Lang, ProjectCard, RepoFull } from './types';
+import type { RepoFull, ProjectCard } from './types';
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { usePreferredMotion } from './hooks/usePreferredMotion';
 import { useGreeting } from './hooks/useGreeting';
-import { useIntro } from './components/IntroProvider';
 import { useDeviceTilt } from './hooks/useDeviceTilt';
 import { useTheme } from 'next-themes';
 import { useTranslations } from './hooks/useTranslations';
-import { useSectionObserver } from './hooks/useSectionObserver';
 import { useScrollReveal } from './hooks/useScrollReveal';
+
+// ── Extracted Hooks ────────────────────────────────────────────────────────
+import { useProjectNavigation } from './hooks/useProjectNavigation';
+import { useScrollRestoration } from './hooks/useScrollRestoration';
+import { useReturnTransition } from './hooks/useReturnTransition';
+import { useLenisSetup } from './hooks/useLenisSetup';
+import { useGsapOrchestration } from './hooks/useGsapOrchestration';
+import { useActiveSection } from './hooks/useActiveSection';
+import { useModalState } from './hooks/useModalState';
+import { useMobileMenu } from './hooks/useMobileMenu';
+import { useIntroPhase } from './hooks/useIntroPhase';
+import { useDnaColors } from './hooks/useDnaColors';
+import { useNavbarInteractions } from './hooks/useNavbarInteractions';
 
 // ── UI & Navigation ────────────────────────────────────────────────────────
 import { Preloader } from './components/ui/Preloader';
@@ -32,14 +42,10 @@ import { PortalTransition } from './components/ui/PortalTransition';
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
 import { IdentitySplash } from './components/motion/IdentitySplash';
-import { animateLiquidCurtainOut } from './components/motion/LiquidCurtain';
 import { Hero } from './components/sections/Hero';
 import { About } from './components/sections/About';
 import { Skills } from './components/sections/Skills';
 import { Projects } from './components/sections/Projects';
-import { Philosophy } from './components/sections/Philosophy';
-import { Contact } from './components/sections/Contact';
-import { SiteFooter } from './components/sections/SiteFooter';
 import { memo } from 'react';
 
 // ── Memoized Sections for performance ──
@@ -57,17 +63,11 @@ const MemoFooter = dynamic(() => import('./components/sections/SiteFooter').then
 const DNAHelix = dynamic<{ accent: string; secondary: string; darkMode: boolean }>(
   () => import('./work/visualizers').then(m => m.DNAHelix), { ssr: false }
 );
-const TerrainMesh = dynamic<{ accent: string; darkMode: boolean }>(
-  () => import('./work/visualizers').then(m => m.TerrainMesh), { ssr: false }
-);
 
 // Registrar plugins GSAP
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
-
-const PROJECTS_NAV_KEY = 'projects_nav_state';
-const RETURN_OVERLAY_ID = 'return-overlay';
 
 interface HomeClientProps {
   initialGitHubData: {
@@ -88,309 +88,53 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   // ── Estado ──────────────────────────────────────────────────────────────
-  const { phase, setPhase, markSeen } = useIntro();
   const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const { lang, setLang, t } = useTranslations();
   const tilt = useDeviceTilt();
-  const [menu, setMenu] = useState(false);
-  const [cmd, setCmd] = useState(false);
   const [hoveredProject, setHoveredProject] = useState<{ name: string; color: string } | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
-  const isDark = mounted && theme === 'dark';
-  // 🚀 FIX: Consider ready if phase is already 'ready' OR if we have the session flag,
-  // this prevents the "white screen" flash during the 'checking' phase on back-navigation.
-  // CRITICAL: Must use 'mounted' to avoid hydration mismatch (Error #418).
-  const ready = phase === 'ready' || (mounted && typeof window !== 'undefined' && sessionStorage.getItem('hasSeenIntro') === 'true');
   const reduced = usePreferredMotion();
-  const isLite = mounted && (window as any).__LITE;
   const [isMobile, setIsMobile] = useState(false);
+
+  // ── Extracted Hooks Integration ──
+  const mounted = useProjectNavigation(t);
+
+  const isDark = mounted && theme === 'dark';
+  const isLite = mounted && typeof window !== 'undefined' && (window as Window).__LITE;
 
   useEffect(() => {
     if (!mounted) return;
     setIsMobile(window.matchMedia('(hover: none)').matches);
   }, [mounted]);
 
-  const [activeSection, setActiveSection] = useState('hero');
+  // Intro phase state machine hook
+  const { phase, ready, onPreloaderDone, onSplashComplete } = useIntroPhase(mounted);
+
+  // Modal and menu state managers
+  const [cmd, setCmd] = useModalState();
+  const [menu, setMenu] = useMobileMenu();
+
+  // Scroll controls & observer integration
+  const activeSection = useActiveSection(ready, t, navInner, indRef, activeLinkRef);
+  useScrollRestoration(ready);
+  useReturnTransition(ready);
+  useLenisSetup();
+
+  // Reveal effects
+  useScrollReveal(ready);
+
+  // GSAP visuals & entry stagger sequences
+  useGsapOrchestration(main, ready, reduced);
+
   const greeting = useGreeting(t.times, t.greetingFn);
   const { repos, top3, load, offline, errorMsg } = initialGitHubData;
 
-  // ── Custom Hooks ────────────────────────────────────────────────────────
-  useSectionObserver(ready, t, navInner, indRef, activeLinkRef, setActiveSection);
-  useScrollReveal(ready);
-
-  // ── Effects ─────────────────────────────────────────────────────────────
-  
-  // Tab title dinámico
-  useEffect(() => {
-    const orig = document.title;
-    const h = () => { document.title = document.hidden ? t.tabAway : t.tabBack; };
-    document.addEventListener('visibilitychange', h);
-    return () => {
-      document.removeEventListener('visibilitychange', h);
-      document.title = orig;
-    };
-  }, [t]);
-
-  // Global Transition Cleanup
-  useEffect(() => {
-    const cleanup = () => {
-      // Clear any transition overlays that might have lingered from other projects/pages
-      // EXCEPT the active transition layers which we handle separately via reveal effect
-      document.querySelectorAll('[id*="overlay"], [id*="transition"], [id*="curtain"]').forEach(el => {
-        if (el.id === RETURN_OVERLAY_ID || el.id === 'project-transition-layer') return;
-        gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => el.remove() });
-      });
-      window.__lenis?.start?.();
-    };
-    cleanup();
-    setMounted(true);
-    const timer = setTimeout(cleanup, 800); // Increased safety margin
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Bloquear scroll robusto para móviles
-  useEffect(() => {
-    if (cmd || menu) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.height = '100vh';
-      document.body.style.touchAction = 'none';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.height = '';
-      document.body.style.touchAction = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.height = '';
-      document.body.style.touchAction = '';
-    };
-  }, [cmd, menu]);
-
-  // CMD+K & Escape
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault(); e.stopPropagation();
-        setCmd(c => !c);
-        return;
-      }
-      if (e.key === 'Escape') { setCmd(false); setMenu(false); }
-    };
-    window.addEventListener('keydown', h, { capture: true });
-    return () => window.removeEventListener('keydown', h, { capture: true });
-  }, []);
-
-  // Mobile menu items animation (Handled by CSS in MobileMenu.tsx for better reliability)
-
-  // Scroll restoration / Return transition
-  useLayoutEffect(() => {
-    if (!ready) return;
-    try {
-      const saved = JSON.parse(sessionStorage.getItem(PROJECTS_NAV_KEY) || '{}');
-      if (saved.scrollY != null) {
-        window.__lenis?.stop?.();
-        window.scrollTo({ top: saved.scrollY, behavior: 'instant' as ScrollBehavior });
-      }
-    } catch (_) {}
-  }, [ready]);
-
-  useEffect(() => {
-    if (!ready) return;
-    const lenis = window.__lenis;
-    try {
-      const saved = JSON.parse(sessionStorage.getItem(PROJECTS_NAV_KEY) || '{}');
-      if (saved.scrollY != null) {
-        lenis?.scrollTo?.(saved.scrollY, { immediate: true, force: true });
-        lenis?.start?.();
-      }
-    } catch (_) {}
-    ScrollTrigger.refresh();
-  }, [ready]);
-
-
-  useEffect(() => {
-    if (!ready) return;
-    if (window.location.hash) {
-      const el = document.querySelector(window.location.hash);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-    const id = setTimeout(() => ScrollTrigger.refresh(), 100);
-    return () => clearTimeout(id);
-  }, [ready]);
-
-  useEffect(() => {
-    if (!ready) return;
-    const overlay = document.getElementById(RETURN_OVERLAY_ID);
-    if (!overlay) {
-      window.__lenis?.start?.();
-      try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
-      return;
-    }
-
-    let cancelled = false;
-    const reveal = () => {
-      if (cancelled) return;
-      const isSVG = overlay.tagName.toLowerCase() === 'svg';
-      if (isSVG) {
-        animateLiquidCurtainOut(overlay as unknown as SVGSVGElement, {
-          duration: 0.45,
-          onComplete: () => {
-            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
-            window.__lenis?.start?.();
-            ScrollTrigger.refresh();
-          },
-        });
-      } else {
-        gsap.to(overlay, {
-          opacity: 0, duration: 0.34, ease: 'power3.out',
-          onComplete: () => {
-            overlay.remove();
-            try { sessionStorage.removeItem(PROJECTS_NAV_KEY); } catch (_) { }
-            window.__lenis?.start?.();
-            ScrollTrigger.refresh();
-          },
-        });
-      }
-    };
-
-    const raf1 = requestAnimationFrame(() => {
-      if (cancelled) return;
-      const raf2 = requestAnimationFrame(() => {
-        if (cancelled) return;
-        const raf3 = requestAnimationFrame(reveal);
-        overlay.setAttribute('data-raf3', String(raf3));
-      });
-      overlay.setAttribute('data-raf2', String(raf2));
-    });
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf1);
-      const r2 = Number(overlay.getAttribute('data-raf2')); if (r2) cancelAnimationFrame(r2);
-      const r3 = Number(overlay.getAttribute('data-raf3')); if (r3) cancelAnimationFrame(r3);
-    };
-  }, [ready]);
-
-  // ── GSAP Animations ─────────────────────────────────────────────────────
-  useGSAP(() => {
-    if (reduced) return;
-
-    // Parallax hero
-    if (document.querySelector('.h-txt')) {
-      gsap.to('.h-txt', {
-        yPercent: -6, ease: 'none',
-        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
-      });
-    }
-
-    if (document.querySelector('.memoji')) {
-      gsap.to('.memoji', {
-        yPercent: -10, ease: 'none',
-        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
-      });
-    }
-
-    // Section headings reveal
-    const headings = document.querySelectorAll<HTMLElement>('.sec-h');
-    if (headings.length) {
-      headings.forEach(el => {
-        gsap.fromTo(el,
-          { opacity: 0, y: 24 },
-          {
-            opacity: 1, y: 0, duration: 0.24, ease: 'power2.out',
-            scrollTrigger: { trigger: el, start: 'top 83%', once: true }
-          }
-        );
-      });
-    }
-
-    // Intro timeline
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    if (document.querySelectorAll('.n-el, .h-ln, .h-fd, .memoji').length) {
-      tl
-        .to('.n-el', { opacity: 1, y: 0, duration: 0.12, stagger: 0.015 })
-        .to('.h-ln', { yPercent: 0, duration: 0.25, stagger: 0.02 }, '-=0.1')
-        .to('.h-fd', { opacity: 1, y: 0, duration: 0.18, stagger: 0.02 }, '-=0.15')
-        .to('.memoji', { opacity: 1, x: 0, duration: 0.3, ease: 'power3.out' }, '-=0.25');
-    }
-
-    // DNA Helix rotation (Now handled internally by DNAHelix component for better performance)
-    // Removed redundant GSAP scroll-bound rotation to avoid jitter
-  }, { scope: main, dependencies: [ready, reduced] });
-
-  useLayoutEffect(() => {
-    if (!ready || reduced) return;
-    gsap.set('.n-el', { opacity: 0, y: -14 });
-    gsap.set('.h-ln', { yPercent: 115 });
-    gsap.set('.h-fd', { opacity: 0, y: 16 });
-    gsap.set('.memoji', { opacity: 0, x: 60 });
-  }, [ready, reduced]);
-
-  // ── Nav Handlers ────────────────────────────────────────────────────────
-  const onNavEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    const el = e.currentTarget;
-    if (!indRef.current || !navInner.current) return;
-    const r = el.getBoundingClientRect();
-    const nr = navInner.current.getBoundingClientRect();
-    const targetX = r.left - nr.left;
-    const currentX = gsap.getProperty(indRef.current, 'x') as number;
-    const distance = Math.abs(targetX - currentX);
-    const stretch = Math.min(1.4, 1 + distance / 200);
-
-    if (!indRef.current || !navInner.current) return;
-    const tl = gsap.timeline();
-    tl.to(indRef.current, {
-      x: targetX, width: r.width, scaleX: stretch, height: r.height,
-      opacity: 1, duration: 0.35, ease: 'power3.out',
-    }).to(indRef.current, {
-      scaleX: 1, duration: 0.45, ease: 'elastic.out(1, 0.5)',
-    }, '-=0.15');
-  }, []);
-
-  const onNavContainerLeave = useCallback(() => {
-    const active = activeLinkRef.current;
-    const nr = navInner.current?.getBoundingClientRect();
-    if (active && nr && indRef.current) {
-      const r = active.getBoundingClientRect();
-      gsap.to(indRef.current, {
-        x: r.left - nr.left, width: r.width, height: r.height,
-        opacity: 0.65, duration: 0.24, ease: 'power3.out',
-      });
-    } else if (indRef.current) {
-      gsap.to(indRef.current, { opacity: 0, duration: 0.12 });
-    }
-  }, []);
+  // ── Nav Handlers ──
+  const { onNavEnter, onNavContainerLeave } = useNavbarInteractions(navInner, indRef, activeLinkRef);
 
   // ── DNA Colors Logic ──
-  const dnaColors = useMemo(() => {
-    const isDarkLocal = theme === 'dark' || resolvedTheme === 'dark';
-    const PROJ_COLORS: Record<string, string> = {
-      'ana-peluquera': '#ff2d78',
-      'who-are-ya-backend': '#00c940',
-      'rides24ofiziala': '#e69400',
-      'spotshare-parking': '#00d4e8',
-      'pke-web': '#9b1fff',
-    };
-
-    if (activeSection === 'work') {
-      if (expandedIdx !== null && top3[expandedIdx]) {
-        const pColor = PROJ_COLORS[top3[expandedIdx].name] || (isDarkLocal ? '#0066ff' : '#0044cc');
-        return { accent: pColor, secondary: isDarkLocal ? '#444444' : '#cccccc' };
-      }
-    }
-    
-    // Natural color fallback
-    return { accent: isDarkLocal ? '#ffffff' : '#1a1a1a', secondary: isDarkLocal ? '#666666' : '#b3b3b3' };
-  }, [activeSection, expandedIdx, top3, theme, resolvedTheme]);
-
-  // ── Phase Handlers ──────────────────────────────────────────────────────
-  const onPreloaderDone = useCallback(() => setPhase('splash'), [setPhase]);
-  const onSplashComplete = useCallback(() => {
-    setPhase('ready');
-    markSeen();
-  }, [setPhase, markSeen]);
+  const dnaColors = useDnaColors(theme, resolvedTheme, activeSection, expandedIdx, top3);
 
   return (
     <>

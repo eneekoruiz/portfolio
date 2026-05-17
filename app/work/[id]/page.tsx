@@ -70,7 +70,7 @@ const PROJECT_SUMMARIES: Record<string, { name: string; langs: string[] }> = {
   'who-are-ya-backend': { name: 'Who Are Ya Backend', langs: ['Node.js', 'Express', 'MongoDB', 'JWT'] },
   'rides24ofiziala': { name: 'Rides24 Ofiziala', langs: ['Java', 'JAX-WS', 'ObjectDB', 'Swing'] },
   'spotshare-parking': { name: 'Spotshare Parking', langs: ['TypeScript', 'SonarCloud', 'NestJS', 'Docker'] },
-  'pke-web': { name: 'PKE Web', langs: ['React', 'WCAG 2.1', 'Tailwind', 'A11y'] },
+  'pke-web': { name: 'PKE Web', langs: ['React', 'Tailwind', 'A11y', 'Semantic HTML'] },
 };
 
 // ── GlareCard (Local Component) ───────────────────────────────────

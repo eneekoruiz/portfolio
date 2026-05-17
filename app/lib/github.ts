@@ -14,16 +14,14 @@ const customStacks: Record<string, string[]> = {
   'who-are-ya-backend': ['Node.js', 'Express', 'MongoDB', 'JWT', 'REST API', 'GitHub Actions'],
   'rides24ofiziala': ['Java', 'JAX-WS', 'ObjectDB', 'Swing', 'SOAP', 'JUnit'],
   'spotshare-parking': ['TypeScript', 'SonarCloud', 'NestJS', 'Docker', 'PostgreSQL', 'CI/CD'],
-  'pke-web': ['React', 'WCAG 2.1', 'Tailwind', 'A11y', 'Semantic UI', 'Jest'],
+  'pke-web': ['React', 'Tailwind', 'A11y', 'Semantic HTML', 'Semantic UI', 'Jest'],
 };
 
 export async function getGitHubData(t: Tx) {
   const token = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://eneko-ruiz.vercel.app';
   
-  // In a real Server Component, we can fetch from the external API directly to avoid internal network hop if preferred,
-  // but since we have a hardened API route, we could also call it. 
-  // However, fetching directly from GitHub on the server is more "Next.js 14" way.
+  // However, fetching directly from GitHub on the server is the native Next.js Server Components way.
   
   const headers: HeadersInit = {
     Accept: 'application/vnd.github+json',
@@ -68,7 +66,7 @@ export async function getGitHubData(t: Tx) {
         if (id === 'who-are-ya-backend') return t?.projectWhoDesc || 'Backend escalable para juego de fútbol con arquitectura MVC.';
         if (id === 'rides24ofiziala') return t?.projectRidesDesc || 'Sistema distribuido de ride-sharing con transacciones seguras.';
         if (id === 'spotshare-parking') return 'Gestión Cloud de aparcamientos con enfoque en calidad SonarCloud.';
-        if (id === 'pke-web') return 'Plataforma web semántica con cumplimiento estricto de accesibilidad WCAG.';
+        if (id === 'pke-web') return 'Plataforma web semántica con especial consideración por la accesibilidad (WCAG-conscious).';
         return '';
       };
 

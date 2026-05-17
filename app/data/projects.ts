@@ -479,7 +479,7 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
       supabaseP: 'Contrastes auditados, estados visibles y respeto total por prefers-reduced-motion para una experiencia que no excluye a nadie.',
       outcomeH: 'A11Y sin Compromisos', outcomeP: 'Una base semántica preparada para crecer con componentes accesibles y una puntuación Lighthouse consistente.',
       codeSpotlight: 'useFocusTrap.ts — Accessibility Core',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     en: {
       title: 'PKE Web', subtitle: 'Accessible Semantics by Default', role: 'UX/A11Y Developer',
@@ -490,95 +490,95 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
       supabaseP: 'Audited contrast, visible states, and full respect for prefers-reduced-motion to avoid excluding anyone.',
       outcomeH: 'A11Y without Compromise', outcomeP: 'A semantic base ready to scale with accessible components and a consistently strong Lighthouse score.',
       codeSpotlight: 'useFocusTrap.ts — Accessibility Core',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     eu: {
       title: 'PKE Web', subtitle: 'Irisgarritasuna eta Semantika', role: 'UX/A11Y Developer',
-      objective: 'Irisgarritasuna oinarri duen plataforma. WCAG 2.1 AA betetzen du.',
+      objective: 'Irisgarritasuna oinarri duen plataforma, irisgarritasun jarraibideak kontuan hartuz diseinatua.',
       algorithmH: 'Focus Trapping eta ARIA Roles',
       algorithmP: 'DOM kudeaketa egokia teklatu bidezko nabigaziorako eta pantaila-irakurleentzako.',
       supabaseH: 'Diseinu Inklusiboa',
       supabaseP: 'Kontraste analisi erreala eta prefers-reduced-motion-erako euskarri natiboa.',
       outcomeH: '100% Lighthouse A11Y', outcomeP: 'Pertsona guztientzako interfaze erabilgarria, salbuespenik gabe.',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     fr: {
       title: 'PKE Web', subtitle: 'Accessibilité & Sémantique', role: 'UX/A11Y Developer',
-      objective: 'Plateforme basée sur l\'accessibilité. Conformité WCAG 2.1 AA.',
+      objective: 'Plateforme conçue avec des considérations d\'accessibilité (WCAG-conscious).',
       algorithmH: 'Focus Trapping & ARIA Roles',
       algorithmP: 'Gestion parfaite du DOM pour la navigation au clavier et les lecteurs d\'écran.',
       supabaseH: 'Design Inclusif',
       supabaseP: 'Analyse réelle du contraste et support natif de prefers-reduced-motion.',
       outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interface accessible à tous sans exception.',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     it: {
       title: 'PKE Web', subtitle: 'Accessibilità & Semantica', role: 'UX/A11Y Developer',
-      objective: 'Piattaforma dove l\'accessibilità è la base. Conformità WCAG 2.1 AA.',
+      objective: 'Piattaforma progettata con considerazioni sull\'accessibilità.',
       algorithmH: 'Focus Trapping & ARIA Roles',
       algorithmP: 'Gestione impeccabile del DOM per navigazione da tastiera e screen reader.',
       supabaseH: 'Design Inclusivo',
       supabaseP: 'Analisi reale del contrasto e supporto per prefers-reduced-motion.',
       outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interfaccia utilizzabile da chiunque senza eccezioni.',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     de: {
       title: 'PKE Web', subtitle: 'Barrierefreiheit & Semantik', role: 'UX/A11Y Developer',
-      objective: 'Plattform mit Fokus auf Barrierefreiheit. WCAG 2.1 AA-Konformität.',
+      objective: 'Plattform mit Fokus auf Barrierefreiheit, unter Berücksichtigung von A11y-Richtlinien.',
       algorithmH: 'Focus Trapping & ARIA Roles',
       algorithmP: 'DOM-Management für Tastaturnavigation und Screenreader.',
       supabaseH: 'Inklusives Design',
       supabaseP: 'Echtzeit-Kontrastanalyse und Support für prefers-reduced-motion.',
       outcomeH: '100% Lighthouse A11Y', outcomeP: 'Uneingeschränkt nutzbare Schnittstelle für alle.',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     pt: {
       title: 'PKE Web', subtitle: 'Acessibilidade & Semântica', role: 'UX/A11Y Developer',
-      objective: 'Plataforma baseada em acessibilidade. Conformidade WCAG 2.1 AA.',
+      objective: 'Plataforma projetada com considerações de acessibilidade (WCAG-conscious).',
       algorithmH: 'Focus Trapping & ARIA Roles',
       algorithmP: 'Gestão impecável do DOM para navegação por teclado e leitores de ecrã.',
       supabaseH: 'Design Inclusivo',
       supabaseP: 'Análise de contraste real e suporte nativo para prefers-reduced-motion.',
       outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interface utilizável por todos sem exceções.',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     ca: {
       title: 'PKE Web', subtitle: 'Accessibilitat & Semàntica', role: 'UX/A11Y Developer',
-      objective: 'Plataforma basada en l\'accessibilitat. Conformitat WCAG 2.1 AA.',
+      objective: 'Plataforma dissenyada amb consideracions d\'accessibilitat.',
       algorithmH: 'Focus Trapping & ARIA Roles',
       algorithmP: 'Gestió perfecta del DOM per a navegació per teclat i lectors de pantalla.',
       supabaseH: 'Disseny Inclusiu',
       supabaseP: 'Anàlisi de contrast real i suport natiu per prefers-reduced-motion.',
       outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interfície accessible per a tothom sense excepcions.',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     gl: {
       title: 'PKE Web', subtitle: 'Accesibilidade & Semántica', role: 'UX/A11Y Developer',
-      objective: 'Plataforma baseada na accesibilidade. Cumprimento WCAG 2.1 AA.',
+      objective: 'Plataforma deseñada con consideracións de accesibilidade.',
       algorithmH: 'Focus Trapping & ARIA Roles',
       algorithmP: 'Xestión perfecta do DOM para navegación por teclado e lectores de pantalla.',
       supabaseH: 'Deseño Inclusivo',
       supabaseP: 'Análise de contraste real e soporte nativo para prefers-reduced-motion.',
       outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interface utilizable por calquera persoa sen excepcións.',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     },
     ja: {
       title: 'PKE Web', subtitle: 'アクセシビリティ & セマンティクス', role: 'UX/A11Y デベロッパー',
-      objective: 'アクセシビリティを基盤としたプラットフォーム。WCAG 2.1 AA 準拠。',
+      objective: 'アクセシビリティに配慮して設計されたプラットフォーム。',
       algorithmH: 'フォーカストラップ & ARIA ロール',
       algorithmP: 'キーボードナビゲーションとスクリーンリーダーのための完璧な DOM 管理。',
       supabaseH: 'インクルーシブデザイン',
       supabaseP: '実際のコントラスト分析と prefers-reduced-motion のネイティブサポート。',
       outcomeH: '100% Lighthouse A11Y', outcomeP: '例外なく誰でも利用できるインターフェース。',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG 2.1 AA', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     }
   }
 };
@@ -643,7 +643,7 @@ export class ParkingService {
   }
 }`,
 
-  'pke-web': `// useFocusTrap.ts — WCAG 2.1 AA Hook
+  'pke-web': `// useFocusTrap.ts — Accessibility/A11y Focus Hook
 export const useFocusTrap = (ref: RefObject<HTMLElement>, isActive: boolean) => {
   useEffect(() => {
     if (!isActive || !ref.current) return;
