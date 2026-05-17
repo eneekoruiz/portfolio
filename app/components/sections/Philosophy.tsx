@@ -94,7 +94,7 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index }: {
         backdrop-blur-xl shadow-sm hover:shadow-xl
         ${accent 
           ? 'bg-gradient-to-br from-brand/10 via-brand/5 to-transparent dark:from-brand/[0.12] dark:via-brand/[0.06] shadow-brand/5' 
-          : 'bg-black/[0.03] dark:bg-[#0A0A0A]/80 hover:dark:bg-[#111111]/90 shadow-black/5'
+          : 'bg-black/[0.03] dark:bg-white/[0.03] hover:dark:bg-white/[0.06] shadow-black/5'
         }
       `}
       data-h

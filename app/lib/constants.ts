@@ -158,3 +158,53 @@ export const LANG_COLORS: Record<string, string> = {
 
 /** Alias for backwards compat */
 export const LANG_C = LANG_COLORS;
+
+/**
+ * Robust, case-insensitive, deterministic technology color resolver
+ */
+export function getTechColor(tech: string): string {
+  if (!tech) return '#888888';
+  
+  // 1. Direct match (Fast path)
+  if (LANG_COLORS[tech]) return LANG_COLORS[tech];
+  
+  // 2. Case-insensitive lookup (Robust path)
+  const lowerTech = tech.toLowerCase().trim();
+  const foundKey = Object.keys(LANG_COLORS).find(
+    k => k.toLowerCase().trim() === lowerTech
+  );
+  if (foundKey) return LANG_COLORS[foundKey];
+  
+  // 3. Substring/Alias match
+  if (lowerTech.includes('react')) return '#61DAFB';
+  if (lowerTech.includes('node')) return '#339933';
+  if (lowerTech.includes('firebase')) return '#FFCA28';
+  if (lowerTech.includes('google')) return '#4285F4';
+  if (lowerTech.includes('tailwind')) return '#06B6D4';
+  if (lowerTech.includes('express')) return '#353535';
+  if (lowerTech.includes('mongo')) return '#47A248';
+  if (lowerTech.includes('java')) return '#b07219';
+  if (lowerTech.includes('jax')) return '#E65100';
+  if (lowerTech.includes('object')) return '#4A148C';
+  if (lowerTech.includes('swing')) return '#5382a1';
+  if (lowerTech.includes('soap')) return '#8E24AA';
+  if (lowerTech.includes('junit')) return '#25A162';
+  if (lowerTech.includes('sonar')) return '#F3702A';
+  if (lowerTech.includes('nest')) return '#E0234E';
+  if (lowerTech.includes('docker')) return '#2496ED';
+  if (lowerTech.includes('postgres')) return '#4169E1';
+  if (lowerTech.includes('a11y') || lowerTech.includes('wcag') || lowerTech.includes('access')) return '#1976D2';
+  if (lowerTech.includes('html')) return '#E34C26';
+  if (lowerTech.includes('css')) return '#1572B6';
+  if (lowerTech.includes('jest')) return '#C21325';
+  if (lowerTech.includes('git')) return '#F05032';
+  if (lowerTech.includes('linux')) return '#FCC624';
+  
+  // 4. Deterministic Hash Color (Bespoke fallback)
+  let hash = 0;
+  for (let i = 0; i < tech.length; i++) {
+    hash = tech.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 85%, 45%)`;
+}

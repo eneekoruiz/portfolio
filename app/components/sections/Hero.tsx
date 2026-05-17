@@ -334,8 +334,8 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
               <div 
                 className="pointer-events-none transition-opacity duration-500"
                 style={{ 
-                  opacity: isDark ? 0.12 : 0.8,
-                  color: '#6e6e73' // Hardened lead color
+                  opacity: isDark ? 0.38 : 0.8,
+                  color: isDark ? '#a1a1a6' : '#6e6e73' // Sleek Apple silver for dark mode
                 }}
               >
                 <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">

@@ -68,12 +68,12 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
             className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border transition-all duration-300 backdrop-blur-xl rounded-[32px] overflow-hidden`}
             style={{ 
               background: isDark 
-                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)` 
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.06) 0%, rgba(${c.rgb}, 0.02) 100%)` 
                 : `linear-gradient(145deg, rgba(${c.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
               borderColor: isDark 
-                ? `rgba(${c.rgb}, 0.55)` 
+                ? `rgba(${c.rgb}, 0.35)` 
                 : `rgba(${c.rgb}, 0.4)`,
-              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.25' : '0.15'})`
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.12' : '0.15'})`
             } as React.CSSProperties}
           >
             <div ref={iconRef} className="transition-all duration-200">
@@ -96,12 +96,12 @@ function EmailCard({ c }: { c: typeof CONTACTS[0] }) {
             className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden" 
             style={{ 
               background: isDark 
-                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.45) 0%, rgba(${c.rgb}, 0.1) 100%)` 
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.1) 0%, rgba(${c.rgb}, 0.03) 100%)` 
                 : `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)`,
               borderColor: isDark 
-                ? `rgba(${c.rgb}, 0.65)` 
+                ? `rgba(${c.rgb}, 0.45)` 
                 : `rgba(${c.rgb}, 0.5)`,
-              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.3' : '0.2'})`
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.15' : '0.2'})`
             } as React.CSSProperties}
           >
             <c.icon size={42} style={{ color: (isDark && c.label === 'GitHub') ? '#fff' : c.bg }} aria-hidden="true" />
@@ -130,12 +130,12 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
             className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden`} 
             style={{ 
               background: isDark 
-                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)` 
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.06) 0%, rgba(${c.rgb}, 0.02) 100%)` 
                 : `linear-gradient(145deg, rgba(${c.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
               borderColor: isDark 
-                ? `rgba(${c.rgb}, 0.55)` 
+                ? `rgba(${c.rgb}, 0.35)` 
                 : `rgba(${c.rgb}, 0.4)`,
-              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.25' : '0.15'})`
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.12' : '0.15'})`
             } as React.CSSProperties}
           >
 
@@ -154,12 +154,12 @@ function SocialCard({ c }: { c: typeof CONTACTS[0] }) {
             className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden" 
             style={{ 
               background: isDark 
-                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.45) 0%, rgba(${c.rgb}, 0.1) 100%)` 
+                ? `linear-gradient(145deg, rgba(${c.rgb}, 0.1) 0%, rgba(${c.rgb}, 0.03) 100%)` 
                 : `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)`,
               borderColor: isDark 
-                ? `rgba(${c.rgb}, 0.65)` 
+                ? `rgba(${c.rgb}, 0.45)` 
                 : `rgba(${c.rgb}, 0.5)`,
-              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.3' : '0.2'})`
+              boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? '0.15' : '0.2'})`
             } as React.CSSProperties}
           >
             <c.icon size={42} style={{ color: (isDark && c.label === 'GitHub') ? '#fff' : c.bg }} aria-hidden="true" />

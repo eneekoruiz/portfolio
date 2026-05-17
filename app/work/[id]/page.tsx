@@ -21,7 +21,7 @@ import {
 
 import { TX }              from '../../data/translations';
 import { PROJECTS_CONTENT, CODE_SNIPPETS } from '../../data/projects';
-import { LANG_COLORS }     from '../../lib/constants';
+import { LANG_COLORS, getTechColor } from '../../lib/constants';
 import type { Lang }       from '../../types';
 import { useMagnetic }     from '../../hooks/useMagnetic';
 import { useTextScramble } from '../../hooks/useTextScramble';
@@ -413,14 +413,17 @@ export default function ProjectPage() {
           <GlareCard accent={theme.accent} className="p-8 group">
             <h3 className="text-xs font-mono uppercase tracking-[0.3em] opacity-40 mb-8 text-ink">Stack Tecnológico</h3>
             <div className="flex flex-col gap-4 text-ink">
-              {summary.langs.map((l, i) => (
-                <div key={l} className="flex items-center gap-4">
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: LANG_COLORS[l] ?? theme.accent }} />
-                  <span className="font-medium text-lg tracking-tight">{l}</span>
-                  <div className="flex-1 h-px bg-black/5 dark:bg-white/5 group-hover:bg-black/10 dark:group-hover:bg-white/10 transition-colors" />
-                  <span className="font-mono text-[9px] opacity-30">0{i + 1}</span>
-                </div>
-              ))}
+              {summary.langs.map((l, i) => {
+                const tColor = getTechColor(l);
+                return (
+                  <div key={l} className="flex items-center gap-4">
+                    <div className="w-1.5 h-1.5 rounded-full shadow-lg" style={{ background: tColor, boxShadow: `0 0 8px ${tColor}` }} />
+                    <span className="font-medium text-lg tracking-tight transition-colors duration-300 group-hover:text-[var(--tech-color)]" style={{ '--tech-color': tColor } as React.CSSProperties}>{l}</span>
+                    <div className="flex-1 h-px bg-black/5 dark:bg-white/5 group-hover:bg-black/10 dark:group-hover:bg-white/10 transition-colors" />
+                    <span className="font-mono text-[9px] opacity-30">0{i + 1}</span>
+                  </div>
+                );
+              })}
             </div>
           </GlareCard>
         </section>

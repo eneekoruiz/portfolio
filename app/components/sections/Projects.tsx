@@ -16,7 +16,7 @@ import {
   Activity, Code2, Loader2, ChevronDown,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { LANG_COLORS } from '../../lib/constants';
+import { LANG_COLORS, getTechColor } from '../../lib/constants';
 import type { ProjectCard, RepoFull, Tx } from '../../types';
 import {
   createLiquidCurtain,
@@ -159,27 +159,30 @@ function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }: RepoR
                 {r.name}
               </span>
               <div className="flex flex-wrap gap-[0.3rem]">
-                {r.langs?.map(l => (
-                  <span 
-                    key={l} 
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap transition-all"
-                    style={{
-                      background: (LANG_COLORS[l] || '#888888') + '35',
-                      borderColor: (LANG_COLORS[l] || '#888888') + 'E0', // Much more vivid border
-                      color: LANG_COLORS[l] || 'var(--ink)' // Always colored text
-                    }}
-                  >
-                    <span
-                      className="w-[5px] h-[5px] rounded-full shrink-0"
-                      style={{
-                        background: LANG_COLORS[l] || 'var(--brand)',
-                        filter: isActive ? `drop-shadow(0 0 4px ${LANG_COLORS[l] || 'var(--brand)'})` : 'none',
-                        transition: 'filter .2s',
-                      }}
-                    />
-                    {l}
-                  </span>
-                ))}
+                 {r.langs?.map(l => {
+                   const tColor = getTechColor(l);
+                   return (
+                     <span 
+                       key={l} 
+                       className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap transition-all"
+                       style={{
+                         background: tColor + '30',
+                         borderColor: tColor + 'B0', // Much more vivid border
+                         color: tColor // Always colored text
+                       }}
+                     >
+                       <span
+                         className="w-[5px] h-[5px] rounded-full shrink-0"
+                         style={{
+                           background: tColor,
+                           filter: isActive ? `drop-shadow(0 0 4px ${tColor})` : 'none',
+                           transition: 'filter .2s',
+                         }}
+                       />
+                       {l}
+                     </span>
+                   );
+                 })}
               </div>
             </div>
             <div className={`overflow-hidden transition-[max-height,opacity] duration-300 ${isActive ? 'max-h-40 opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
@@ -636,7 +639,7 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
           </div>
 
           <div
-            className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.08] backdrop-blur-xl flex flex-col justify-between gap-6"
+            className="p-6 rounded-[20px] border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.05] dark:bg-white/[0.03] backdrop-blur-xl flex flex-col justify-between gap-6"
           >
             <p className="text-sm md:text-[15px] font-light leading-relaxed text-ink/78">
               {proj.desc}
@@ -654,19 +657,22 @@ function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject, skipA
               <div className="col-span-2 sm:col-span-1 space-y-2">
                 <span className="block font-mono text-[7px] md:text-[8px] uppercase tracking-[0.34em] text-lead/40">Stack</span>
                 <div className="flex flex-wrap gap-1">
-                  {proj.langs.map(l => (
-                    <span
-                      key={l}
-                      className="px-2 py-0.5 rounded-full border text-[8px] md:text-[9px] font-bold tracking-wide transition-all"
-                      style={{
-                        background: (LANG_COLORS[l] || '#888888') + '35',
-                        borderColor: (LANG_COLORS[l] || '#888888') + 'E0', // Much more vivid border
-                        color: LANG_COLORS[l] || 'var(--ink)'
-                      }}
-                    >
-                      {l}
-                    </span>
-                  ))}
+                  {proj.langs.map(l => {
+                    const tColor = getTechColor(l);
+                    return (
+                      <span
+                        key={l}
+                        className="px-2 py-0.5 rounded-full border text-[8px] md:text-[9px] font-bold tracking-wide transition-all"
+                        style={{
+                          background: tColor + '30',
+                          borderColor: tColor + 'B0', // Much more vivid border
+                          color: tColor
+                        }}
+                      >
+                        {l}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>

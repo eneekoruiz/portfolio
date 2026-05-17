@@ -35,7 +35,7 @@ export function middleware(request: NextRequest) {
     img-src 'self' blob: data: https://avatars.githubusercontent.com https://raw.githubusercontent.com https://eneko-ruiz.vercel.app;
     font-src 'self' https://fonts.gstatic.com;
     connect-src 'self' https://api.github.com https://eneko-ruiz-curriculum.vercel.app https://vercel.live https://*.vercel.live https://va.vercel-scripts.com https://vitals.vercel-insights.com;
-    frame-src 'self' https://eneko-ruiz-curriculum.vercel.app https://vercel.live;
+    frame-src 'self' https://eneko-ruiz-curriculum.vercel.app https://vercel.live https://agpeluqueria.vercel.app https://who-are-ya-backend.onrender.com https://pke-web.vercel.app;
     media-src 'self';
     object-src 'none';
     base-uri 'self';

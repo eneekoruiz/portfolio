@@ -60,7 +60,7 @@ const MemoContact = dynamic(() => import('./components/sections/Contact').then(m
 const MemoFooter = dynamic(() => import('./components/sections/SiteFooter').then(m => m.SiteFooter), { ssr: false });
 
 // ── Dynamic Visualizers ──
-const DNAHelix = dynamic<{ accent: string; secondary: string; darkMode: boolean }>(
+const DNAHelix = dynamic<{ accent: string; secondary: string; darkMode: boolean; paused?: boolean }>(
   () => import('./work/visualizers').then(m => m.DNAHelix), { ssr: false }
 );
 
@@ -163,7 +163,11 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
             }}
             ref={(el) => {
               if (el) {
-                el.style.transform = `rotateY(${tilt.x * 12}deg) rotateX(${-tilt.y * 12}deg)`;
+                if (expandedIdx !== null) {
+                  el.style.transform = 'rotateY(0deg) rotateX(0deg)';
+                } else {
+                  el.style.transform = `rotateY(${tilt.x * 12}deg) rotateX(${-tilt.y * 12}deg)`;
+                }
               }
             }}
           >
@@ -171,6 +175,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               accent={dnaColors.accent} 
               secondary={dnaColors.secondary} 
               darkMode={isDark} 
+              paused={expandedIdx !== null}
             />
           </div>
         </div>
