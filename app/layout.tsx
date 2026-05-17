@@ -61,6 +61,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             `.replace(/\s{2,}/g, ' '),
           }}
         />
+        {/* Elite Graceful Degradation for JS-disabled clients */}
+        <noscript>
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                #main-content {
+                  visibility: visible !important;
+                  opacity: 1 !important;
+                }
+                .preloader-container, .splash-container, .identity-splash, #preloader, #splash {
+                  display: none !important;
+                }
+                .title-char, .word-inner, .about-reveal, .animate-char {
+                  opacity: 1 !important;
+                  transform: none !important;
+                }
+              `,
+            }}
+          />
+        </noscript>
       </head>
       <body>
         <SkipLink />
