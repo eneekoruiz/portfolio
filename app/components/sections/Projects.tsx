@@ -839,18 +839,18 @@ export function Projects({
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
             <h2 
-              className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tighter leading-[0.95] text-ink uppercase italic perspective-1000"
+              className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tight leading-[0.95] text-ink uppercase italic perspective-1000"
               aria-label="Selected Works"
             >
-              <span className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
+              <span className="overflow-hidden inline-block py-2 pl-4 pr-12 -my-2 -ml-4 -mr-12">
                 { "Selected".split('').map((c, i) => (
-                  <span key={i} className="title-char inline-block will-change-transform">{c}</span>
+                  <span key={i} className="title-char inline-block will-change-transform pr-[0.1em]">{c}</span>
                 ))}
               </span>
               <br/>
-              <span className="overflow-hidden inline-block py-2 px-4 -my-2 -mx-4">
+              <span className="overflow-hidden inline-block py-2 pl-4 pr-12 -my-2 -ml-4 -mr-12">
                 { "Works.".split('').map((c, i) => (
-                  <span key={i} className="title-char inline-block will-change-transform">{c}</span>
+                  <span key={i} className="title-char inline-block will-change-transform pr-[0.1em]">{c}</span>
                 ))}
               </span>
             </h2>
