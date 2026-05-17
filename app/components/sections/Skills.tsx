@@ -297,8 +297,13 @@ export function Skills({ t }: SkillsProps) {
            </span>
         </div>
         <h2 className="font-black text-[clamp(2.2rem,6vw,4.5rem)] tracking-tighter leading-none text-ink perspective-1000">
-          {(t.skH || 'Tecnologías que domino.').split('').map((c, i) => (
-            <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+          {(t.skH || 'Tecnologías que domino.').split(' ').map((word, wIdx, wordsArray) => (
+            <span key={wIdx} className="inline-block whitespace-nowrap">
+              {word.split('').map((c, cIdx) => (
+                <span key={cIdx} className="title-char inline-block">{c}</span>
+              ))}
+              {wIdx < wordsArray.length - 1 && <span className="title-char inline-block">&nbsp;</span>}
+            </span>
           ))}
         </h2>
       </div>

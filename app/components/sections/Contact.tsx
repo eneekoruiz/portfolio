@@ -199,8 +199,13 @@ export function Contact({ t }: { t: Tx }) {
         <div className="max-w-[700px]">
           <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">{t.coLb}</p>
           <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3 perspective-1000">
-            {t.coH.split('').map((c, i) => (
-              <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+            {t.coH.split(' ').map((word, wIdx, wordsArray) => (
+              <span key={wIdx} className="inline-block whitespace-nowrap">
+                {word.split('').map((c, cIdx) => (
+                  <span key={cIdx} className="title-char inline-block">{c}</span>
+                ))}
+                {wIdx < wordsArray.length - 1 && <span className="title-char inline-block">&nbsp;</span>}
+              </span>
             ))}
           </h2>
           <p className="sec-h text-[15px] md:text-[18px] text-lead max-w-[500px] leading-relaxed">

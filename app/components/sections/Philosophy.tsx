@@ -178,8 +178,13 @@ export function Philosophy({ t }: { t: Tx }) {
       
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
         <h2 className="sec-h font-black text-4xl md:text-5xl lg:text-6xl tracking-tight leading-none text-slate-900 dark:text-white max-w-2xl drop-shadow-sm perspective-1000">
-          {t.valH.split('').map((c, i) => (
-            <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+          {t.valH.split(' ').map((word, wIdx, wordsArray) => (
+            <span key={wIdx} className="inline-block whitespace-nowrap">
+              {word.split('').map((c, cIdx) => (
+                <span key={cIdx} className="title-char inline-block">{c}</span>
+              ))}
+              {wIdx < wordsArray.length - 1 && <span className="title-char inline-block">&nbsp;</span>}
+            </span>
           ))}
         </h2>
       </div>

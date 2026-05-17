@@ -106,8 +106,13 @@ function AboutContent({ t }: { t: Tx }) {
           <div>
             <p className="about-reveal text-[11px] font-bold tracking-[0.2em] uppercase text-brand mb-4">{t.abLb}</p>
             <h2 className="font-black text-[clamp(2.5rem,6vw,4.5rem)] tracking-tight leading-none mb-8 md:mb-12 text-ink perspective-1000">
-              {t.abH.split('').map((c, i) => (
-                <span key={i} className="title-char inline-block">{c === ' ' ? '\u00A0' : c}</span>
+              {t.abH.split(' ').map((word, wIdx, wordsArray) => (
+                <span key={wIdx} className="inline-block whitespace-nowrap">
+                  {word.split('').map((c, cIdx) => (
+                    <span key={cIdx} className="title-char inline-block">{c}</span>
+                  ))}
+                  {wIdx < wordsArray.length - 1 && <span className="title-char inline-block">&nbsp;</span>}
+                </span>
               ))}
             </h2>
           </div>
