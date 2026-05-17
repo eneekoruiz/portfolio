@@ -99,9 +99,8 @@ function AboutContent({ t }: { t: Tx }) {
 
   return (
     <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden z-[20]">
+      <NetworkParticles />
       <div className="px-6 md:px-8 max-w-[1200px] mx-auto relative z-10">
-        <NetworkParticles />
-
         <div className="relative z-10">
           <div>
             <p className="about-reveal text-[11px] font-bold tracking-[0.2em] uppercase text-brand mb-4">{t.abLb}</p>

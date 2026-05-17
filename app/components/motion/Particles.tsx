@@ -10,11 +10,10 @@ export function NetworkParticles() {
     const ctx = cv.getContext('2d')!;
     let W = 0, H = 0, raf = 0;
     
-    // x, y, velocidad x, velocidad y, radio
+    // x, y, velocity x, velocity y, radius
     type Pt = { x: number; y: number; vx: number; vy: number; r: number };
     const pts: Pt[] = [];
     
-    // 🔥 AUMENTADO: De 80 a 140 para una red mucho más densa y visible
     const NUM_PTS = 140; 
     const mouse = { x: -999, y: -999 };
 
@@ -30,10 +29,25 @@ export function NetworkParticles() {
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
     };
+    
+    const touch = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const rect = cv.getBoundingClientRect();
+        mouse.x = e.touches[0].clientX - rect.left;
+        mouse.y = e.touches[0].clientY - rect.top;
+      }
+    };
+    
     const ml = () => { mouse.x = -999; mouse.y = -999; };
     
-    cv.addEventListener('mousemove', mm);
-    cv.addEventListener('mouseleave', ml);
+    // Delegate event listeners to the parent section to capture interaction over text/cards
+    const container = cv.closest('section') || cv;
+    container.addEventListener('mousemove', mm as EventListener);
+    container.addEventListener('mouseleave', ml);
+    container.addEventListener('touchstart', touch as EventListener, { passive: true });
+    container.addEventListener('touchmove', touch as EventListener, { passive: true });
+    container.addEventListener('touchend', ml);
+    container.addEventListener('touchcancel', ml);
 
     for (let i = 0; i < NUM_PTS; i++) {
       pts.push({
@@ -41,16 +55,15 @@ export function NetworkParticles() {
         y: Math.random() * H,
         vx: (Math.random() - 0.5) * 0.8,
         vy: (Math.random() - 0.5) * 0.8,
-        r: Math.random() * 1.5 + 1.2 // Puntos un poco más grandes
+        r: Math.random() * 1.5 + 1.2
       });
     }
 
     const loop = () => {
       ctx.clearRect(0, 0, W, H);
       
-      // 🔥 AUMENTADO: Se conectan desde un poco más lejos para hacer más "tela de araña"
       const maxDist = 160; 
-      const mouseDist = 200; // El ratón atrae desde más lejos
+      const mouseDist = 220; // Ratón atrae desde más lejos
 
       pts.forEach((p, i) => {
         p.x += p.vx;
@@ -62,7 +75,7 @@ export function NetworkParticles() {
         // Dibujar el punto
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 102, 255, 0.8)'; // Un poco más opacos
+        ctx.fillStyle = 'rgba(0, 102, 255, 0.8)';
         ctx.fill();
 
         // Conectar con otros puntos
@@ -76,7 +89,6 @@ export function NetworkParticles() {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            // 🔥 AUMENTADO: Líneas un poco más visibles
             const alpha = (1 - dist / maxDist) * 0.45; 
             ctx.strokeStyle = `rgba(0, 102, 255, ${alpha})`;
             ctx.lineWidth = 1;
@@ -84,7 +96,7 @@ export function NetworkParticles() {
           }
         }
 
-        // Conectar y repeler suavemente con el ratón
+        // Conectar y atraer/repeler suavemente con el ratón o dedo
         if (mouse.x !== -999) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
@@ -94,13 +106,22 @@ export function NetworkParticles() {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
-            const alpha = (1 - dist / mouseDist) * 0.6; // Conexión fuerte con el ratón
+            const alpha = (1 - dist / mouseDist) * 0.65;
             ctx.strokeStyle = `rgba(0, 102, 255, ${alpha})`;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
 
-            // Atracción/Repulsión
-            p.x += dx * 0.005;
-            p.y += dy * 0.005;
+            // Mecánica táctil premium: atracción a distancia, fuerte repulsión de proximidad
+            const force = (mouseDist - dist) / mouseDist;
+            if (dist > 45) {
+              // Atracción hacia el cursor (juntar las telas)
+              p.x -= dx * 0.012 * force;
+              p.y -= dy * 0.012 * force;
+            } else {
+              // Repulsión magnética cercana (efecto burbuja táctil)
+              p.x += dx * 0.06 * force;
+              p.y += dy * 0.06 * force;
+            }
           }
         }
       });
@@ -112,8 +133,12 @@ export function NetworkParticles() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
-      cv.removeEventListener('mousemove', mm);
-      cv.removeEventListener('mouseleave', ml);
+      container.removeEventListener('mousemove', mm as EventListener);
+      container.removeEventListener('mouseleave', ml);
+      container.removeEventListener('touchstart', touch as EventListener);
+      container.removeEventListener('touchmove', touch as EventListener);
+      container.removeEventListener('touchend', ml);
+      container.removeEventListener('touchcancel', ml);
     };
   }, []);
 
