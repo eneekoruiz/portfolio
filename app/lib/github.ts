@@ -50,7 +50,7 @@ export async function getGitHubData(t: Tx) {
           try {
             const langRes = await fetch(r.languages_url, { headers, next: { revalidate: 3600 } });
             if (langRes.ok) {
-              const langData = await langRes.json();
+              const langData: Record<string, number> = await langRes.json();
               return { ...r, langs: Object.keys(langData) };
             }
           } catch (e) {}

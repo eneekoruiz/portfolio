@@ -2,7 +2,7 @@ import Lenis from 'lenis';
 import type { LucideIcon } from 'lucide-react';
 
 // Language types
-export type Lang = 'es' | 'en' | 'eu' | 'fr' | 'it' | 'de' | 'pt' | 'ca' | 'gl' | 'ja';
+export type Lang = 'es' | 'en' | 'eu' | 'fr' | 'it' | 'de' | 'pt' | 'ca' | 'gl' | 'ja' | 'zh' | 'ar';
 
 // GitHub repository types
 export interface Repo {

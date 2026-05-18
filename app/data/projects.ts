@@ -127,6 +127,28 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
       outcomeH: '実際の影響', outcomeP: '収益が 30% 増加し、読み込み時間は 300 ミリ秒未満。',
       codeSpotlight: 'useCreateBooking.ts — Firebase',
       techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+    },
+    zh: {
+      title: 'AG 美容沙龙', subtitle: '预约编排与内容管理系统', role: '全栈首席架构师',
+      objective: '在不失奢华感的前提下实现高端业务数字化：无缝预约流程、为店主提供完全管理权限，以及从首秒起便传递信任的精致界面。',
+      algorithmH: '三明治算法：智能调度',
+      algorithmP: '将服务时长拆分为“活跃-等待-活跃”三阶段，以精确释放空闲时段，允许无冲突的并行预约。',
+      supabaseH: 'Firebase + 谷歌日历',
+      supabaseP: '通过服务账号与 Firestore 实现原子级的双向同步，确保日历和预订始终保持完美一致。',
+      outcomeH: '真实成效', outcomeP: '营收提升 30%，首屏加载时间小于 300 毫秒，且预约操作如丝般顺滑。',
+      codeSpotlight: 'useCreateBooking.ts — 核心预订引擎',
+      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+    },
+    ar: {
+      title: 'AG Beauty Salon', subtitle: 'تنسيق الحجوزات ونظام إدارة المحتوى', role: 'كبير مهندسي البرمجيات متكامل الخدمات',
+      objective: 'رقمنة صالون تجميل راقٍ دون فقدان الطابع الفاخر: تجربة حجز خالية من العوائق، تحكم كامل للمالكة، وواجهة مريحة تبني الثقة فوراً.',
+      algorithmH: 'خوارزمية الساندوتش: جدولة ذكية',
+      algorithmP: 'يتم تقسيم توافر الوقت إلى مراحل (نشط - انتظار - نشط) لتحرير الخانات بدقة وإتاحة حجوزات متوازية دون تضارب.',
+      supabaseH: 'Firebase + Google Calendar',
+      supabaseP: 'بنية NoSQL مع تزامن ثنائي الاتجاه من خلال حسابات الخدمة و Firestore للحفاظ على محاذاة التقويم والحجوزات بدقة.',
+      outcomeH: 'الأثر الفعلي', outcomeP: 'زيادة الإيرادات بنسبة 30٪، وقت تحميل أولي أقل من 300 مللي ثانية، وتدفق حجز فوري للغاية.',
+      codeSpotlight: 'useCreateBooking.ts — محرك الحجوزات الأساسي',
+      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
     }
   },
 
@@ -239,6 +261,28 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
       supabaseP: 'CMS ダッシュボード用の管理者認証と保護されたサーバーセッション。',
       outcomeH: '実稼働', outcomeP: 'MongoDB Atlas を使用して Render にデプロイされた REST API。',
       codeSpotlight: 'players.controller.js — Filter Engine',
+      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+    },
+    zh: {
+      title: 'Who Are Ya?', subtitle: '足球身份竞猜引擎', role: '后端架构师',
+      objective: '以真实产品标准打造游戏后端：闪电般的检索速度、高一致性数据架构，以及支持平滑扩展的稳固基石。',
+      algorithmH: 'MVC 架构与 MongoDB 高效索引',
+      algorithmP: '巧妙结合 ObjectIds、关联填充(populate)和复合过滤器，以极低延迟对数千名球员进行交叉匹配。',
+      supabaseH: 'JWT + Bcrypt 安全屏障',
+      supabaseP: '为内容管理系统(CMS)后台提供严密的身份验证、受保护的会话以及严格的服务器端访问控制。',
+      outcomeH: '实战交付', outcomeP: '在 Render 平台部署了基于 MongoDB Atlas 的 REST API，并已做好了作为稳定产品运营的准备。',
+      codeSpotlight: 'players.controller.js — 过滤器引擎',
+      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+    },
+    ar: {
+      title: 'Who Are Ya?', subtitle: 'محرك هوية كرة القدم', role: 'مهندس الخلفية البرمجية',
+      objective: 'بناء الخلفية البرمجية للعبة تشعر كأنها منتج حقيقي: بحث سريع، بيانات متسقة، وأساس متين يمكنه التوسع بسهولة.',
+      algorithmH: 'هيكلية MVC وذكاء MongoDB',
+      algorithmP: 'تتحد معرّفات الكائنات ObjectIds والتعبئة (populate) والفلاتر المركبة للبحث المتقاطع بين آلاف اللاعبين بحد أدنى من زمن الوصول.',
+      supabaseH: 'طبقة الحماية عبر JWT + Bcrypt',
+      supabaseP: 'مصادقة قوية للغاية للوحة تحكم إدارة المحتوى (CMS) مع جلسات محمية وتحكم صارم في الوصول على جانب الخادم.',
+      outcomeH: 'الإنتاج الفعلي', outcomeP: 'واجهة برمجة تطبيقات REST تم نشرها على Render مع MongoDB Atlas وجاهزة للعمل كمنتج مستقر.',
+      codeSpotlight: 'players.controller.js — محرك التصفية',
       techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
     }
   },
@@ -353,6 +397,28 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
       outcomeH: '完全な一貫性', outcomeP: '競合状態がゼロであることを負荷テストで確認済み。',
       codeSpotlight: 'RideService.java — Atomic Lock',
       techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+    },
+    zh: {
+      title: 'Rides24', subtitle: 'Java 分布式系统', role: '系统架构师',
+      objective: '打造分布式拼车出行平台。核心挑战：确保高并发预订下的数据绝对一致性与零差错。',
+      algorithmH: '原子事务与 ObjectDB 数据库',
+      algorithmP: '采用 JAX-WS 和悲观锁(PESSIMISTIC_WRITE)机制，彻底杜绝座位重复预订问题。',
+      supabaseH: '线程安全并发控制',
+      supabaseP: '运用 Java 监视器(Monitor)模式，同步多用户并发请求，确保安全。',
+      outcomeH: '极致一致性', outcomeP: '在高负载测试下表现卓越的可用系统，实现零竞态条件。',
+      codeSpotlight: 'RideService.java — 原子锁实现',
+      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+    },
+    ar: {
+      title: 'Rides24', subtitle: 'نظام Java الموزع', role: 'مهندس النظم والشبكات',
+      objective: 'مشاركة الرحلات الموزعة. التحدي: اتساق البيانات المطلقة وإتمام الحجوزات المتزامنة دون أي أخطاء.',
+      algorithmH: 'المعاملات الذرية وقاعدة بيانات ObjectDB',
+      algorithmP: 'استخدام JAX-WS والأقفال المتشائمة (PESSIMISTIC_WRITE) لمنع تكرار حجز نفس المقعد بشكل متزامن.',
+      supabaseH: 'التعامل المتزامن الآمن خيطياً Thread-Safe',
+      supabaseP: 'إدارة مراقبي Java (Java Monitors) لمزامنة طلبات المستخدمين المتزامنة بأمان تام.',
+      outcomeH: 'الاتساق المطلق', outcomeP: 'نظام تشغيلي متكامل تم اختباره تحت أقصى درجات الحمل مع حدوث صفر ظروف تسابق.',
+      codeSpotlight: 'RideService.java — القفل الذري المتزامن',
+      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
     }
   },
 
@@ -466,6 +532,28 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
       outcomeH: 'エンタープライズコード', outcomeP: 'すべての PR で自動的に監査されるスケーラブルなアーキテクチャ。',
       codeSpotlight: 'parking.service.ts — Lock Logic',
       techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+    },
+    zh: {
+      title: 'SpotShare', subtitle: '云端智能车位管理系统', role: '云端质量工程师',
+      objective: '将停车体验转变为高密度、低摩擦的现代服务：实时泊位查询、可视化信任感以及零操作含糊性。',
+      algorithmH: '精准质量关卡(Quality Gate)',
+      algorithmP: '在流水线中集成 SonarCloud、单元测试覆盖率校验及严格的代码规范，确保代码库的高质量可扩展性。',
+      supabaseH: '实时状态同步',
+      supabaseP: '采用乐观锁(Optimistic Locking)技术实现无冲突车位预约，支持原子更新并瞬时同步到管理后台。',
+      outcomeH: '优雅扩展', outcomeP: '具备自动化审计、清晰度量指标及丝滑交互体验的现代化高成长性系统。',
+      codeSpotlight: 'parking.service.ts — 核心预约逻辑',
+      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
+    },
+    ar: {
+      title: 'SpotShare', subtitle: 'ذكاء مواقف السيارات السحابية', role: 'مهندس جودة الحوسبة السحابية',
+      objective: 'تحويل مواقف السيارات إلى تجربة عالية الكثافة وسهلة الاستخدام: توفر فوري في الوقت الفعلي، وموثوقية بصرية، وصفر غموض تشغيلي.',
+      algorithmH: 'بوابة جودة دقيقة (Quality Gate)',
+      algorithmP: 'خطوط أنابيب CI/CD مع SonarCloud، وفحوصات التغطية والانضباط التقني العالي للحفاظ على بنية برمجية قابلة للتوسع.',
+      supabaseH: 'حالة الوقت الفعلي الفورية',
+      supabaseP: 'يمنع القفل المتفائل (Optimistic Locking) تضارب الحجوزات للمواقف، مع تحديثات ذرية تنعكس فوراً على لوحة التشغيل.',
+      outcomeH: 'التوسع بأناقة وسلاسة', outcomeP: 'نظام مُهيأ للنمو المستقبلي، مدعوم بعمليات تدقيق تلقائية، ومقاييس أداء واضحة، وتجربة مستخدم متميزة.',
+      codeSpotlight: 'parking.service.ts — منطق الحجز والتحقق',
+      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
     }
   },
 
@@ -578,6 +666,28 @@ export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectConten
       supabaseP: '実際のコントラスト分析と prefers-reduced-motion のネイティブサポート。',
       outcomeH: '100% Lighthouse A11Y', outcomeP: '例外なく誰でも利用できるインターフェース。',
       codeSpotlight: 'useFocusTrap.ts — React Hook',
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+    },
+    zh: {
+      title: 'PKE 网页端', subtitle: '默认无障碍(A11y)语义化网页', role: 'UX 与无障碍开发专家',
+      objective: '打造无障碍设计并非点缀而是核心架构的标杆界面：全键盘导航、屏幕阅读器高度适配、强对比度以及尊重减弱动画偏好。',
+      algorithmH: '焦点管理与 ARIA 规范架构',
+      algorithmP: '对 DOM 进行精准控制，构建出行为可预测、静默且完全由键盘驱动的完美无障碍浏览路径。',
+      supabaseH: '极致包容性设计',
+      supabaseP: '通过严格的对比度审计、可见焦点状态提示以及对 prefers-reduced-motion 的原生适配，确保人人皆可平等享用。',
+      outcomeH: '无妥协的无障碍体验', outcomeP: '语义化基石保障系统轻松承载无障碍组件，提供始终满分的 Lighthouse A11Y 表现。',
+      codeSpotlight: 'useFocusTrap.ts — 核心无障碍 Hook',
+      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+    },
+    ar: {
+      title: 'PKE Web', subtitle: 'دلالات سهولة الوصول بشكل افتراضي', role: 'مطور واجهات المستخدم وإمكانية الوصول (A11Y)',
+      objective: 'بناء واجهة لا تكون فيها إمكانية الوصول مجرد طبقة إضافية بل هي صلب البنية الهيكلية: لوحة المفاتيح، قارئات الشاشة، والتباين العالي.',
+      algorithmH: 'بنية إدارة التركيز وأدوار ARIA',
+      algorithmP: 'التحكم الصارم في شجرة DOM لإنشاء مسار تنقل متوقع، هادئ، ويمكن التحكم فيه بالكامل عبر لوحة المفاتيح.',
+      supabaseH: 'التصميم الشامل للجميع',
+      supabaseP: 'عمليات تدقيق التباين، والتركيز المرئي النشط، والاحترام الكامل لإعدادات prefers-reduced-motion لتجربة لا تستثني أحداً.',
+      outcomeH: 'إمكانية وصول بلا مساومات', outcomeP: 'قاعدة دلالية متينة جاهزة للنمو مع مكونات سهلة الاستخدام ودرجة Lighthouse قوية وثابتة.',
+      codeSpotlight: 'useFocusTrap.ts — إدارة التركيز الفعالة',
       techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
     }
   }

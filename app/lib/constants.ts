@@ -80,6 +80,8 @@ export const LANG_LABELS: Record<Lang, string> = {
   ca: 'Català',
   gl: 'Galego',
   ja: '日本語',
+  zh: '中文',
+  ar: 'العربية',
 };
 
 /**

@@ -259,6 +259,10 @@ export function ProjectHero({
         window.__lenis?.start();
         window.removeEventListener('keydown', handleEsc);
       };
+    } else {
+      // 🚀 When exiting, force ScrollTrigger to refresh immediately and reapply its exact active styles (scale, opacity, etc.)
+      ScrollTrigger.refresh();
+      ScrollTrigger.getAll().forEach(t => t.update());
     }
   }, [isInteracting]);
 
@@ -270,7 +274,7 @@ export function ProjectHero({
       <div
         ref={heroRef}
         className="relative h-[100dvh] w-full overflow-hidden flex items-center justify-center bg-transparent"
-        style={{ perspective: '2000px' }}
+        style={{ perspective: isInteracting ? 'none' : '2000px' }}
       >
         {/* ── Background Layer ── */}
         <div
@@ -361,9 +365,7 @@ export function ProjectHero({
             } : {
               transformStyle: 'preserve-3d',
               willChange: 'transform, width, height, border-radius',
-              borderColor: isInteracting ? 'transparent' : 'rgba(255,255,255,0.1)',
-              transform: 'scale(0.05)',
-              opacity: 0,
+              borderColor: 'rgba(255,255,255,0.1)',
             }}
           >
             {/* Studio HUD - Top Control Bar */}

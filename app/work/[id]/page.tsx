@@ -144,6 +144,21 @@ function GlareCard({ children, accent, className = '', style }: {
   );
 }
 
+const BACK_TO_PROJECTS: Record<Lang, string> = {
+  es: 'Todos los proyectos',
+  en: 'All Projects',
+  eu: 'Proiektu guztiak',
+  fr: 'Tous les projets',
+  it: 'Tutti i progetti',
+  de: 'Alle Projekte',
+  pt: 'Todos os projetos',
+  ca: 'Tots els projectes',
+  gl: 'Todos os proxectos',
+  ja: 'すべてのプロジェクト',
+  zh: '所有项目',
+  ar: 'جميع المشاريع',
+};
+
 // ── PÁGINA PRINCIPAL ──────────────────────────────────────────────────────────
 
 export default function ProjectPage() {
@@ -151,9 +166,17 @@ export default function ProjectPage() {
   const router   = useRouter();
   const main     = useRef<HTMLDivElement>(null);
 
-  const [lang]     = useState<Lang>('es');
+  const [lang, setLang] = useState<Lang>('es');
   const [darkMode, setDarkMode] = useState(false);
   
+  // Sync language from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('portfolio_lang') as Lang;
+    if (saved && TX[saved]) {
+      setLang(saved);
+    }
+  }, []);
+
   // 💎 KEY STATE: Defers heavy animation loading until after route transition completes
   const [isReadyToAnimate, setIsReadyToAnimate] = useState(false);
 
@@ -380,7 +403,13 @@ export default function ProjectPage() {
             className="flex items-center gap-2 font-medium text-xs tracking-wide opacity-70 hover:opacity-100 transition-opacity text-ink bg-transparent border-none cursor-pointer"
           >
             <span className="flex items-center gap-2">
-              <ChevronLeft size={16} /> <span className="hidden xs:inline">Todos los proyectos</span><span className="xs:hidden">Volver</span>
+              <ChevronLeft size={16} />
+              <span className="hidden xs:inline">
+                {BACK_TO_PROJECTS[lang] ?? 'All Projects'}
+              </span>
+              <span className="xs:hidden">
+                {TX[lang]?.back ?? 'Back'}
+              </span>
             </span>
           </button>
           <div className="flex items-center gap-2 font-mono text-[8px] md:text-[9px] uppercase tracking-widest px-2.5 md:px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 truncate max-w-[120px] md:max-w-none">

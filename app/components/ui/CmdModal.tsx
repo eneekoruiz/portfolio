@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, KeyboardEvent as RKE } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, KeyboardEvent as RKE } from 'react';
 import { Search, Check } from 'lucide-react';
+import gsap from 'gsap';
 import { LANG_LABELS } from '../../lib/constants';
 import type { Lang, Tx } from '../../types';
 
@@ -16,6 +17,7 @@ export function CmdModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   const lastFocusRef = useRef<HTMLElement | null>(null);
   const listRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [isLeaving, setIsLeaving] = useState(false);
 
   // Robust body scroll lock — no layout jump from scrollbar width
   useEffect(() => {
@@ -33,6 +35,60 @@ export function CmdModal({
     };
   }, []);
 
+  // Premium exit animation sequence before calling actual onClose
+  const handleClose = useCallback(() => {
+    if (isLeaving) return;
+    setIsLeaving(true);
+    const overlay = dialogRef.current?.parentElement;
+    const box = dialogRef.current;
+    if (overlay && box) {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          onClose();
+        },
+      });
+      tl.to(box, {
+        scale: 0.95,
+        y: 20,
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+      }, 0);
+      tl.to(overlay, {
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.in',
+      }, 0);
+    } else {
+      onClose();
+    }
+  }, [onClose, isLeaving]);
+
+  // Entrance GSAP sequence
+  useEffect(() => {
+    const overlay = dialogRef.current?.parentElement;
+    const box = dialogRef.current;
+    if (overlay && box) {
+      gsap.killTweensOf([overlay, box]);
+      gsap.set(overlay, { opacity: 0 });
+      gsap.set(box, { scale: 0.95, y: -20, opacity: 0 });
+
+      gsap.to(overlay, {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power3.out',
+      });
+      gsap.to(box, {
+        scale: 1,
+        y: 0,
+        opacity: 1,
+        duration: 0.4,
+        ease: 'expo.out',
+        clearProps: 'transform,scale,opacity',
+      });
+    }
+  }, []);
+
   type Item = { id: string; label: string; group: string; action: () => void };
 
   const navItems = useMemo<Item[]>(() =>
@@ -40,15 +96,15 @@ export function CmdModal({
       id: `n${i}`, label, group: t.cmdNav,
       action: () => {
         document.getElementById(t.hrefs[i].slice(1))?.scrollIntoView({ behavior: 'smooth' });
-        onClose();
+        handleClose();
       },
-    })), [t, onClose]);
+    })), [t, handleClose]);
 
   const langItems = useMemo<Item[]>(() =>
     (Object.entries(LANG_LABELS) as [Lang, string][]).map(([k, label]) => ({
       id: k, label: `${k.toUpperCase()} — ${label}`, group: t.cmdLang,
-      action: () => { setLang(k); onClose(); },
-    })), [t.cmdLang, setLang, onClose]);
+      action: () => { setLang(k); handleClose(); },
+    })), [t.cmdLang, setLang, handleClose]);
 
   const flatAll = [...navItems, ...langItems];
   const flatFiltered = q
@@ -69,7 +125,7 @@ export function CmdModal({
   }, [activeList, sel]);
 
   const onKey = (e: RKE) => {
-    if (e.key === 'Escape') { onClose(); return; }
+    if (e.key === 'Escape') { handleClose(); return; }
     if (e.key === 'Tab') {
       const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
         'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
@@ -102,15 +158,16 @@ export function CmdModal({
   return (
     <div
       className="cmd-overlay"
-      onClick={onClose}
+      onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-label="Buscador"
+      style={{ animation: 'none', opacity: 0 }}
     >
       <div
         ref={dialogRef}
         className="cmd-box flex flex-col"
-        style={{ maxHeight: 'min(78vh, 560px)' }}
+        style={{ maxHeight: 'min(78vh, 560px)', animation: 'none', opacity: 0, transform: 'scale(0.95) translateY(-20px)' }}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
         onKeyDown={onKey}
         tabIndex={-1}
@@ -128,7 +185,7 @@ export function CmdModal({
             aria-label="Buscar"
           />
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             type="button"
             className="font-mono text-[10px] text-lead/50 hover:text-ink px-[7px] py-[2px] border border-black/10 dark:border-white/10 rounded-[5px] shrink-0 hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all"
             aria-label="Cerrar buscador"

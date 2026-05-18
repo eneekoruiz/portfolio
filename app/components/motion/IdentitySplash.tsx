@@ -40,6 +40,8 @@ const WELCOME_TEXT: Record<Lang, string> = {
   ca: 'Benvingut',
   gl: 'Benvido',
   ja: 'ようこそ',
+  zh: '欢迎',
+  ar: 'مرحباً',
 };
 
 interface IdentitySplashProps {
