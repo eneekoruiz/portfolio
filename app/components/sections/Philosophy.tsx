@@ -91,10 +91,10 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index }: {
         relative overflow-hidden group rounded-[20px] p-7 flex-col gap-4 border-beam
         transition-colors duration-500 will-change-transform
         focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none
-        backdrop-blur-xl shadow-sm hover:shadow-xl
+        backdrop-blur-[8px] shadow-sm hover:shadow-xl
         ${accent 
-          ? 'bg-gradient-to-br from-brand/10 via-brand/5 to-transparent dark:from-brand/[0.12] dark:via-brand/[0.06] shadow-brand/5' 
-          : 'bg-black/[0.03] dark:bg-white/[0.03] hover:dark:bg-white/[0.06] shadow-black/5'
+          ? 'bg-gradient-to-br from-brand/[0.06] via-brand/[0.03] to-transparent dark:from-brand/[0.08] dark:via-brand/[0.04] shadow-brand/5' 
+          : 'bg-black/[0.015] dark:bg-white/[0.01] hover:bg-black/[0.03] hover:dark:bg-white/[0.02] shadow-black/5'
         }
       `}
       data-h

@@ -322,14 +322,14 @@ export function Skills({ t }: SkillsProps) {
               role="listitem"
             >
                 <div 
-                  className={`relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[16px] shadow-2xl hover:-translate-y-2 border-beam ${isLast ? 'w-full md:w-[calc(50%-1rem)]' : 'w-full'}`}
+                  className={`relative h-[240px] p-8 rounded-[32px] border transition-all duration-500 overflow-hidden group backdrop-blur-[8px] shadow-2xl hover:-translate-y-2 border-beam ${isLast ? 'w-full md:w-[calc(50%-1rem)]' : 'w-full'}`}
                   style={{
                     background: isDark 
-                      ? `linear-gradient(145deg, rgba(${card.rgb}, 0.35) 0%, rgba(${card.rgb}, 0.05) 100%)` 
-                      : `linear-gradient(145deg, rgba(${card.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
+                      ? `linear-gradient(145deg, rgba(${card.rgb}, 0.12) 0%, rgba(${card.rgb}, 0.02) 100%)` 
+                      : `linear-gradient(145deg, rgba(${card.rgb}, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%)`,
                     borderColor: isDark 
-                      ? `rgba(${card.rgb}, 0.55)` 
-                      : `rgba(${card.rgb}, 0.4)`,
+                      ? `rgba(${card.rgb}, 0.25)` 
+                      : `rgba(${card.rgb}, 0.18)`,
                     boxShadow: `0 20px 50px rgba(${card.rgb}, ${isDark ? '0.25' : '0.15'})`
                   } as React.CSSProperties}
                 >

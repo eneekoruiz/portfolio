@@ -216,7 +216,7 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
           else ctx.lineTo(pt.x, pt.y);
         });
         ctx.lineWidth = darkMode ? 3.5 : 4;
-        ctx.strokeStyle = darkMode ? '#cccccc' : (s === 0 ? accentColor : secondaryColor);
+        ctx.strokeStyle = darkMode ? '#ffffff' : (s === 0 ? accentColor : secondaryColor);
         ctx.globalAlpha = darkMode ? 0.98 : 0.8;
         ctx.stroke();
       }
@@ -236,7 +236,7 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
           ctx.beginPath();
           ctx.moveTo(pt1.x, pt1.y);
           ctx.lineTo(pt2.x, pt2.y);
-          ctx.strokeStyle = darkMode ? '#999999' : secondaryColor;
+          ctx.strokeStyle = darkMode ? '#eeeeee' : secondaryColor;
           ctx.globalAlpha = (darkMode ? 0.45 : 0.18) * (z1 + z2 + 2) / 2;
           ctx.lineWidth = darkMode ? 2 : 1.5;
           ctx.stroke();
@@ -257,7 +257,7 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
           ctx.globalAlpha = 1.0;
           ctx.beginPath();
           ctx.arc(rx, ry, size, 0, Math.PI * 2);
-          ctx.fillStyle = darkMode ? '#cccccc' : nodeColor;
+          ctx.fillStyle = darkMode ? '#ffffff' : nodeColor;
           ctx.fill();
 
           // Outermost brand stroke for styling in dark mode

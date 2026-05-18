@@ -25,7 +25,7 @@ function MetricCard({ v, l }: MetricCardProps) {
   return (
     <div
       ref={ref}
-      className="p-8 md:p-10 rounded-3xl border border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] backdrop-blur-xl block will-change-transform border-beam"
+      className="p-8 md:p-10 rounded-3xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-white/[0.03] backdrop-blur-xl block will-change-transform border-beam"
     >
       <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">{v}</div>
       <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">{l}</p>
@@ -98,7 +98,7 @@ function AboutContent({ t }: { t: Tx }) {
   };
 
   return (
-    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden z-[20]">
+    <section ref={sectionRef} id="about" aria-label="Sobre mí" className="relative py-24 md:py-40 overflow-hidden z-[20] bg-page">
       <NetworkParticles />
       <div className="px-6 md:px-8 max-w-[1200px] mx-auto relative z-10">
         <div className="relative z-10">

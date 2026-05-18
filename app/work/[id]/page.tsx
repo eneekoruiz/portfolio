@@ -122,7 +122,7 @@ function GlareCard({ children, accent, className = '', style }: {
       ref={cardRef}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className={`relative overflow-hidden rounded-3xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-black/15 dark:hover:border-white/15 hover:shadow-2xl group ${className}`}
+      className={`relative overflow-hidden rounded-3xl border border-black/5 dark:border-white/5 bg-white/90 dark:bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-black/15 dark:hover:border-white/15 hover:shadow-2xl group ${className}`}
       style={{
         ...style,
         perspective: '1000px',
@@ -177,7 +177,16 @@ export default function ProjectPage() {
     'spotshare-parking':  null,
   };
 
+  const GITHUB_URLS: Record<string, string | null> = {
+    'ana-peluquera':      'https://github.com/eneekoruiz/ana-peluquera',
+    'who-are-ya-backend': 'https://github.com/eneekoruiz/who-are-ya-backend',
+    'pke-web':            'https://github.com/eneekoruiz/pke-web',
+    'rides24ofiziala':    'https://github.com/eneekoruiz/rides24ofiziala',
+    'spotshare-parking':  'https://github.com/eneekoruiz/spotshare-parking',
+  };
+
   const liveUrl = LIVE_URLS[safeId] ?? null;
+  const githubUrl = GITHUB_URLS[safeId] ?? null;
   const videoUrl = isJava ? '/loginjsf.mp4' : null;
 
   // 🎯 Punto 6 — Magnetic buttons
@@ -389,6 +398,7 @@ export default function ProjectPage() {
         accent={theme.accent}
         accentBg={theme.helixA}
         liveUrl={liveUrl ?? undefined}
+        githubUrl={githubUrl ?? undefined}
         videoUrl={videoUrl ?? undefined}
         iframeTitle={`${safeId} Preview`}
         label={theme.label}
