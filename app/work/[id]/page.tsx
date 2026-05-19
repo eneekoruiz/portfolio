@@ -443,6 +443,7 @@ export default function ProjectPage() {
         darkMode={darkMode}
         index={projectIndex}
         isReady={isReadyToAnimate}
+        lang={lang}
       />
 
         <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-24 md:pt-40 pb-32 bg-transparent">

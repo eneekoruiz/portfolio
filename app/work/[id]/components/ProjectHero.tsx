@@ -31,6 +31,203 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
+const STUDIO_TX: Record<string, {
+  sourceCode: string;
+  closeSession: string;
+  enterStudio: string;
+  clickToInteract: string;
+  initializing: string;
+  mounting: string;
+  preparing: string;
+  demoWorking: string;
+  comingSoon: string;
+  scrollDownInit: string;
+  auditDesc: string;
+  deepScroll: string;
+  keepScrolling: string;
+}> = {
+  es: {
+    sourceCode: 'Código Fuente',
+    closeSession: 'Cerrar Sesión',
+    enterStudio: 'Entrar al Estudio',
+    clickToInteract: 'Haz clic para interactuar',
+    initializing: 'Inicializando Estudio',
+    mounting: 'Montando entorno remoto...',
+    preparing: 'Preparando Entorno',
+    demoWorking: 'Estamos trabajando en la demo todavía',
+    comingSoon: 'Próximamente',
+    scrollDownInit: 'Desplaza hacia abajo para inicializar la vista previa del sistema.',
+    auditDesc: 'Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.',
+    deepScroll: 'Desplaza para Entrar',
+    keepScrolling: 'Sigue desplazándote',
+  },
+  en: {
+    sourceCode: 'Source Code',
+    closeSession: 'Close Session',
+    enterStudio: 'Enter Studio',
+    clickToInteract: 'Click to Interact',
+    initializing: 'Initializing Studio',
+    mounting: 'Mounting remote environment...',
+    preparing: 'Preparing Environment',
+    demoWorking: 'We are still working on the demo',
+    comingSoon: 'Coming Soon',
+    scrollDownInit: 'Scroll down to initialize the system preview.',
+    auditDesc: 'This project is being audited for final deployment in the test environment.',
+    deepScroll: 'Deep Scroll to Enter',
+    keepScrolling: 'Keep scrolling',
+  },
+  eu: {
+    sourceCode: 'Iturburu Kodea',
+    closeSession: 'Saioa Itxi',
+    enterStudio: 'Estudioan Sartu',
+    clickToInteract: 'Klikatu elkarreragiteko',
+    initializing: 'Estudioa Hasieratzen',
+    mounting: 'Urruneko ingurunea muntatzen...',
+    preparing: 'Ingurunea Prestatzen',
+    demoWorking: 'Demolanean ari gara oraindik',
+    comingSoon: 'Laster',
+    scrollDownInit: 'Mugitu behera sistemaren aurrebista kargatzeko.',
+    auditDesc: 'Proiektu hau proba-ingurunean azken hedapenerako ikuskatzen ari da.',
+    deepScroll: 'Mugitu Gehiago Sartzeko',
+    keepScrolling: 'Jarraitu mugitzen',
+  },
+  fr: {
+    sourceCode: 'Code Source',
+    closeSession: 'Quitter l\'Atelier',
+    enterStudio: 'Entrer dans l\'Atelier',
+    clickToInteract: 'Cliquer pour interagir',
+    initializing: 'Initialisation de l\'Atelier',
+    mounting: 'Montage de l\'environnement distant...',
+    preparing: 'Préparation de l\'Environnement',
+    demoWorking: 'Nous travaillons encore sur la démo',
+    comingSoon: 'Prochainement',
+    scrollDownInit: 'Faites défiler vers le bas pour initialiser l\'aperçu.',
+    auditDesc: 'Ce projet est en cours d\'audit pour déploiement final dans l\'environnement de test.',
+    deepScroll: 'Défiler pour Entrer',
+    keepScrolling: 'Continuez à défiler',
+  },
+  it: {
+    sourceCode: 'Codice Sorgente',
+    closeSession: 'Chiudi Sessione',
+    enterStudio: 'Entra nello Studio',
+    clickToInteract: 'Clicca per interagire',
+    initializing: 'Inizializzazione Studio',
+    mounting: 'Montaggio dell\'ambiente remoto...',
+    preparing: 'Preparazione Ambiente',
+    demoWorking: 'Stiamo ancora lavorando alla demo',
+    comingSoon: 'Prossimamente',
+    scrollDownInit: 'Scorri verso il basso per inizializzare l\'anteprima.',
+    auditDesc: 'Questo progetto è in fase di verifica per il rilascio finale nell\'ambiente di test.',
+    deepScroll: 'Scorri per Entrare',
+    keepScrolling: 'Continua a scorrere',
+  },
+  de: {
+    sourceCode: 'Quellcode',
+    closeSession: 'Sitzung beenden',
+    enterStudio: 'Studio betreten',
+    clickToInteract: 'Klicken zum Interagieren',
+    initializing: 'Studio wird initialisiert',
+    mounting: 'Remote-Umgebung wird geladen...',
+    preparing: 'Umgebung wird vorbereitet',
+    demoWorking: 'Wir arbeiten noch an der Demo',
+    comingSoon: 'Demnächst',
+    scrollDownInit: 'Nach unten scrollen, um die Systemvorschau zu laden.',
+    auditDesc: 'Dieses Projekt wird für die endgültige Bereitstellung in der Testumgebung geprüft.',
+    deepScroll: 'Scrollen zum Betreten',
+    keepScrolling: 'Weiter scrollen',
+  },
+  pt: {
+    sourceCode: 'Código Fonte',
+    closeSession: 'Fechar Sessão',
+    enterStudio: 'Entrar no Estúdio',
+    clickToInteract: 'Clique para interagir',
+    initializing: 'Inicializando Estúdio',
+    mounting: 'Montando ambiente remoto...',
+    preparing: 'Preparando Ambiente',
+    demoWorking: 'Ainda estamos trabalhando na demo',
+    comingSoon: 'Em breve',
+    scrollDownInit: 'Role para baixo para inicializar a pré-visualização.',
+    auditDesc: 'Este projeto está sendo auditado para implantação final no ambiente de testes.',
+    deepScroll: 'Rolar para Entrar',
+    keepScrolling: 'Continue a rolar',
+  },
+  ca: {
+    sourceCode: 'Codi Font',
+    closeSession: 'Tancar Sessió',
+    enterStudio: 'Entrar a l\'Estudi',
+    clickToInteract: 'Fes clic per interactuar',
+    initializing: 'Inicialitzant Estudi',
+    mounting: 'Muntant entorn remot...',
+    preparing: 'Preparant Entorn',
+    demoWorking: 'Encara estem treballant en la demo',
+    comingSoon: 'Properament',
+    scrollDownInit: 'Desplaça cap avall per inicialitzar la vista prèvia.',
+    auditDesc: 'Aquest projecte està sent auditat per al seu desplegament final a l\'entorn de proves.',
+    deepScroll: 'Desplaça per Entrar',
+    keepScrolling: 'Continua desplaçant-te',
+  },
+  gl: {
+    sourceCode: 'Código Fonte',
+    closeSession: 'Pechar Sesión',
+    enterStudio: 'Entrar no Estudio',
+    clickToInteract: 'Fai clic para interactuar',
+    initializing: 'Inicializando Estudio',
+    mounting: 'Montando contorno remoto...',
+    preparing: 'Preparando Contorno',
+    demoWorking: 'Aínda estamos traballando na demo',
+    comingSoon: 'Proximamente',
+    scrollDownInit: 'Despraza cara a baixo para inicializar a vista previa.',
+    auditDesc: 'Este proxecto está sendo auditado para o seu despregue final no contorno de probas.',
+    deepScroll: 'Desprazar para Entrar',
+    keepScrolling: 'Continúa desprazándote',
+  },
+  ja: {
+    sourceCode: 'ソースコード',
+    closeSession: 'セッションを終了',
+    enterStudio: 'スタジオに入る',
+    clickToInteract: 'クリックして操作',
+    initializing: 'スタジオを初期化中',
+    mounting: 'リモート環境をマウント中...',
+    preparing: '環境を準備中',
+    demoWorking: 'デモ版は現在開発中です',
+    comingSoon: '近日公開',
+    scrollDownInit: '下へスクロールしてシステムプレビューを起動してください。',
+    auditDesc: 'このプロジェクトは、テスト環境への最終デプロイに向けて監査中です。',
+    deepScroll: 'スクロールして入場',
+    keepScrolling: 'スクロールを続けてください',
+  },
+  zh: {
+    sourceCode: '源代码',
+    closeSession: '关闭会话',
+    enterStudio: '进入工作台',
+    clickToInteract: '点击以进行交互',
+    initializing: '正在初始化工作台',
+    mounting: '正在挂载远程环境...',
+    preparing: '正在准备环境',
+    demoWorking: '我们仍在开发演示版',
+    comingSoon: '即将推出',
+    scrollDownInit: '向下滚动以启动系统预览。',
+    auditDesc: '该项目正在进行审计，以进行测试环境의 最终部署。',
+    deepScroll: '向下滚动以进入',
+    keepScrolling: '请继续滚动',
+  },
+  ar: {
+    sourceCode: 'كود المصدر',
+    closeSession: 'إغلاق الجلسة',
+    enterStudio: 'دخول الاستوديو',
+    clickToInteract: 'انقر للتفاعل',
+    initializing: 'جاري تهيئة الاستوديو',
+    mounting: 'جاري تحميل البيئة عن بعد...',
+    preparing: 'جاري تحضير البيئة',
+    demoWorking: 'ما زلنا نعمل على العرض التجريبي',
+    comingSoon: 'قريباً',
+    scrollDownInit: 'مرر لأسفل لتهيئة معاينة النظام.',
+    auditDesc: 'يتم تدقيق هذا المشروع من أجل النشر النهائي في بيئة الاختبار.',
+    deepScroll: 'مرر للدخول',
+    keepScrolling: 'استمر في التمرير',
+  },
+};
+
 interface ProjectHeroProps {
   projectId: string;
   title: string;
@@ -46,6 +243,7 @@ interface ProjectHeroProps {
   darkMode: boolean;
   index?: number;
   isReady?: boolean;
+  lang?: string;
 }
 
 export function ProjectHero({
@@ -63,7 +261,9 @@ export function ProjectHero({
   darkMode,
   index = 1,
   isReady = true,
+  lang = 'es',
 }: ProjectHeroProps) {
+  const s = STUDIO_TX[lang] ?? STUDIO_TX['en'];
   const heroRef = useRef<HTMLDivElement>(null);
   const bgImageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -486,7 +686,7 @@ export function ProjectHero({
                       title="View Source Code"
                     >
                       <Github size={16} className="group-hover:scale-110" />
-                      <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">Source Code</span>
+                      <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">{s.sourceCode}</span>
                     </a>
                   )}
 
@@ -509,7 +709,7 @@ export function ProjectHero({
                     className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group"
                   >
                     <X size={16} className="font-bold" />
-                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">Close Session</span>
+                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">{s.closeSession}</span>
                   </button>
                 </div>
               </header>
@@ -535,9 +735,9 @@ export function ProjectHero({
                     </div>
                     <div className="flex flex-col items-center gap-2 text-center">
                       <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
-                        Enter Studio
+                        {s.enterStudio}
                       </span>
-                      <span className="text-[10px] text-white/40 uppercase tracking-widest">Click to Interact</span>
+                      <span className="text-[10px] text-white/40 uppercase tracking-widest">{s.clickToInteract}</span>
                     </div>
                   </div>
                 )}
@@ -559,8 +759,8 @@ export function ProjectHero({
                         </div>
                       </div>
                       <div className="flex flex-col items-center gap-2">
-                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">Initializing Studio</span>
-                        <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">Mounting remote environment...</span>
+                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">{s.initializing}</span>
+                        <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">{s.mounting}</span>
                       </div>
                     </div>
                   )}
@@ -611,11 +811,11 @@ export function ProjectHero({
                     </div>
                     <div className="flex flex-col items-center gap-3">
                       <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
-                        {liveUrl || videoUrl ? 'Preparing Environment' : projectId === 'rides24ofiziala' ? 'Estamos trabajando en la demo todavía' : 'Próximamente'}
+                        {liveUrl || videoUrl ? s.preparing : projectId === 'rides24ofiziala' ? s.demoWorking : s.comingSoon}
                       </span>
                       <div className="w-12 h-px bg-white/10" />
                       <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
-                        {liveUrl || videoUrl ? 'Scroll down to initialize the system preview.' : 'Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.'}
+                        {liveUrl || videoUrl ? s.scrollDownInit : s.auditDesc}
                       </span>
                     </div>
                  </div>
@@ -656,7 +856,7 @@ export function ProjectHero({
         {!disableStudio && (
           <div 
             ref={scrollProgressRef}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 w-[280px]"
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 w-[300px] px-6 py-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
             style={{ opacity: 1 }}
           >
             {/* Layout 1: Default hint before scroll */}
@@ -664,8 +864,8 @@ export function ProjectHero({
               ref={scrollHintDefaultRef}
               className="flex flex-col items-center gap-3"
             >
-              <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/40">Deep Scroll to Enter</p>
-              <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent animate-pulse" />
+              <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/50">{s.deepScroll}</p>
+              <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent animate-pulse" />
             </div>
 
             {/* Layout 2: Progress telemetry during scroll */}
@@ -673,19 +873,19 @@ export function ProjectHero({
               ref={scrollHintProgressRef}
               className="hidden flex-col items-center gap-2 w-full"
             >
-              <div className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/50">
-                <span>Initializing Studio</span>
+              <div className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/70">
+                <span>{s.initializing}</span>
                 <span ref={scrollTextRef}>0%</span>
               </div>
-              <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden border border-white/5">
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/5 shadow-inner">
                 <div 
                   ref={scrollBarRef}
-                  className="h-full transition-all duration-75 ease-out rounded-full"
+                  className="h-full transition-all duration-75 ease-out rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
                   style={{ width: '0%', backgroundColor: accent }}
                 />
               </div>
-              <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-white/30 animate-pulse mt-1">
-                Keep scrolling
+              <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-white font-bold animate-pulse mt-2 flex items-center gap-1.5">
+                {s.keepScrolling} <span className="inline-block animate-bounce font-sans text-xs">↓</span>
               </span>
             </div>
           </div>
