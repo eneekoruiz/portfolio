@@ -25,6 +25,8 @@ export function useProjectsAnimations({ sectionRef, load, expandedIdx }: UseProj
   useEffect(() => {
     if (load) return;
 
+    let onScrollEnd: (() => void) | undefined;
+
     const ctx = gsap.context(() => {
       // 1. Header Entrance
       gsap.fromTo('.projects-header',
@@ -65,9 +67,6 @@ export function useProjectsAnimations({ sectionRef, load, expandedIdx }: UseProj
       // 4. Wave Inertia Scrolling Effect (Efecto Ola)
       const rows = gsap.utils.toArray<HTMLElement>('.work-row-anim');
       if (rows.length > 0) {
-        const skewSetter = gsap.quickTo(rows, 'skewY', { duration: 0.4, ease: 'power2.out' });
-        const ySetter = gsap.quickTo(rows, 'y', { duration: 0.5, ease: 'power2.out' });
-
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: 'top bottom',
@@ -81,19 +80,35 @@ export function useProjectsAnimations({ sectionRef, load, expandedIdx }: UseProj
             const skew = gsap.utils.clamp(-6, 6, v / 180);
             const yOffset = gsap.utils.clamp(-20, 20, v / 100);
             
-            skewSetter(skew);
-            ySetter(yOffset);
+            gsap.to(rows, {
+              skewY: skew,
+              y: yOffset,
+              duration: 0.4,
+              ease: 'power2.out',
+              overwrite: 'auto'
+            });
           },
         });
 
         // Soft recovery when scroll stops
-        ScrollTrigger.addEventListener('scrollEnd', () => {
-          skewSetter(0);
-          ySetter(0);
-        });
+        onScrollEnd = () => {
+          gsap.to(rows, {
+            skewY: 0,
+            y: 0,
+            duration: 0.4,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
+        };
+        ScrollTrigger.addEventListener('scrollEnd', onScrollEnd);
       }
     });
 
-    return () => ctx.revert();
-  }, [load]);
+    return () => {
+      ctx.revert();
+      if (onScrollEnd) {
+        ScrollTrigger.removeEventListener('scrollEnd', onScrollEnd);
+      }
+    };
+  }, [load, sectionRef]);
 }
