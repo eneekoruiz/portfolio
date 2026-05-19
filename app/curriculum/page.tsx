@@ -68,9 +68,12 @@ export default function CurriculumPage() {
   useGSAP(() => {
     if (!containerRef.current || !headerRef.current) return;
     const tl = gsap.timeline();
-    tl
-      .from(headerRef.current, { opacity: 0, y: -30, duration: 0.6, ease: 'power3.out' }, 0)
-      .from('.curriculum-content', { opacity: 0, scale: 0.98, duration: 0.8, ease: 'power3.out' }, 0.2);
+    tl.from(headerRef.current, { opacity: 0, y: -30, duration: 0.6, ease: 'power3.out' }, 0);
+    
+    const hasCurriculum = containerRef.current.querySelectorAll('.curriculum-content').length > 0;
+    if (hasCurriculum) {
+      tl.from('.curriculum-content', { opacity: 0, scale: 0.98, duration: 0.8, ease: 'power3.out' }, 0.2);
+    }
   }, { scope: containerRef });
 
   useGSAP(() => {
@@ -87,8 +90,12 @@ export default function CurriculumPage() {
       iframeRef.current.contentWindow.postMessage({ type: 'leaving' }, '*');
     }
     const tl = gsap.timeline({ onComplete: () => { router.push('/#hero'); } });
-    tl.to(headerRef.current, { opacity: 0, y: -20, duration: 0.4, ease: 'power2.in' });
-    tl.to(containerRef.current, { opacity: 0, scale: 0.98, filter: 'blur(10px)', duration: 0.6, ease: 'power2.inOut' }, '-=0.2');
+    if (headerRef.current) {
+      tl.to(headerRef.current, { opacity: 0, y: -20, duration: 0.4, ease: 'power2.in' });
+    }
+    if (containerRef.current) {
+      tl.to(containerRef.current, { opacity: 0, scale: 0.98, filter: 'blur(10px)', duration: 0.6, ease: 'power2.inOut' }, headerRef.current ? '-=0.2' : undefined);
+    }
   };
 
   return (
@@ -152,25 +159,27 @@ export default function CurriculumPage() {
           </div>
         )}
 
-        <iframe
-          ref={iframeRef}
-          src="https://eneko-ruiz-curriculum.vercel.app"
-          title="Eneko Ruiz Curriculum"
-          style={{ height: iframeHeight }}
-          className={`w-full border-none transition-all duration-1000 ${loading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
-          allow="web-share; clipboard-write; print"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
-          onLoad={() => {
-            setLoading(false);
-            setHasError(false);
-            setShowFallback(false);
-          }}
-          onError={() => {
-            setLoading(false);
-            setHasError(true);
-            setShowFallback(true);
-          }}
-        />
+        <div className="curriculum-content w-full h-full">
+          <iframe
+            ref={iframeRef}
+            src="https://eneko-ruiz-curriculum.vercel.app"
+            title="Eneko Ruiz Curriculum"
+            style={{ height: iframeHeight }}
+            className={`w-full border-none transition-all duration-1000 ${loading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+            allow="web-share; clipboard-write"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
+            onLoad={() => {
+              setLoading(false);
+              setHasError(false);
+              setShowFallback(false);
+            }}
+            onError={() => {
+              setLoading(false);
+              setHasError(true);
+              setShowFallback(true);
+            }}
+          />
+        </div>
         
         {/* FALLBACK: Si no carga por seguridad (X-Frame-Options) */}
         {showFallback && (

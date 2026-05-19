@@ -16,7 +16,7 @@ export function useProjectsAnimations({ sectionRef, load, expandedIdx }: UseProj
   // Keep ref up to date
   useEffect(() => {
     expandedIdxRef.current = expandedIdx;
-    if (expandedIdx !== null) {
+    if (expandedIdx !== null && document.querySelectorAll('.work-row-anim').length > 0) {
       // Immediately smooth out active skew or translation on expand to prevent sudden jerks
       gsap.to('.work-row-anim', { skewY: 0, y: 0, duration: 0.3, overwrite: 'auto' });
     }

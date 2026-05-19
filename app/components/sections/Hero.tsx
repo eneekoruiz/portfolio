@@ -181,7 +181,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
 
     const onLeave = () => {
       if (isMobile) return;
-      gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' });
+      if (btn) gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' });
       
       if (textContainerRef.current) {
         gsap.to(textContainerRef.current, {

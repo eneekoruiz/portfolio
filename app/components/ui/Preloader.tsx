@@ -39,52 +39,60 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       onComplete: () => onDoneRef.current(),
     });
 
-    tl
-      // 1. Zoom the number MASSIVELY to create a portal effect
-      .to(numRef.current, {
+    if (numRef.current) {
+      tl.to(numRef.current, {
         scale: 60,
         opacity: 0,
         duration: 1.0,
         ease: 'power4.inOut',
         force3D: true, // GPU acceleration to avoid pixelation
-      })
-      // 2. Fade out UI elements
-      .to([barContainerRef.current, spotlightRef.current], {
+      });
+    }
+
+    const fadeTargets = [barContainerRef.current, spotlightRef.current].filter(Boolean);
+    if (fadeTargets.length > 0) {
+      tl.to(fadeTargets, {
         opacity: 0,
         duration: 0.4,
         ease: 'power2.out',
-      }, 0)
-      // 3. Pulse and expand light
-      .to(lightRef.current, {
+      }, 0);
+    }
+
+    if (lightRef.current) {
+      tl.to(lightRef.current, {
         scale: 4,
         opacity: 0,
         duration: 1,
         ease: 'power3.inOut',
-      }, 0.2)
-      // 4. Fade entire container
-      .to(containerRef.current, {
+      }, 0.2);
+    }
+
+    if (containerRef.current) {
+      tl.to(containerRef.current, {
         backgroundColor: 'transparent',
         opacity: 0,
         duration: 0.8,
         ease: 'power2.inOut',
       }, 0.6);
+    }
   }, []);
 
   // ── Spotlight Movement Animation ─────────────────────────────────────
   useEffect(() => {
     if (!spotlightRef.current) return;
     
-    const moveSpotlight = () => {
-      gsap.to(spotlightRef.current, {
-        x: gsap.utils.random(-300, 300),
-        y: gsap.utils.random(-300, 300),
-        duration: gsap.utils.random(2, 4),
-        ease: 'sine.inOut',
-        onComplete: moveSpotlight
-      });
-    };
+    const tween = gsap.to(spotlightRef.current, {
+      x: () => gsap.utils.random(-300, 300),
+      y: () => gsap.utils.random(-300, 300),
+      duration: () => gsap.utils.random(2, 4),
+      ease: 'sine.inOut',
+      repeat: -1,
+      repeatRefresh: true,
+    });
     
-    moveSpotlight();
+    return () => {
+      tween.kill();
+    };
   }, []);
 
   // ── Counter Logic (High precision) ──────────────────────────────────────

@@ -42,7 +42,7 @@ function AboutContent({ t }: { t: Tx }) {
 
       // 1. Título con animación de caracteres
       const titleChars = sectionRef.current?.querySelectorAll('.title-char');
-      if (titleChars) {
+      if (titleChars && titleChars.length > 0) {
         gsap.fromTo(titleChars,
           { y: '100%', rotateX: -90, opacity: 0 },
           {

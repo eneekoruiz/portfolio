@@ -206,7 +206,7 @@ export function Skills({ t }: SkillsProps) {
       
       // 1. Animación del Título (Igual para todos)
       const titleChars = containerRef.current?.querySelectorAll('.title-char');
-      if (titleChars) {
+      if (titleChars && titleChars.length > 0) {
         gsap.fromTo(titleChars,
           { y: '100%', rotateX: -90, opacity: 0 },
           {

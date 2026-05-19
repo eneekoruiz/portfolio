@@ -147,7 +147,7 @@ export function Philosophy({ t }: { t: Tx }) {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const titleChars = containerRef.current?.querySelectorAll('.title-char');
-      if (titleChars) {
+      if (titleChars && titleChars.length > 0) {
         gsap.fromTo(titleChars,
           { y: '100%', rotateX: -90, opacity: 0 },
           {

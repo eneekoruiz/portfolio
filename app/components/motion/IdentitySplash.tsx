@@ -68,18 +68,18 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
   useEffect(() => {
     if (!spotlightRef.current || !active) return;
     
-    const moveSpotlight = () => {
-      if (!spotlightRef.current) return;
-      gsap.to(spotlightRef.current, {
-        x: gsap.utils.random(-300, 300),
-        y: gsap.utils.random(-300, 300),
-        duration: gsap.utils.random(2, 4),
-        ease: 'sine.inOut',
-        onComplete: moveSpotlight
-      });
-    };
+    const tween = gsap.to(spotlightRef.current, {
+      x: () => gsap.utils.random(-300, 300),
+      y: () => gsap.utils.random(-300, 300),
+      duration: () => gsap.utils.random(2, 4),
+      ease: 'sine.inOut',
+      repeat: -1,
+      repeatRefresh: true,
+    });
     
-    moveSpotlight();
+    return () => {
+      tween.kill();
+    };
   }, [active]);
 
   const word = WELCOME_TEXT[lang] ?? 'Welcome';

@@ -37,6 +37,7 @@ export function GlareCard({ children, accent, className = '', style }: { childre
   };
 
   const onLeave = () => {
+    if (!cardRef.current) return;
     gsap.to(cardRef.current, {
       rotateY: 0,
       rotateX: 0,

@@ -31,18 +31,21 @@ export function SmoothScroll() {
     gsap.ticker.lagSmoothing(0);
 
     // Scroll Progress Bar Logic
-    gsap.to('#scroll-progress', {
-      scaleX: 1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: 'body',
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.3,
-      }
+    const ctx = gsap.context(() => {
+      gsap.to('#scroll-progress', {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: 'body',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.3,
+        }
+      });
     });
 
     return () => {
+      ctx.revert();
       if (tickerFnRef.current) {
         gsap.ticker.remove(tickerFnRef.current);
         tickerFnRef.current = null;

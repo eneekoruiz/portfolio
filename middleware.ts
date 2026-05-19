@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
   // Development: Relaxed policy for Next.js developer experience.
   const scriptSrc = isDev
     ? "'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel.live"
-    : `'self' 'nonce-${nonce}' https://vercel.live https://*.vercel.live https://va.vercel-scripts.com https://vitals.vercel-insights.com`; 
+    : `'self' 'nonce-${nonce}' 'sha256-n46vPwSWuMC0W703pBofImv82Z26xo4LXymv0E9caPk=' https://vercel.live https://*.vercel.live https://va.vercel-scripts.com https://vitals.vercel-insights.com`; 
 
   const cspHeader = `
     default-src 'self';

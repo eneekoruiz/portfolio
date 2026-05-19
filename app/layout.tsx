@@ -85,7 +85,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <SkipLink />
         <div id="scroll-progress" className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0" />
-        <ClientThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+        <ClientThemeProvider attribute="class" defaultTheme="system" enableSystem={true} nonce={nonce}>
           <SmoothScroll />
           <EasterEgg />
           <InfallibleCursor />

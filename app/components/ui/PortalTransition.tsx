@@ -5,33 +5,37 @@ import gsap from 'gsap';
 
 export function PortalTransition() {
   const [active, setActive] = useState(false);
+  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
 
   const startPortal = useCallback((url: string) => {
+    setPendingUrl(url);
     setActive(true);
     
     // Lock scroll
     document.body.style.overflow = 'hidden';
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        window.location.href = url;
-      }
-    });
-
-    tl.to('#portal-ring', {
-      scale: 25,
-      opacity: 1,
-      duration: 0.8,
-      ease: 'power4.in',
-    })
-    .to('#portal-overlay', {
-      opacity: 1,
-      duration: 0.4,
-      ease: 'power2.in',
-    }, '-=0.3');
-
-    return tl;
   }, []);
+
+  useEffect(() => {
+    if (active && pendingUrl) {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          window.location.href = pendingUrl;
+        }
+      });
+
+      tl.to('#portal-ring', {
+        scale: 25,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power4.in',
+      })
+      .to('#portal-overlay', {
+        opacity: 1,
+        duration: 0.4,
+        ease: 'power2.in',
+      }, '-=0.3');
+    }
+  }, [active, pendingUrl]);
 
   useEffect(() => {
     const handlePortal = (e: any) => {

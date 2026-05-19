@@ -12,10 +12,10 @@ export function useGsapOrchestration(
   // Preset entrance properties to avoid layout shifts on first render
   useLayoutEffect(() => {
     if (!ready || reduced) return;
-    gsap.set('.n-el', { opacity: 0, y: -14 });
-    gsap.set('.h-ln', { yPercent: 115 });
-    gsap.set('.h-fd', { opacity: 0, y: 16 });
-    gsap.set('.memoji', { opacity: 0, x: 60 });
+    if (document.querySelectorAll('.n-el').length > 0) gsap.set('.n-el', { opacity: 0, y: -14 });
+    if (document.querySelectorAll('.h-ln').length > 0) gsap.set('.h-ln', { yPercent: 115 });
+    if (document.querySelectorAll('.h-fd').length > 0) gsap.set('.h-fd', { opacity: 0, y: 16 });
+    if (document.querySelectorAll('.memoji').length > 0) gsap.set('.memoji', { opacity: 0, x: 60 });
   }, [ready, reduced]);
 
   // Orchestrate timelines using @gsap/react safe-scoping
@@ -73,11 +73,24 @@ export function useGsapOrchestration(
 
     // Dynamic intro stagger timeline
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    if (document.querySelectorAll('.n-el, .h-ln, .h-fd, .memoji').length) {
-      tl.to('.n-el', { opacity: 1, y: 0, duration: 0.12, stagger: 0.015 })
-        .to('.h-ln', { yPercent: 0, duration: 0.25, stagger: 0.02 }, '-=0.1')
-        .to('.h-fd', { opacity: 1, y: 0, duration: 0.18, stagger: 0.02 }, '-=0.15')
-        .to('.memoji', { opacity: 1, x: 0, duration: 0.3, ease: 'power3.out' }, '-=0.25');
+    const hasNel = document.querySelectorAll('.n-el').length > 0;
+    const hasHln = document.querySelectorAll('.h-ln').length > 0;
+    const hasHfd = document.querySelectorAll('.h-fd').length > 0;
+    const hasMemoji = document.querySelectorAll('.memoji').length > 0;
+
+    if (hasNel || hasHln || hasHfd || hasMemoji) {
+      if (hasNel) {
+        tl.to('.n-el', { opacity: 1, y: 0, duration: 0.12, stagger: 0.015 });
+      }
+      if (hasHln) {
+        tl.to('.h-ln', { yPercent: 0, duration: 0.25, stagger: 0.02 }, hasNel ? '-=0.1' : undefined);
+      }
+      if (hasHfd) {
+        tl.to('.h-fd', { opacity: 1, y: 0, duration: 0.18, stagger: 0.02 }, (hasNel || hasHln) ? '-=0.15' : undefined);
+      }
+      if (hasMemoji) {
+        tl.to('.memoji', { opacity: 1, x: 0, duration: 0.3, ease: 'power3.out' }, (hasNel || hasHln || hasHfd) ? '-=0.25' : undefined);
+      }
     }
   }, { scope: mainRef, dependencies: [ready, reduced] });
 }
