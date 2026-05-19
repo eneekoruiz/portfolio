@@ -83,9 +83,10 @@ export function NetworkParticles() {
           const p2 = pts[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
 
-          if (dist < maxDist) {
+          if (distSq < maxDist * maxDist) {
+            const dist = Math.sqrt(distSq);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
@@ -100,9 +101,10 @@ export function NetworkParticles() {
         if (mouse.x !== -999) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
 
-          if (dist < mouseDist) {
+          if (distSq < mouseDist * mouseDist) {
+            const dist = Math.sqrt(distSq);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);

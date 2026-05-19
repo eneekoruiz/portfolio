@@ -109,8 +109,8 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
       const mouseX = mouseRef.current.x - rect.left;
       const mouseY = mouseRef.current.y - rect.top;
       
-      // Calculate closest distance to the helix in local space
-      let minDistance = 999999;
+      // Calculate closest distance to the helix in local space using squared distance
+      let minDistanceSq = 99999999;
       const baseRotation = rotationRef.current;
 
       for (let i = 0; i <= steps; i += 2) {
@@ -122,12 +122,13 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
         const x1 = w / 2 + Math.cos(angle) * r;
         const x2 = w / 2 + Math.cos(angle + Math.PI) * r;
         
-        const d1 = Math.sqrt((x1 - mouseX) ** 2 + (y - mouseY) ** 2);
-        const d2 = Math.sqrt((x2 - mouseX) ** 2 + (y - mouseY) ** 2);
+        const d1Sq = (x1 - mouseX) ** 2 + (y - mouseY) ** 2;
+        const d2Sq = (x2 - mouseX) ** 2 + (y - mouseY) ** 2;
         
-        if (d1 < minDistance) minDistance = d1;
-        if (d2 < minDistance) minDistance = d2;
+        if (d1Sq < minDistanceSq) minDistanceSq = d1Sq;
+        if (d2Sq < minDistanceSq) minDistanceSq = d2Sq;
       }
+      const minDistance = Math.sqrt(minDistanceSq);
 
       // Smoothly interpolate hover speed boost
       const hoverRange = 220;
@@ -166,11 +167,12 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
           // Calculate elastic attraction vector to mouse (spider web stick)
           const dx = mouseX - x;
           const dy = mouseY - y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
           
           let targetX = 0;
           let targetY = 0;
-          if (dist < range) {
+          if (distSq < range * range) {
+            const dist = Math.sqrt(distSq);
             const force = Math.pow((range - dist) / range, 1.8);
             targetX = dx * force * 0.65;
             targetY = dy * force * 0.35;
@@ -496,17 +498,16 @@ export const MVCTerminal = ({ accent }: { accent: string }) => {
 };
 
 export const DistributedNodes = ({ accent }: { accent: string }) => {
-  const [nodes, setNodes] = useState<{x: number, y: number, vx: number, vy: number}[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const nodesRef = useRef<{x: number, y: number, vx: number, vy: number}[]>([]);
 
   useEffect(() => {
-    const initial = Array.from({ length: 12 }).map(() => ({
+    nodesRef.current = Array.from({ length: 12 }).map(() => ({
       x: Math.random() * 300,
       y: Math.random() * 200,
       vx: (Math.random() - 0.5) * 0.5,
       vy: (Math.random() - 0.5) * 0.5,
     }));
-    setNodes(initial);
   }, []);
 
   useEffect(() => {
@@ -518,22 +519,23 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
     const draw = () => {
       ctx.clearRect(0, 0, 300, 200);
       
-      // Update nodes
-      setNodes(prev => prev.map(n => ({
-        ...n,
-        x: (n.x + n.vx + 300) % 300,
-        y: (n.y + n.vy + 200) % 200,
-      })));
+      const nodes = nodesRef.current;
 
-      // Draw connections
+      // Update nodes positions directly (no React state updates to trigger re-renders!)
+      nodes.forEach(n => {
+        n.x = (n.x + n.vx + 300) % 300;
+        n.y = (n.y + n.vy + 200) % 200;
+      });
+
+      // Draw connections using squared distance to avoid Math.sqrt in hot path
       ctx.lineWidth = 0.5;
       ctx.strokeStyle = `${accent}30`;
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 80) {
+          const distSq = dx * dx + dy * dy;
+          if (distSq < 80 * 80) {
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -555,7 +557,7 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
 
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [accent, nodes]);
+  }, [accent]);
 
   return (
     <div className="relative h-44 flex items-center justify-center overflow-hidden">

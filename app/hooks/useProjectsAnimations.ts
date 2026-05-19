@@ -67,6 +67,8 @@ export function useProjectsAnimations({ sectionRef, load, expandedIdx }: UseProj
       // 4. Wave Inertia Scrolling Effect (Efecto Ola)
       const rows = gsap.utils.toArray<HTMLElement>('.work-row-anim');
       if (rows.length > 0) {
+        let lastUpdate = 0;
+
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: 'top bottom',
@@ -76,6 +78,11 @@ export function useProjectsAnimations({ sectionRef, load, expandedIdx }: UseProj
               gsap.set(rows, { skewY: 0, y: 0, overwrite: 'auto' });
               return;
             }
+            
+            const now = Date.now();
+            if (now - lastUpdate < 32) return; // Throttle to ~30fps to save CPU
+            lastUpdate = now;
+
             const v = self.getVelocity();
             const skew = gsap.utils.clamp(-6, 6, v / 180);
             const yOffset = gsap.utils.clamp(-20, 20, v / 100);

@@ -78,20 +78,25 @@ export function ProjectHero({
   const interRef = useRef(false);
   const canRef   = useRef(false);
 
+  // ── DEFERRED LOADING STATE FOR PERFORMANCE ──
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const shouldLoadRef = useRef(false);
+
   // Sync refs with state for use in event listeners
   useEffect(() => { interRef.current = isInteracting; }, [isInteracting]);
   useEffect(() => { canRef.current   = canInteract;   }, [canInteract]);
+  useEffect(() => { shouldLoadRef.current = shouldLoad; }, [shouldLoad]);
 
   const disableStudio = projectId === 'rides24ofiziala';
 
   // Iframe loading safety fallback
   useEffect(() => {
-    if (!liveUrl || iframeLoaded) return;
+    if (!liveUrl || iframeLoaded || !shouldLoad) return;
     const timer = setTimeout(() => {
       setIframeLoaded(true);
     }, 6000); // 6s fallback for heavy sites
     return () => clearTimeout(timer);
-  }, [liveUrl, iframeLoaded]);
+  }, [liveUrl, iframeLoaded, shouldLoad]);
 
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
   useGSAP(() => {
@@ -111,6 +116,12 @@ export function ProjectHero({
           if (!disableStudio && canRef.current !== isLocked) {
             canRef.current = isLocked;
             setCanInteract(isLocked);
+          }
+          
+          // Trigger deferred loading when the user begins to scroll down
+          if (self.progress > 0.05 && !shouldLoadRef.current) {
+            shouldLoadRef.current = true;
+            setShouldLoad(true);
           }
           
           if (screenRef.current && !interRef.current) {
@@ -366,6 +377,8 @@ export function ProjectHero({
               transformStyle: 'preserve-3d',
               willChange: 'transform, width, height, border-radius',
               borderColor: 'rgba(255,255,255,0.1)',
+              opacity: 0,
+              transform: 'translate(-50%, -50%) scale(0.05)',
             }}
           >
             {/* Studio HUD - Top Control Bar */}
@@ -469,7 +482,7 @@ export function ProjectHero({
                 <div className="absolute inset-0 z-[105] pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,210,0.06))] bg-[length:100%_2px,3px_100%] select-none" />
               )}
 
-              {liveUrl ? (
+              {shouldLoad && liveUrl ? (
                 <>
                   {!iframeLoaded && (
                     <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black gap-6">
@@ -497,7 +510,7 @@ export function ProjectHero({
                     }}
                   />
                 </>
-              ) : videoUrl ? (
+              ) : shouldLoad && videoUrl ? (
                  <div className="w-full h-full bg-black relative">
                     <video
                       src={videoUrl}
@@ -518,16 +531,25 @@ export function ProjectHero({
               ) : (
                  <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-6 p-10 text-center">
                     <div className="relative">
-                      <Activity size={48} className="text-white/20 animate-pulse" />
+                      {liveUrl || videoUrl ? (
+                        <div className="relative">
+                          <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
+                          </div>
+                        </div>
+                      ) : (
+                        <Activity size={48} className="text-white/20 animate-pulse" />
+                      )}
                       <div className="absolute inset-0 blur-2xl bg-white/5 animate-pulse" />
                     </div>
                     <div className="flex flex-col items-center gap-3">
                       <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
-                        {projectId === 'rides24ofiziala' ? 'Estamos trabajando en la demo todavía' : 'Próximamente'}
+                        {liveUrl || videoUrl ? 'Preparing Environment' : projectId === 'rides24ofiziala' ? 'Estamos trabajando en la demo todavía' : 'Próximamente'}
                       </span>
                       <div className="w-12 h-px bg-white/10" />
                       <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
-                        Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.
+                        {liveUrl || videoUrl ? 'Scroll down to initialize the system preview.' : 'Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.'}
                       </span>
                     </div>
                  </div>

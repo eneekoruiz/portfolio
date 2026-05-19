@@ -49,7 +49,10 @@ export function RepoRow({ r, idx, activeRepo, setActiveRepo, lineRef, isMobile }
           </span>
           <div className="flex-1 min-w-0">
             <div className="flex flex-col md:flex-row md:items-center gap-y-2 gap-x-3">
-              <span className={`font-mono text-[13px] font-bold md:font-medium tracking-[-0.01em] transition-colors duration-200 ${isActive ? 'text-brand' : 'text-ink'}`}>
+              <span 
+                className={`font-mono text-[13px] font-bold md:font-medium tracking-[-0.01em] transition-colors duration-200 ${!isActive ? 'text-ink' : ''}`}
+                style={isActive ? { color: getTechColor(r.langs?.[0]) } : undefined}
+              >
                 {r.name}
               </span>
               <div className="flex flex-wrap gap-[0.3rem]">

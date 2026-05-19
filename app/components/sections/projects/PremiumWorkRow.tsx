@@ -155,25 +155,34 @@ export function PremiumWorkRow({ proj, idx, isExpanded, onToggle, onHoverProject
         boxShadow: isExpanded ? `inset 0 1px 0 0 rgba(255,255,255,${isDark ? '0.05' : '0.1'}), inset 0 -1px 0 0 rgba(0,0,0,${isDark ? '0.1' : '0.05'})` : 'none',
       }}
     >
-      {/* ── Apple-Style Premium Satin Glass Overlay ── */}
+      {/* ── Vertical Accent Theme-Colored Bar on Hover ── */}
+      <div 
+        className="absolute left-0 top-0 w-[4px] h-full opacity-0 scale-y-50 group-hover/row:opacity-100 group-hover/row:scale-y-100 transition-all duration-500 ease-out z-30 pointer-events-none origin-center"
+        style={{
+          background: theme.color,
+          boxShadow: `0 0 16px ${theme.color}, 0 0 4px ${theme.color}`,
+        }}
+      />
+
+      {/* ── Apple-Style Premium Satin Glass Overlay & Gradient Wash ── */}
       <div 
         className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-all duration-500 ease-out pointer-events-none"
         style={{
           background: isDark
-            ? `linear-gradient(to bottom, rgba(${theme.rgb}, 0.03) 0%, transparent 100%), rgba(255, 255, 255, 0.015)`
-            : `linear-gradient(to bottom, rgba(${theme.rgb}, 0.04) 0%, transparent 100%), rgba(0, 0, 0, 0.006)`,
+            ? `linear-gradient(90deg, rgba(${theme.rgb}, 0.08) 0%, rgba(${theme.rgb}, 0.02) 50%, transparent 100%), rgba(255, 255, 255, 0.015)`
+            : `linear-gradient(90deg, rgba(${theme.rgb}, 0.07) 0%, rgba(${theme.rgb}, 0.01) 60%, transparent 100%), rgba(0, 0, 0, 0.006)`,
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
         }}
       />
 
-      {/* ── Apple-Style Interactive Radial Glow Spot ── */}
+      {/* ── Apple-Style Interactive Radial Glow Spot (Enhanced) ── */}
       <div 
         className="absolute inset-0 z-0 opacity-0 group-hover/row:opacity-100 transition-all duration-300 ease-out pointer-events-none"
         style={{
           background: isDark
-            ? `radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(${theme.rgb}, 0.16) 0%, rgba(${theme.rgb}, 0.04) 50%, transparent 80%)`
-            : `radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(${theme.rgb}, 0.11) 0%, rgba(${theme.rgb}, 0.02) 60%, transparent 80%)`,
+            ? `radial-gradient(420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(${theme.rgb}, 0.22) 0%, rgba(${theme.rgb}, 0.06) 50%, transparent 80%)`
+            : `radial-gradient(420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(${theme.rgb}, 0.16) 0%, rgba(${theme.rgb}, 0.03) 60%, transparent 80%)`,
         }}
       />
       

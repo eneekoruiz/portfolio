@@ -52,15 +52,19 @@ function TextPillCylinder({ techs, cardColor, isDark }: { techs: string[], cardC
 
       if (isVisible) {
         animRef.current = requestAnimationFrame(animate);
-      } else {
-        // Stop loop if not visible, but keep requestAnimationFrame available for next check
-        animRef.current = requestAnimationFrame(animate);
       }
     };
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        const wasVisible = isVisible;
         isVisible = entry.isIntersecting;
+        if (isVisible && !wasVisible) {
+          if (animRef.current !== undefined) cancelAnimationFrame(animRef.current);
+          animRef.current = requestAnimationFrame(animate);
+        } else if (!isVisible) {
+          if (animRef.current !== undefined) cancelAnimationFrame(animRef.current);
+        }
       },
       { threshold: 0.01 } // Lower threshold for faster activation
     );
