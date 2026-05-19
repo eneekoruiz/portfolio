@@ -177,6 +177,14 @@ export default function ProjectPage() {
     }
   }, []);
 
+  // Force scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+    if (window.__lenis) {
+      window.__lenis.scrollTo(0, { immediate: true });
+    }
+  }, []);
+
   // 💎 KEY STATE: Defers heavy animation loading until after route transition completes
   const [isReadyToAnimate, setIsReadyToAnimate] = useState(false);
 
