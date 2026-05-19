@@ -42,7 +42,7 @@ function BentoCard({ val: { icon: Icon, t: title, d }, span, accent, index }: {
           delay: index * 0.1, 
           scrollTrigger: {
             trigger: el,
-            start: 'top 85%',
+            start: 'top 95%',
             once: true
           }
         }
@@ -155,7 +155,7 @@ export function Philosophy({ t }: { t: Tx }) {
             duration: 1.2,
             stagger: 0.02,
             ease: 'expo.out',
-            scrollTrigger: { trigger: containerRef.current, start: 'top 85%' }
+            scrollTrigger: { trigger: containerRef.current, start: 'top 95%' }
           }
         );
       }

@@ -40,6 +40,9 @@ export default function CurriculumPage() {
       }
       if (e.data.type === 'set-cv-height') {
         setIframeHeight(`${e.data.height}px`);
+        setLoading(false);
+        setHasError(false);
+        setShowFallback(false);
       }
     };
     window.addEventListener('message', handleMessage);
@@ -60,7 +63,7 @@ export default function CurriculumPage() {
         setShowFallback(true);
         setLoading(false);
       }
-    }, 8000);
+    }, 20000);
     return () => clearTimeout(timer);
   }, [loading]);
 

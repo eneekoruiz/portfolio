@@ -72,6 +72,14 @@ export function ProjectHero({
   const screenRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  // HUD scroll progress refs
+  const scrollProgressRef = useRef<HTMLDivElement>(null);
+  const scrollTextRef = useRef<HTMLSpanElement>(null);
+  const scrollBarRef = useRef<HTMLDivElement>(null);
+  const scrollHintDefaultRef = useRef<HTMLDivElement>(null);
+  const scrollHintProgressRef = useRef<HTMLDivElement>(null);
+
   const [isInteracting, setIsInteracting] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
@@ -127,6 +135,32 @@ export function ProjectHero({
           if (screenRef.current && !interRef.current) {
             screenRef.current.style.setProperty('--shield-opacity', isLocked ? '0.4' : '1');
             screenRef.current.style.setProperty('--shield-pointer', isLocked ? 'all' : 'none');
+          }
+
+          // Update scroll telemetry HUD
+          const progressPercent = Math.round(self.progress * 100);
+          if (scrollTextRef.current) {
+            scrollTextRef.current.textContent = `${progressPercent}%`;
+          }
+          if (scrollBarRef.current) {
+            scrollBarRef.current.style.width = `${progressPercent}%`;
+          }
+
+          if (scrollProgressRef.current) {
+            if (self.progress > 0.85) {
+              scrollProgressRef.current.style.opacity = '0';
+              scrollProgressRef.current.style.pointerEvents = 'none';
+            } else if (self.progress > 0.02) {
+              scrollProgressRef.current.style.opacity = '1';
+              scrollProgressRef.current.style.pointerEvents = 'auto';
+              if (scrollHintDefaultRef.current) scrollHintDefaultRef.current.style.display = 'none';
+              if (scrollHintProgressRef.current) scrollHintProgressRef.current.style.display = 'flex';
+            } else {
+              scrollProgressRef.current.style.opacity = '1';
+              scrollProgressRef.current.style.pointerEvents = 'auto';
+              if (scrollHintDefaultRef.current) scrollHintDefaultRef.current.style.display = 'flex';
+              if (scrollHintProgressRef.current) scrollHintProgressRef.current.style.display = 'none';
+            }
           }
         }
       },
@@ -258,7 +292,35 @@ export function ProjectHero({
       document.body.classList.add('studio-active');
       window.__lenis?.stop();
 
-      // 2. ESC Key Listener
+      // 2. Prevent Zoom (pinch-to-zoom and Ctrl+wheel) and standard scroll events on parent
+      const preventScrollAndZoom = (e: Event) => {
+        e.preventDefault();
+      };
+
+      const preventZoomKeys = (e: KeyboardEvent) => {
+        const isCtrlCmd = e.ctrlKey || e.metaKey;
+        if (isCtrlCmd && (e.key === '=' || e.key === '-' || e.key === '+' || e.key === '0')) {
+          e.preventDefault();
+        }
+      };
+
+      const preventScrollKeys = (e: KeyboardEvent) => {
+        const keys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
+        if (keys.includes(e.key)) {
+          const active = document.activeElement;
+          if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || (active as HTMLElement).isContentEditable)) {
+            return;
+          }
+          e.preventDefault();
+        }
+      };
+
+      window.addEventListener('wheel', preventScrollAndZoom, { passive: false });
+      window.addEventListener('touchmove', preventScrollAndZoom, { passive: false });
+      window.addEventListener('keydown', preventZoomKeys, { passive: false });
+      window.addEventListener('keydown', preventScrollKeys, { passive: false });
+
+      // 3. ESC Key Listener
       const handleEsc = (e: KeyboardEvent) => {
         if (e.key === 'Escape') setIsInteracting(false);
       };
@@ -268,6 +330,10 @@ export function ProjectHero({
         document.body.style.overflow = '';
         document.body.classList.remove('studio-active');
         window.__lenis?.start();
+        window.removeEventListener('wheel', preventScrollAndZoom);
+        window.removeEventListener('touchmove', preventScrollAndZoom);
+        window.removeEventListener('keydown', preventZoomKeys);
+        window.removeEventListener('keydown', preventScrollKeys);
         window.removeEventListener('keydown', handleEsc);
       };
     } else {
@@ -586,12 +652,41 @@ export function ProjectHero({
           </div>
         )}
 
-        {/* Scroll Hint */}
+        {/* Dynamic Scroll HUD Indicator */}
         {!disableStudio && (
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[40] opacity-20">
-            <div className="flex flex-col items-center gap-3">
-              <p className="font-mono text-[8px] uppercase tracking-[0.5em]">Deep Scroll to Enter</p>
-              <div className="w-px h-12 bg-gradient-to-b from-current to-transparent" />
+          <div 
+            ref={scrollProgressRef}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 w-[280px]"
+            style={{ opacity: 1 }}
+          >
+            {/* Layout 1: Default hint before scroll */}
+            <div 
+              ref={scrollHintDefaultRef}
+              className="flex flex-col items-center gap-3"
+            >
+              <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/40">Deep Scroll to Enter</p>
+              <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent animate-pulse" />
+            </div>
+
+            {/* Layout 2: Progress telemetry during scroll */}
+            <div 
+              ref={scrollHintProgressRef}
+              className="hidden flex-col items-center gap-2 w-full"
+            >
+              <div className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/50">
+                <span>Initializing Studio</span>
+                <span ref={scrollTextRef}>0%</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden border border-white/5">
+                <div 
+                  ref={scrollBarRef}
+                  className="h-full transition-all duration-75 ease-out rounded-full"
+                  style={{ width: '0%', backgroundColor: accent }}
+                />
+              </div>
+              <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-white/30 animate-pulse mt-1">
+                Keep scrolling
+              </span>
             </div>
           </div>
         )}
