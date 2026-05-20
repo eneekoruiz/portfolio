@@ -1,60 +1,79 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import { Tx } from '../types';
+import { Tx } from "../types";
 
 interface SectionMap {
   id: string;
   c: string;
 }
 
-export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.RefObject<HTMLDivElement | null>, indRef: React.RefObject<HTMLDivElement | null>, activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>, onSectionChange?: (id: string) => void) {
+export function useSectionObserver(
+  ready: boolean,
+  t: Tx,
+  navInnerRef: React.RefObject<HTMLDivElement | null>,
+  indRef: React.RefObject<HTMLDivElement | null>,
+  activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>,
+  onSectionChange?: (id: string) => void,
+) {
   useEffect(() => {
     if (!ready) return;
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const meta = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    );
     if (!meta) return;
 
     const map: SectionMap[] = [
-      { id: 'hero', c: '#f5f5f7' },
-      { id: 'skills', c: '#ffffff' },
-      { id: 'work', c: '#f5f5f7' },
-      { id: 'github', c: '#ffffff' },
-      { id: 'about', c: '#f5f5f7' },
-      { id: 'values', c: '#ffffff' },
-      { id: 'contact', c: '#f5f5f7' },
+      { id: "hero", c: "#f5f5f7" },
+      { id: "skills", c: "#ffffff" },
+      { id: "work", c: "#f5f5f7" },
+      { id: "github", c: "#ffffff" },
+      { id: "about", c: "#f5f5f7" },
+      { id: "values", c: "#ffffff" },
+      { id: "contact", c: "#f5f5f7" },
     ];
 
     const observers = map.map(({ id, c }) => {
       const el = document.getElementById(id);
       if (!el) return null;
       const io = new IntersectionObserver(
-        ([e]) => { if (e.isIntersecting) meta.content = c; },
-        { threshold: 0.4 }
+        ([e]) => {
+          if (e.isIntersecting) meta.content = c;
+        },
+        { threshold: 0.4 },
       );
       io.observe(el);
       return io;
     });
 
-    return () => observers.forEach(io => io?.disconnect());
+    return () => observers.forEach((io) => io?.disconnect());
   }, [ready]);
 
   useEffect(() => {
     if (!ready) return;
-    
+
     // Combine navbar sections with internal sections we want to track (like #github)
-    const trackedIds = [...t.hrefs, '#github'];
-    const sections = trackedIds.map((h: string) => document.querySelector(h)).filter(Boolean) as HTMLElement[];
-    const navLinks = navInnerRef.current?.querySelectorAll<HTMLAnchorElement>('a');
-    
+    const trackedIds = [...t.hrefs, "#github"];
+    const sections = trackedIds
+      .map((h: string) => document.querySelector(h))
+      .filter(Boolean) as HTMLElement[];
+    const navLinks =
+      navInnerRef.current?.querySelectorAll<HTMLAnchorElement>("a");
+
     if (!sections.length) return;
 
     const ctx = gsap.context(() => {
       function setActive(id: string, idx: number) {
         // Only update navbar indicator if the section has a corresponding nav link
-        if (navLinks && idx < navLinks.length && indRef.current && navInnerRef.current) {
+        if (
+          navLinks &&
+          idx < navLinks.length &&
+          indRef.current &&
+          navInnerRef.current
+        ) {
           const link = navLinks[idx];
           if (link) {
             activeLinkRef.current = link;
@@ -67,8 +86,8 @@ export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.Ref
                 height: r.height,
                 opacity: 0.65,
                 duration: 0.3,
-                ease: 'power3.out',
-                overwrite: 'auto',
+                ease: "power3.out",
+                overwrite: "auto",
               });
             }
           }
@@ -78,17 +97,17 @@ export function useSectionObserver(ready: boolean, t: Tx, navInnerRef: React.Ref
       }
 
       sections.forEach((sec, idx) => {
-        const id = trackedIds[idx].replace('#', '');
+        const id = trackedIds[idx].replace("#", "");
         ScrollTrigger.create({
           trigger: sec,
-          start: 'top 50%',
-          end: 'bottom 50%',
+          start: "top 50%",
+          end: "bottom 50%",
           onEnter: () => setActive(id, idx),
           onEnterBack: () => setActive(id, idx),
         });
       });
 
-      if (window.scrollY < 100) setActive('hero', 0);
+      if (window.scrollY < 100) setActive("hero", 0);
     });
 
     return () => ctx.revert();

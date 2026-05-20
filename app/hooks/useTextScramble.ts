@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * useTextScramble — "Hacker" text reveal effect
@@ -13,13 +13,13 @@
  * Characters used for scramble: monospace-friendly glyphs.
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from "react";
 
-const CHARS = '!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const CHARS = "!<>-_\\/[]{}—=+*^?#_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 interface ScrambleOptions {
   /** How the scramble triggers. 'mount' = on component mount, 'inView' = on scroll into viewport. Default: 'inView' */
-  trigger?: 'mount' | 'inView';
+  trigger?: "mount" | "inView";
   /** Duration per character resolve in ms. Default: 40 */
   charSpeed?: number;
   /** Number of scramble iterations before each char resolves. Default: 3 */
@@ -35,7 +35,7 @@ export function useTextScramble(
   options: ScrambleOptions = {},
 ) {
   const {
-    trigger = 'inView',
+    trigger = "inView",
     charSpeed = 25,
     iterations = 2,
     delay = 0,
@@ -51,22 +51,24 @@ export function useTextScramble(
     if (hasRun.current) return;
     hasRun.current = true;
 
-    const chars = finalText.split('');
+    const chars = finalText.split("");
     const totalSteps = chars.length * iterations;
     let step = 0;
 
     const tick = () => {
       const resolvedCount = Math.floor(step / iterations);
-      const output = chars.map((char, i) => {
-        if (char === ' ') return ' '; // Preserve spaces
-        if (i < resolvedCount) return char; // Already resolved
-        if (i === resolvedCount) {
-          // Currently scrambling this char
+      const output = chars
+        .map((char, i) => {
+          if (char === " ") return " "; // Preserve spaces
+          if (i < resolvedCount) return char; // Already resolved
+          if (i === resolvedCount) {
+            // Currently scrambling this char
+            return CHARS[Math.floor(Math.random() * CHARS.length)];
+          }
+          // Future chars — show random
           return CHARS[Math.floor(Math.random() * CHARS.length)];
-        }
-        // Future chars — show random
-        return CHARS[Math.floor(Math.random() * CHARS.length)];
-      }).join('');
+        })
+        .join("");
 
       setDisplayText(output);
       step++;
@@ -89,7 +91,7 @@ export function useTextScramble(
   }, [finalText]);
 
   useEffect(() => {
-    if (trigger === 'mount') {
+    if (trigger === "mount") {
       scramble();
       return () => window.clearTimeout(frameRef.current);
     }

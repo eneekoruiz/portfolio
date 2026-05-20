@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Search, Menu as MenuIcon } from 'lucide-react';
-import { LangDD } from '../ui/LangDD';
-import { ThemeToggle } from '../ui/ThemeToggle';
-import { MotionToggle } from '../ui/MotionToggle';
-import { useMagnetic } from '../../hooks/useMagnetic';
-import type { Lang, Tx } from '../../types';
+import React from "react";
+import { Search, Menu as MenuIcon } from "lucide-react";
+import { LangDD } from "../ui/LangDD";
+import { ThemeToggle } from "../ui/ThemeToggle";
+import { MotionToggle } from "../ui/MotionToggle";
+import { useMagnetic } from "../../hooks/useMagnetic";
+import type { Lang, Tx } from "../../types";
 
 interface NavbarProps {
   t: Tx;
@@ -29,7 +29,7 @@ export function Navbar({
   navInnerRef,
   indRef,
   onNavEnter,
-  onNavContainerLeave
+  onNavContainerLeave,
 }: NavbarProps) {
   const logoRef = useMagnetic<HTMLAnchorElement>({ strength: 0.15 });
   return (
@@ -38,9 +38,9 @@ export function Navbar({
       data-noprint
     >
       <div className="flex items-center justify-between gap-2 md:gap-4 px-3 md:px-5 py-[.62rem] rounded-full bg-white/82 dark:bg-[#0a0a0a]/82 backdrop-blur-3xl border border-white/80 dark:border-white/10 shadow-glass">
-        <a 
+        <a
           ref={logoRef}
-          href="#hero" 
+          href="#hero"
           className="n-el font-black text-[1rem] tracking-[-0.8px] text-ink no-underline shrink-0"
         >
           <span className="hidden min-[380px]:inline">Eneko.</span>
@@ -59,11 +59,11 @@ export function Navbar({
             aria-hidden="true"
           />
           {t.menu.map((link: string, i: number) => (
-            <NavItem 
-              key={link} 
-              link={link} 
-              href={t.hrefs[i]} 
-              onEnter={onNavEnter} 
+            <NavItem
+              key={link}
+              link={link}
+              href={t.hrefs[i]}
+              onEnter={onNavEnter}
             />
           ))}
         </nav>
@@ -93,8 +93,14 @@ export function Navbar({
   );
 }
 
-function NavItem({ link, href, onEnter }: {
-  link: string; href: string; onEnter: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+function NavItem({
+  link,
+  href,
+  onEnter,
+}: {
+  link: string;
+  href: string;
+  onEnter: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const ref = useMagnetic<HTMLAnchorElement>({ strength: 0.2 });
   return (

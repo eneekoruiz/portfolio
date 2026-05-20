@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -6,31 +6,41 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { useRef, useState, useEffect } from 'react';
-import { notFound, useParams, useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import { useRef, useState, useEffect } from "react";
+import { notFound, useParams, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import {
-  Github, ArrowUpRight, Database, Terminal,
-  Cpu, ShieldCheck, Zap, Activity, Server,
-  Layers, ChevronLeft, CheckCircle2, Radar,
-} from 'lucide-react';
+  Github,
+  ArrowUpRight,
+  Database,
+  Terminal,
+  Cpu,
+  ShieldCheck,
+  Zap,
+  Activity,
+  Server,
+  Layers,
+  ChevronLeft,
+  CheckCircle2,
+  Radar,
+} from "lucide-react";
 
-import { TX }              from '../../data/translations';
-import { PROJECTS_CONTENT, CODE_SNIPPETS } from '../../data/projects';
-import { LANG_COLORS, getTechColor } from '../../lib/constants';
-import type { Lang }       from '../../types';
-import { useMagnetic }     from '../../hooks/useMagnetic';
-import { useTextScramble } from '../../hooks/useTextScramble';
-import { ProjectHero }     from './components/ProjectHero';
+import { TX } from "../../data/translations";
+import { PROJECTS_CONTENT, CODE_SNIPPETS } from "../../data/projects";
+import { LANG_COLORS, getTechColor } from "../../lib/constants";
+import type { Lang } from "../../types";
+import { useMagnetic } from "../../hooks/useMagnetic";
+import { useTextScramble } from "../../hooks/useTextScramble";
+import { ProjectHero } from "./components/ProjectHero";
 import {
   createLiquidCurtain,
   animateLiquidCurtainIn,
   animateLiquidCurtainOut,
-} from '../../components/motion/LiquidCurtain';
+} from "../../components/motion/LiquidCurtain";
 
 // ── DYNAMIC IMPORTS: Defer heavy components until after route transition ──
 type DNAHelixProps = { accent: string; secondary: string; darkMode: boolean };
@@ -38,71 +48,154 @@ type TerrainMeshProps = { accent: string; darkMode: boolean };
 type FloatingArtifactProps = { accent: string; idx: number };
 type AccentProps = { accent: string };
 
-const DNAHelix = dynamic<DNAHelixProps>(() => import('../visualizers').then(m => m.DNAHelix), { ssr: false });
-const TerrainMesh = dynamic<TerrainMeshProps>(() => import('../visualizers').then(m => m.TerrainMesh), { ssr: false });
-const FloatingArtifact = dynamic<FloatingArtifactProps>(() => import('../visualizers').then(m => m.FloatingArtifact), { ssr: false });
-const SandwichDiagram = dynamic<AccentProps>(() => import('../visualizers').then(m => m.SandwichDiagram), { ssr: false });
-const MVCTerminal = dynamic<AccentProps>(() => import('../visualizers').then(m => m.MVCTerminal), { ssr: false });
-const DistributedNodes = dynamic<AccentProps>(() => import('../visualizers').then(m => m.DistributedNodes), { ssr: false });
-const WCAGVisualizer = dynamic<AccentProps>(() => import('../visualizers').then(m => m.WCAGVisualizer), { ssr: false });
-const SpotshareHeatmap = dynamic<AccentProps>(() => import('../visualizers').then(m => m.SpotshareHeatmap), { ssr: false });
+const DNAHelix = dynamic<DNAHelixProps>(
+  () => import("../visualizers").then((m) => m.DNAHelix),
+  { ssr: false },
+);
+const TerrainMesh = dynamic<TerrainMeshProps>(
+  () => import("../visualizers").then((m) => m.TerrainMesh),
+  { ssr: false },
+);
+const FloatingArtifact = dynamic<FloatingArtifactProps>(
+  () => import("../visualizers").then((m) => m.FloatingArtifact),
+  { ssr: false },
+);
+const SandwichDiagram = dynamic<AccentProps>(
+  () => import("../visualizers").then((m) => m.SandwichDiagram),
+  { ssr: false },
+);
+const MVCTerminal = dynamic<AccentProps>(
+  () => import("../visualizers").then((m) => m.MVCTerminal),
+  { ssr: false },
+);
+const DistributedNodes = dynamic<AccentProps>(
+  () => import("../visualizers").then((m) => m.DistributedNodes),
+  { ssr: false },
+);
+const WCAGVisualizer = dynamic<AccentProps>(
+  () => import("../visualizers").then((m) => m.WCAGVisualizer),
+  { ssr: false },
+);
+const SpotshareHeatmap = dynamic<AccentProps>(
+  () => import("../visualizers").then((m) => m.SpotshareHeatmap),
+  { ssr: false },
+);
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
 // ── Themes ────────────────────────────────────────────────────────────────────
 
-const THEMES: Record<string, {
-  helixA: string; helixB: string; accent: string; label: string;
-}> = {
-  'ana-peluquera':      { helixA: '#ff2d78', helixB: '#ff9fcd', accent: '#ff2d78', label: 'FRONTEND / UX_ENGINE' },
-  'who-are-ya-backend': { helixA: '#00ff41', helixB: '#00cc33', accent: '#00ff41', label: 'BACKEND / SYSTEM_CORE' },
-  'rides24ofiziala':    { helixA: '#f59e0b', helixB: '#fbbf24', accent: '#f59e0b', label: 'DISTRIBUTED / JAX-WS' },
-  'spotshare-parking':  { helixA: '#00f0ff', helixB: '#0ea5e9', accent: '#00f0ff', label: 'CLOUD / REAL_TIME' },
-  'pke-web':            { helixA: '#b026ff', helixB: '#d8b4fe', accent: '#b026ff', label: 'A11Y / UX_SEMANTIC' },
+const THEMES: Record<
+  string,
+  {
+    helixA: string;
+    helixB: string;
+    accent: string;
+    label: string;
+  }
+> = {
+  "ana-peluquera": {
+    helixA: "#ff2d78",
+    helixB: "#ff9fcd",
+    accent: "#ff2d78",
+    label: "FRONTEND / UX_ENGINE",
+  },
+  "who-are-ya-backend": {
+    helixA: "#00ff41",
+    helixB: "#00cc33",
+    accent: "#00ff41",
+    label: "BACKEND / SYSTEM_CORE",
+  },
+  rides24ofiziala: {
+    helixA: "#f59e0b",
+    helixB: "#fbbf24",
+    accent: "#f59e0b",
+    label: "DISTRIBUTED / JAX-WS",
+  },
+  "spotshare-parking": {
+    helixA: "#00f0ff",
+    helixB: "#0ea5e9",
+    accent: "#00f0ff",
+    label: "CLOUD / REAL_TIME",
+  },
+  "pke-web": {
+    helixA: "#b026ff",
+    helixB: "#d8b4fe",
+    accent: "#b026ff",
+    label: "A11Y / UX_SEMANTIC",
+  },
 };
 
-const DEFAULT_THEME = { helixA: '#888', helixB: '#aaa', accent: '#888', label: 'MODULE' };
+const DEFAULT_THEME = {
+  helixA: "#888",
+  helixB: "#aaa",
+  accent: "#888",
+  label: "MODULE",
+};
 
 const PROJECT_SUMMARIES: Record<string, { name: string; langs: string[] }> = {
-  'ana-peluquera': { name: 'AG Beauty Salon', langs: ['React', 'Firebase', 'Node.js', 'Google Calendar API'] },
-  'who-are-ya-backend': { name: 'Who Are Ya Backend', langs: ['Node.js', 'Express', 'MongoDB', 'JWT'] },
-  'rides24ofiziala': { name: 'Rides24 Ofiziala', langs: ['Java', 'JAX-WS', 'ObjectDB', 'Swing'] },
-  'spotshare-parking': { name: 'Spotshare Parking', langs: ['TypeScript', 'SonarCloud', 'NestJS', 'Docker'] },
-  'pke-web': { name: 'PKE Web', langs: ['React', 'Tailwind', 'A11y', 'Semantic HTML'] },
+  "ana-peluquera": {
+    name: "AG Beauty Salon",
+    langs: ["React", "Firebase", "Node.js", "Google Calendar API"],
+  },
+  "who-are-ya-backend": {
+    name: "Who Are Ya Backend",
+    langs: ["Node.js", "Express", "MongoDB", "JWT"],
+  },
+  rides24ofiziala: {
+    name: "Rides24 Ofiziala",
+    langs: ["Java", "JAX-WS", "ObjectDB", "Swing"],
+  },
+  "spotshare-parking": {
+    name: "Spotshare Parking",
+    langs: ["TypeScript", "SonarCloud", "NestJS", "Docker"],
+  },
+  "pke-web": {
+    name: "PKE Web",
+    langs: ["React", "Tailwind", "A11y", "Semantic HTML"],
+  },
 };
 
 // ── GlareCard (Local Component) ───────────────────────────────────
 
-function GlareCard({ children, accent, className = '', style }: {
-  children: React.ReactNode; accent: string; className?: string; style?: React.CSSProperties;
+function GlareCard({
+  children,
+  accent,
+  className = "",
+  style,
+}: {
+  children: React.ReactNode;
+  accent: string;
+  className?: string;
+  style?: React.CSSProperties;
 }) {
-  const cardRef  = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const r = cardRef.current?.getBoundingClientRect();
     if (!r || !glareRef.current) return;
-    
+
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
-    
+
     const xPercent = (x / r.width - 0.5) * 2;
     const yPercent = (y / r.height - 0.5) * 2;
-    
+
     gsap.to(cardRef.current, {
       rotateY: xPercent * 6,
       rotateX: -yPercent * 6,
       duration: 0.5,
-      ease: 'power2.out',
-      overwrite: 'auto'
+      ease: "power2.out",
+      overwrite: "auto",
     });
 
-    const gx = (x / r.width)  * 100;
+    const gx = (x / r.width) * 100;
     const gy = (y / r.height) * 100;
-    glareRef.current.style.setProperty('--gx', `${gx}%`);
-    glareRef.current.style.setProperty('--gy', `${gy}%`);
+    glareRef.current.style.setProperty("--gx", `${gx}%`);
+    glareRef.current.style.setProperty("--gy", `${gy}%`);
   };
 
   const onLeave = () => {
@@ -111,8 +204,8 @@ function GlareCard({ children, accent, className = '', style }: {
         rotateY: 0,
         rotateX: 0,
         duration: 1,
-        ease: 'power2.out',
-        overwrite: 'auto'
+        ease: "power2.out",
+        overwrite: "auto",
       });
     }
   };
@@ -125,19 +218,22 @@ function GlareCard({ children, accent, className = '', style }: {
       className={`relative overflow-hidden rounded-3xl border border-black/5 dark:border-white/5 bg-white/90 dark:bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-black/15 dark:hover:border-white/15 hover:shadow-2xl group ${className}`}
       style={{
         ...style,
-        perspective: '1000px',
-        transformStyle: 'preserve-3d'
+        perspective: "1000px",
+        transformStyle: "preserve-3d",
       }}
     >
-      <div 
-        ref={glareRef} 
-        className="absolute inset-0 pointer-events-none z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100" 
-        style={{ 
+      <div
+        ref={glareRef}
+        className="absolute inset-0 pointer-events-none z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+        style={{
           background: `radial-gradient(circle 300px at var(--gx,50%) var(--gy,50%), ${accent}20, transparent 80%)`,
-          transform: 'translateZ(50px)' 
-        }} 
+          transform: "translateZ(50px)",
+        }}
       />
-      <div className="relative z-0 h-full w-full" style={{ transform: 'translateZ(20px)' }}>
+      <div
+        className="relative z-0 h-full w-full"
+        style={{ transform: "translateZ(20px)" }}
+      >
         {children}
       </div>
     </div>
@@ -145,33 +241,33 @@ function GlareCard({ children, accent, className = '', style }: {
 }
 
 const BACK_TO_PROJECTS: Record<Lang, string> = {
-  es: 'Todos los proyectos',
-  en: 'All Projects',
-  eu: 'Proiektu guztiak',
-  fr: 'Tous les projets',
-  it: 'Tutti i progetti',
-  de: 'Alle Projekte',
-  pt: 'Todos os projetos',
-  ca: 'Tots els projectes',
-  gl: 'Todos os proxectos',
-  ja: 'すべてのプロジェクト',
-  zh: '所有项目',
-  ar: 'جميع المشاريع',
+  es: "Todos los proyectos",
+  en: "All Projects",
+  eu: "Proiektu guztiak",
+  fr: "Tous les projets",
+  it: "Tutti i progetti",
+  de: "Alle Projekte",
+  pt: "Todos os projetos",
+  ca: "Tots els projectes",
+  gl: "Todos os proxectos",
+  ja: "すべてのプロジェクト",
+  zh: "所有项目",
+  ar: "جميع المشاريع",
 };
 
 // ── PÁGINA PRINCIPAL ──────────────────────────────────────────────────────────
 
 export default function ProjectPage() {
-  const { id }   = useParams();
-  const router   = useRouter();
-  const main     = useRef<HTMLDivElement>(null);
+  const { id } = useParams();
+  const router = useRouter();
+  const main = useRef<HTMLDivElement>(null);
 
-  const [lang, setLang] = useState<Lang>('es');
+  const [lang, setLang] = useState<Lang>("es");
   const [darkMode, setDarkMode] = useState(false);
-  
+
   // Sync language from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('portfolio_lang') as Lang;
+    const saved = localStorage.getItem("portfolio_lang") as Lang;
     if (saved && TX[saved]) {
       setLang(saved);
     }
@@ -188,46 +284,54 @@ export default function ProjectPage() {
   // 💎 KEY STATE: Defers heavy animation loading until after route transition completes
   const [isReadyToAnimate, setIsReadyToAnimate] = useState(false);
 
-  const safeId  = id as string;
-  const theme   = THEMES[safeId] ?? DEFAULT_THEME;
+  const safeId = id as string;
+  const theme = THEMES[safeId] ?? DEFAULT_THEME;
   const summary = PROJECT_SUMMARIES[safeId];
 
-  const isBackend = safeId === 'who-are-ya-backend';
-  const isJava    = safeId === 'rides24ofiziala';
-  const isSpot    = safeId === 'spotshare-parking';
-  const isA11y    = safeId === 'pke-web';
+  const isBackend = safeId === "who-are-ya-backend";
+  const isJava = safeId === "rides24ofiziala";
+  const isSpot = safeId === "spotshare-parking";
+  const isA11y = safeId === "pke-web";
 
   const projectData = PROJECTS_CONTENT[safeId as keyof typeof PROJECTS_CONTENT];
-  const content = projectData ? (projectData[lang] ?? projectData['en'] ?? projectData['es']) : undefined;
+  const content = projectData
+    ? (projectData[lang] ?? projectData["en"] ?? projectData["es"])
+    : undefined;
   const snippet = CODE_SNIPPETS[safeId as keyof typeof CODE_SNIPPETS];
   const LIVE_URLS: Record<string, string | null> = {
-    'ana-peluquera':      'https://agpeluqueria.vercel.app',
-    'who-are-ya-backend': 'https://who-are-ya-backend.onrender.com',
-    'pke-web':            'https://pke-web.vercel.app',
-    'rides24ofiziala':    null,
-    'spotshare-parking':  null,
+    "ana-peluquera": "https://agpeluqueria.vercel.app",
+    "who-are-ya-backend": "https://who-are-ya-backend.onrender.com",
+    "pke-web": "https://pke-web.vercel.app",
+    rides24ofiziala: null,
+    "spotshare-parking": null,
   };
 
   const GITHUB_URLS: Record<string, string | null> = {
-    'ana-peluquera':      'https://github.com/eneekoruiz/ana-peluquera',
-    'who-are-ya-backend': 'https://github.com/eneekoruiz/who-are-ya-backend',
-    'pke-web':            'https://github.com/eneekoruiz/pke-web',
-    'rides24ofiziala':    'https://github.com/eneekoruiz/rides24ofiziala',
-    'spotshare-parking':  'https://github.com/eneekoruiz/spotshare-parking',
+    "ana-peluquera": "https://github.com/eneekoruiz/ana-peluquera",
+    "who-are-ya-backend": "https://github.com/eneekoruiz/who-are-ya-backend",
+    "pke-web": "https://github.com/eneekoruiz/pke-web",
+    rides24ofiziala: "https://github.com/eneekoruiz/rides24ofiziala",
+    "spotshare-parking": "https://github.com/eneekoruiz/spotshare-parking",
   };
 
   const liveUrl = LIVE_URLS[safeId] ?? null;
   const githubUrl = GITHUB_URLS[safeId] ?? null;
-  const videoUrl = isJava ? '/loginjsf.mp4' : null;
+  const videoUrl = isJava ? "/loginjsf.mp4" : null;
 
   // 🎯 Punto 6 — Magnetic buttons
-  const closeMagRef = useMagnetic<HTMLButtonElement>({ strength: 0.3, innerStrength: 0.12 });
-  const backMagRef  = useMagnetic<HTMLButtonElement>({ strength: 0.25, innerStrength: 0.1 });
+  const closeMagRef = useMagnetic<HTMLButtonElement>({
+    strength: 0.3,
+    innerStrength: 0.12,
+  });
+  const backMagRef = useMagnetic<HTMLButtonElement>({
+    strength: 0.25,
+    innerStrength: 0.1,
+  });
 
   // 🎯 Punto 7 — Text scramble for project title
   const titleText = content?.title ?? summary?.name ?? safeId;
   const { text: scrambledTitle } = useTextScramble(titleText, {
-    trigger: 'mount',
+    trigger: "mount",
     charSpeed: 35,
     iterations: 4,
     delay: 200,
@@ -235,8 +339,9 @@ export default function ProjectPage() {
 
   // Detect dark mode
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark')
-                || window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark =
+      document.documentElement.classList.contains("dark") ||
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
     setDarkMode(isDark);
   }, []);
 
@@ -246,15 +351,15 @@ export default function ProjectPage() {
    */
   useEffect(() => {
     // 🌊 Punto 8 — Liquid curtain reveal or fallback
-    const overlay = document.getElementById('project-transition-layer');
-    
+    const overlay = document.getElementById("project-transition-layer");
+
     if (overlay) {
       let done = false;
       const reveal = () => {
         if (done) return;
         done = true;
 
-        const isSVG = overlay.tagName.toLowerCase() === 'svg';
+        const isSVG = overlay.tagName.toLowerCase() === "svg";
 
         if (isSVG) {
           animateLiquidCurtainOut(overlay as unknown as SVGSVGElement, {
@@ -276,7 +381,7 @@ export default function ProjectPage() {
       // Ensure we reveal as soon as possible
       const raf = requestAnimationFrame(() => requestAnimationFrame(reveal));
       const fallback = setTimeout(reveal, 500); // Safety fallback
-      
+
       return () => {
         cancelAnimationFrame(raf);
         clearTimeout(fallback);
@@ -296,19 +401,21 @@ export default function ProjectPage() {
 
     // 🚀 AGGRESSIVE CLEANUP
     window.__lenis?.stop?.();
-    
+
     // Remove existing overlays
-    document.querySelectorAll('[id^="return-overlay"]').forEach(el => el.remove());
+    document
+      .querySelectorAll('[id^="return-overlay"]')
+      .forEach((el) => el.remove());
 
     const navigate = () => {
-      sessionStorage.setItem('hasSeenIntro', 'true');
+      sessionStorage.setItem("hasSeenIntro", "true");
       window.__lenis?.start?.(); // Start before navigating
-      router.replace('/', { scroll: false });
-      
+      router.replace("/", { scroll: false });
+
       // Safety fallback
       setTimeout(() => {
-        if (window.location.pathname !== '/') {
-           window.location.href = '/';
+        if (window.location.pathname !== "/") {
+          window.location.href = "/";
         }
       }, 700);
     };
@@ -316,8 +423,8 @@ export default function ProjectPage() {
     // 🌊 Punto 8 — SVG Liquid Curtain
     const svg = createLiquidCurtain({
       color: theme.accent,
-      direction: 'down',
-      id: 'return-overlay',
+      direction: "down",
+      id: "return-overlay",
     });
     document.body.appendChild(svg);
 
@@ -328,34 +435,38 @@ export default function ProjectPage() {
 
     // Hard fallback
     setTimeout(() => {
-      if (document.getElementById('return-overlay')) navigate();
+      if (document.getElementById("return-overlay")) navigate();
     }, 1200);
   };
 
   // ── Section reveals (Static, only run once when content is ready) ──────────
-  useGSAP(() => {
-    if (!main.current || !content) return;
+  useGSAP(
+    () => {
+      if (!main.current || !content) return;
 
-    const sections = gsap.utils.toArray<HTMLElement>('.reveal-sec');
-    sections.forEach(el => {
-      gsap.fromTo(el,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1, 
-          y: 0, 
-          duration: 0.6, 
-          ease: 'power2.out',
-          scrollTrigger: { 
-            trigger: el, 
-            start: 'top 88%', 
-            once: true,
-            // Prevent interference with pinning
-            fastScrollEnd: true,
+      const sections = gsap.utils.toArray<HTMLElement>(".reveal-sec");
+      sections.forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              once: true,
+              // Prevent interference with pinning
+              fastScrollEnd: true,
+            },
           },
-        }
-      );
-    });
-  }, { scope: main, dependencies: [content] });
+        );
+      });
+    },
+    { scope: main, dependencies: [content] },
+  );
 
   // ── Helix Animation is now handled internally in Canvas-based DNAHelix ─────
 
@@ -370,23 +481,29 @@ export default function ProjectPage() {
       ref={main}
       className="relative min-h-[350vh] overflow-x-hidden selection:bg-brand/20 bg-page text-ink transition-colors duration-300"
     >
-
-
       {/* ── 3D BACKGROUND (DEFERRED LOADING) ── */}
       {isReadyToAnimate && (
         <>
-          <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden" style={{ perspective: '900px' }}>
-            {(!isA11y && !isSpot) && (
+          <div
+            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden"
+            style={{ perspective: "900px" }}
+          >
+            {!isA11y && !isSpot && (
               <div
                 className="helix-group will-change-transform"
                 style={{
-                  width: 'clamp(140px, 40vw, 420px)', height: '210vh',
+                  width: "clamp(140px, 40vw, 420px)",
+                  height: "210vh",
                   opacity: darkMode ? 0.55 : 0.3,
                   filter: `drop-shadow(0 0 25px ${theme.helixA}60)`,
-                  transformStyle: 'preserve-3d',
+                  transformStyle: "preserve-3d",
                 }}
               >
-                <DNAHelix accent={theme.helixA} secondary={theme.helixB} darkMode={darkMode} />
+                <DNAHelix
+                  accent={theme.helixA}
+                  secondary={theme.helixB}
+                  darkMode={darkMode}
+                />
               </div>
             )}
           </div>
@@ -394,7 +511,7 @@ export default function ProjectPage() {
             <TerrainMesh accent={theme.helixA} darkMode={darkMode} />
           </div>
           <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-            {[1, 2, 3, 4, 5].map(i => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <FloatingArtifact key={i} accent={theme.accent} idx={i} />
             ))}
           </div>
@@ -413,15 +530,17 @@ export default function ProjectPage() {
             <span className="flex items-center gap-2">
               <ChevronLeft size={16} />
               <span className="hidden xs:inline">
-                {BACK_TO_PROJECTS[lang] ?? 'All Projects'}
+                {BACK_TO_PROJECTS[lang] ?? "All Projects"}
               </span>
-              <span className="xs:hidden">
-                {TX[lang]?.back ?? 'Back'}
-              </span>
+              <span className="xs:hidden">{TX[lang]?.back ?? "Back"}</span>
             </span>
           </button>
           <div className="flex items-center gap-2 font-mono text-[8px] md:text-[9px] uppercase tracking-widest px-2.5 md:px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 truncate max-w-[120px] md:max-w-none">
-            <Activity size={10} style={{ color: theme.accent }} className="animate-pulse shrink-0" />
+            <Activity
+              size={10}
+              style={{ color: theme.accent }}
+              className="animate-pulse shrink-0"
+            />
             <span className="truncate">{theme.label}</span>
           </div>
         </div>
@@ -431,7 +550,7 @@ export default function ProjectPage() {
       <ProjectHero
         projectId={safeId}
         title={scrambledTitle}
-        subtitle={content?.subtitle ?? ''}
+        subtitle={content?.subtitle ?? ""}
         accent={theme.accent}
         accentBg={theme.helixA}
         liveUrl={liveUrl ?? undefined}
@@ -446,12 +565,11 @@ export default function ProjectPage() {
         lang={lang}
       />
 
-        <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-24 md:pt-40 pb-32 bg-transparent">
-
-          {/* ── OBJECTIVE & STACK ── */}
-          <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-10 md:gap-16 mb-24 md:mb-40 items-start">
-            <div className="space-y-6">
-              <h2 className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] opacity-40 border-b border-black/10 dark:border-white/10 pb-4 text-ink">
+      <main className="relative z-10 max-w-[1000px] mx-auto px-6 pt-24 md:pt-40 pb-32 bg-transparent">
+        {/* ── OBJECTIVE & STACK ── */}
+        <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-10 md:gap-16 mb-24 md:mb-40 items-start">
+          <div className="space-y-6">
+            <h2 className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] opacity-40 border-b border-black/10 dark:border-white/10 pb-4 text-ink">
               El Desafío
             </h2>
             <p className="text-2xl md:text-3xl font-light leading-relaxed tracking-tight text-ink/90">
@@ -459,16 +577,31 @@ export default function ProjectPage() {
             </p>
           </div>
           <GlareCard accent={theme.accent} className="p-8 group">
-            <h3 className="text-xs font-mono uppercase tracking-[0.3em] opacity-40 mb-8 text-ink">Stack Tecnológico</h3>
+            <h3 className="text-xs font-mono uppercase tracking-[0.3em] opacity-40 mb-8 text-ink">
+              Stack Tecnológico
+            </h3>
             <div className="flex flex-col gap-4 text-ink">
               {summary.langs.map((l, i) => {
                 const tColor = getTechColor(l);
                 return (
                   <div key={l} className="flex items-center gap-4">
-                    <div className="w-1.5 h-1.5 rounded-full shadow-lg" style={{ background: tColor, boxShadow: `0 0 8px ${tColor}` }} />
-                    <span className="font-medium text-lg tracking-tight transition-colors duration-300 group-hover:text-[var(--tech-color)]" style={{ '--tech-color': tColor } as React.CSSProperties}>{l}</span>
+                    <div
+                      className="w-1.5 h-1.5 rounded-full shadow-lg"
+                      style={{
+                        background: tColor,
+                        boxShadow: `0 0 8px ${tColor}`,
+                      }}
+                    />
+                    <span
+                      className="font-medium text-lg tracking-tight transition-colors duration-300 group-hover:text-[var(--tech-color)]"
+                      style={{ "--tech-color": tColor } as React.CSSProperties}
+                    >
+                      {l}
+                    </span>
                     <div className="flex-1 h-px bg-black/5 dark:bg-white/5 group-hover:bg-black/10 dark:group-hover:bg-white/10 transition-colors" />
-                    <span className="font-mono text-[9px] opacity-30">0{i + 1}</span>
+                    <span className="font-mono text-[9px] opacity-30">
+                      0{i + 1}
+                    </span>
                   </div>
                 );
               })}
@@ -480,11 +613,13 @@ export default function ProjectPage() {
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-24 md:mb-40 items-center">
           <div className="order-2 md:order-1">
             <GlareCard accent={theme.accent} className="p-6 md:p-10">
-              {!isBackend && !isJava && !isA11y && !isSpot && <SandwichDiagram accent={theme.accent} />}
+              {!isBackend && !isJava && !isA11y && !isSpot && (
+                <SandwichDiagram accent={theme.accent} />
+              )}
               {isBackend && <MVCTerminal accent={theme.accent} />}
-              {isJava    && <DistributedNodes accent={theme.accent} />}
-              {isA11y    && <WCAGVisualizer accent={theme.accent} />}
-              {isSpot    && <SpotshareHeatmap accent={theme.accent} />}
+              {isJava && <DistributedNodes accent={theme.accent} />}
+              {isA11y && <WCAGVisualizer accent={theme.accent} />}
+              {isSpot && <SpotshareHeatmap accent={theme.accent} />}
             </GlareCard>
           </div>
           <div className="order-1 md:order-2 space-y-4 md:space-y-6">
@@ -492,10 +627,15 @@ export default function ProjectPage() {
               className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center border border-black/10 dark:border-white/10 shadow-lg"
               style={{ background: `${theme.accent}15` }}
             >
-              {isBackend ? <Database size={18} style={{ color: theme.accent }} />
-               : isJava  ? <Server   size={18} style={{ color: theme.accent }} />
-               : isA11y  ? <Layers   size={18} style={{ color: theme.accent }} />
-               :            <Zap     size={18} style={{ color: theme.accent }} />}
+              {isBackend ? (
+                <Database size={18} style={{ color: theme.accent }} />
+              ) : isJava ? (
+                <Server size={18} style={{ color: theme.accent }} />
+              ) : isA11y ? (
+                <Layers size={18} style={{ color: theme.accent }} />
+              ) : (
+                <Zap size={18} style={{ color: theme.accent }} />
+              )}
             </div>
             <h2 className="text-2xl md:text-4xl font-medium tracking-tight leading-tight text-ink">
               {content?.algorithmH}
@@ -510,8 +650,12 @@ export default function ProjectPage() {
         {snippet && (
           <section className="reveal-sec mb-24 md:mb-40">
             <div className="mb-6 md:mb-10 space-y-3 md:space-y-4 max-w-2xl text-ink">
-              <h2 className="text-2xl md:text-3xl font-medium tracking-tight">{content?.supabaseH}</h2>
-              <p className="text-base md:text-lg opacity-60 font-light">{content?.supabaseP}</p>
+              <h2 className="text-2xl md:text-3xl font-medium tracking-tight">
+                {content?.supabaseH}
+              </h2>
+              <p className="text-base md:text-lg opacity-60 font-light">
+                {content?.supabaseP}
+              </p>
             </div>
             <div className="rounded-2xl md:rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-2xl relative group">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -522,10 +666,17 @@ export default function ProjectPage() {
                     {content?.codeSpotlight}
                   </span>
                 </div>
-                <ShieldCheck size={12} style={{ color: theme.accent }} className="opacity-50" />
+                <ShieldCheck
+                  size={12}
+                  style={{ color: theme.accent }}
+                  className="opacity-50"
+                />
               </div>
               <pre className="p-5 md:p-8 overflow-x-auto bg-black/[0.02] dark:bg-transparent">
-                <code className="font-mono text-[11px] md:text-[13px] leading-loose" style={{ color: theme.accent }}>
+                <code
+                  className="font-mono text-[11px] md:text-[13px] leading-loose"
+                  style={{ color: theme.accent }}
+                >
                   {snippet}
                 </code>
               </pre>
@@ -540,7 +691,11 @@ export default function ProjectPage() {
           </p>
           <h2
             className="font-black uppercase italic tracking-tighter mb-10 text-ink"
-            style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', lineHeight: 0.9, color: theme.accent }}
+            style={{
+              fontSize: "clamp(3rem, 8vw, 6rem)",
+              lineHeight: 0.9,
+              color: theme.accent,
+            }}
           >
             {content?.outcomeH}
           </h2>

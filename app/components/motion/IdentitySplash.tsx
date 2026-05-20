@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -25,129 +25,165 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import type { Lang } from '../../types';
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import type { Lang } from "../../types";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
 const WELCOME_TEXT: Record<Lang, string> = {
-  es: 'Bienvenido',
-  en: 'Welcome',
-  eu: 'Ongi etorri',
-  fr: 'Bienvenue',
-  it: 'Benvenuto',
-  de: 'Willkommen',
-  pt: 'Bem-vindo',
-  ca: 'Benvingut',
-  gl: 'Benvido',
-  ja: 'ようこそ',
-  zh: '欢迎',
-  ar: 'مرحباً',
+  es: "Bienvenido",
+  en: "Welcome",
+  eu: "Ongi etorri",
+  fr: "Bienvenue",
+  it: "Benvenuto",
+  de: "Willkommen",
+  pt: "Bem-vindo",
+  ca: "Benvingut",
+  gl: "Benvido",
+  ja: "ようこそ",
+  zh: "欢迎",
+  ar: "مرحباً",
 };
 
 interface IdentitySplashProps {
   onComplete: () => void;
-  onReveal:   () => void;
-  lang:       Lang;
+  onReveal: () => void;
+  lang: Lang;
   /** Si es false, el splash está montado pero esperando para empezar su animación */
-  active:     boolean;
+  active: boolean;
 }
 
-export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentitySplashProps) {
+export function IdentitySplash({
+  onComplete,
+  onReveal,
+  lang,
+  active,
+}: IdentitySplashProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const textRef      = useRef<HTMLDivElement>(null);
-  const lineRef      = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   // Stable refs to prevent stale closures in the timeline
   const onCompleteRef = useRef(onComplete);
-  const onRevealRef   = useRef(onReveal);
+  const onRevealRef = useRef(onReveal);
   onCompleteRef.current = onComplete;
-  onRevealRef.current   = onReveal;
+  onRevealRef.current = onReveal;
 
   // ── Spotlight Movement Animation ─────────────────────────────────────
   useEffect(() => {
-    if (!spotlightRef.current || !active) return;
-    
+    if (!spotlightRef.current || !active || !motionEnabled) return;
+
     const tween = gsap.to(spotlightRef.current, {
       x: () => gsap.utils.random(-300, 300),
       y: () => gsap.utils.random(-300, 300),
       duration: () => gsap.utils.random(2, 4),
-      ease: 'sine.inOut',
+      ease: "sine.inOut",
       repeat: -1,
       repeatRefresh: true,
     });
-    
+
     return () => {
       tween.kill();
     };
-  }, [active]);
+  }, [active, motionEnabled]);
 
-  const word = WELCOME_TEXT[lang] ?? 'Welcome';
+  const word = WELCOME_TEXT[lang] ?? "Welcome";
   useEffect(() => {
     if (!textRef.current || !lineRef.current || !containerRef.current) return;
 
+    if (!motionEnabled) {
+      onRevealRef.current?.();
+      onCompleteRef.current?.();
+      return;
+    }
+
     if (!active) {
       const ctx = gsap.context(() => {
-        const chars = textRef.current?.querySelectorAll<HTMLElement>('.char');
-        if (chars && chars.length > 0) gsap.set(chars, { yPercent: 110, opacity: 0 });
+        const chars = textRef.current?.querySelectorAll<HTMLElement>(".char");
+        if (chars && chars.length > 0)
+          gsap.set(chars, { yPercent: 110, opacity: 0 });
         if (lineRef.current) gsap.set(lineRef.current, { scaleX: 0 });
       }, containerRef.current);
       return () => ctx.revert();
     }
 
     const ctx = gsap.context(() => {
-      const chars = textRef.current?.querySelectorAll<HTMLElement>('.char');
+      const chars = textRef.current?.querySelectorAll<HTMLElement>(".char");
 
       // ── Timeline de entrada + salida ───────────────────────────────────
       const tl = gsap.timeline();
 
       if (lineRef.current) {
         tl.to(lineRef.current, {
-          scaleX: 1, duration: 0.35, ease: 'power3.out',
+          scaleX: 1,
+          duration: 0.35,
+          ease: "power3.out",
         });
       }
 
       if (chars && chars.length > 0) {
-        tl.to(chars, {
-          yPercent: 0, opacity: 1,
-          stagger: 0.025, duration: 0.48, ease: 'power3.out',
-        }, '-=0.15');
+        tl.to(
+          chars,
+          {
+            yPercent: 0,
+            opacity: 1,
+            stagger: 0.025,
+            duration: 0.48,
+            ease: "power3.out",
+          },
+          "-=0.15",
+        );
       }
 
       if (lineRef.current) {
-        tl.to(lineRef.current, {
-          scaleX: 0, duration: 0.3, ease: 'power3.in',
-        }, '-=0.40');
+        tl.to(
+          lineRef.current,
+          {
+            scaleX: 0,
+            duration: 0.3,
+            ease: "power3.in",
+          },
+          "-=0.40",
+        );
       }
 
       tl.to({}, { duration: 0.35 });
 
       if (chars && chars.length > 0) {
         tl.to(chars, {
-          yPercent: -120, opacity: 0,
-          stagger: 0.02, duration: 0.3, ease: 'power3.in',
+          yPercent: -120,
+          opacity: 0,
+          stagger: 0.02,
+          duration: 0.3,
+          ease: "power3.in",
         });
       }
 
       tl.add(() => {
         onRevealRef.current?.();
-      }, '-=0.1');
+      }, "-=0.1");
 
       if (containerRef.current) {
-        tl.to(containerRef.current, {
-          yPercent: -100, duration: 0.65, ease: 'power3.out',
-        }, '<');
+        tl.to(
+          containerRef.current,
+          {
+            yPercent: -100,
+            duration: 0.65,
+            ease: "power3.out",
+          },
+          "<",
+        );
       }
 
       tl.add(() => {
         onCompleteRef.current?.();
       });
-
     }, containerRef.current || undefined);
 
     return () => ctx.revert();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]); // Re-ejecutar cuando active pase a true
+  }, [active, motionEnabled]); // Re-ejecutar cuando active pase a true
 
   return (
     <div
@@ -157,14 +193,14 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
       aria-hidden="true"
     >
       {/* ── Grid Background (Linear) ── */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(var(--line) 1px, transparent 1px),
             linear-gradient(90deg, var(--line) 1px, transparent 1px)
           `,
-          backgroundSize: '40px 40px',
+          backgroundSize: "40px 40px",
         }}
         aria-hidden="true"
       />
@@ -175,10 +211,11 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
         className="absolute pointer-events-none z-0"
         aria-hidden="true"
         style={{
-          width: '500px',
-          height: '500px',
-          background: 'radial-gradient(circle, rgba(0,163,255,0.12) 0%, transparent 75%)',
-          filter: 'blur(70px)',
+          width: "500px",
+          height: "500px",
+          background:
+            "radial-gradient(circle, rgba(0,163,255,0.12) 0%, transparent 75%)",
+          filter: "blur(70px)",
         }}
       />
 
@@ -188,12 +225,12 @@ export function IdentitySplash({ onComplete, onReveal, lang, active }: IdentityS
         */}
         <div className="overflow-hidden pb-2 mb-8">
           <div ref={textRef} className="flex">
-            {word.split('').map((char: string, i: number) => (
+            {word.split("").map((char: string, i: number) => (
               <span
                 key={i}
                 className="char font-black text-[clamp(4rem,10vw,8.5rem)] tracking-[-0.05em] leading-none inline-block gpu-accelerated translate-y-[110%] opacity-0"
               >
-                {char === ' ' ? '\u00A0' : char}
+                {char === " " ? "\u00A0" : char}
               </span>
             ))}
           </div>

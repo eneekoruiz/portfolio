@@ -1,5 +1,5 @@
 // app/lib/projects-data.ts
-import type { Lang } from '../types';
+import type { Lang } from "../types";
 
 export interface ProjectContent {
   title: string;
@@ -16,685 +16,1137 @@ export interface ProjectContent {
   techBadges: string[];
 }
 
-export const PROJECTS_CONTENT: Record<string, Partial<Record<Lang, ProjectContent>>> = {
-  'ana-peluquera': {
+export const PROJECTS_CONTENT: Record<
+  string,
+  Partial<Record<Lang, ProjectContent>>
+> = {
+  "ana-peluquera": {
     es: {
-      title: 'AG Beauty Salon', subtitle: 'Booking Orchestration & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Digitalizar un negocio premium sin perder sensaciones de lujo: reserva sin fricción, control total para la propietaria y una interfaz que transmite confianza desde el primer segundo.',
-      algorithmH: 'Algoritmo Sandwich: Scheduling Inteligente',
-      algorithmP: 'La disponibilidad se divide en fases Active-Wait-Active para liberar huecos con precisión y permitir reservas paralelas sin colisiones.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Arquitectura NoSQL con sincronización atómica bidireccional, Service Accounts y Firestore para mantener calendario y reservas siempre alineados.',
-      outcomeH: 'Impacto Real', outcomeP: 'Facturación +30%, carga inicial < 300ms y un flujo de reserva que se siente instantáneo.',
-      codeSpotlight: 'useCreateBooking.ts — Booking Core',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Booking Orchestration & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Digitalizar un negocio premium sin perder sensaciones de lujo: reserva sin fricción, control total para la propietaria y una interfaz que transmite confianza desde el primer segundo.",
+      algorithmH: "Algoritmo Sandwich: Scheduling Inteligente",
+      algorithmP:
+        "La disponibilidad se divide en fases Active-Wait-Active para liberar huecos con precisión y permitir reservas paralelas sin colisiones.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP:
+        "Arquitectura NoSQL con sincronización atómica bidireccional, Service Accounts y Firestore para mantener calendario y reservas siempre alineados.",
+      outcomeH: "Impacto Real",
+      outcomeP:
+        "Facturación +30%, carga inicial < 300ms y un flujo de reserva que se siente instantáneo.",
+      codeSpotlight: "useCreateBooking.ts — Booking Core",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     en: {
-      title: 'AG Beauty Salon', subtitle: 'Booking Orchestration & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Digitize a premium business without losing the luxury feel: zero-friction booking, full-owner control, and an interface that builds trust instantly.',
-      algorithmH: 'Sandwich Algorithm: Smart Scheduling',
-      algorithmP: 'Availability is split into Active-Wait-Active phases to release slots with precision and enable parallel bookings without collisions.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Atomic bidirectional sync across Service Accounts and Firestore keeps the calendar and reservations perfectly aligned.',
-      outcomeH: 'Real Impact', outcomeP: 'Revenue +30%, initial load < 300ms and a booking flow that feels immediate.',
-      codeSpotlight: 'useCreateBooking.ts — Booking Core',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Booking Orchestration & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Digitize a premium business without losing the luxury feel: zero-friction booking, full-owner control, and an interface that builds trust instantly.",
+      algorithmH: "Sandwich Algorithm: Smart Scheduling",
+      algorithmP:
+        "Availability is split into Active-Wait-Active phases to release slots with precision and enable parallel bookings without collisions.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP:
+        "Atomic bidirectional sync across Service Accounts and Firestore keeps the calendar and reservations perfectly aligned.",
+      outcomeH: "Real Impact",
+      outcomeP:
+        "Revenue +30%, initial load < 300ms and a booking flow that feels immediate.",
+      codeSpotlight: "useCreateBooking.ts — Booking Core",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     eu: {
-      title: 'AG Beauty Salon', subtitle: 'Erreserbak eta CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Goi mailako negozio baten digitalizazioa. Erreserba sistema erraza eta jabearentzat kontrol osoa.',
-      algorithmH: 'Sandwich Algoritmoa: O(n) Optimizazioa',
-      algorithmP: 'Zerbitzuak Active-Wait-Active fasetan banatzen ditu, tarte libreak automatikoki aprobetxatuz.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'NoSQL arkitektura Firestore bidez eta Google Calendarrekin sinkronizazio atomikoa.',
-      outcomeH: 'Eragin Erreala', outcomeP: 'Fakturazioa %30 hazi da eta karga < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Erreserbak eta CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Goi mailako negozio baten digitalizazioa. Erreserba sistema erraza eta jabearentzat kontrol osoa.",
+      algorithmH: "Sandwich Algoritmoa: O(n) Optimizazioa",
+      algorithmP:
+        "Zerbitzuak Active-Wait-Active fasetan banatzen ditu, tarte libreak automatikoki aprobetxatuz.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP:
+        "NoSQL arkitektura Firestore bidez eta Google Calendarrekin sinkronizazio atomikoa.",
+      outcomeH: "Eragin Erreala",
+      outcomeP: "Fakturazioa %30 hazi da eta karga < 300ms.",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     fr: {
-      title: 'AG Beauty Salon', subtitle: 'Réservations & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Numérisation totale d\'un salon de luxe. Réservation fluide et contrôle total pour la propriétaire.',
-      algorithmH: 'Algorithme Sandwich : Optimisation O(n)',
-      algorithmP: 'Divise les services en phases Active-Wait-Active pour libérer des créneaux en parallèle.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Architecture NoSQL avec synchronisation bidirectionnelle atomique.',
-      outcomeH: 'Impact Réel', outcomeP: 'Chiffre d\'affaires +30%, chargement < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Réservations & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Numérisation totale d'un salon de luxe. Réservation fluide et contrôle total pour la propriétaire.",
+      algorithmH: "Algorithme Sandwich : Optimisation O(n)",
+      algorithmP:
+        "Divise les services en phases Active-Wait-Active pour libérer des créneaux en parallèle.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP:
+        "Architecture NoSQL avec synchronisation bidirectionnelle atomique.",
+      outcomeH: "Impact Réel",
+      outcomeP: "Chiffre d'affaires +30%, chargement < 300ms.",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     it: {
-      title: 'AG Beauty Salon', subtitle: 'Prenotazioni & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Digitalizzazione totale. Esperienza di prenotazione fluida e gestione completa per la titolare.',
-      algorithmH: 'Algoritmo Sandwich: Ottimizzazione O(n)',
-      algorithmP: 'Divide i servizi in fasi Active-Wait-Active, liberando slot per prenotazioni parallele.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Architettura NoSQL con sincronizzazione atomica bidirezionale.',
-      outcomeH: 'Impatto Reale', outcomeP: 'Fatturato +30%, caricamento < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Prenotazioni & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Digitalizzazione totale. Esperienza di prenotazione fluida e gestione completa per la titolare.",
+      algorithmH: "Algoritmo Sandwich: Ottimizzazione O(n)",
+      algorithmP:
+        "Divide i servizi in fasi Active-Wait-Active, liberando slot per prenotazioni parallele.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP:
+        "Architettura NoSQL con sincronizzazione atomica bidirezionale.",
+      outcomeH: "Impatto Reale",
+      outcomeP: "Fatturato +30%, caricamento < 300ms.",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     de: {
-      title: 'AG Beauty Salon', subtitle: 'Buchung & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Vollständige Digitalisierung eines Luxus-Salons. Ziel: reibungslose Buchung und volle Kontrolle.',
-      algorithmH: 'Sandwich-Algorithmus: O(n) Optimierung',
-      algorithmP: 'Teilt Dienste in Active-Wait-Active-Phasen auf, um parallele Termine zu ermöglichen.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'NoSQL-Architektur mit atomarer bidirektionaler Synchronisierung.',
-      outcomeH: 'Echte Wirkung', outcomeP: 'Umsatz +30%, Ladezeit < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Buchung & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Vollständige Digitalisierung eines Luxus-Salons. Ziel: reibungslose Buchung und volle Kontrolle.",
+      algorithmH: "Sandwich-Algorithmus: O(n) Optimierung",
+      algorithmP:
+        "Teilt Dienste in Active-Wait-Active-Phasen auf, um parallele Termine zu ermöglichen.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP:
+        "NoSQL-Architektur mit atomarer bidirektionaler Synchronisierung.",
+      outcomeH: "Echte Wirkung",
+      outcomeP: "Umsatz +30%, Ladezeit < 300ms.",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     pt: {
-      title: 'AG Beauty Salon', subtitle: 'Reservas & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Digitalização total. Foco em experiência de reserva fluida e controle total para o proprietário.',
-      algorithmH: 'Algoritmo Sandwich: Otimização O(n)',
-      algorithmP: 'Divide serviços em fases para permitir reservas paralelas automaticamente.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Arquitetura NoSQL com sincronização bidirecional atómica.',
-      outcomeH: 'Impacto Real', outcomeP: 'Faturação +30%, carga < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Reservas & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Digitalização total. Foco em experiência de reserva fluida e controle total para o proprietário.",
+      algorithmH: "Algoritmo Sandwich: Otimização O(n)",
+      algorithmP:
+        "Divide serviços em fases para permitir reservas paralelas automaticamente.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP: "Arquitetura NoSQL com sincronização bidirecional atómica.",
+      outcomeH: "Impacto Real",
+      outcomeP: "Faturação +30%, carga < 300ms.",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     ca: {
-      title: 'AG Beauty Salon', subtitle: 'Reserves & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Digitalització total d\'un saló de luxe. Reserva sense fricció i control total per a la propietària.',
-      algorithmH: 'Algorisme Sandwich: Optimització O(n)',
-      algorithmP: 'Divideix serveis en fases per alliberar forats al calendari per a reserves paral·leles.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Arquitectura NoSQL amb sincronització bidireccional atòmica.',
-      outcomeH: 'Impacte Real', outcomeP: 'Facturació +30%, càrrega < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Reserves & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Digitalització total d'un saló de luxe. Reserva sense fricció i control total per a la propietària.",
+      algorithmH: "Algorisme Sandwich: Optimització O(n)",
+      algorithmP:
+        "Divideix serveis en fases per alliberar forats al calendari per a reserves paral·leles.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP: "Arquitectura NoSQL amb sincronització bidireccional atòmica.",
+      outcomeH: "Impacte Real",
+      outcomeP: "Facturació +30%, càrrega < 300ms.",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     gl: {
-      title: 'AG Beauty Salon', subtitle: 'Reservas & CMS', role: 'Full-Stack Lead Architect',
-      objective: 'Dixitalización total dun salón de luxo. Reserva sen fricción e control total para a dona.',
-      algorithmH: 'Algoritmo Sandwich: Optimización O(n)',
-      algorithmP: 'Divide servizos en fases para liberar o calendario para reservas en paralelo.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'Arquitectura NoSQL con sincronización bidireccional atómica.',
-      outcomeH: 'Impacto Real', outcomeP: 'Facturación +30%, carga < 300ms.',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG Beauty Salon",
+      subtitle: "Reservas & CMS",
+      role: "Full-Stack Lead Architect",
+      objective:
+        "Dixitalización total dun salón de luxo. Reserva sen fricción e control total para a dona.",
+      algorithmH: "Algoritmo Sandwich: Optimización O(n)",
+      algorithmP:
+        "Divide servizos en fases para liberar o calendario para reservas en paralelo.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP: "Arquitectura NoSQL con sincronización bidireccional atómica.",
+      outcomeH: "Impacto Real",
+      outcomeP: "Facturación +30%, carga < 300ms.",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     ja: {
-      title: 'AG 美容院', subtitle: '予約 & CMS', role: 'フルスタックリードアーキテクト',
-      objective: '高級サロンの完全デジタル化。顧客にはシームレスな予約を、オーナーには完全な管理権限を。',
-      algorithmH: 'サンドイッチアルゴリズム: O(n) 最適化',
-      algorithmP: 'サービスをアクティブ・待機・アクティブに分割し、並行予約を自動的に可能にします。',
-      supabaseH: 'Firebase + Google カレンダー',
-      supabaseP: 'Firestore を使用した NoSQL アーキテクチャ。Google カレンダー API とのアトミックな同期。',
-      outcomeH: '実際の影響', outcomeP: '収益が 30% 増加し、読み込み時間は 300 ミリ秒未満。',
-      codeSpotlight: 'useCreateBooking.ts — Firebase',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG 美容院",
+      subtitle: "予約 & CMS",
+      role: "フルスタックリードアーキテクト",
+      objective:
+        "高級サロンの完全デジタル化。顧客にはシームレスな予約を、オーナーには完全な管理権限を。",
+      algorithmH: "サンドイッチアルゴリズム: O(n) 最適化",
+      algorithmP:
+        "サービスをアクティブ・待機・アクティブに分割し、並行予約を自動的に可能にします。",
+      supabaseH: "Firebase + Google カレンダー",
+      supabaseP:
+        "Firestore を使用した NoSQL アーキテクチャ。Google カレンダー API とのアトミックな同期。",
+      outcomeH: "実際の影響",
+      outcomeP: "収益が 30% 増加し、読み込み時間は 300 ミリ秒未満。",
+      codeSpotlight: "useCreateBooking.ts — Firebase",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     zh: {
-      title: 'AG 美容沙龙', subtitle: '预约编排与内容管理系统', role: '全栈首席架构师',
-      objective: '在不失奢华感的前提下实现高端业务数字化：无缝预约流程、为店主提供完全管理权限，以及从首秒起便传递信任的精致界面。',
-      algorithmH: '三明治算法：智能调度',
-      algorithmP: '将服务时长拆分为“活跃-等待-活跃”三阶段，以精确释放空闲时段，允许无冲突的并行预约。',
-      supabaseH: 'Firebase + 谷歌日历',
-      supabaseP: '通过服务账号与 Firestore 实现原子级的双向同步，确保日历和预订始终保持完美一致。',
-      outcomeH: '真实成效', outcomeP: '营收提升 30%，首屏加载时间小于 300 毫秒，且预约操作如丝般顺滑。',
-      codeSpotlight: 'useCreateBooking.ts — 核心预订引擎',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
+      title: "AG 美容沙龙",
+      subtitle: "预约编排与内容管理系统",
+      role: "全栈首席架构师",
+      objective:
+        "在不失奢华感的前提下实现高端业务数字化：无缝预约流程、为店主提供完全管理权限，以及从首秒起便传递信任的精致界面。",
+      algorithmH: "三明治算法：智能调度",
+      algorithmP:
+        "将服务时长拆分为“活跃-等待-活跃”三阶段，以精确释放空闲时段，允许无冲突的并行预约。",
+      supabaseH: "Firebase + 谷歌日历",
+      supabaseP:
+        "通过服务账号与 Firestore 实现原子级的双向同步，确保日历和预订始终保持完美一致。",
+      outcomeH: "真实成效",
+      outcomeP:
+        "营收提升 30%，首屏加载时间小于 300 毫秒，且预约操作如丝般顺滑。",
+      codeSpotlight: "useCreateBooking.ts — 核心预订引擎",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
     },
     ar: {
-      title: 'AG Beauty Salon', subtitle: 'تنسيق الحجوزات ونظام إدارة المحتوى', role: 'كبير مهندسي البرمجيات متكامل الخدمات',
-      objective: 'رقمنة صالون تجميل راقٍ دون فقدان الطابع الفاخر: تجربة حجز خالية من العوائق، تحكم كامل للمالكة، وواجهة مريحة تبني الثقة فوراً.',
-      algorithmH: 'خوارزمية الساندوتش: جدولة ذكية',
-      algorithmP: 'يتم تقسيم توافر الوقت إلى مراحل (نشط - انتظار - نشط) لتحرير الخانات بدقة وإتاحة حجوزات متوازية دون تضارب.',
-      supabaseH: 'Firebase + Google Calendar',
-      supabaseP: 'بنية NoSQL مع تزامن ثنائي الاتجاه من خلال حسابات الخدمة و Firestore للحفاظ على محاذاة التقويم والحجوزات بدقة.',
-      outcomeH: 'الأثر الفعلي', outcomeP: 'زيادة الإيرادات بنسبة 30٪، وقت تحميل أولي أقل من 300 مللي ثانية، وتدفق حجز فوري للغاية.',
-      codeSpotlight: 'useCreateBooking.ts — محرك الحجوزات الأساسي',
-      techBadges: ['Atomic Transactions', 'Firebase', 'Google Calendar API', 'Bcrypt']
-    }
+      title: "AG Beauty Salon",
+      subtitle: "تنسيق الحجوزات ونظام إدارة المحتوى",
+      role: "كبير مهندسي البرمجيات متكامل الخدمات",
+      objective:
+        "رقمنة صالون تجميل راقٍ دون فقدان الطابع الفاخر: تجربة حجز خالية من العوائق، تحكم كامل للمالكة، وواجهة مريحة تبني الثقة فوراً.",
+      algorithmH: "خوارزمية الساندوتش: جدولة ذكية",
+      algorithmP:
+        "يتم تقسيم توافر الوقت إلى مراحل (نشط - انتظار - نشط) لتحرير الخانات بدقة وإتاحة حجوزات متوازية دون تضارب.",
+      supabaseH: "Firebase + Google Calendar",
+      supabaseP:
+        "بنية NoSQL مع تزامن ثنائي الاتجاه من خلال حسابات الخدمة و Firestore للحفاظ على محاذاة التقويم والحجوزات بدقة.",
+      outcomeH: "الأثر الفعلي",
+      outcomeP:
+        "زيادة الإيرادات بنسبة 30٪، وقت تحميل أولي أقل من 300 مللي ثانية، وتدفق حجز فوري للغاية.",
+      codeSpotlight: "useCreateBooking.ts — محرك الحجوزات الأساسي",
+      techBadges: [
+        "Atomic Transactions",
+        "Firebase",
+        "Google Calendar API",
+        "Bcrypt",
+      ],
+    },
   },
 
-  'who-are-ya-backend': {
+  "who-are-ya-backend": {
     es: {
-      title: 'Who Are Ya?', subtitle: 'Football Identity Engine', role: 'Backend Architect',
-      objective: 'Construir el backend de un juego con ritmo de producto real: búsquedas rápidas, datos consistentes y una base preparada para escalar sin perder control.',
-      algorithmH: 'MVC & MongoDB Intelligence',
-      algorithmP: 'ObjectIds, populate y filtros compuestos se combinan para cruzar miles de jugadores con latencia mínima.',
-      supabaseH: 'JWT + Bcrypt Security Layer',
-      supabaseP: 'Autenticación blindada para el panel CMS con sesiones protegidas y control estricto de acceso al servidor.',
-      outcomeH: 'Producción Real', outcomeP: 'API REST desplegada en Render con MongoDB Atlas y preparada para operar como producto estable.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Football Identity Engine",
+      role: "Backend Architect",
+      objective:
+        "Construir el backend de un juego con ritmo de producto real: búsquedas rápidas, datos consistentes y una base preparada para escalar sin perder control.",
+      algorithmH: "MVC & MongoDB Intelligence",
+      algorithmP:
+        "ObjectIds, populate y filtros compuestos se combinan para cruzar miles de jugadores con latencia mínima.",
+      supabaseH: "JWT + Bcrypt Security Layer",
+      supabaseP:
+        "Autenticación blindada para el panel CMS con sesiones protegidas y control estricto de acceso al servidor.",
+      outcomeH: "Producción Real",
+      outcomeP:
+        "API REST desplegada en Render con MongoDB Atlas y preparada para operar como producto estable.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     en: {
-      title: 'Who Are Ya?', subtitle: 'Football Identity Engine', role: 'Backend Architect',
-      objective: 'Build the backend of a game with the feel of a real product: fast search, consistent data, and a foundation that can scale without losing control.',
-      algorithmH: 'MVC & MongoDB Intelligence',
-      algorithmP: 'ObjectIds, populate and compound filters work together to cross-match thousands of players with minimal latency.',
-      supabaseH: 'JWT + Bcrypt Security Layer',
-      supabaseP: 'Hardened CMS authentication with protected sessions and strict server-side access control.',
-      outcomeH: 'Real Production', outcomeP: 'REST API deployed on Render with MongoDB Atlas and ready to operate as a stable product.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Football Identity Engine",
+      role: "Backend Architect",
+      objective:
+        "Build the backend of a game with the feel of a real product: fast search, consistent data, and a foundation that can scale without losing control.",
+      algorithmH: "MVC & MongoDB Intelligence",
+      algorithmP:
+        "ObjectIds, populate and compound filters work together to cross-match thousands of players with minimal latency.",
+      supabaseH: "JWT + Bcrypt Security Layer",
+      supabaseP:
+        "Hardened CMS authentication with protected sessions and strict server-side access control.",
+      outcomeH: "Real Production",
+      outcomeP:
+        "REST API deployed on Render with MongoDB Atlas and ready to operate as a stable product.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     eu: {
-      title: 'Who Are Ya?', subtitle: 'Futbol Jokoaren Backend-a', role: 'Backend Architect',
-      objective: 'Futbol joko ezagunaren klona. Erronka: milaka jokalari eta liga milisegundotan filtratzea.',
-      algorithmH: 'MVC Arkitektura eta MongoDB',
-      algorithmP: 'ObjectId-ak eta Mongoose "populate" erabiliz datu harreman konplexuak eta azkarrak kudeatzea.',
-      supabaseH: 'JWT eta Bcrypt Segurtasuna',
-      supabaseP: 'Administratzaile autentifikazio segurua eta zerbitzariko saio babestuak CMS panelerako.',
-      outcomeH: 'Produkzioan', outcomeP: 'REST API-a Render-en eta MongoDB Atlas-en erabilgarri.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Futbol Jokoaren Backend-a",
+      role: "Backend Architect",
+      objective:
+        "Futbol joko ezagunaren klona. Erronka: milaka jokalari eta liga milisegundotan filtratzea.",
+      algorithmH: "MVC Arkitektura eta MongoDB",
+      algorithmP:
+        'ObjectId-ak eta Mongoose "populate" erabiliz datu harreman konplexuak eta azkarrak kudeatzea.',
+      supabaseH: "JWT eta Bcrypt Segurtasuna",
+      supabaseP:
+        "Administratzaile autentifikazio segurua eta zerbitzariko saio babestuak CMS panelerako.",
+      outcomeH: "Produkzioan",
+      outcomeP: "REST API-a Render-en eta MongoDB Atlas-en erabilgarri.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     fr: {
-      title: 'Who Are Ya?', subtitle: 'Backend Jeu de Foot', role: 'Backend Architect',
-      objective: 'Clone d\'un jeu célèbre. Défi : filtrer des milliers de joueurs en quelques millisecondes.',
-      algorithmH: 'Architecture MVC & MongoDB',
-      algorithmP: 'Relations complexes via ObjectIds et Mongoose "populate" pour des recherches ultra-rapides.',
-      supabaseH: 'Sécurité JWT & Bcrypt',
-      supabaseP: 'Authentification admin robuste et sessions sécurisées pour le tableau de bord CMS.',
-      outcomeH: 'Production Réelle', outcomeP: 'API REST déployée sur Render avec MongoDB Atlas.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Backend Jeu de Foot",
+      role: "Backend Architect",
+      objective:
+        "Clone d'un jeu célèbre. Défi : filtrer des milliers de joueurs en quelques millisecondes.",
+      algorithmH: "Architecture MVC & MongoDB",
+      algorithmP:
+        'Relations complexes via ObjectIds et Mongoose "populate" pour des recherches ultra-rapides.',
+      supabaseH: "Sécurité JWT & Bcrypt",
+      supabaseP:
+        "Authentification admin robuste et sessions sécurisées pour le tableau de bord CMS.",
+      outcomeH: "Production Réelle",
+      outcomeP: "API REST déployée sur Render avec MongoDB Atlas.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     it: {
-      title: 'Who Are Ya?', subtitle: 'Backend Gioco Calcio', role: 'Backend Architect',
-      objective: 'Clone del famoso gioco. Sfida: filtrare migliaia di giocatori e campionati in millisecondi.',
-      algorithmH: 'Architettura MVC & MongoDB',
-      algorithmP: 'Relazioni complesse tramite ObjectIds e Mongoose "populate" per ricerche dati veloci.',
-      supabaseH: 'Sicurezza JWT & Bcrypt',
-      supabaseP: 'Autenticazione amministratore blindata e sessioni server protette per il CMS.',
-      outcomeH: 'Produzione', outcomeP: 'API REST su Render con MongoDB Atlas.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Backend Gioco Calcio",
+      role: "Backend Architect",
+      objective:
+        "Clone del famoso gioco. Sfida: filtrare migliaia di giocatori e campionati in millisecondi.",
+      algorithmH: "Architettura MVC & MongoDB",
+      algorithmP:
+        'Relazioni complesse tramite ObjectIds e Mongoose "populate" per ricerche dati veloci.',
+      supabaseH: "Sicurezza JWT & Bcrypt",
+      supabaseP:
+        "Autenticazione amministratore blindata e sessioni server protette per il CMS.",
+      outcomeH: "Produzione",
+      outcomeP: "API REST su Render con MongoDB Atlas.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     de: {
-      title: 'Who Are Ya?', subtitle: 'Fußballspiel-Backend', role: 'Backend Architect',
-      objective: 'Klon des berühmten Spiels. Herausforderung: Tausende Spieler in Millisekunden filtern.',
-      algorithmH: 'MVC-Architektur & MongoDB',
-      algorithmP: 'Komplexe Beziehungen über ObjectIds und Mongoose "populate" für schnellen Datenzugriff.',
-      supabaseH: 'JWT & Bcrypt Sicherheit',
-      supabaseP: 'Gesicherte Admin-Authentifizierung und Server-Sitzungen für das CMS.',
-      outcomeH: 'Echte Produktion', outcomeP: 'REST API auf Render mit MongoDB Atlas.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Fußballspiel-Backend",
+      role: "Backend Architect",
+      objective:
+        "Klon des berühmten Spiels. Herausforderung: Tausende Spieler in Millisekunden filtern.",
+      algorithmH: "MVC-Architektur & MongoDB",
+      algorithmP:
+        'Komplexe Beziehungen über ObjectIds und Mongoose "populate" für schnellen Datenzugriff.',
+      supabaseH: "JWT & Bcrypt Sicherheit",
+      supabaseP:
+        "Gesicherte Admin-Authentifizierung und Server-Sitzungen für das CMS.",
+      outcomeH: "Echte Produktion",
+      outcomeP: "REST API auf Render mit MongoDB Atlas.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     pt: {
-      title: 'Who Are Ya?', subtitle: 'Backend Jogo Futebol', role: 'Backend Architect',
-      objective: 'Clone do jogo famoso. Desafio: filtrar milhares de jogadores em milissegundos.',
-      algorithmH: 'Arquitetura MVC & MongoDB',
-      algorithmP: 'Relacionamentos complexos via ObjectIds e Mongoose "populate" para busca rápida.',
-      supabaseH: 'Segurança JWT & Bcrypt',
-      supabaseP: 'Autenticação de administrador segura e sessões protegidas para o CMS.',
-      outcomeH: 'Produção Real', outcomeP: 'API REST em Render com MongoDB Atlas.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Backend Jogo Futebol",
+      role: "Backend Architect",
+      objective:
+        "Clone do jogo famoso. Desafio: filtrar milhares de jogadores em milissegundos.",
+      algorithmH: "Arquitetura MVC & MongoDB",
+      algorithmP:
+        'Relacionamentos complexos via ObjectIds e Mongoose "populate" para busca rápida.',
+      supabaseH: "Segurança JWT & Bcrypt",
+      supabaseP:
+        "Autenticação de administrador segura e sessões protegidas para o CMS.",
+      outcomeH: "Produção Real",
+      outcomeP: "API REST em Render com MongoDB Atlas.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     ca: {
-      title: 'Who Are Ya?', subtitle: 'Backend Joc de Futbol', role: 'Backend Architect',
-      objective: 'Clon del famós joc. El repte: filtrar milers de jugadors i lligues en mil·lisegons.',
-      algorithmH: 'Arquitectura MVC & MongoDB',
-      algorithmP: 'Relacions complexes mitjançant ObjectIds i Mongoose "populate" per a cerques ràpides.',
-      supabaseH: 'Seguretat JWT & Bcrypt',
-      supabaseP: 'Autenticació admin blindada i sessions protegides per al CMS.',
-      outcomeH: 'Producció Real', outcomeP: 'API REST desplegada a Render amb MongoDB Atlas.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Backend Joc de Futbol",
+      role: "Backend Architect",
+      objective:
+        "Clon del famós joc. El repte: filtrar milers de jugadors i lligues en mil·lisegons.",
+      algorithmH: "Arquitectura MVC & MongoDB",
+      algorithmP:
+        'Relacions complexes mitjançant ObjectIds i Mongoose "populate" per a cerques ràpides.',
+      supabaseH: "Seguretat JWT & Bcrypt",
+      supabaseP:
+        "Autenticació admin blindada i sessions protegides per al CMS.",
+      outcomeH: "Producció Real",
+      outcomeP: "API REST desplegada a Render amb MongoDB Atlas.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     gl: {
-      title: 'Who Are Ya?', subtitle: 'Backend Xogo Fútbol', role: 'Backend Architect',
-      objective: 'Clon do famoso xogo. O reto: filtrar miles de xogadores en milisegundos.',
-      algorithmH: 'Arquitectura MVC & MongoDB',
-      algorithmP: 'Relacións complexas mediante ObjectIds e Mongoose "populate" para buscas veloces.',
-      supabaseH: 'Seguridade JWT & Bcrypt',
-      supabaseP: 'Autenticación admin protexida e sesións de servidor para o CMS.',
-      outcomeH: 'Produción Real', outcomeP: 'API REST en Render con MongoDB Atlas.',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "Backend Xogo Fútbol",
+      role: "Backend Architect",
+      objective:
+        "Clon do famoso xogo. O reto: filtrar miles de xogadores en milisegundos.",
+      algorithmH: "Arquitectura MVC & MongoDB",
+      algorithmP:
+        'Relacións complexas mediante ObjectIds e Mongoose "populate" para buscas veloces.',
+      supabaseH: "Seguridade JWT & Bcrypt",
+      supabaseP:
+        "Autenticación admin protexida e sesións de servidor para o CMS.",
+      outcomeH: "Produción Real",
+      outcomeP: "API REST en Render con MongoDB Atlas.",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     ja: {
-      title: 'Who Are Ya?', subtitle: 'サッカーゲーム バックエンド', role: 'バックエンドアーキテクト',
-      objective: '有名なゲームのクローン。数千人のプレイヤーやリーグをミリ秒単位でフィルタリングします。',
-      algorithmH: 'MVC アーキテクチャ & MongoDB',
-      algorithmP: 'ObjectIds と Mongoose の "populate" を使用して、高速なデータ検索のための複雑な関係を構築。',
-      supabaseH: 'JWT & Bcrypt セキュリティ',
-      supabaseP: 'CMS ダッシュボード用の管理者認証と保護されたサーバーセッション。',
-      outcomeH: '実稼働', outcomeP: 'MongoDB Atlas を使用して Render にデプロイされた REST API。',
-      codeSpotlight: 'players.controller.js — Filter Engine',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "サッカーゲーム バックエンド",
+      role: "バックエンドアーキテクト",
+      objective:
+        "有名なゲームのクローン。数千人のプレイヤーやリーグをミリ秒単位でフィルタリングします。",
+      algorithmH: "MVC アーキテクチャ & MongoDB",
+      algorithmP:
+        'ObjectIds と Mongoose の "populate" を使用して、高速なデータ検索のための複雑な関係を構築。',
+      supabaseH: "JWT & Bcrypt セキュリティ",
+      supabaseP:
+        "CMS ダッシュボード用の管理者認証と保護されたサーバーセッション。",
+      outcomeH: "実稼働",
+      outcomeP: "MongoDB Atlas を使用して Render にデプロイされた REST API。",
+      codeSpotlight: "players.controller.js — Filter Engine",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     zh: {
-      title: 'Who Are Ya?', subtitle: '足球身份竞猜引擎', role: '后端架构师',
-      objective: '以真实产品标准打造游戏后端：闪电般的检索速度、高一致性数据架构，以及支持平滑扩展的稳固基石。',
-      algorithmH: 'MVC 架构与 MongoDB 高效索引',
-      algorithmP: '巧妙结合 ObjectIds、关联填充(populate)和复合过滤器，以极低延迟对数千名球员进行交叉匹配。',
-      supabaseH: 'JWT + Bcrypt 安全屏障',
-      supabaseP: '为内容管理系统(CMS)后台提供严密的身份验证、受保护的会话以及严格的服务器端访问控制。',
-      outcomeH: '实战交付', outcomeP: '在 Render 平台部署了基于 MongoDB Atlas 的 REST API，并已做好了作为稳定产品运营的准备。',
-      codeSpotlight: 'players.controller.js — 过滤器引擎',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
+      title: "Who Are Ya?",
+      subtitle: "足球身份竞猜引擎",
+      role: "后端架构师",
+      objective:
+        "以真实产品标准打造游戏后端：闪电般的检索速度、高一致性数据架构，以及支持平滑扩展的稳固基石。",
+      algorithmH: "MVC 架构与 MongoDB 高效索引",
+      algorithmP:
+        "巧妙结合 ObjectIds、关联填充(populate)和复合过滤器，以极低延迟对数千名球员进行交叉匹配。",
+      supabaseH: "JWT + Bcrypt 安全屏障",
+      supabaseP:
+        "为内容管理系统(CMS)后台提供严密的身份验证、受保护的会话以及严格的服务器端访问控制。",
+      outcomeH: "实战交付",
+      outcomeP:
+        "在 Render 平台部署了基于 MongoDB Atlas 的 REST API，并已做好了作为稳定产品运营的准备。",
+      codeSpotlight: "players.controller.js — 过滤器引擎",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
     },
     ar: {
-      title: 'Who Are Ya?', subtitle: 'محرك هوية كرة القدم', role: 'مهندس الخلفية البرمجية',
-      objective: 'بناء الخلفية البرمجية للعبة تشعر كأنها منتج حقيقي: بحث سريع، بيانات متسقة، وأساس متين يمكنه التوسع بسهولة.',
-      algorithmH: 'هيكلية MVC وذكاء MongoDB',
-      algorithmP: 'تتحد معرّفات الكائنات ObjectIds والتعبئة (populate) والفلاتر المركبة للبحث المتقاطع بين آلاف اللاعبين بحد أدنى من زمن الوصول.',
-      supabaseH: 'طبقة الحماية عبر JWT + Bcrypt',
-      supabaseP: 'مصادقة قوية للغاية للوحة تحكم إدارة المحتوى (CMS) مع جلسات محمية وتحكم صارم في الوصول على جانب الخادم.',
-      outcomeH: 'الإنتاج الفعلي', outcomeP: 'واجهة برمجة تطبيقات REST تم نشرها على Render مع MongoDB Atlas وجاهزة للعمل كمنتج مستقر.',
-      codeSpotlight: 'players.controller.js — محرك التصفية',
-      techBadges: ['Node.js', 'MongoDB', 'JWT', 'Bcrypt', 'MVC']
-    }
+      title: "Who Are Ya?",
+      subtitle: "محرك هوية كرة القدم",
+      role: "مهندس الخلفية البرمجية",
+      objective:
+        "بناء الخلفية البرمجية للعبة تشعر كأنها منتج حقيقي: بحث سريع، بيانات متسقة، وأساس متين يمكنه التوسع بسهولة.",
+      algorithmH: "هيكلية MVC وذكاء MongoDB",
+      algorithmP:
+        "تتحد معرّفات الكائنات ObjectIds والتعبئة (populate) والفلاتر المركبة للبحث المتقاطع بين آلاف اللاعبين بحد أدنى من زمن الوصول.",
+      supabaseH: "طبقة الحماية عبر JWT + Bcrypt",
+      supabaseP:
+        "مصادقة قوية للغاية للوحة تحكم إدارة المحتوى (CMS) مع جلسات محمية وتحكم صارم في الوصول على جانب الخادم.",
+      outcomeH: "الإنتاج الفعلي",
+      outcomeP:
+        "واجهة برمجة تطبيقات REST تم نشرها على Render مع MongoDB Atlas وجاهزة للعمل كمنتج مستقر.",
+      codeSpotlight: "players.controller.js — محرك التصفية",
+      techBadges: ["Node.js", "MongoDB", "JWT", "Bcrypt", "MVC"],
+    },
   },
 
-  'rides24ofiziala': {
+  rides24ofiziala: {
     es: {
-      title: 'Rides24', subtitle: 'Sistema Distribuido Java', role: 'Systems Architect',
-      objective: 'Ride-sharing distribuido. Reto: consistencia de datos y reservas concurrentes sin errores.',
-      algorithmH: 'Transacciones Atómicas & ObjectDB',
-      algorithmP: 'Uso de JAX-WS y bloqueos pesimistas (PESSIMISTIC_WRITE) para evitar duplicados en asientos.',
-      supabaseH: 'Concurrencia Thread-Safe',
-      supabaseP: 'Gestión de monitores de Java para sincronizar peticiones de usuarios simultáneos.',
-      outcomeH: 'Consistencia Total', outcomeP: 'Sistema funcional testeado bajo carga con 0 condiciones de carrera.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Sistema Distribuido Java",
+      role: "Systems Architect",
+      objective:
+        "Ride-sharing distribuido. Reto: consistencia de datos y reservas concurrentes sin errores.",
+      algorithmH: "Transacciones Atómicas & ObjectDB",
+      algorithmP:
+        "Uso de JAX-WS y bloqueos pesimistas (PESSIMISTIC_WRITE) para evitar duplicados en asientos.",
+      supabaseH: "Concurrencia Thread-Safe",
+      supabaseP:
+        "Gestión de monitores de Java para sincronizar peticiones de usuarios simultáneos.",
+      outcomeH: "Consistencia Total",
+      outcomeP:
+        "Sistema funcional testeado bajo carga con 0 condiciones de carrera.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     en: {
-      title: 'Rides24', subtitle: 'Java Distributed System', role: 'Systems Architect',
-      objective: 'Distributed ride-sharing. Challenge: data consistency and concurrent bookings without errors.',
-      algorithmH: 'Atomic Transactions & ObjectDB',
-      algorithmP: 'Using JAX-WS and pessimistic locks to prevent duplicate seat reservations.',
-      supabaseH: 'Thread-Safe Concurrency',
-      supabaseP: 'Java monitor management to synchronize simultaneous user requests.',
-      outcomeH: 'Total Consistency', outcomeP: 'Functional system load-tested with zero race conditions.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Java Distributed System",
+      role: "Systems Architect",
+      objective:
+        "Distributed ride-sharing. Challenge: data consistency and concurrent bookings without errors.",
+      algorithmH: "Atomic Transactions & ObjectDB",
+      algorithmP:
+        "Using JAX-WS and pessimistic locks to prevent duplicate seat reservations.",
+      supabaseH: "Thread-Safe Concurrency",
+      supabaseP:
+        "Java monitor management to synchronize simultaneous user requests.",
+      outcomeH: "Total Consistency",
+      outcomeP: "Functional system load-tested with zero race conditions.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     eu: {
-      title: 'Rides24', subtitle: 'Java Sistema Banatua', role: 'Systems Architect',
-      objective: 'Bidaia partekatu banatua. Erronka: datuen koherentzia eta erreserba konkurrenteak errorerik gabe.',
-      algorithmH: 'Transakzio Atomikoak eta ObjectDB',
-      algorithmP: 'JAX-WS eta blokeo pesimistak erabiliz eserlekuen erreserba bikoitzak saihesteko.',
-      supabaseH: 'Thread-Safe Konkurrentzia',
-      supabaseP: 'Java monitoreak erabiltzen ditu aldi bereko erabiltzaileen eskaerak sinkronizatzeko.',
-      outcomeH: 'Koherentzia Osoa', outcomeP: 'Karga-testetan probatutako sistema, zero lasterketa-baldintzarekin.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Java Sistema Banatua",
+      role: "Systems Architect",
+      objective:
+        "Bidaia partekatu banatua. Erronka: datuen koherentzia eta erreserba konkurrenteak errorerik gabe.",
+      algorithmH: "Transakzio Atomikoak eta ObjectDB",
+      algorithmP:
+        "JAX-WS eta blokeo pesimistak erabiliz eserlekuen erreserba bikoitzak saihesteko.",
+      supabaseH: "Thread-Safe Konkurrentzia",
+      supabaseP:
+        "Java monitoreak erabiltzen ditu aldi bereko erabiltzaileen eskaerak sinkronizatzeko.",
+      outcomeH: "Koherentzia Osoa",
+      outcomeP:
+        "Karga-testetan probatutako sistema, zero lasterketa-baldintzarekin.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     fr: {
-      title: 'Rides24', subtitle: 'Système Distribué Java', role: 'Systems Architect',
-      objective: 'Ride-sharing distribué. Défi : cohérence des données et réservations simultanées.',
-      algorithmH: 'Transactions Atomiques & ObjectDB',
-      algorithmP: 'Utilisation de JAX-WS et verrous pessimistes pour éviter les doubles réservations.',
-      supabaseH: 'Concurrence Thread-Safe',
-      supabaseP: 'Gestion des moniteurs Java pour synchroniser les requêtes utilisateurs simultanées.',
-      outcomeH: 'Cohérence Totale', outcomeP: 'Système testé sous charge avec zéro condition de course.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Système Distribué Java",
+      role: "Systems Architect",
+      objective:
+        "Ride-sharing distribué. Défi : cohérence des données et réservations simultanées.",
+      algorithmH: "Transactions Atomiques & ObjectDB",
+      algorithmP:
+        "Utilisation de JAX-WS et verrous pessimistes pour éviter les doubles réservations.",
+      supabaseH: "Concurrence Thread-Safe",
+      supabaseP:
+        "Gestion des moniteurs Java pour synchroniser les requêtes utilisateurs simultanées.",
+      outcomeH: "Cohérence Totale",
+      outcomeP: "Système testé sous charge avec zéro condition de course.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     it: {
-      title: 'Rides24', subtitle: 'Sistema Distribuito Java', role: 'Systems Architect',
-      objective: 'Ride-sharing distribuito. Sfida: coerenza dei dati e prenotazioni simultanee.',
-      algorithmH: 'Transazioni Atomiche & ObjectDB',
-      algorithmP: 'JAX-WS e blocchi pessimistici per prevenire doppie prenotazioni di posti.',
-      supabaseH: 'Concorrenza Thread-Safe',
-      supabaseP: 'Gestione monitor Java per sincronizzare le richieste simultanee degli utenti.',
-      outcomeH: 'Coerenza Totale', outcomeP: 'Sistema testato sotto carico con zero race conditions.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Sistema Distribuito Java",
+      role: "Systems Architect",
+      objective:
+        "Ride-sharing distribuito. Sfida: coerenza dei dati e prenotazioni simultanee.",
+      algorithmH: "Transazioni Atomiche & ObjectDB",
+      algorithmP:
+        "JAX-WS e blocchi pessimistici per prevenire doppie prenotazioni di posti.",
+      supabaseH: "Concorrenza Thread-Safe",
+      supabaseP:
+        "Gestione monitor Java per sincronizzare le richieste simultanee degli utenti.",
+      outcomeH: "Coerenza Totale",
+      outcomeP: "Sistema testato sotto carico con zero race conditions.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     de: {
-      title: 'Rides24', subtitle: 'Verteiltes Java-System', role: 'Systems Architect',
-      objective: 'Verteiltes Ride-Sharing. Herausforderung: Datenkonsistenz bei gleichzeitigen Buchungen.',
-      algorithmH: 'Atomare Transaktionen & ObjectDB',
-      algorithmP: 'Einsatz von JAX-WS und pessimistischen Sperren zur Vermeidung von Doppelbuchungen.',
-      supabaseH: 'Thread-Safe Nebenläufigkeit',
-      supabaseP: 'Java-Monitor-Management zur Synchronisierung gleichzeitiger Anfragen.',
-      outcomeH: 'Volle Konsistenz', outcomeP: 'Lastgetestetes System mit Null Race Conditions.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Verteiltes Java-System",
+      role: "Systems Architect",
+      objective:
+        "Verteiltes Ride-Sharing. Herausforderung: Datenkonsistenz bei gleichzeitigen Buchungen.",
+      algorithmH: "Atomare Transaktionen & ObjectDB",
+      algorithmP:
+        "Einsatz von JAX-WS und pessimistischen Sperren zur Vermeidung von Doppelbuchungen.",
+      supabaseH: "Thread-Safe Nebenläufigkeit",
+      supabaseP:
+        "Java-Monitor-Management zur Synchronisierung gleichzeitiger Anfragen.",
+      outcomeH: "Volle Konsistenz",
+      outcomeP: "Lastgetestetes System mit Null Race Conditions.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     pt: {
-      title: 'Rides24', subtitle: 'Sistema Distribuído Java', role: 'Systems Architect',
-      objective: 'Ride-sharing distribuído. Desafio: consistência de dados e reservas concorrentes.',
-      algorithmH: 'Transações Atómicas & ObjectDB',
-      algorithmP: 'JAX-WS e bloqueios pessimistas para evitar reservas duplicadas.',
-      supabaseH: 'Concorrência Thread-Safe',
-      supabaseP: 'Gestão de monitores Java para sincronizar pedidos simultâneos.',
-      outcomeH: 'Consistência Total', outcomeP: 'Sistema testado com carga e zero condições de corrida.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Sistema Distribuído Java",
+      role: "Systems Architect",
+      objective:
+        "Ride-sharing distribuído. Desafio: consistência de dados e reservas concorrentes.",
+      algorithmH: "Transações Atómicas & ObjectDB",
+      algorithmP:
+        "JAX-WS e bloqueios pessimistas para evitar reservas duplicadas.",
+      supabaseH: "Concorrência Thread-Safe",
+      supabaseP:
+        "Gestão de monitores Java para sincronizar pedidos simultâneos.",
+      outcomeH: "Consistência Total",
+      outcomeP: "Sistema testado com carga e zero condições de corrida.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     ca: {
-      title: 'Rides24', subtitle: 'Sistema Distribuït Java', role: 'Systems Architect',
-      objective: 'Ride-sharing distribuït. Repte: consistència de dades i reserves simultànies.',
-      algorithmH: 'Transaccions Atòmiques & ObjectDB',
-      algorithmP: 'JAX-WS i bloquejos pessimistes per evitar reserves de seients duplicades.',
-      supabaseH: 'Concurrència Thread-Safe',
-      supabaseP: 'Gestió de monitors Java per sincronitzar peticions simultànies.',
-      outcomeH: 'Consistència Total', outcomeP: 'Sistema provat sota càrrega amb zero condicions de carrera.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Sistema Distribuït Java",
+      role: "Systems Architect",
+      objective:
+        "Ride-sharing distribuït. Repte: consistència de dades i reserves simultànies.",
+      algorithmH: "Transaccions Atòmiques & ObjectDB",
+      algorithmP:
+        "JAX-WS i bloquejos pessimistes per evitar reserves de seients duplicades.",
+      supabaseH: "Concurrència Thread-Safe",
+      supabaseP:
+        "Gestió de monitors Java per sincronitzar peticions simultànies.",
+      outcomeH: "Consistència Total",
+      outcomeP: "Sistema provat sota càrrega amb zero condicions de carrera.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     gl: {
-      title: 'Rides24', subtitle: 'Sistema Distribuído Java', role: 'Systems Architect',
-      objective: 'Ride-sharing distribuído. Reto: consistencia de datos e reservas concorrentes.',
-      algorithmH: 'Transaccións Atómicas & ObjectDB',
-      algorithmP: 'JAX-WS e bloqueos pesimistas para evitar reservas duplicadas de asentos.',
-      supabaseH: 'Concorrencia Thread-Safe',
-      supabaseP: 'Xestión de monitores Java para sincronizar peticións simultáneas.',
-      outcomeH: 'Consistencia Total', outcomeP: 'Sistema probado con carga e cero condicións de carreira.',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Sistema Distribuído Java",
+      role: "Systems Architect",
+      objective:
+        "Ride-sharing distribuído. Reto: consistencia de datos e reservas concorrentes.",
+      algorithmH: "Transaccións Atómicas & ObjectDB",
+      algorithmP:
+        "JAX-WS e bloqueos pesimistas para evitar reservas duplicadas de asentos.",
+      supabaseH: "Concorrencia Thread-Safe",
+      supabaseP:
+        "Xestión de monitores Java para sincronizar peticións simultáneas.",
+      outcomeH: "Consistencia Total",
+      outcomeP: "Sistema probado con carga e cero condicións de carreira.",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     ja: {
-      title: 'Rides24', subtitle: 'Java 分散システム', role: 'システムアーキテクト',
-      objective: '分散型ライドシェアリング。課題：データの一貫性とエラーのない同時予約。',
-      algorithmH: 'アトミックトランザクション & ObjectDB',
-      algorithmP: 'JAX-WS と悲観的ロックを使用して、座席の重複予約を防ぎます。',
-      supabaseH: 'スレッドセーフな並行処理',
-      supabaseP: '同時ユーザーリクエストを同期するための Java モニター管理。',
-      outcomeH: '完全な一貫性', outcomeP: '競合状態がゼロであることを負荷テストで確認済み。',
-      codeSpotlight: 'RideService.java — Atomic Lock',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Java 分散システム",
+      role: "システムアーキテクト",
+      objective:
+        "分散型ライドシェアリング。課題：データの一貫性とエラーのない同時予約。",
+      algorithmH: "アトミックトランザクション & ObjectDB",
+      algorithmP: "JAX-WS と悲観的ロックを使用して、座席の重複予約を防ぎます。",
+      supabaseH: "スレッドセーフな並行処理",
+      supabaseP: "同時ユーザーリクエストを同期するための Java モニター管理。",
+      outcomeH: "完全な一貫性",
+      outcomeP: "競合状態がゼロであることを負荷テストで確認済み。",
+      codeSpotlight: "RideService.java — Atomic Lock",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     zh: {
-      title: 'Rides24', subtitle: 'Java 分布式系统', role: '系统架构师',
-      objective: '打造分布式拼车出行平台。核心挑战：确保高并发预订下的数据绝对一致性与零差错。',
-      algorithmH: '原子事务与 ObjectDB 数据库',
-      algorithmP: '采用 JAX-WS 和悲观锁(PESSIMISTIC_WRITE)机制，彻底杜绝座位重复预订问题。',
-      supabaseH: '线程安全并发控制',
-      supabaseP: '运用 Java 监视器(Monitor)模式，同步多用户并发请求，确保安全。',
-      outcomeH: '极致一致性', outcomeP: '在高负载测试下表现卓越的可用系统，实现零竞态条件。',
-      codeSpotlight: 'RideService.java — 原子锁实现',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
+      title: "Rides24",
+      subtitle: "Java 分布式系统",
+      role: "系统架构师",
+      objective:
+        "打造分布式拼车出行平台。核心挑战：确保高并发预订下的数据绝对一致性与零差错。",
+      algorithmH: "原子事务与 ObjectDB 数据库",
+      algorithmP:
+        "采用 JAX-WS 和悲观锁(PESSIMISTIC_WRITE)机制，彻底杜绝座位重复预订问题。",
+      supabaseH: "线程安全并发控制",
+      supabaseP:
+        "运用 Java 监视器(Monitor)模式，同步多用户并发请求，确保安全。",
+      outcomeH: "极致一致性",
+      outcomeP: "在高负载测试下表现卓越的可用系统，实现零竞态条件。",
+      codeSpotlight: "RideService.java — 原子锁实现",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
     },
     ar: {
-      title: 'Rides24', subtitle: 'نظام Java الموزع', role: 'مهندس النظم والشبكات',
-      objective: 'مشاركة الرحلات الموزعة. التحدي: اتساق البيانات المطلقة وإتمام الحجوزات المتزامنة دون أي أخطاء.',
-      algorithmH: 'المعاملات الذرية وقاعدة بيانات ObjectDB',
-      algorithmP: 'استخدام JAX-WS والأقفال المتشائمة (PESSIMISTIC_WRITE) لمنع تكرار حجز نفس المقعد بشكل متزامن.',
-      supabaseH: 'التعامل المتزامن الآمن خيطياً Thread-Safe',
-      supabaseP: 'إدارة مراقبي Java (Java Monitors) لمزامنة طلبات المستخدمين المتزامنة بأمان تام.',
-      outcomeH: 'الاتساق المطلق', outcomeP: 'نظام تشغيلي متكامل تم اختباره تحت أقصى درجات الحمل مع حدوث صفر ظروف تسابق.',
-      codeSpotlight: 'RideService.java — القفل الذري المتزامن',
-      techBadges: ['JAX-WS', 'ObjectDB', 'Java Swing', 'Thread-Safe']
-    }
+      title: "Rides24",
+      subtitle: "نظام Java الموزع",
+      role: "مهندس النظم والشبكات",
+      objective:
+        "مشاركة الرحلات الموزعة. التحدي: اتساق البيانات المطلقة وإتمام الحجوزات المتزامنة دون أي أخطاء.",
+      algorithmH: "المعاملات الذرية وقاعدة بيانات ObjectDB",
+      algorithmP:
+        "استخدام JAX-WS والأقفال المتشائمة (PESSIMISTIC_WRITE) لمنع تكرار حجز نفس المقعد بشكل متزامن.",
+      supabaseH: "التعامل المتزامن الآمن خيطياً Thread-Safe",
+      supabaseP:
+        "إدارة مراقبي Java (Java Monitors) لمزامنة طلبات المستخدمين المتزامنة بأمان تام.",
+      outcomeH: "الاتساق المطلق",
+      outcomeP:
+        "نظام تشغيلي متكامل تم اختباره تحت أقصى درجات الحمل مع حدوث صفر ظروف تسابق.",
+      codeSpotlight: "RideService.java — القفل الذري المتزامن",
+      techBadges: ["JAX-WS", "ObjectDB", "Java Swing", "Thread-Safe"],
+    },
   },
 
-  'spotshare-parking': {
+  "spotshare-parking": {
     es: {
-      title: 'SpotShare', subtitle: 'Cloud Parking Intelligence', role: 'Cloud Quality Engineer',
-      objective: 'Convertir el parking en una experiencia de alta densidad y baja fricción: disponibilidad en tiempo real, confianza visual y cero ambigüedad operativa.',
-      algorithmH: 'Quality Gate de Precisión',
-      algorithmP: 'Pipelines con SonarCloud, validaciones de cobertura y disciplina técnica para mantener una base de código que escala sin perder control.',
-      supabaseH: 'Estado en Tiempo Real',
-      supabaseP: 'Optimistic Locking para reservar plazas sin colisiones, con cambios atómicos y reflejo inmediato en el panel operativo.',
-      outcomeH: 'Escala con Elegancia', outcomeP: 'Sistema preparado para crecer con auditorías automáticas, métricas claras y una experiencia limpia en cada interacción.',
-      codeSpotlight: 'parking.service.ts — Reservation Core',
-      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Cloud Parking Intelligence",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Convertir el parking en una experiencia de alta densidad y baja fricción: disponibilidad en tiempo real, confianza visual y cero ambigüedad operativa.",
+      algorithmH: "Quality Gate de Precisión",
+      algorithmP:
+        "Pipelines con SonarCloud, validaciones de cobertura y disciplina técnica para mantener una base de código que escala sin perder control.",
+      supabaseH: "Estado en Tiempo Real",
+      supabaseP:
+        "Optimistic Locking para reservar plazas sin colisiones, con cambios atómicos y reflejo inmediato en el panel operativo.",
+      outcomeH: "Escala con Elegancia",
+      outcomeP:
+        "Sistema preparado para crecer con auditorías automáticas, métricas claras y una experiencia limpia en cada interacción.",
+      codeSpotlight: "parking.service.ts — Reservation Core",
+      techBadges: [
+        "SonarCloud A",
+        "Cloud Native",
+        "CI/CD",
+        "Optimistic Locking",
+      ],
     },
     en: {
-      title: 'SpotShare', subtitle: 'Cloud Parking Intelligence', role: 'Cloud Quality Engineer',
-      objective: 'Turn parking into a high-density, low-friction experience: real-time availability, visual trust, and zero operational ambiguity.',
-      algorithmH: 'Precision Quality Gate',
-      algorithmP: 'SonarCloud pipelines, coverage checks and technical discipline keep the codebase scalable without losing control.',
-      supabaseH: 'Real-Time State',
-      supabaseP: 'Optimistic Locking prevents reservation collisions, with atomic updates and instant reflection in the operator dashboard.',
-      outcomeH: 'Scale with Elegance', outcomeP: 'A system built for growth, with automatic audits, clear metrics, and a clean experience at every interaction.',
-      codeSpotlight: 'parking.service.ts — Reservation Core',
-      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Cloud Parking Intelligence",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Turn parking into a high-density, low-friction experience: real-time availability, visual trust, and zero operational ambiguity.",
+      algorithmH: "Precision Quality Gate",
+      algorithmP:
+        "SonarCloud pipelines, coverage checks and technical discipline keep the codebase scalable without losing control.",
+      supabaseH: "Real-Time State",
+      supabaseP:
+        "Optimistic Locking prevents reservation collisions, with atomic updates and instant reflection in the operator dashboard.",
+      outcomeH: "Scale with Elegance",
+      outcomeP:
+        "A system built for growth, with automatic audits, clear metrics, and a clean experience at every interaction.",
+      codeSpotlight: "parking.service.ts — Reservation Core",
+      techBadges: [
+        "SonarCloud A",
+        "Cloud Native",
+        "CI/CD",
+        "Optimistic Locking",
+      ],
     },
     eu: {
-      title: 'SpotShare', subtitle: 'Cloud Aparkaleku Kudeatzailea', role: 'Cloud Quality Engineer',
-      objective: 'Aparkalekuen Cloud kudeaketa. Fokua: Kodearen kalitatea eta eskalagarritasuna.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'SonarCloud-en "A" balorazioa: 0 Bug eta ahultasun. Zor teknikoa %2 baino txikiagoa.',
-      supabaseH: 'Cloud Konkurrentzia',
-      supabaseP: 'Optimistic Locking erabiliz aparkaleku-plazen egoera denbora errealean kudeatzeko.',
-      outcomeH: 'Enpresa Mailako Kodea', outcomeP: 'Arkitektura eskalagarria PR bakoitzean automatikoki auditaturik.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Cloud Aparkaleku Kudeatzailea",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Aparkalekuen Cloud kudeaketa. Fokua: Kodearen kalitatea eta eskalagarritasuna.",
+      algorithmH: "SonarCloud Quality Gate",
+      algorithmP:
+        'SonarCloud-en "A" balorazioa: 0 Bug eta ahultasun. Zor teknikoa %2 baino txikiagoa.',
+      supabaseH: "Cloud Konkurrentzia",
+      supabaseP:
+        "Optimistic Locking erabiliz aparkaleku-plazen egoera denbora errealean kudeatzeko.",
+      outcomeH: "Enpresa Mailako Kodea",
+      outcomeP:
+        "Arkitektura eskalagarria PR bakoitzean automatikoki auditaturik.",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     fr: {
-      title: 'SpotShare', subtitle: 'Gestion Parking Cloud', role: 'Cloud Quality Engineer',
-      objective: 'Gestion Cloud de parkings. Focus : Qualité du code et évolutivité.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'Score "A" sur SonarCloud : 0 bogues et vulnérabilités. Dette technique < 2%.',
-      supabaseH: 'Concurrence Cloud',
-      supabaseP: 'Utilisation de l\'Optimistic Locking pour l\'état des places en temps réel.',
-      outcomeH: 'Code Entreprise', outcomeP: 'Architecture évolutive auditée automatiquement à chaque PR.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Gestion Parking Cloud",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Gestion Cloud de parkings. Focus : Qualité du code et évolutivité.",
+      algorithmH: "SonarCloud Quality Gate",
+      algorithmP:
+        'Score "A" sur SonarCloud : 0 bogues et vulnérabilités. Dette technique < 2%.',
+      supabaseH: "Concurrence Cloud",
+      supabaseP:
+        "Utilisation de l'Optimistic Locking pour l'état des places en temps réel.",
+      outcomeH: "Code Entreprise",
+      outcomeP: "Architecture évolutive auditée automatiquement à chaque PR.",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     it: {
-      title: 'SpotShare', subtitle: 'Cloud Parking Manager', role: 'Cloud Quality Engineer',
-      objective: 'Gestione parcheggi Cloud. Focus: Qualità del codice e scalabilità.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'Rating "A" su SonarCloud: 0 Bug e vulnerabilità. Debito tecnico < 2%.',
-      supabaseH: 'Concorrenza Cloud',
-      supabaseP: 'Utilizzo di Optimistic Locking per gestire i posti in tempo reale.',
-      outcomeH: 'Codice Enterprise', outcomeP: 'Architettura scalabile auditata automaticamente in ogni PR.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Cloud Parking Manager",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Gestione parcheggi Cloud. Focus: Qualità del codice e scalabilità.",
+      algorithmH: "SonarCloud Quality Gate",
+      algorithmP:
+        'Rating "A" su SonarCloud: 0 Bug e vulnerabilità. Debito tecnico < 2%.',
+      supabaseH: "Concorrenza Cloud",
+      supabaseP:
+        "Utilizzo di Optimistic Locking per gestire i posti in tempo reale.",
+      outcomeH: "Codice Enterprise",
+      outcomeP: "Architettura scalabile auditata automaticamente in ogni PR.",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     de: {
-      title: 'SpotShare', subtitle: 'Cloud Parkplatz-Manager', role: 'Cloud Quality Engineer',
-      objective: 'Cloud-Parkplatzverwaltung. Fokus: Codequalität und Skalierbarkeit.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'Rating "A" in SonarCloud: 0 Bugs und Schwachstellen. Technische Schuld < 2%.',
-      supabaseH: 'Cloud-Nebenläufigkeit',
-      supabaseP: 'Optimistic Locking zur Echtzeitverwaltung der Parkplätze.',
-      outcomeH: 'Business-Code', outcomeP: 'Skalierbare Architektur, automatisch bei jedem PR geprüft.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Cloud Parkplatz-Manager",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Cloud-Parkplatzverwaltung. Fokus: Codequalität und Skalierbarkeit.",
+      algorithmH: "SonarCloud Quality Gate",
+      algorithmP:
+        'Rating "A" in SonarCloud: 0 Bugs und Schwachstellen. Technische Schuld < 2%.',
+      supabaseH: "Cloud-Nebenläufigkeit",
+      supabaseP: "Optimistic Locking zur Echtzeitverwaltung der Parkplätze.",
+      outcomeH: "Business-Code",
+      outcomeP: "Skalierbare Architektur, automatisch bei jedem PR geprüft.",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     pt: {
-      title: 'SpotShare', subtitle: 'Gestor de Estacionamento Cloud', role: 'Cloud Quality Engineer',
-      objective: 'Gestão Cloud. Foco: Qualidade do código e escalabilidade.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'Rating "A" no SonarCloud: 0 Bugs e vulnerabilidades. Dívida técnica < 2%.',
-      supabaseH: 'Concorrência Cloud',
-      supabaseP: 'Uso de Optimistic Locking para gerir lugares em tempo real.',
-      outcomeH: 'Código Enterprise', outcomeP: 'Arquitetura escalável auditada em cada PR.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Gestor de Estacionamento Cloud",
+      role: "Cloud Quality Engineer",
+      objective: "Gestão Cloud. Foco: Qualidade do código e escalabilidade.",
+      algorithmH: "SonarCloud Quality Gate",
+      algorithmP:
+        'Rating "A" no SonarCloud: 0 Bugs e vulnerabilidades. Dívida técnica < 2%.',
+      supabaseH: "Concorrência Cloud",
+      supabaseP: "Uso de Optimistic Locking para gerir lugares em tempo real.",
+      outcomeH: "Código Enterprise",
+      outcomeP: "Arquitetura escalável auditada em cada PR.",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     ca: {
-      title: 'SpotShare', subtitle: 'Cloud Parking Manager', role: 'Cloud Quality Engineer',
-      objective: 'Gestió Cloud d\'aparcaments. Focus: Qualitat del codi i escalabilitat.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'Rating "A" a SonarCloud: 0 Bugs i vulnerabilitats. Deute tècnic < 2%.',
-      supabaseH: 'Concurrència Cloud',
-      supabaseP: 'Ús d\'Optimistic Locking per gestionar l\'estat de les places en temps real.',
-      outcomeH: 'Codi Empresarial', outcomeP: 'Arquitectura escalable auditada automàticament en cada PR.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Cloud Parking Manager",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Gestió Cloud d'aparcaments. Focus: Qualitat del codi i escalabilitat.",
+      algorithmH: "SonarCloud Quality Gate",
+      algorithmP:
+        'Rating "A" a SonarCloud: 0 Bugs i vulnerabilitats. Deute tècnic < 2%.',
+      supabaseH: "Concurrència Cloud",
+      supabaseP:
+        "Ús d'Optimistic Locking per gestionar l'estat de les places en temps real.",
+      outcomeH: "Codi Empresarial",
+      outcomeP: "Arquitectura escalable auditada automàticament en cada PR.",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     gl: {
-      title: 'SpotShare', subtitle: 'Xestor de Parking Cloud', role: 'Cloud Quality Engineer',
-      objective: 'Xestión Cloud de aparcadoiros. Foco: Calidade do código e escalabilidade.',
-      algorithmH: 'SonarCloud Quality Gate',
-      algorithmP: 'Rating "A" en SonarCloud: 0 Bugs e vulnerabilidades. Débeda técnica < 2%.',
-      supabaseH: 'Concorrencia Cloud',
-      supabaseP: 'Uso de Optimistic Locking para xestionar prazas en tempo real.',
-      outcomeH: 'Código Empresarial', outcomeP: 'Arquitectura escalable auditada automaticamente en cada PR.',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "Xestor de Parking Cloud",
+      role: "Cloud Quality Engineer",
+      objective:
+        "Xestión Cloud de aparcadoiros. Foco: Calidade do código e escalabilidade.",
+      algorithmH: "SonarCloud Quality Gate",
+      algorithmP:
+        'Rating "A" en SonarCloud: 0 Bugs e vulnerabilidades. Débeda técnica < 2%.',
+      supabaseH: "Concorrencia Cloud",
+      supabaseP:
+        "Uso de Optimistic Locking para xestionar prazas en tempo real.",
+      outcomeH: "Código Empresarial",
+      outcomeP: "Arquitectura escalable auditada automaticamente en cada PR.",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     ja: {
-      title: 'SpotShare', subtitle: 'クラウド駐車場管理', role: 'クラウド品質エンジニア',
-      objective: '駐車場のクラウド管理。重点：コードの品質とスケーラビリティ。',
-      algorithmH: 'SonarCloud クオリティゲート',
-      algorithmP: 'SonarCloud で「A」評価：バグと脆弱性ゼロ。テクニカルデット 2% 未満。',
-      supabaseH: 'クラウド並行性',
-      supabaseP: '駐車スペースの状態をリアルタイムで管理するための楽観的ロックの使用。',
-      outcomeH: 'エンタープライズコード', outcomeP: 'すべての PR で自動的に監査されるスケーラブルなアーキテクチャ。',
-      codeSpotlight: 'parking.service.ts — Lock Logic',
-      techBadges: ['SonarCloud A', 'Cloud', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "クラウド駐車場管理",
+      role: "クラウド品質エンジニア",
+      objective: "駐車場のクラウド管理。重点：コードの品質とスケーラビリティ。",
+      algorithmH: "SonarCloud クオリティゲート",
+      algorithmP:
+        "SonarCloud で「A」評価：バグと脆弱性ゼロ。テクニカルデット 2% 未満。",
+      supabaseH: "クラウド並行性",
+      supabaseP:
+        "駐車スペースの状態をリアルタイムで管理するための楽観的ロックの使用。",
+      outcomeH: "エンタープライズコード",
+      outcomeP:
+        "すべての PR で自動的に監査されるスケーラブルなアーキテクチャ。",
+      codeSpotlight: "parking.service.ts — Lock Logic",
+      techBadges: ["SonarCloud A", "Cloud", "CI/CD", "Optimistic Locking"],
     },
     zh: {
-      title: 'SpotShare', subtitle: '云端智能车位管理系统', role: '云端质量工程师',
-      objective: '将停车体验转变为高密度、低摩擦的现代服务：实时泊位查询、可视化信任感以及零操作含糊性。',
-      algorithmH: '精准质量关卡(Quality Gate)',
-      algorithmP: '在流水线中集成 SonarCloud、单元测试覆盖率校验及严格的代码规范，确保代码库的高质量可扩展性。',
-      supabaseH: '实时状态同步',
-      supabaseP: '采用乐观锁(Optimistic Locking)技术实现无冲突车位预约，支持原子更新并瞬时同步到管理后台。',
-      outcomeH: '优雅扩展', outcomeP: '具备自动化审计、清晰度量指标及丝滑交互体验的现代化高成长性系统。',
-      codeSpotlight: 'parking.service.ts — 核心预约逻辑',
-      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
+      title: "SpotShare",
+      subtitle: "云端智能车位管理系统",
+      role: "云端质量工程师",
+      objective:
+        "将停车体验转变为高密度、低摩擦的现代服务：实时泊位查询、可视化信任感以及零操作含糊性。",
+      algorithmH: "精准质量关卡(Quality Gate)",
+      algorithmP:
+        "在流水线中集成 SonarCloud、单元测试覆盖率校验及严格的代码规范，确保代码库的高质量可扩展性。",
+      supabaseH: "实时状态同步",
+      supabaseP:
+        "采用乐观锁(Optimistic Locking)技术实现无冲突车位预约，支持原子更新并瞬时同步到管理后台。",
+      outcomeH: "优雅扩展",
+      outcomeP:
+        "具备自动化审计、清晰度量指标及丝滑交互体验的现代化高成长性系统。",
+      codeSpotlight: "parking.service.ts — 核心预约逻辑",
+      techBadges: [
+        "SonarCloud A",
+        "Cloud Native",
+        "CI/CD",
+        "Optimistic Locking",
+      ],
     },
     ar: {
-      title: 'SpotShare', subtitle: 'ذكاء مواقف السيارات السحابية', role: 'مهندس جودة الحوسبة السحابية',
-      objective: 'تحويل مواقف السيارات إلى تجربة عالية الكثافة وسهلة الاستخدام: توفر فوري في الوقت الفعلي، وموثوقية بصرية، وصفر غموض تشغيلي.',
-      algorithmH: 'بوابة جودة دقيقة (Quality Gate)',
-      algorithmP: 'خطوط أنابيب CI/CD مع SonarCloud، وفحوصات التغطية والانضباط التقني العالي للحفاظ على بنية برمجية قابلة للتوسع.',
-      supabaseH: 'حالة الوقت الفعلي الفورية',
-      supabaseP: 'يمنع القفل المتفائل (Optimistic Locking) تضارب الحجوزات للمواقف، مع تحديثات ذرية تنعكس فوراً على لوحة التشغيل.',
-      outcomeH: 'التوسع بأناقة وسلاسة', outcomeP: 'نظام مُهيأ للنمو المستقبلي، مدعوم بعمليات تدقيق تلقائية، ومقاييس أداء واضحة، وتجربة مستخدم متميزة.',
-      codeSpotlight: 'parking.service.ts — منطق الحجز والتحقق',
-      techBadges: ['SonarCloud A', 'Cloud Native', 'CI/CD', 'Optimistic Locking']
-    }
+      title: "SpotShare",
+      subtitle: "ذكاء مواقف السيارات السحابية",
+      role: "مهندس جودة الحوسبة السحابية",
+      objective:
+        "تحويل مواقف السيارات إلى تجربة عالية الكثافة وسهلة الاستخدام: توفر فوري في الوقت الفعلي، وموثوقية بصرية، وصفر غموض تشغيلي.",
+      algorithmH: "بوابة جودة دقيقة (Quality Gate)",
+      algorithmP:
+        "خطوط أنابيب CI/CD مع SonarCloud، وفحوصات التغطية والانضباط التقني العالي للحفاظ على بنية برمجية قابلة للتوسع.",
+      supabaseH: "حالة الوقت الفعلي الفورية",
+      supabaseP:
+        "يمنع القفل المتفائل (Optimistic Locking) تضارب الحجوزات للمواقف، مع تحديثات ذرية تنعكس فوراً على لوحة التشغيل.",
+      outcomeH: "التوسع بأناقة وسلاسة",
+      outcomeP:
+        "نظام مُهيأ للنمو المستقبلي، مدعوم بعمليات تدقيق تلقائية، ومقاييس أداء واضحة، وتجربة مستخدم متميزة.",
+      codeSpotlight: "parking.service.ts — منطق الحجز والتحقق",
+      techBadges: [
+        "SonarCloud A",
+        "Cloud Native",
+        "CI/CD",
+        "Optimistic Locking",
+      ],
+    },
   },
 
-  'pke-web': {
+  "pke-web": {
     es: {
-      title: 'PKE Web', subtitle: 'Accessible Semantics by Default', role: 'UX/A11Y Developer',
-      objective: 'Construir una interfaz donde la accesibilidad no sea una capa extra sino la propia arquitectura: teclado, lector de pantalla, contraste y movimiento reducido.',
-      algorithmH: 'Focus Architecture & ARIA',
-      algorithmP: 'Gestión rigurosa del DOM para crear una navegación predecible, silenciosa y completamente controlable por teclado.',
-      supabaseH: 'Diseño Inclusivo',
-      supabaseP: 'Contrastes auditados, estados visibles y respeto total por prefers-reduced-motion para una experiencia que no excluye a nadie.',
-      outcomeH: 'A11Y sin Compromisos', outcomeP: 'Una base semántica preparada para crecer con componentes accesibles y una puntuación Lighthouse consistente.',
-      codeSpotlight: 'useFocusTrap.ts — Accessibility Core',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Accessible Semantics by Default",
+      role: "UX/A11Y Developer",
+      objective:
+        "Construir una interfaz donde la accesibilidad no sea una capa extra sino la propia arquitectura: teclado, lector de pantalla, contraste y movimiento reducido.",
+      algorithmH: "Focus Architecture & ARIA",
+      algorithmP:
+        "Gestión rigurosa del DOM para crear una navegación predecible, silenciosa y completamente controlable por teclado.",
+      supabaseH: "Diseño Inclusivo",
+      supabaseP:
+        "Contrastes auditados, estados visibles y respeto total por prefers-reduced-motion para una experiencia que no excluye a nadie.",
+      outcomeH: "A11Y sin Compromisos",
+      outcomeP:
+        "Una base semántica preparada para crecer con componentes accesibles y una puntuación Lighthouse consistente.",
+      codeSpotlight: "useFocusTrap.ts — Accessibility Core",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     en: {
-      title: 'PKE Web', subtitle: 'Accessible Semantics by Default', role: 'UX/A11Y Developer',
-      objective: 'Build an interface where accessibility is not a layer on top but the actual architecture: keyboard, screen readers, contrast, and reduced motion.',
-      algorithmH: 'Focus Architecture & ARIA',
-      algorithmP: 'Strict DOM control creates a navigation model that feels predictable, quiet, and fully keyboard-driven.',
-      supabaseH: 'Inclusive Design',
-      supabaseP: 'Audited contrast, visible states, and full respect for prefers-reduced-motion to avoid excluding anyone.',
-      outcomeH: 'A11Y without Compromise', outcomeP: 'A semantic base ready to scale with accessible components and a consistently strong Lighthouse score.',
-      codeSpotlight: 'useFocusTrap.ts — Accessibility Core',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Accessible Semantics by Default",
+      role: "UX/A11Y Developer",
+      objective:
+        "Build an interface where accessibility is not a layer on top but the actual architecture: keyboard, screen readers, contrast, and reduced motion.",
+      algorithmH: "Focus Architecture & ARIA",
+      algorithmP:
+        "Strict DOM control creates a navigation model that feels predictable, quiet, and fully keyboard-driven.",
+      supabaseH: "Inclusive Design",
+      supabaseP:
+        "Audited contrast, visible states, and full respect for prefers-reduced-motion to avoid excluding anyone.",
+      outcomeH: "A11Y without Compromise",
+      outcomeP:
+        "A semantic base ready to scale with accessible components and a consistently strong Lighthouse score.",
+      codeSpotlight: "useFocusTrap.ts — Accessibility Core",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     eu: {
-      title: 'PKE Web', subtitle: 'Irisgarritasuna eta Semantika', role: 'UX/A11Y Developer',
-      objective: 'Irisgarritasuna oinarri duen plataforma, irisgarritasun jarraibideak kontuan hartuz diseinatua.',
-      algorithmH: 'Focus Trapping eta ARIA Roles',
-      algorithmP: 'DOM kudeaketa egokia teklatu bidezko nabigaziorako eta pantaila-irakurleentzako.',
-      supabaseH: 'Diseinu Inklusiboa',
-      supabaseP: 'Kontraste analisi erreala eta prefers-reduced-motion-erako euskarri natiboa.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Pertsona guztientzako interfaze erabilgarria, salbuespenik gabe.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Irisgarritasuna eta Semantika",
+      role: "UX/A11Y Developer",
+      objective:
+        "Irisgarritasuna oinarri duen plataforma, irisgarritasun jarraibideak kontuan hartuz diseinatua.",
+      algorithmH: "Focus Trapping eta ARIA Roles",
+      algorithmP:
+        "DOM kudeaketa egokia teklatu bidezko nabigaziorako eta pantaila-irakurleentzako.",
+      supabaseH: "Diseinu Inklusiboa",
+      supabaseP:
+        "Kontraste analisi erreala eta prefers-reduced-motion-erako euskarri natiboa.",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP:
+        "Pertsona guztientzako interfaze erabilgarria, salbuespenik gabe.",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     fr: {
-      title: 'PKE Web', subtitle: 'Accessibilité & Sémantique', role: 'UX/A11Y Developer',
-      objective: 'Plateforme conçue avec des considérations d\'accessibilité (WCAG-conscious).',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'Gestion parfaite du DOM pour la navigation au clavier et les lecteurs d\'écran.',
-      supabaseH: 'Design Inclusif',
-      supabaseP: 'Analyse réelle du contraste et support natif de prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interface accessible à tous sans exception.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Accessibilité & Sémantique",
+      role: "UX/A11Y Developer",
+      objective:
+        "Plateforme conçue avec des considérations d'accessibilité (WCAG-conscious).",
+      algorithmH: "Focus Trapping & ARIA Roles",
+      algorithmP:
+        "Gestion parfaite du DOM pour la navigation au clavier et les lecteurs d'écran.",
+      supabaseH: "Design Inclusif",
+      supabaseP:
+        "Analyse réelle du contraste et support natif de prefers-reduced-motion.",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP: "Interface accessible à tous sans exception.",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     it: {
-      title: 'PKE Web', subtitle: 'Accessibilità & Semantica', role: 'UX/A11Y Developer',
-      objective: 'Piattaforma progettata con considerazioni sull\'accessibilità.',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'Gestione impeccabile del DOM per navigazione da tastiera e screen reader.',
-      supabaseH: 'Design Inclusivo',
-      supabaseP: 'Analisi reale del contrasto e supporto per prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interfaccia utilizzabile da chiunque senza eccezioni.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Accessibilità & Semantica",
+      role: "UX/A11Y Developer",
+      objective:
+        "Piattaforma progettata con considerazioni sull'accessibilità.",
+      algorithmH: "Focus Trapping & ARIA Roles",
+      algorithmP:
+        "Gestione impeccabile del DOM per navigazione da tastiera e screen reader.",
+      supabaseH: "Design Inclusivo",
+      supabaseP:
+        "Analisi reale del contrasto e supporto per prefers-reduced-motion.",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP: "Interfaccia utilizzabile da chiunque senza eccezioni.",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     de: {
-      title: 'PKE Web', subtitle: 'Barrierefreiheit & Semantik', role: 'UX/A11Y Developer',
-      objective: 'Plattform mit Fokus auf Barrierefreiheit, unter Berücksichtigung von A11y-Richtlinien.',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'DOM-Management für Tastaturnavigation und Screenreader.',
-      supabaseH: 'Inklusives Design',
-      supabaseP: 'Echtzeit-Kontrastanalyse und Support für prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Uneingeschränkt nutzbare Schnittstelle für alle.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Barrierefreiheit & Semantik",
+      role: "UX/A11Y Developer",
+      objective:
+        "Plattform mit Fokus auf Barrierefreiheit, unter Berücksichtigung von A11y-Richtlinien.",
+      algorithmH: "Focus Trapping & ARIA Roles",
+      algorithmP: "DOM-Management für Tastaturnavigation und Screenreader.",
+      supabaseH: "Inklusives Design",
+      supabaseP:
+        "Echtzeit-Kontrastanalyse und Support für prefers-reduced-motion.",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP: "Uneingeschränkt nutzbare Schnittstelle für alle.",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     pt: {
-      title: 'PKE Web', subtitle: 'Acessibilidade & Semântica', role: 'UX/A11Y Developer',
-      objective: 'Plataforma projetada com considerações de acessibilidade (WCAG-conscious).',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'Gestão impecável do DOM para navegação por teclado e leitores de ecrã.',
-      supabaseH: 'Design Inclusivo',
-      supabaseP: 'Análise de contraste real e suporte nativo para prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interface utilizável por todos sem exceções.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Acessibilidade & Semântica",
+      role: "UX/A11Y Developer",
+      objective:
+        "Plataforma projetada com considerações de acessibilidade (WCAG-conscious).",
+      algorithmH: "Focus Trapping & ARIA Roles",
+      algorithmP:
+        "Gestão impecável do DOM para navegação por teclado e leitores de ecrã.",
+      supabaseH: "Design Inclusivo",
+      supabaseP:
+        "Análise de contraste real e suporte nativo para prefers-reduced-motion.",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP: "Interface utilizável por todos sem exceções.",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     ca: {
-      title: 'PKE Web', subtitle: 'Accessibilitat & Semàntica', role: 'UX/A11Y Developer',
-      objective: 'Plataforma dissenyada amb consideracions d\'accessibilitat.',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'Gestió perfecta del DOM per a navegació per teclat i lectors de pantalla.',
-      supabaseH: 'Disseny Inclusiu',
-      supabaseP: 'Anàlisi de contrast real i suport natiu per prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interfície accessible per a tothom sense excepcions.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Accessibilitat & Semàntica",
+      role: "UX/A11Y Developer",
+      objective: "Plataforma dissenyada amb consideracions d'accessibilitat.",
+      algorithmH: "Focus Trapping & ARIA Roles",
+      algorithmP:
+        "Gestió perfecta del DOM per a navegació per teclat i lectors de pantalla.",
+      supabaseH: "Disseny Inclusiu",
+      supabaseP:
+        "Anàlisi de contrast real i suport natiu per prefers-reduced-motion.",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP: "Interfície accessible per a tothom sense excepcions.",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     gl: {
-      title: 'PKE Web', subtitle: 'Accesibilidade & Semántica', role: 'UX/A11Y Developer',
-      objective: 'Plataforma deseñada con consideracións de accesibilidade.',
-      algorithmH: 'Focus Trapping & ARIA Roles',
-      algorithmP: 'Xestión perfecta do DOM para navegación por teclado e lectores de pantalla.',
-      supabaseH: 'Deseño Inclusivo',
-      supabaseP: 'Análise de contraste real e soporte nativo para prefers-reduced-motion.',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: 'Interface utilizable por calquera persoa sen excepcións.',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "Accesibilidade & Semántica",
+      role: "UX/A11Y Developer",
+      objective: "Plataforma deseñada con consideracións de accesibilidade.",
+      algorithmH: "Focus Trapping & ARIA Roles",
+      algorithmP:
+        "Xestión perfecta do DOM para navegación por teclado e lectores de pantalla.",
+      supabaseH: "Deseño Inclusivo",
+      supabaseP:
+        "Análise de contraste real e soporte nativo para prefers-reduced-motion.",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP: "Interface utilizable por calquera persoa sen excepcións.",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     ja: {
-      title: 'PKE Web', subtitle: 'アクセシビリティ & セマンティクス', role: 'UX/A11Y デベロッパー',
-      objective: 'アクセシビリティに配慮して設計されたプラットフォーム。',
-      algorithmH: 'フォーカストラップ & ARIA ロール',
-      algorithmP: 'キーボードナビゲーションとスクリーンリーダーのための完璧な DOM 管理。',
-      supabaseH: 'インクルーシブデザイン',
-      supabaseP: '実際のコントラスト分析と prefers-reduced-motion のネイティブサポート。',
-      outcomeH: '100% Lighthouse A11Y', outcomeP: '例外なく誰でも利用できるインターフェース。',
-      codeSpotlight: 'useFocusTrap.ts — React Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE Web",
+      subtitle: "アクセシビリティ & セマンティクス",
+      role: "UX/A11Y デベロッパー",
+      objective: "アクセシビリティに配慮して設計されたプラットフォーム。",
+      algorithmH: "フォーカストラップ & ARIA ロール",
+      algorithmP:
+        "キーボードナビゲーションとスクリーンリーダーのための完璧な DOM 管理。",
+      supabaseH: "インクルーシブデザイン",
+      supabaseP:
+        "実際のコントラスト分析と prefers-reduced-motion のネイティブサポート。",
+      outcomeH: "100% Lighthouse A11Y",
+      outcomeP: "例外なく誰でも利用できるインターフェース。",
+      codeSpotlight: "useFocusTrap.ts — React Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     zh: {
-      title: 'PKE 网页端', subtitle: '默认无障碍(A11y)语义化网页', role: 'UX 与无障碍开发专家',
-      objective: '打造无障碍设计并非点缀而是核心架构的标杆界面：全键盘导航、屏幕阅读器高度适配、强对比度以及尊重减弱动画偏好。',
-      algorithmH: '焦点管理与 ARIA 规范架构',
-      algorithmP: '对 DOM 进行精准控制，构建出行为可预测、静默且完全由键盘驱动的完美无障碍浏览路径。',
-      supabaseH: '极致包容性设计',
-      supabaseP: '通过严格的对比度审计、可见焦点状态提示以及对 prefers-reduced-motion 的原生适配，确保人人皆可平等享用。',
-      outcomeH: '无妥协的无障碍体验', outcomeP: '语义化基石保障系统轻松承载无障碍组件，提供始终满分的 Lighthouse A11Y 表现。',
-      codeSpotlight: 'useFocusTrap.ts — 核心无障碍 Hook',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
+      title: "PKE 网页端",
+      subtitle: "默认无障碍(A11y)语义化网页",
+      role: "UX 与无障碍开发专家",
+      objective:
+        "打造无障碍设计并非点缀而是核心架构的标杆界面：全键盘导航、屏幕阅读器高度适配、强对比度以及尊重减弱动画偏好。",
+      algorithmH: "焦点管理与 ARIA 规范架构",
+      algorithmP:
+        "对 DOM 进行精准控制，构建出行为可预测、静默且完全由键盘驱动的完美无障碍浏览路径。",
+      supabaseH: "极致包容性设计",
+      supabaseP:
+        "通过严格的对比度审计、可见焦点状态提示以及对 prefers-reduced-motion 的原生适配，确保人人皆可平等享用。",
+      outcomeH: "无妥协的无障碍体验",
+      outcomeP:
+        "语义化基石保障系统轻松承载无障碍组件，提供始终满分的 Lighthouse A11Y 表现。",
+      codeSpotlight: "useFocusTrap.ts — 核心无障碍 Hook",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
     ar: {
-      title: 'PKE Web', subtitle: 'دلالات سهولة الوصول بشكل افتراضي', role: 'مطور واجهات المستخدم وإمكانية الوصول (A11Y)',
-      objective: 'بناء واجهة لا تكون فيها إمكانية الوصول مجرد طبقة إضافية بل هي صلب البنية الهيكلية: لوحة المفاتيح، قارئات الشاشة، والتباين العالي.',
-      algorithmH: 'بنية إدارة التركيز وأدوار ARIA',
-      algorithmP: 'التحكم الصارم في شجرة DOM لإنشاء مسار تنقل متوقع، هادئ، ويمكن التحكم فيه بالكامل عبر لوحة المفاتيح.',
-      supabaseH: 'التصميم الشامل للجميع',
-      supabaseP: 'عمليات تدقيق التباين، والتركيز المرئي النشط، والاحترام الكامل لإعدادات prefers-reduced-motion لتجربة لا تستثني أحداً.',
-      outcomeH: 'إمكانية وصول بلا مساومات', outcomeP: 'قاعدة دلالية متينة جاهزة للنمو مع مكونات سهلة الاستخدام ودرجة Lighthouse قوية وثابتة.',
-      codeSpotlight: 'useFocusTrap.ts — إدارة التركيز الفعالة',
-      techBadges: ['WCAG-conscious', 'Focus Trap', 'A11Y', 'Semantic HTML']
-    }
-  }
+      title: "PKE Web",
+      subtitle: "دلالات سهولة الوصول بشكل افتراضي",
+      role: "مطور واجهات المستخدم وإمكانية الوصول (A11Y)",
+      objective:
+        "بناء واجهة لا تكون فيها إمكانية الوصول مجرد طبقة إضافية بل هي صلب البنية الهيكلية: لوحة المفاتيح، قارئات الشاشة، والتباين العالي.",
+      algorithmH: "بنية إدارة التركيز وأدوار ARIA",
+      algorithmP:
+        "التحكم الصارم في شجرة DOM لإنشاء مسار تنقل متوقع، هادئ، ويمكن التحكم فيه بالكامل عبر لوحة المفاتيح.",
+      supabaseH: "التصميم الشامل للجميع",
+      supabaseP:
+        "عمليات تدقيق التباين، والتركيز المرئي النشط، والاحترام الكامل لإعدادات prefers-reduced-motion لتجربة لا تستثني أحداً.",
+      outcomeH: "إمكانية وصول بلا مساومات",
+      outcomeP:
+        "قاعدة دلالية متينة جاهزة للنمو مع مكونات سهلة الاستخدام ودرجة Lighthouse قوية وثابتة.",
+      codeSpotlight: "useFocusTrap.ts — إدارة التركيز الفعالة",
+      techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
+    },
+  },
 };
 
 export const CODE_SNIPPETS: Record<string, string> = {
-  'ana-peluquera': `// useCreateBooking.ts — Firebase Orchestrator
+  "ana-peluquera": `// useCreateBooking.ts — Firebase Orchestrator
 export const handleBooking = async (bookingData: BookingPayload) => {
   const { service, startTime, phase2Min } = bookingData;
   const docRef = await db.collection("bookings").add({ ...bookingData, status: "confirmed", createdAt: serverTimestamp() });
@@ -707,7 +1159,7 @@ export const handleBooking = async (bookingData: BookingPayload) => {
   return { success: true, id: docRef.id, freeSlot: { phase1End, phase2End } };
 };`,
 
-  'who-are-ya-backend': `// players.controller.js — MongoDB Filter Engine
+  "who-are-ya-backend": `// players.controller.js — MongoDB Filter Engine
 export const getPlayers = async (req, res) => {
   try {
     const { name, team, position } = req.query;
@@ -722,7 +1174,7 @@ export const getPlayers = async (req, res) => {
   } catch (error) { res.status(500).json({ message: 'Error', error }); }
 };`,
 
-  'rides24ofiziala': `// RideService.java — JAX-WS Atomic Seat Lock
+  rides24ofiziala: `// RideService.java — JAX-WS Atomic Seat Lock
 @WebMethod
 public synchronized BookingResult reserveSeat(String rideId, String userId, int seat) {
   EntityTransaction tx = em.getTransaction();
@@ -740,7 +1192,7 @@ public synchronized BookingResult reserveSeat(String rideId, String userId, int 
   } catch (Exception e) { if (tx.isActive()) tx.rollback(); throw new WebServiceException(e); }
 }`,
 
-  'spotshare-parking': `// parking.service.ts — Optimistic Locking
+  "spotshare-parking": `// parking.service.ts — Optimistic Locking
 @Injectable()
 export class ParkingService {
   async reserveSpot(spotId: string, userId: string, currentVersion: number) {
@@ -753,7 +1205,7 @@ export class ParkingService {
   }
 }`,
 
-  'pke-web': `// useFocusTrap.ts — Accessibility/A11y Focus Hook
+  "pke-web": `// useFocusTrap.ts — Accessibility/A11y Focus Hook
 export const useFocusTrap = (ref: RefObject<HTMLElement>, isActive: boolean) => {
   useEffect(() => {
     if (!isActive || !ref.current) return;
@@ -773,5 +1225,5 @@ export const useFocusTrap = (ref: RefObject<HTMLElement>, isActive: boolean) => 
     document.addEventListener('keydown', handleTab);
     return () => document.removeEventListener('keydown', handleTab);
   }, [isActive, ref]);
-};`
+};`,
 };

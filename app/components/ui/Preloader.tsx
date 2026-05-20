@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -13,11 +13,13 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import gsap from 'gsap';
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import gsap from "gsap";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
 export function Preloader({ onDone }: { onDone: () => void }) {
   const [n, setN] = useState(0);
+  const motionEnabled = useMotionEnabled();
   const containerRef = useRef<HTMLDivElement>(null);
   const numRef = useRef<HTMLDivElement>(null);
   const barContainerRef = useRef<HTMLDivElement>(null);
@@ -44,52 +46,66 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         scale: 60,
         opacity: 0,
         duration: 1.0,
-        ease: 'power4.inOut',
+        ease: "power4.inOut",
         force3D: true, // GPU acceleration to avoid pixelation
       });
     }
 
-    const fadeTargets = [barContainerRef.current, spotlightRef.current].filter(Boolean);
+    const fadeTargets = [barContainerRef.current, spotlightRef.current].filter(
+      Boolean,
+    );
     if (fadeTargets.length > 0) {
-      tl.to(fadeTargets, {
-        opacity: 0,
-        duration: 0.4,
-        ease: 'power2.out',
-      }, 0);
+      tl.to(
+        fadeTargets,
+        {
+          opacity: 0,
+          duration: 0.4,
+          ease: "power2.out",
+        },
+        0,
+      );
     }
 
     if (lightRef.current) {
-      tl.to(lightRef.current, {
-        scale: 4,
-        opacity: 0,
-        duration: 1,
-        ease: 'power3.inOut',
-      }, 0.2);
+      tl.to(
+        lightRef.current,
+        {
+          scale: 4,
+          opacity: 0,
+          duration: 1,
+          ease: "power3.inOut",
+        },
+        0.2,
+      );
     }
 
     if (containerRef.current) {
-      tl.to(containerRef.current, {
-        backgroundColor: 'transparent',
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.inOut',
-      }, 0.6);
+      tl.to(
+        containerRef.current,
+        {
+          backgroundColor: "transparent",
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.inOut",
+        },
+        0.6,
+      );
     }
   }, []);
 
   // ── Spotlight Movement Animation ─────────────────────────────────────
   useEffect(() => {
     if (!spotlightRef.current) return;
-    
+
     const tween = gsap.to(spotlightRef.current, {
       x: () => gsap.utils.random(-300, 300),
       y: () => gsap.utils.random(-300, 300),
       duration: () => gsap.utils.random(2, 4),
-      ease: 'sine.inOut',
+      ease: "sine.inOut",
       repeat: -1,
       repeatRefresh: true,
     });
-    
+
     return () => {
       tween.kill();
     };
@@ -97,6 +113,12 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
   // ── Counter Logic (High precision) ──────────────────────────────────────
   useEffect(() => {
+    if (!motionEnabled) {
+      setN(100);
+      onDoneRef.current();
+      return;
+    }
+
     let v = 0;
     let rafId: number;
 
@@ -104,14 +126,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       // Significantly faster increments
       const inc = Math.random() * 4 + 2;
       v += inc;
-      
+
       if (v >= 100) {
         setN(100);
         // Instant exit to feel more snappy
         setTimeout(() => playExit(), 80);
         return;
       }
-      
+
       setN(Math.round(v));
       rafId = requestAnimationFrame(() => {
         // Reduced latency for faster feel
@@ -123,7 +145,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [playExit]);
+  }, [motionEnabled, playExit]);
 
   return (
     <div
@@ -134,14 +156,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       aria-busy={n < 100}
     >
       {/* ── Grid Background (Linear) ── */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(var(--line) 1px, transparent 1px),
             linear-gradient(90deg, var(--line) 1px, transparent 1px)
           `,
-          backgroundSize: '40px 40px',
+          backgroundSize: "40px 40px",
         }}
         aria-hidden="true"
       />
@@ -152,10 +174,11 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         className="absolute pointer-events-none rounded-full opacity-20"
         aria-hidden="true"
         style={{
-          width: '80vw',
-          height: '80vw',
-          background: 'radial-gradient(circle, rgba(0,102,255,0.15) 0%, transparent 70%)',
-          filter: 'blur(120px)',
+          width: "80vw",
+          height: "80vw",
+          background:
+            "radial-gradient(circle, rgba(0,102,255,0.15) 0%, transparent 70%)",
+          filter: "blur(120px)",
           transform: `scale(${1 + (n / 100) * 0.5})`,
         }}
       />
@@ -166,10 +189,11 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         className="absolute pointer-events-none z-0"
         aria-hidden="true"
         style={{
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(0,163,255,0.1) 0%, transparent 75%)',
-          filter: 'blur(60px)',
+          width: "400px",
+          height: "400px",
+          background:
+            "radial-gradient(circle, rgba(0,163,255,0.1) 0%, transparent 75%)",
+          filter: "blur(60px)",
         }}
       />
 
@@ -178,11 +202,11 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         <div
           ref={numRef}
           className="font-black text-[clamp(7rem,22vw,16rem)] tracking-[-0.08em] leading-none select-none mix-blend-difference will-change-transform"
-          style={{ 
-            color: 'var(--ink)',
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            transformOrigin: 'center center'
+          style={{
+            color: "var(--ink)",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transformOrigin: "center center",
           }}
           aria-label={`${n} percent loaded`}
         >
@@ -190,7 +214,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         </div>
 
         {/* ── Progress Bar (Positioned below center) ── */}
-        <div 
+        <div
           ref={barContainerRef}
           className="absolute top-[120%] flex flex-col items-center gap-4 opacity-40"
           role="progressbar"
@@ -202,18 +226,21 @@ export function Preloader({ onDone }: { onDone: () => void }) {
             <div
               ref={barRef}
               className="absolute inset-0 bg-ink origin-left"
-              style={{ 
+              style={{
                 transform: `scaleX(${n / 100})`,
-                transition: 'transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)' 
+                transition: "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)",
               }}
             />
           </div>
-          
+
           <div className="flex items-center gap-4">
-             <span className="font-mono text-[9px] tracking-[0.6em] uppercase opacity-40 font-black">
-               {n < 100 ? 'Initializing Protocol' : 'Signal Synchronized'}
-             </span>
-             <div className={`w-1.5 h-1.5 rounded-full bg-brand ${n < 100 ? 'animate-pulse' : ''}`} aria-hidden="true" />
+            <span className="font-mono text-[9px] tracking-[0.6em] uppercase opacity-40 font-black">
+              {n < 100 ? "Initializing Protocol" : "Signal Synchronized"}
+            </span>
+            <div
+              className={`w-1.5 h-1.5 rounded-full bg-brand ${n < 100 ? "animate-pulse" : ""}`}
+              aria-hidden="true"
+            />
           </div>
         </div>
       </div>
@@ -221,10 +248,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       {/* ── Corner Indices (Premium Detail) ── */}
       <div className="absolute top-12 left-12 flex flex-col gap-2 opacity-15">
         <div className="w-10 h-[1px] bg-ink" />
-        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">Terminal_Auth</span>
+        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">
+          Terminal_Auth
+        </span>
       </div>
       <div className="absolute bottom-12 right-12 flex flex-col items-end gap-2 opacity-15">
-        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">Node_01 // 2026</span>
+        <span className="font-mono text-[9px] tracking-[0.3em] uppercase font-bold">
+          Node_01 // 2026
+        </span>
         <div className="w-10 h-[1px] bg-ink" />
       </div>
     </div>

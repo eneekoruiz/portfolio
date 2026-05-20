@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import gsap from 'gsap';
+import { useState, useEffect, useCallback } from "react";
+import gsap from "gsap";
 
 export function PortalTransition() {
   const [active, setActive] = useState(false);
@@ -10,9 +10,9 @@ export function PortalTransition() {
   const startPortal = useCallback((url: string) => {
     setPendingUrl(url);
     setActive(true);
-    
+
     // Lock scroll
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   }, []);
 
   useEffect(() => {
@@ -20,20 +20,23 @@ export function PortalTransition() {
       const tl = gsap.timeline({
         onComplete: () => {
           window.location.href = pendingUrl;
-        }
+        },
       });
 
-      tl.to('#portal-ring', {
+      tl.to("#portal-ring", {
         scale: 25,
         opacity: 1,
         duration: 0.8,
-        ease: 'power4.in',
-      })
-      .to('#portal-overlay', {
-        opacity: 1,
-        duration: 0.4,
-        ease: 'power2.in',
-      }, '-=0.3');
+        ease: "power4.in",
+      }).to(
+        "#portal-overlay",
+        {
+          opacity: 1,
+          duration: 0.4,
+          ease: "power2.in",
+        },
+        "-=0.3",
+      );
     }
   }, [active, pendingUrl]);
 
@@ -44,8 +47,8 @@ export function PortalTransition() {
       }
     };
 
-    window.addEventListener('trigger-portal', handlePortal);
-    return () => window.removeEventListener('trigger-portal', handlePortal);
+    window.addEventListener("trigger-portal", handlePortal);
+    return () => window.removeEventListener("trigger-portal", handlePortal);
   }, [startPortal]);
 
   if (!active) return null;
@@ -54,20 +57,27 @@ export function PortalTransition() {
     <div className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center overflow-hidden">
       {/* Black background fade */}
       <div id="portal-overlay" className="absolute inset-0 bg-page opacity-0" />
-      
+
       {/* The Zooming Ring */}
-      <div 
+      <div
         id="portal-ring"
         className="w-[100px] h-[100px] rounded-full border-[2px] border-brand/40 opacity-0 shadow-[0_0_100px_rgba(var(--brand-rgb),0.5)]"
         style={{
-          boxShadow: 'inset 0 0 50px rgba(var(--brand-rgb),0.3), 0 0 100px rgba(var(--brand-rgb),0.5)'
+          boxShadow:
+            "inset 0 0 50px rgba(var(--brand-rgb),0.3), 0 0 100px rgba(var(--brand-rgb),0.5)",
         }}
       />
 
       {/* Internal Glitch Elements */}
       <div className="absolute inset-0 flex items-center justify-center">
-         <div className="w-1 h-full bg-brand/5 animate-pulse" style={{ transform: 'rotate(45deg)' }} />
-         <div className="w-1 h-full bg-brand/5 animate-pulse" style={{ transform: 'rotate(-45deg)' }} />
+        <div
+          className="w-1 h-full bg-brand/5 animate-pulse"
+          style={{ transform: "rotate(45deg)" }}
+        />
+        <div
+          className="w-1 h-full bg-brand/5 animate-pulse"
+          style={{ transform: "rotate(-45deg)" }}
+        />
       </div>
     </div>
   );
@@ -77,6 +87,6 @@ export function PortalTransition() {
  * Utility to trigger the portal from anywhere
  */
 export const triggerPortal = (url: string) => {
-  const event = new CustomEvent('trigger-portal', { detail: { url } });
+  const event = new CustomEvent("trigger-portal", { detail: { url } });
   window.dispatchEvent(event);
 };

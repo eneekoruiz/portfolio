@@ -12,7 +12,9 @@
     "start": "next start",
     "lint": "eslint app",
     "typecheck": "tsc --noEmit",
-    "check-i18n": "npx tsx scripts/check-i18n.ts"
+    "check-i18n": "npx tsx scripts/check-i18n.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
@@ -32,6 +34,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.6",
     "postcss": "^8.5.14",
+    "prettier": "^3.8.3",
     "tailwindcss": "^3.4.19",
     "typescript": "^6.0.3"
   }

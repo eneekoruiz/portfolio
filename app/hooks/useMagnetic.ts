@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * useMagnetic — GSAP-powered magnetic attraction for buttons
@@ -16,8 +16,8 @@
  * Only activates on devices with a fine pointer (mouse).
  */
 
-import { useEffect, useRef, useCallback } from 'react';
-import gsap from 'gsap';
+import { useEffect, useRef, useCallback } from "react";
+import gsap from "gsap";
 
 interface MagneticOptions {
   /** Strength of the attraction (0–1). Default: 0.35 */
@@ -47,17 +47,17 @@ export function useMagnetic<T extends HTMLElement>(
     if (!el) return;
 
     // Only on devices with a precise pointer (mouse)
-    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
 
     const inner = el.firstElementChild as HTMLElement | null;
 
     const onMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
-      const currentX = (gsap.getProperty(el, 'x') as number) || 0;
-      const currentY = (gsap.getProperty(el, 'y') as number) || 0;
-      
-      const cx = (rect.left - currentX) + rect.width / 2;
-      const cy = (rect.top - currentY) + rect.height / 2;
+      const currentX = (gsap.getProperty(el, "x") as number) || 0;
+      const currentY = (gsap.getProperty(el, "y") as number) || 0;
+
+      const cx = rect.left - currentX + rect.width / 2;
+      const cy = rect.top - currentY + rect.height / 2;
       const dx = e.clientX - cx;
       const dy = e.clientY - cy;
 
@@ -65,7 +65,7 @@ export function useMagnetic<T extends HTMLElement>(
         x: dx * strength,
         y: dy * strength,
         duration: 0.3,
-        ease: 'power3.out',
+        ease: "power3.out",
         overwrite: true,
       });
 
@@ -74,7 +74,7 @@ export function useMagnetic<T extends HTMLElement>(
           x: dx * innerStrength,
           y: dy * innerStrength,
           duration: 0.3,
-          ease: 'power3.out',
+          ease: "power3.out",
           overwrite: true,
         });
       }
@@ -85,7 +85,7 @@ export function useMagnetic<T extends HTMLElement>(
         x: 0,
         y: 0,
         duration: returnDuration,
-        ease: 'elastic.out(1, 0.4)',
+        ease: "elastic.out(1, 0.4)",
         overwrite: true,
       });
       if (inner) {
@@ -93,18 +93,18 @@ export function useMagnetic<T extends HTMLElement>(
           x: 0,
           y: 0,
           duration: returnDuration,
-          ease: 'elastic.out(1, 0.4)',
+          ease: "elastic.out(1, 0.4)",
           overwrite: true,
         });
       }
     };
 
-    el.addEventListener('mousemove', onMove);
-    el.addEventListener('mouseleave', onLeave);
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
 
     return () => {
-      el.removeEventListener('mousemove', onMove);
-      el.removeEventListener('mouseleave', onLeave);
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
       // Reset transforms on cleanup
       gsap.set(el, { x: 0, y: 0 });
       if (inner) gsap.set(inner, { x: 0, y: 0 });

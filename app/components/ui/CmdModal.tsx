@@ -1,17 +1,31 @@
-'use client';
+"use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, KeyboardEvent as RKE } from 'react';
-import { Search, Check } from 'lucide-react';
-import gsap from 'gsap';
-import { LANG_LABELS } from '../../lib/constants';
-import type { Lang, Tx } from '../../types';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+  KeyboardEvent as RKE,
+} from "react";
+import { Search, Check } from "lucide-react";
+import gsap from "gsap";
+import { LANG_LABELS } from "../../lib/constants";
+import type { Lang, Tx } from "../../types";
 
 export function CmdModal({
-  lang, setLang, onClose, t,
+  lang,
+  setLang,
+  onClose,
+  t,
 }: {
-  lang: Lang; setLang: (l: Lang) => void; onClose: () => void; t: Tx;
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  onClose: () => void;
+  t: Tx;
 }) {
-  const [q,   setQ]   = useState('');
+  const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const inp = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -23,14 +37,14 @@ export function CmdModal({
   useEffect(() => {
     const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
     const prev = document.body.style.overflow;
-    document.body.style.overflow  = 'hidden';
+    document.body.style.overflow = "hidden";
     document.body.style.paddingRight = `${scrollbarW}px`;
     // Freeze Lenis if available
     const lenis = window.__lenis;
     lenis?.stop?.();
     return () => {
-      document.body.style.overflow  = prev || '';
-      document.body.style.paddingRight = '';
+      document.body.style.overflow = prev || "";
+      document.body.style.paddingRight = "";
       lenis?.start?.();
     };
   }, []);
@@ -47,18 +61,26 @@ export function CmdModal({
           onClose();
         },
       });
-      tl.to(box, {
-        scale: 0.95,
-        y: 20,
-        opacity: 0,
-        duration: 0.2,
-        ease: 'power2.in',
-      }, 0);
-      tl.to(overlay, {
-        opacity: 0,
-        duration: 0.2,
-        ease: 'power2.in',
-      }, 0);
+      tl.to(
+        box,
+        {
+          scale: 0.95,
+          y: 20,
+          opacity: 0,
+          duration: 0.2,
+          ease: "power2.in",
+        },
+        0,
+      );
+      tl.to(
+        overlay,
+        {
+          opacity: 0,
+          duration: 0.2,
+          ease: "power2.in",
+        },
+        0,
+      );
     } else {
       onClose();
     }
@@ -76,59 +98,82 @@ export function CmdModal({
       gsap.to(overlay, {
         opacity: 1,
         duration: 0.3,
-        ease: 'power3.out',
+        ease: "power3.out",
       });
       gsap.to(box, {
         scale: 1,
         y: 0,
         opacity: 1,
         duration: 0.4,
-        ease: 'expo.out',
-        clearProps: 'transform,scale,opacity',
+        ease: "expo.out",
+        clearProps: "transform,scale,opacity",
       });
     }
   }, []);
 
   type Item = { id: string; label: string; group: string; action: () => void };
 
-  const navItems = useMemo<Item[]>(() =>
-    t.menu.map((label, i) => ({
-      id: `n${i}`, label, group: t.cmdNav,
-      action: () => {
-        document.getElementById(t.hrefs[i].slice(1))?.scrollIntoView({ behavior: 'smooth' });
-        handleClose();
-      },
-    })), [t, handleClose]);
+  const navItems = useMemo<Item[]>(
+    () =>
+      t.menu.map((label, i) => ({
+        id: `n${i}`,
+        label,
+        group: t.cmdNav,
+        action: () => {
+          document
+            .getElementById(t.hrefs[i].slice(1))
+            ?.scrollIntoView({ behavior: "smooth" });
+          handleClose();
+        },
+      })),
+    [t, handleClose],
+  );
 
-  const langItems = useMemo<Item[]>(() =>
-    (Object.entries(LANG_LABELS) as [Lang, string][]).map(([k, label]) => ({
-      id: k, label: `${k.toUpperCase()} — ${label}`, group: t.cmdLang,
-      action: () => { setLang(k); handleClose(); },
-    })), [t.cmdLang, setLang, handleClose]);
+  const langItems = useMemo<Item[]>(
+    () =>
+      (Object.entries(LANG_LABELS) as [Lang, string][]).map(([k, label]) => ({
+        id: k,
+        label: `${k.toUpperCase()} — ${label}`,
+        group: t.cmdLang,
+        action: () => {
+          setLang(k);
+          handleClose();
+        },
+      })),
+    [t.cmdLang, setLang, handleClose],
+  );
 
   const flatAll = [...navItems, ...langItems];
   const flatFiltered = q
-    ? flatAll.filter(i => i.label.toLowerCase().includes(q.toLowerCase()))
+    ? flatAll.filter((i) => i.label.toLowerCase().includes(q.toLowerCase()))
     : [];
   const activeList = q ? flatFiltered : flatAll;
 
   useLayoutEffect(() => {
     lastFocusRef.current = document.activeElement as HTMLElement | null;
-    return () => { lastFocusRef.current?.focus?.(); };
+    return () => {
+      lastFocusRef.current?.focus?.();
+    };
   }, []);
-  useEffect(() => { inp.current?.focus(); setSel(0); }, []);
+  useEffect(() => {
+    inp.current?.focus();
+    setSel(0);
+  }, []);
   useEffect(() => setSel(0), [q]);
   useEffect(() => {
     const active = activeList[sel];
     if (!active) return;
-    listRefs.current[active.id]?.scrollIntoView({ block: 'nearest' });
+    listRefs.current[active.id]?.scrollIntoView({ block: "nearest" });
   }, [activeList, sel]);
 
   const onKey = (e: RKE) => {
-    if (e.key === 'Escape') { handleClose(); return; }
-    if (e.key === 'Tab') {
+    if (e.key === "Escape") {
+      handleClose();
+      return;
+    }
+    if (e.key === "Tab") {
       const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
       );
       if (!focusables || focusables.length === 0) return;
       const items = Array.from(focusables);
@@ -147,9 +192,15 @@ export function CmdModal({
       return;
     }
     const list = activeList;
-    if (e.key === 'ArrowDown') { e.preventDefault(); setSel(s => Math.min(s + 1, list.length - 1)); }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); setSel(s => Math.max(s - 1, 0)); }
-    if (e.key === 'Enter' && list[sel]) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSel((s) => Math.min(s + 1, list.length - 1));
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSel((s) => Math.max(s - 1, 0));
+    }
+    if (e.key === "Enter" && list[sel]) {
       e.preventDefault();
       list[sel].action();
     }
@@ -162,12 +213,17 @@ export function CmdModal({
       role="dialog"
       aria-modal="true"
       aria-label="Buscador"
-      style={{ animation: 'none', opacity: 0 }}
+      style={{ animation: "none", opacity: 0 }}
     >
       <div
         ref={dialogRef}
         className="cmd-box flex flex-col"
-        style={{ maxHeight: 'min(78vh, 560px)', animation: 'none', opacity: 0, transform: 'scale(0.95) translateY(-20px)' }}
+        style={{
+          maxHeight: "min(78vh, 560px)",
+          animation: "none",
+          opacity: 0,
+          transform: "scale(0.95) translateY(-20px)",
+        }}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
         onKeyDown={onKey}
         tabIndex={-1}
@@ -181,10 +237,12 @@ export function CmdModal({
             className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 font-sans text-[16px] text-ink py-[1.1rem] caret-brand"
             placeholder={t.cmdPh}
             value={q}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setQ(e.target.value)
+            }
             aria-label="Buscar"
           />
-          <button 
+          <button
             onClick={handleClose}
             type="button"
             className="font-mono text-[10px] text-lead/50 hover:text-ink px-[7px] py-[2px] border border-black/10 dark:border-white/10 rounded-[5px] shrink-0 hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all"
@@ -198,7 +256,9 @@ export function CmdModal({
         <div className="overflow-y-auto overscroll-contain flex-1 pb-3">
           {!q && (
             <div className="px-5 pt-4 pb-2 flex items-center justify-between text-[11px] text-lead/70">
-              <span className="hidden md:inline">Usa ↑ ↓ y Enter para navegar</span>
+              <span className="hidden md:inline">
+                Usa ↑ ↓ y Enter para navegar
+              </span>
               <span className="md:hidden">Selecciona una opción</span>
               <span>{flatAll.length} opciones</span>
             </div>
@@ -210,7 +270,9 @@ export function CmdModal({
               {flatFiltered.length === 0 && (
                 <div className="py-10 text-center text-[13px] text-lead">
                   <p className="mb-1 font-medium text-ink">Sin resultados</p>
-                  <p className="text-lead/70">Prueba con otro texto o usa Esc para cerrar.</p>
+                  <p className="text-lead/70">
+                    Prueba con otro texto o usa Esc para cerrar.
+                  </p>
                 </div>
               )}
               {flatFiltered.map((item, idx) => {
@@ -218,14 +280,18 @@ export function CmdModal({
                   <button
                     key={item.id}
                     type="button"
-                    ref={el => { listRefs.current[item.id] = el; }}
-                    className={`w-full flex items-center gap-[.7rem] px-5 py-[.55rem] rounded-[11px] mx-1 text-[13px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? 'bg-brand/7 text-brand' : 'text-lead hover:bg-brand/7 hover:text-brand'}`}
+                    ref={(el) => {
+                      listRefs.current[item.id] = el;
+                    }}
+                    className={`w-full flex items-center gap-[.7rem] px-5 py-[.55rem] rounded-[11px] mx-1 text-[13px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "bg-brand/7 text-brand" : "text-lead hover:bg-brand/7 hover:text-brand"}`}
                     onClick={item.action}
                     onMouseEnter={() => setSel(idx)}
                   >
                     <span className="opacity-40 text-[12px]">›</span>
                     {item.label}
-                    {item.id === lang && <Check size={12} className="ml-auto text-brand" />}
+                    {item.id === lang && (
+                      <Check size={12} className="ml-auto text-brand" />
+                    )}
                   </button>
                 );
               })}
@@ -237,15 +303,19 @@ export function CmdModal({
             <>
               {/* Navigation */}
               <div className="px-2 pt-3">
-                <p className="text-[9px] font-bold tracking-[.2em] uppercase text-lead/50 px-3 pb-1.5">{t.cmdNav}</p>
-                {navItems.map(item => {
+                <p className="text-[9px] font-bold tracking-[.2em] uppercase text-lead/50 px-3 pb-1.5">
+                  {t.cmdNav}
+                </p>
+                {navItems.map((item) => {
                   const idx = flatAll.indexOf(item);
                   return (
                     <button
                       key={item.id}
                       type="button"
-                      ref={el => { listRefs.current[item.id] = el; }}
-                      className={`w-full flex items-center gap-[.7rem] px-3 py-[.52rem] rounded-[10px] text-[13px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? 'bg-brand/7 text-brand' : 'text-lead hover:bg-brand/7 hover:text-brand'}`}
+                      ref={(el) => {
+                        listRefs.current[item.id] = el;
+                      }}
+                      className={`w-full flex items-center gap-[.7rem] px-3 py-[.52rem] rounded-[10px] text-[13px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "bg-brand/7 text-brand" : "text-lead hover:bg-brand/7 hover:text-brand"}`}
                       onClick={item.action}
                       onMouseEnter={() => setSel(idx)}
                     >
@@ -260,21 +330,27 @@ export function CmdModal({
 
               {/* Languages — 2-col grid, all visible at once */}
               <div className="px-2">
-                <p className="text-[9px] font-bold tracking-[.2em] uppercase text-lead/50 px-3 pb-1.5">{t.cmdLang}</p>
+                <p className="text-[9px] font-bold tracking-[.2em] uppercase text-lead/50 px-3 pb-1.5">
+                  {t.cmdLang}
+                </p>
                 <div className="grid grid-cols-2 gap-1 px-1">
-                  {langItems.map(item => {
+                  {langItems.map((item) => {
                     const idx = flatAll.indexOf(item);
                     return (
                       <button
                         key={item.id}
                         type="button"
-                        ref={el => { listRefs.current[item.id] = el; }}
-                        className={`flex items-center justify-between px-3 py-[.48rem] rounded-[9px] text-[12px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? 'bg-brand/7 text-brand' : 'text-lead hover:bg-brand/7 hover:text-brand'}`}
+                        ref={(el) => {
+                          listRefs.current[item.id] = el;
+                        }}
+                        className={`flex items-center justify-between px-3 py-[.48rem] rounded-[9px] text-[12px] transition-colors duration-75 text-left focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "bg-brand/7 text-brand" : "text-lead hover:bg-brand/7 hover:text-brand"}`}
                         onClick={item.action}
                         onMouseEnter={() => setSel(idx)}
                       >
                         <span>{item.label}</span>
-                        {item.id === lang && <Check size={11} className="text-brand shrink-0" />}
+                        {item.id === lang && (
+                          <Check size={11} className="text-brand shrink-0" />
+                        )}
                       </button>
                     );
                   })}

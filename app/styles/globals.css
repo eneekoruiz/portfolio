@@ -9,23 +9,25 @@
   --lead: #6e6e73;
   --brand: #0066ff;
   --brand-rgb: 0, 102, 255;
-  --line: rgba(0, 0, 0, .07);
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --line: rgba(0, 0, 0, 0.07);
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --fs-xl: clamp(3.5rem, 12vw, 9rem);
   --fs-lg: clamp(2.5rem, 8vw, 5rem);
 }
 
 .dark {
   --page: #000000;
-  --ink: #FFFFFF;
+  --ink: #ffffff;
   --lead: #888888;
   --brand: #0066ff;
   --brand-rgb: 0, 102, 255;
-  --line: rgba(255, 255, 255, .08);
+  --line: rgba(255, 255, 255, 0.08);
 }
 
 /* ── 2. BASE RESET ── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -48,60 +50,94 @@ body {
   color: var(--ink);
   overflow-x: hidden;
   /* Optimized transitions: faster for responsiveness, cubic-bezier for organic feel */
-  transition: background 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              border-color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition:
+    background 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   /* Prevent layout shifts and ensure smooth animations */
   will-change: auto;
 }
 
-::-webkit-scrollbar { width: 14px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { 
-  background-color: rgba(var(--brand-rgb), 0.3); 
-  border-radius: 20px; 
-  border: 4px solid var(--page); 
+::-webkit-scrollbar {
+  width: 14px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--brand-rgb), 0.3);
+  border-radius: 20px;
+  border: 4px solid var(--page);
   background-clip: content-box;
 }
-::-webkit-scrollbar-thumb:hover { 
-  background-color: rgba(var(--brand-rgb), 0.6); 
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--brand-rgb), 0.6);
 }
-* { scrollbar-width: thin; scrollbar-color: rgba(var(--brand-rgb), 0.3) transparent; }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--brand-rgb), 0.3) transparent;
+}
 
-::selection { 
-  background: rgba(var(--brand-rgb), 0.2); 
-  color: var(--brand); 
+::selection {
+  background: rgba(var(--brand-rgb), 0.2);
+  color: var(--brand);
 }
-.dark ::selection { 
-  background: rgba(var(--brand-rgb), 0.4); 
-  color: #ffffff; 
+.dark ::selection {
+  background: rgba(var(--brand-rgb), 0.4);
+  color: #ffffff;
 }
 
 /* ── 3. CUSTOM CURSOR ── */
 @media (hover: hover) and (pointer: fine) {
-  html, body, a, button, [role="button"], input, textarea, select {
+  html,
+  body,
+  a,
+  button,
+  [role="button"],
+  input,
+  textarea,
+  select {
     cursor: none !important;
   }
-  .cur-dot, .cur-ring {
-    position: fixed; top: 0; left: 0; z-index: 99999;
-    pointer-events: none; border-radius: 9999px; will-change: transform;
+  .cur-dot,
+  .cur-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+    pointer-events: none;
+    border-radius: 9999px;
+    will-change: transform;
   }
-  .custom-cursor-dot { mix-blend-mode: difference; }
+  .custom-cursor-dot {
+    mix-blend-mode: difference;
+  }
 }
 
 /* Cursor Shake Pulse */
 @keyframes cursorPulse {
-  0% { box-shadow: 0 0 0 0px rgba(255,255,255,0.7); }
-  50% { box-shadow: 0 0 0 15px rgba(255,255,255,0); }
-  100% { box-shadow: 0 0 0 0px rgba(255,255,255,0); }
+  0% {
+    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0);
+  }
 }
 .cursor-shake-pulse {
   animation: cursorPulse 0.25s ease-out infinite;
 }
 
 @media (max-width: 768px) {
-  .cur-dot, .cur-ring { display: none !important; }
-  * { cursor: auto !important; }
+  .cur-dot,
+  .cur-ring {
+    display: none !important;
+  }
+  * {
+    cursor: auto !important;
+  }
 }
 
 /* SOTD Grade Polish */
@@ -132,7 +168,7 @@ body {
   position: relative;
 }
 .border-beam::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: -1px;
   border-radius: inherit;
@@ -143,8 +179,12 @@ body {
     var(--brand),
     transparent
   );
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
   pointer-events: none;
@@ -156,12 +196,16 @@ body {
   animation: beam-rotate 4s linear infinite;
 }
 @keyframes beam-rotate {
-  from { --beam-angle: 0deg; }
-  to { --beam-angle: 360deg; }
+  from {
+    --beam-angle: 0deg;
+  }
+  to {
+    --beam-angle: 360deg;
+  }
 }
 
 @property --beam-angle {
-  syntax: '<angle>';
+  syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
 }
@@ -175,18 +219,35 @@ body {
   will-change: transform, opacity;
 }
 @keyframes grain {
-  0%, 100% { transform: translate(0, 0); }
-  10%       { transform: translate(-2%, -2%); }
-  30%       { transform: translate(2%, 2%); }
-  50%       { transform: translate(-2%, 1%); }
-  70%       { transform: translate(1%, -2%); }
-  90%       { transform: translate(-1%, 2%); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-2%, -2%);
+  }
+  30% {
+    transform: translate(2%, 2%);
+  }
+  50% {
+    transform: translate(-2%, 1%);
+  }
+  70% {
+    transform: translate(1%, -2%);
+  }
+  90% {
+    transform: translate(-1%, 2%);
+  }
 }
 
 body::after {
-  content: '';
-  position: fixed; inset: -50%; width: 200%; height: 200%;
-  z-index: 9990; pointer-events: none;
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 9990;
+  pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   opacity: 0.035;
   mix-blend-mode: overlay;
@@ -195,18 +256,34 @@ body::after {
 
 /* FIX #10: Disable grain on mobile for performance */
 @media (max-width: 768px) {
-  body::after { display: none; }
+  body::after {
+    display: none;
+  }
 }
 
 /* Disable heavy visuals when lite mode is active */
-html[data-lite='1'] body::after { display: none !important; }
-html[data-lite='1'] .cur-dot, html[data-lite='1'] .cur-ring { display: none !important; }
-html[data-lite='1'] html, html[data-lite='1'] body, html[data-lite='1'] a, html[data-lite='1'] button { cursor: auto !important; }
-html[data-lite='1'] .will-gpu { will-change: auto !important; transform: none !important; }
+html[data-lite="1"] body::after {
+  display: none !important;
+}
+html[data-lite="1"] .cur-dot,
+html[data-lite="1"] .cur-ring {
+  display: none !important;
+}
+html[data-lite="1"] html,
+html[data-lite="1"] body,
+html[data-lite="1"] a,
+html[data-lite="1"] button {
+  cursor: auto !important;
+}
+html[data-lite="1"] .will-gpu {
+  will-change: auto !important;
+  transform: none !important;
+}
 
 /* ── 5. GLOBAL ANIMATION DEFAULTS ── */
 /* Prevent forced layout calculations during animations */
-.will-gpu, .gpu-accelerated {
+.will-gpu,
+.gpu-accelerated {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
@@ -230,52 +307,120 @@ html {
 }
 
 /* ── 6. SCROLL REVEAL — Optimized for smooth entrance ── */
-.sr { opacity: 0; transform: translateY(30px); will-change: opacity, transform; }
+.sr {
+  opacity: 0;
+  transform: translateY(30px);
+  will-change: opacity, transform;
+}
 .sr.in {
-  opacity: 1; transform: translateY(0);
-  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── 7. BUTTON STATES — GPU-accelerated ── */
 @keyframes btn-scan {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 @keyframes dot-bounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 .btn-bit {
-  position: absolute; font-family: monospace; font-size: 10px;
-  color: var(--brand); opacity: 0.6; pointer-events: none; line-height: 1;
+  position: absolute;
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--brand);
+  opacity: 0.6;
+  pointer-events: none;
+  line-height: 1;
   animation: bit-fly 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 @keyframes bit-fly {
-  from { transform: translateY(0); opacity: 0.7; }
-  to   { transform: translateY(-30px); opacity: 0; }
+  from {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
 }
 .btn-done-ripple {
-  position: absolute; inset: 0; border-radius: 9999px; pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
   animation: ripple-out 0.6s ease-out forwards;
 }
 @keyframes ripple-out {
-  from { transform: scale(0.8); opacity: 0.8; }
-  to   { transform: scale(1.6); opacity: 0; }
+  from {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
-.portal-swirl-spin { animation: spin 0.7s linear; border-radius: 50%; }
-@keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
-.portal-warp-text { animation: warp-chars 0.4s ease-out; }
+.portal-swirl-spin {
+  animation: spin 0.7s linear;
+  border-radius: 50%;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.portal-warp-text {
+  animation: warp-chars 0.4s ease-out;
+}
 @keyframes warp-chars {
-  0%   { letter-spacing: -0.2em; opacity: 0.3; }
-  100% { letter-spacing: normal; opacity: 1; }
+  0% {
+    letter-spacing: -0.2em;
+    opacity: 0.3;
+  }
+  100% {
+    letter-spacing: normal;
+    opacity: 1;
+  }
 }
-.branch-icon-pop { animation: pop 0.25s cubic-bezier(.34,1.56,.64,1); }
-@keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+.branch-icon-pop {
+  animation: pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pop {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 @keyframes studio-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-  70%  { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
 }
 .studio-pulse {
   animation: studio-pulse 2s infinite;
@@ -300,8 +445,12 @@ html {
 }
 
 @keyframes hud-scan {
-  0% { transform: translateY(-100vh); }
-  100% { transform: translateY(100vh); }
+  0% {
+    transform: translateY(-100vh);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
 }
 
 .hud-vignette {
@@ -309,11 +458,19 @@ html {
   inset: 0;
   z-index: 9995;
   pointer-events: none;
-  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.1) 100%);
+  background: radial-gradient(
+    circle at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
   mix-blend-mode: multiply;
 }
 .dark .hud-vignette {
-  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.3) 100%);
+  background: radial-gradient(
+    circle at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
 }
 
 /* ── 7. WORK PAGE: DNA Helix ── */
@@ -324,11 +481,17 @@ html {
 /* ── 8. WORK PAGE: Terrain mesh canvas ── */
 
 /* ── 9. WORK PAGE: Accordion ── */
-[data-accordion] { overflow: hidden; }
+[data-accordion] {
+  overflow: hidden;
+}
 
 /* ── 10. WORK PAGE: GlareCard ── */
-.glare-card { transform: translateZ(0); }
-.glare-card:hover { transform: translateZ(0) scale(1.012); }
+.glare-card {
+  transform: translateZ(0);
+}
+.glare-card:hover {
+  transform: translateZ(0) scale(1.012);
+}
 
 /* ── 11. CODE blocks: 2-space tabs, proper syntax spacing ── */
 .code-block pre {
@@ -339,17 +502,27 @@ html {
 /* ── 12. CYLINDER CAROUSEL ── */
 
 /* ── 13. SKILLS: Bento Glare ── */
-.bento-glow { transform: translateZ(0); }
-.bento-glare::before {
-  content: '';
-  position: absolute; inset: 0; border-radius: inherit;
-  background: radial-gradient(circle 200px at var(--gx,50%) var(--gy,50%), rgba(255,255,255,0.07), transparent);
-  pointer-events: none; z-index: 1;
-  opacity: 0; transition: opacity 0.3s;
+.bento-glow {
+  transform: translateZ(0);
 }
-.bento-glare:hover::before { opacity: 1; }
-
-
+.bento-glare::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle 200px at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 255, 255, 0.07),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.bento-glare:hover::before {
+  opacity: 1;
+}
 
 /* ── 14. PRINT / PDF CV (Dossier Edition) ── */
 @media print {
@@ -362,38 +535,60 @@ html {
   }
 
   /* Ocultar interfaz y multimedia */
-  .cur-dot, .cur-ring, nav, header, button, .no-print, 
-  video, canvas, iframe, .helix-group, .helix-svg,
-  [data-scroll], .animate-bounce { 
-    display: none !important; 
+  .cur-dot,
+  .cur-ring,
+  nav,
+  header,
+  button,
+  .no-print,
+  video,
+  canvas,
+  iframe,
+  .helix-group,
+  .helix-svg,
+  [data-scroll],
+  .animate-bounce {
+    display: none !important;
   }
 
   /* RESET DE ALTURAS */
-  body, main, section, div, article {
+  body,
+  main,
+  section,
+  div,
+  article {
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
-    position: static !important; 
+    position: static !important;
   }
 
   /* FORZAR VISIBILIDAD (GSAP bypass) */
-  .sr, .reveal-sec, .work-row-anim, .glare-card, 
-  [style*="opacity"], [class*="opacity-0"], 
-  .opacity-0, .translate-y-full, .scale-0 {
+  .sr,
+  .reveal-sec,
+  .work-row-anim,
+  .glare-card,
+  [style*="opacity"],
+  [class*="opacity-0"],
+  .opacity-0,
+  .translate-y-full,
+  .scale-0 {
     opacity: 1 !important;
     transform: none !important;
     visibility: visible !important;
   }
 
   /* ACORDEONES ABIERTOS */
-  [style*="grid-template-rows: 0fr"], [style*="grid-template-rows"] {
+  [style*="grid-template-rows: 0fr"],
+  [style*="grid-template-rows"] {
     grid-template-rows: 1fr !important;
     opacity: 1 !important;
   }
 
   /* 🔥 LA MAGIA: DESENROLLAR EL CILINDRO 3D DE SKILLS */
-  .cyl-item, .cylinder-wrapper {
+  .cyl-item,
+  .cylinder-wrapper {
     position: relative !important;
     transform: none !important;
     display: inline-block !important;
@@ -416,22 +611,32 @@ html {
   }
 
   /* EVITAR CORTES POR LA MITAD */
-  .glare-card, .work-row-anim, h1, h2, h3, h4, p, img, .border-b {
+  .glare-card,
+  .work-row-anim,
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  img,
+  .border-b {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  @page { 
-    margin: 1.5cm; 
-    size: A4; 
+  @page {
+    margin: 1.5cm;
+    size: A4;
   }
 
   body {
     font-family: var(--font-sans) !important;
-    background: var(--page) !important; 
+    background: var(--page) !important;
     color: var(--ink) !important;
   }
-  body::after { display: none !important; }
+  body::after {
+    display: none !important;
+  }
 }
 
 /* ── 15. RESPONSIVE: Mobile performance ── */
@@ -440,9 +645,15 @@ html {
     opacity: 0.07 !important;
     filter: none !important;
   }
-  canvas.terrain-mesh { display: none !important; }
-  .cylinder-wrapper { pointer-events: none; }
-  h1, h2, h3 {
+  canvas.terrain-mesh {
+    display: none !important;
+  }
+  .cylinder-wrapper {
+    pointer-events: none;
+  }
+  h1,
+  h2,
+  h3 {
     overflow-wrap: normal;
     word-break: normal;
     hyphens: none;
@@ -455,8 +666,13 @@ html {
   .helix-strand-a,
   .helix-strand-b,
   .helix-rung,
-  .cyl-item { animation: none !important; transition: none !important; }
-  body::after { animation: none !important; }
+  .cyl-item {
+    animation: none !important;
+    transition: none !important;
+  }
+  body::after {
+    animation: none !important;
+  }
 }
 
 /* ── 17. DARK MODE: Helix glow amplification ── */
@@ -466,20 +682,28 @@ html {
 
 /* ── 18. SHADOW GLASS (Nav pill) ── */
 .shadow-glass {
-  box-shadow: 0 4px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 /* ── 19. TRANSITION: Cinematic zoom-in page change ── */
 .page-transition-overlay {
-  position: fixed; inset: 0; z-index: 9997;
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
   pointer-events: none;
-  transition: opacity 0.4s cubic-bezier(0.16,1,0.3,1);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── 20. CMD MODAL ── */
 .cmd-overlay {
-  position: fixed; inset: 0; z-index: 9998;
-  display: flex; align-items: flex-start; justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   padding-top: 8vh;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
@@ -487,8 +711,12 @@ html {
 }
 
 @keyframes cmd-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .cmd-box {
@@ -503,12 +731,12 @@ html {
 }
 
 @keyframes cmd-pop-in {
-  from { 
-    opacity: 0; 
+  from {
+    opacity: 0;
     transform: scale(0.95) translateY(-20px);
   }
-  to { 
-    opacity: 1; 
+  to {
+    opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
@@ -534,19 +762,33 @@ html {
 
 /* Custom clip-path animation for the "Eclipse" effect */
 @keyframes eclipse-in {
-  from { clip-path: circle(0% at var(--x) var(--y)); }
-  to   { clip-path: circle(150% at var(--x) var(--y)); }
+  from {
+    clip-path: circle(0% at var(--x) var(--y));
+  }
+  to {
+    clip-path: circle(150% at var(--x) var(--y));
+  }
 }
 
-[data-transition='eclipse']::view-transition-new(root) {
+[data-transition="eclipse"]::view-transition-new(root) {
   animation: eclipse-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 /* -- BINARY STREAM BUTTON ANIMATIONS -- */
 @keyframes btnStream {
-  0% { transform: translateY(0); opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { transform: translateY(-40px); opacity: 0; }
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
 }
 
 .btn-bit-stream {

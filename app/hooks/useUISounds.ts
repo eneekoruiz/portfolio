@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * useUISounds — Sound Design Hook (Prepared Stubs)
@@ -15,7 +15,7 @@
  *   <button onClick={playClick}>Magnetic CTA</button>
  */
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback } from "react";
 
 interface UISoundsOptions {
   /** Master switch. When false, all play* calls are silent no-ops. Default: false */
@@ -54,29 +54,29 @@ export function useUISounds(options: UISoundsOptions = {}): UISoundsReturn {
   const { enabled = false, volume = 0.3 } = options;
 
   // Track active audio to prevent overlapping
-  const clickRef   = useRef<HTMLAudioElement | null>(null);
-  const swooshRef  = useRef<HTMLAudioElement | null>(null);
-  const staticRef  = useRef<HTMLAudioElement | null>(null);
+  const clickRef = useRef<HTMLAudioElement | null>(null);
+  const swooshRef = useRef<HTMLAudioElement | null>(null);
+  const staticRef = useRef<HTMLAudioElement | null>(null);
 
   const playClick = useCallback(() => {
     if (!enabled) return;
     // Expected file: /public/sounds/click.mp3 (short, ~50ms, subtle tap)
     clickRef.current?.pause();
-    clickRef.current = playAudio('/sounds/click.mp3', volume * 0.8);
+    clickRef.current = playAudio("/sounds/click.mp3", volume * 0.8);
   }, [enabled, volume]);
 
   const playSwoosh = useCallback(() => {
     if (!enabled) return;
     // Expected file: /public/sounds/swoosh.mp3 (~300ms, liquid whoosh)
     swooshRef.current?.pause();
-    swooshRef.current = playAudio('/sounds/swoosh.mp3', volume);
+    swooshRef.current = playAudio("/sounds/swoosh.mp3", volume);
   }, [enabled, volume]);
 
   const playStaticNoise = useCallback(() => {
     if (!enabled) return;
     // Expected file: /public/sounds/static.mp3 (~200ms, light crackle/digital noise)
     staticRef.current?.pause();
-    staticRef.current = playAudio('/sounds/static.mp3', volume * 0.5);
+    staticRef.current = playAudio("/sounds/static.mp3", volume * 0.5);
   }, [enabled, volume]);
 
   return { playClick, playSwoosh, playStaticNoise };

@@ -9,31 +9,31 @@ A high-performance portfolio focusing on motion design and hardened React archit
 - **Rendering Strategy**: hybrid approach using Server Components for data pre-fetching and specialized Client Components for GSAP-driven interactions.
 - **Motion Engine**: custom proximity-based interaction system using GSAP and Lenis for smooth, physics-based scrolling.
 - **Data Integrity**: direct integration with GitHub REST API with server-side caching and atomic fallback states.
-- **Security**: hardened Content-Security-Policy (CSP), sanitized API routes, and zero-public-token architecture.
-- **A11Y**: Designed with accessibility considerations (WCAG-conscious), full keyboard navigation, and `prefers-reduced-motion` support.
+- **Security**: hardened nonce-based script CSP, sanitized API routes, and zero-public-token architecture.
+- **A11Y**: WCAG 2.2 AA targeted (WCAG-conscious), full keyboard navigation, and `prefers-reduced-motion` support.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | Next.js 16 (App Router) |
-| **Runtime** | React 19 + Node 22 |
-| **Logic** | TypeScript 6 |
-| **Motion** | GSAP (GreenSock) |
-| **Styling** | Tailwind CSS 3.4 |
-| **Infrastructure** | Vercel |
+| Layer              | Technology              |
+| :----------------- | :---------------------- |
+| **Framework**      | Next.js 16 (App Router) |
+| **Runtime**        | React 19 + Node 22      |
+| **Logic**          | TypeScript 6            |
+| **Motion**         | GSAP (GreenSock)        |
+| **Styling**        | Tailwind CSS 3.4        |
+| **Infrastructure** | Vercel                  |
 
 ---
 
 ## Featured Work (Selection)
 
-*   **AG Beauty Salon**: Full-stack booking platform with a custom Sandwich Algorithm and atomic Google Calendar synchronization.
-*   **Who Are Ya?**: High-performance football identity engine with an MVC architecture and MongoDB Atlas integration.
-*   **Rides24**: Distributed system implementation in Java with JAX-WS and ObjectDB, focusing on thread-safe concurrency.
-*   **SpotShare**: Cloud-native parking intelligence platform with SonarCloud audit and optimistic locking.
-*   **PKE Web**: Semantic web platform designed with accessibility considerations (WCAG-conscious).
+- **AG Beauty Salon**: Full-stack booking platform with a custom Sandwich Algorithm and atomic Google Calendar synchronization.
+- **Who Are Ya?**: High-performance football identity engine with an MVC architecture and MongoDB Atlas integration.
+- **Rides24**: Distributed system implementation in Java with JAX-WS and ObjectDB, focusing on thread-safe concurrency.
+- **SpotShare**: Cloud-native parking intelligence platform with SonarCloud audit and optimistic locking.
+- **PKE Web**: Semantic web platform designed with accessibility considerations (WCAG-conscious).
 
 ---
 
@@ -50,7 +50,7 @@ npm install
 npm run build
 ```
 
-*Note: Requires `GITHUB_TOKEN` in environment variables for authenticated API requests.*
+_Note: Requires `GITHUB_TOKEN` in environment variables for authenticated API requests._
 
 ---
 
@@ -70,7 +70,7 @@ The portfolio has been meticulously hardened to pass strict production audits co
    - **Visual DNA Integrity**: Retained 100% fidelity for all GSAP timelines, responsive layout boundaries, dark mode transitions, DNA Helix responsive transformations, and Lenis scroll physics.
 
 3. **Hardened Content-Security-Policy (`middleware.ts`)**:
-   - **Strict Script Protection**: Implements a strong cryptographically signed nonce (`'nonce-...'`) policy for script tags in production, completely removing both `'unsafe-inline'` and `'unsafe-eval'` to secure against script injections.
+   - **Hardened Script Protection**: Implements a strong cryptographically signed nonce (`'nonce-...'`) policy for script tags in production, completely removing both `'unsafe-inline'` and `'unsafe-eval'` to secure against script injections.
    - **Style Trade-Off**: Retains `'unsafe-inline'` under `style-src` as an audited trade-off, necessitated by Next.js (runtime dynamic styling), Tailwind CSS, and GSAP's physics engine which require runtime style injections for 60fps animations, responsive design limits, and fluid dark-mode theme switches.
    - **Protocol Security**: Rejects all insecure HTTP connections globally via `upgrade-insecure-requests`.
 

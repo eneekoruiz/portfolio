@@ -9,7 +9,7 @@ export interface NavState {
   scrollY: number;
 }
 
-const SESSION_KEY = 'projects_nav_state';
+const SESSION_KEY = "projects_nav_state";
 
 export function saveNavState(state: NavState): void {
   try {
@@ -20,7 +20,7 @@ export function saveNavState(state: NavState): void {
 export function loadNavState(): NavState | null {
   try {
     const raw = sessionStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) as NavState : null;
+    return raw ? (JSON.parse(raw) as NavState) : null;
   } catch (_) {
     return null;
   }

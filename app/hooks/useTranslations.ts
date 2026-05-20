@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useEffect } from 'react';
-import { TX } from '../data/translations';
-import type { Lang } from '../types';
+import { useState, useMemo, useEffect } from "react";
+import { TX } from "../data/translations";
+import type { Lang } from "../types";
 
-const STORAGE_KEY = 'portfolio_lang';
+const STORAGE_KEY = "portfolio_lang";
 
 export function useTranslations() {
-  const [lang, setLangState] = useState<Lang>('es');
+  const [lang, setLangState] = useState<Lang>("es");
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as Lang;
@@ -18,6 +18,12 @@ export function useTranslations() {
     setLangState(newLang);
     localStorage.setItem(STORAGE_KEY, newLang);
   };
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = lang;
+    }
+  }, [lang]);
 
   const t = useMemo(() => TX[lang], [lang]);
 

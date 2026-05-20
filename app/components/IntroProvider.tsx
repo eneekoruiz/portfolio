@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -19,9 +19,16 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-export type IntroPhase = 'checking' | 'loading' | 'splash' | 'ready';
+export type IntroPhase = "checking" | "loading" | "splash" | "ready";
 
 interface IntroContextValue {
   phase: IntroPhase;
@@ -35,40 +42,47 @@ const IntroContext = createContext<IntroContextValue | null>(null);
 let hasSeenGlobal = false;
 
 export function IntroProvider({ children }: { children: React.ReactNode }) {
-  const [phase, setPhase] = useState<IntroPhase>('checking');
+  const [phase, setPhase] = useState<IntroPhase>("checking");
 
   useEffect(() => {
     // Determine the initial phase on the client after hydration
     const checkSeen = () => {
       try {
         // If it's a reload (F5), we ignore the session flag to show the preloader again
-        const isReload = typeof window !== 'undefined' && 
-                         (window.performance?.getEntriesByType('navigation')[0] as PerformanceNavigationTiming)?.type === 'reload';
-        
+        const isReload =
+          typeof window !== "undefined" &&
+          (
+            window.performance?.getEntriesByType(
+              "navigation",
+            )[0] as PerformanceNavigationTiming
+          )?.type === "reload";
+
         if (isReload) {
-          sessionStorage.removeItem('hasSeenIntro');
+          sessionStorage.removeItem("hasSeenIntro");
           return false;
         }
 
-        return hasSeenGlobal || sessionStorage.getItem('hasSeenIntro') === 'true';
+        return (
+          hasSeenGlobal || sessionStorage.getItem("hasSeenIntro") === "true"
+        );
       } catch (_) {
         return false;
       }
     };
 
     if (checkSeen()) {
-      setPhase('ready');
+      setPhase("ready");
     } else {
-      setPhase('loading');
+      setPhase("loading");
     }
   }, []);
 
   const markSeen = useCallback(() => {
     hasSeenGlobal = true;
     try {
-      sessionStorage.setItem('hasSeenIntro', 'true');
+      sessionStorage.setItem("hasSeenIntro", "true");
     } catch (_) {}
-    setPhase('ready');
+    setPhase("ready");
   }, []);
 
   const value = useMemo(
@@ -76,13 +90,15 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
     [phase, markSeen],
   );
 
-  return <IntroContext.Provider value={value}>{children}</IntroContext.Provider>;
+  return (
+    <IntroContext.Provider value={value}>{children}</IntroContext.Provider>
+  );
 }
 
 export function useIntro() {
   const ctx = useContext(IntroContext);
   if (!ctx) {
-    throw new Error('useIntro must be used inside IntroProvider');
+    throw new Error("useIntro must be used inside IntroProvider");
   }
   return ctx;
 }

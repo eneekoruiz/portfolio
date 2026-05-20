@@ -1,8 +1,20 @@
-import Lenis from 'lenis';
-import type { LucideIcon } from 'lucide-react';
+import Lenis from "lenis";
+import type { LucideIcon } from "lucide-react";
 
 // Language types
-export type Lang = 'es' | 'en' | 'eu' | 'fr' | 'it' | 'de' | 'pt' | 'ca' | 'gl' | 'ja' | 'zh' | 'ar';
+export type Lang =
+  | "es"
+  | "en"
+  | "eu"
+  | "fr"
+  | "it"
+  | "de"
+  | "pt"
+  | "ca"
+  | "gl"
+  | "ja"
+  | "zh"
+  | "ar";
 
 // GitHub repository types
 export interface Repo {
@@ -85,7 +97,7 @@ export interface ProjectCard {
   size: string;
   desc: string;
   langs: string[];
-  challenge: string;   
+  challenge: string;
   architecture: string;
   outcome: string;
   video?: string;
@@ -103,4 +115,3 @@ declare global {
     webkitAudioContext?: typeof AudioContext;
   }
 }
-

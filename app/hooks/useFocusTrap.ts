@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 export function useFocusTrap(active: boolean) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -9,9 +9,9 @@ export function useFocusTrap(active: boolean) {
   useEffect(() => {
     if (active) {
       lastFocusRef.current = document.activeElement as HTMLElement;
-      
+
       const focusables = containerRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
 
       if (focusables && focusables.length > 0) {
@@ -21,11 +21,12 @@ export function useFocusTrap(active: boolean) {
       }
 
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key !== 'Tab') return;
+        if (e.key !== "Tab") return;
 
-        const currentFocusables = containerRef.current?.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
+        const currentFocusables =
+          containerRef.current?.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          );
 
         if (!currentFocusables || currentFocusables.length === 0) return;
 
@@ -41,9 +42,9 @@ export function useFocusTrap(active: boolean) {
         }
       };
 
-      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener("keydown", handleKeyDown);
       return () => {
-        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener("keydown", handleKeyDown);
         lastFocusRef.current?.focus();
       };
     }

@@ -1,13 +1,21 @@
-'use client';
+"use client";
 
-import React, { useRef, useState, useEffect } from 'react';
-import gsap from 'gsap';
-import { Database, Server, Radar, CheckCircle2, Layers } from 'lucide-react';
+import React, { useRef, useState, useEffect } from "react";
+import gsap from "gsap";
+import { Database, Server, Radar, CheckCircle2, Layers } from "lucide-react";
 
 // ── DNAHelix ──────────────────────────────────────────────────────────────────
 
-export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
-  accent: string; secondary: string; darkMode: boolean; paused?: boolean;
+export const DNAHelix = ({
+  accent,
+  secondary,
+  darkMode,
+  paused = false,
+}: {
+  accent: string;
+  secondary: string;
+  darkMode: boolean;
+  paused?: boolean;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollRef = useRef(0);
@@ -16,6 +24,11 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
   const mouseRef = useRef({ x: -2000, y: -2000 });
   const colorsRef = useRef({ accent, secondary });
   const motionEnabledRef = useRef(true);
+  const pausedRef = useRef(paused);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   // Spring physics states for both strands (61 points each) to achieve organic elastic wiggling/damping
   const physicsRef = useRef<{
@@ -27,8 +40,9 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
   });
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const initial = localStorage.getItem('portfolio-motion-enabled') !== 'false';
+    if (typeof window === "undefined") return;
+    const initial =
+      localStorage.getItem("portfolio-motion-enabled") !== "false";
     motionEnabledRef.current = initial;
 
     const handleMotionChange = (e: Event) => {
@@ -36,9 +50,12 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
       motionEnabledRef.current = customEvent.detail.enabled;
     };
 
-    window.addEventListener('portfolio-motion-changed', handleMotionChange);
+    window.addEventListener("portfolio-motion-changed", handleMotionChange);
     return () => {
-      window.removeEventListener('portfolio-motion-changed', handleMotionChange);
+      window.removeEventListener(
+        "portfolio-motion-changed",
+        handleMotionChange,
+      );
     };
   }, []);
 
@@ -47,28 +64,30 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
       accent,
       secondary,
       duration: 0.8,
-      ease: 'power2.out',
+      ease: "power2.out",
     });
   }, [accent, secondary]);
 
   useEffect(() => {
-    const handleScroll = () => { scrollRef.current = window.scrollY; };
+    const handleScroll = () => {
+      scrollRef.current = window.scrollY;
+    };
     const handleMouse = (e: MouseEvent) => {
       mouseRef.current.x = e.clientX;
       mouseRef.current.y = e.clientY;
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('mousemove', handleMouse, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("mousemove", handleMouse, { passive: true });
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouse);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleMouse);
     };
   }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
     let frame = 0;
@@ -82,7 +101,7 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
     };
 
     const draw = () => {
-      if (!activeRef.current || document.visibilityState !== 'visible') {
+      if (!activeRef.current || document.visibilityState !== "visible") {
         frame = 0;
         return;
       }
@@ -95,20 +114,25 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
       }
 
       ctx.clearRect(0, 0, w, h);
-      
+
       const steps = 60;
       const baseSpeed = 0.012;
-      
+
       // Calculate scroll velocity
       const currentScroll = scrollRef.current;
-      const scrollVelocity = Math.abs(currentScroll - (canvas.dataset.lastScroll ? parseFloat(canvas.dataset.lastScroll) : currentScroll));
+      const scrollVelocity = Math.abs(
+        currentScroll -
+          (canvas.dataset.lastScroll
+            ? parseFloat(canvas.dataset.lastScroll)
+            : currentScroll),
+      );
       canvas.dataset.lastScroll = currentScroll.toString();
-      
+
       // Get mouse position in local canvas space
       const rect = canvas.getBoundingClientRect();
       const mouseX = mouseRef.current.x - rect.left;
       const mouseY = mouseRef.current.y - rect.top;
-      
+
       // Calculate closest distance to the helix in local space using squared distance
       let minDistanceSq = 99999999;
       const baseRotation = rotationRef.current;
@@ -118,13 +142,13 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
         const y = progress * h;
         const angle = progress * Math.PI * 4 + baseRotation;
         const r = Math.min(w * 0.15, 140);
-        
+
         const x1 = w / 2 + Math.cos(angle) * r;
         const x2 = w / 2 + Math.cos(angle + Math.PI) * r;
-        
+
         const d1Sq = (x1 - mouseX) ** 2 + (y - mouseY) ** 2;
         const d2Sq = (x2 - mouseX) ** 2 + (y - mouseY) ** 2;
-        
+
         if (d1Sq < minDistanceSq) minDistanceSq = d1Sq;
         if (d2Sq < minDistanceSq) minDistanceSq = d2Sq;
       }
@@ -136,12 +160,13 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
       if (minDistance < hoverRange) {
         targetHover = (hoverRange - minDistance) / hoverRange;
       }
-      
+
       hoverIntensity += (targetHover - hoverIntensity) * 0.08;
 
-      if (motionEnabledRef.current && !paused) {
+      if (motionEnabledRef.current && !pausedRef.current) {
         const hoverSpeedBoost = hoverIntensity * 0.048;
-        rotationRef.current += baseSpeed + (scrollVelocity * 0.002) + hoverSpeedBoost;
+        rotationRef.current +=
+          baseSpeed + scrollVelocity * 0.002 + hoverSpeedBoost;
       }
 
       const activeRotation = rotationRef.current;
@@ -163,12 +188,12 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
           const angle = progress * Math.PI * 4 + activeRotation + offset;
           const r = Math.min(w * 0.15, 140);
           const x = w / 2 + Math.cos(angle) * r;
-          
+
           // Calculate elastic attraction vector to mouse (spider web stick)
           const dx = mouseX - x;
           const dy = mouseY - y;
           const distSq = dx * dx + dy * dy;
-          
+
           let targetX = 0;
           let targetY = 0;
           if (distSq < range * range) {
@@ -177,24 +202,24 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
             targetX = dx * force * 0.65;
             targetY = dy * force * 0.35;
           }
-          
+
           // Spring Physics Integration
           const node = nodes[i];
           const stiffness = 0.06;
           const damping = 0.84;
-          
+
           const ax = (targetX - node.x) * stiffness;
           const ay = (targetY - node.y) * stiffness;
-          
+
           node.vx = (node.vx + ax) * damping;
           node.vy = (node.vy + ay) * damping;
-          
+
           node.x += node.vx;
           node.y += node.vy;
-          
+
           const rx = x + node.x;
           const ry = y + node.y;
-          
+
           strandPoints[s].push({ x: rx, y: ry });
         }
 
@@ -218,7 +243,11 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
           else ctx.lineTo(pt.x, pt.y);
         });
         ctx.lineWidth = darkMode ? 3.5 : 4;
-        ctx.strokeStyle = darkMode ? '#ffffff' : (s === 0 ? accentColor : secondaryColor);
+        ctx.strokeStyle = darkMode
+          ? "#ffffff"
+          : s === 0
+            ? accentColor
+            : secondaryColor;
         ctx.globalAlpha = darkMode ? 0.98 : 0.8;
         ctx.stroke();
       }
@@ -227,10 +256,10 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
       for (let i = 0; i <= steps; i++) {
         const progress = i / steps;
         const angle = progress * Math.PI * 4 + activeRotation;
-        
+
         const pt1 = strandPoints[0][i];
         const pt2 = strandPoints[1][i];
-        
+
         const z1 = Math.sin(angle);
         const z2 = Math.sin(angle + Math.PI);
 
@@ -238,28 +267,33 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
           ctx.beginPath();
           ctx.moveTo(pt1.x, pt1.y);
           ctx.lineTo(pt2.x, pt2.y);
-          ctx.strokeStyle = darkMode ? '#eeeeee' : secondaryColor;
-          ctx.globalAlpha = (darkMode ? 0.45 : 0.18) * (z1 + z2 + 2) / 2;
+          ctx.strokeStyle = darkMode ? "#eeeeee" : secondaryColor;
+          ctx.globalAlpha = ((darkMode ? 0.45 : 0.18) * (z1 + z2 + 2)) / 2;
           ctx.lineWidth = darkMode ? 2 : 1.5;
           ctx.stroke();
         }
 
-        const drawNode = (rx: number, ry: number, z: number, isSecondaryStrand: boolean) => {
+        const drawNode = (
+          rx: number,
+          ry: number,
+          z: number,
+          isSecondaryStrand: boolean,
+        ) => {
           const size = 3 + (z + 1) * 3;
           const nodeColor = isSecondaryStrand ? secondaryColor : accentColor;
-          
+
           // Outer Glow
           ctx.globalAlpha = darkMode ? 0.65 : 0.1;
           ctx.beginPath();
           ctx.arc(rx, ry, size * 2.5, 0, Math.PI * 2);
           ctx.fillStyle = nodeColor;
           ctx.fill();
-          
+
           // Solid Core
           ctx.globalAlpha = 1.0;
           ctx.beginPath();
           ctx.arc(rx, ry, size, 0, Math.PI * 2);
-          ctx.fillStyle = darkMode ? '#ffffff' : nodeColor;
+          ctx.fillStyle = darkMode ? "#ffffff" : nodeColor;
           ctx.fill();
 
           // Outermost brand stroke for styling in dark mode
@@ -273,9 +307,9 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
         };
 
         drawNode(pt1.x, pt1.y, z1, false); // Strand A
-        drawNode(pt2.x, pt2.y, z2, true);  // Strand B
+        drawNode(pt2.x, pt2.y, z2, true); // Strand B
       }
-      
+
       frame = requestAnimationFrame(draw);
     };
 
@@ -284,18 +318,18 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
         activeRef.current = entry.isIntersecting;
         if (entry.isIntersecting && !frame) frame = requestAnimationFrame(draw);
       },
-      { threshold: 0.01 }
+      { threshold: 0.01 },
     );
 
     resize();
     observer.observe(canvas);
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
     draw();
 
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
     };
   }, [darkMode]);
 
@@ -303,23 +337,29 @@ export const DNAHelix = ({ accent, secondary, darkMode, paused = false }: {
     <canvas
       ref={canvasRef}
       className="w-full h-full will-change-transform pointer-events-none"
-      style={{ display: 'block' }}
+      style={{ display: "block" }}
     />
   );
 };
 
 // ── TerrainMesh ───────────────────────────────────────────────────────────────
 
-export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: boolean }) => {
+export const TerrainMesh = ({
+  accent,
+  darkMode,
+}: {
+  accent: string;
+  darkMode: boolean;
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef   = useRef<number>(undefined);
-  const tRef      = useRef(0);
+  const animRef = useRef<number>(undefined);
+  const tRef = useRef(0);
   const activeRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext("2d")!;
 
     const resize = () => {
       const ratio = window.devicePixelRatio || 1;
@@ -329,21 +369,22 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
     };
 
     const draw = () => {
-      if (!activeRef.current || document.visibilityState !== 'visible') {
+      if (!activeRef.current || document.visibilityState !== "visible") {
         animRef.current = 0;
         return;
       }
 
-      const W = canvas.offsetWidth, H = canvas.offsetHeight;
+      const W = canvas.offsetWidth,
+        H = canvas.offsetHeight;
       ctx.clearRect(0, 0, W, H);
       tRef.current += 0.0035;
 
       const rows = 12;
       const cols = 20;
-      const points: {x: number, y: number}[] = [];
+      const points: { x: number; y: number }[] = [];
 
       ctx.strokeStyle = accent;
-      ctx.lineWidth   = 0.4;
+      ctx.lineWidth = 0.4;
       ctx.globalAlpha = darkMode ? 0.08 : 0.04;
 
       // Draw Grid Lines (Spiderweb)
@@ -351,10 +392,11 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
         ctx.beginPath();
         for (let c = 0; c <= cols; c++) {
           const x = c * (W / cols);
-          const wave = Math.sin(c * 0.3 + tRef.current * 2) * 15
-                     + Math.sin(r * 0.5 + tRef.current * 1.5) * 10;
+          const wave =
+            Math.sin(c * 0.3 + tRef.current * 2) * 15 +
+            Math.sin(r * 0.5 + tRef.current * 1.5) * 10;
           const y = r * (H / rows) + wave;
-          points.push({x, y});
+          points.push({ x, y });
           if (c === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -394,18 +436,18 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
           animRef.current = requestAnimationFrame(draw);
         }
       },
-      { threshold: 0.01 }
+      { threshold: 0.01 },
     );
 
     resize();
     observer.observe(canvas);
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
     animRef.current = requestAnimationFrame(draw);
 
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
       observer.disconnect();
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
     };
   }, [accent, darkMode]);
 
@@ -413,15 +455,21 @@ export const TerrainMesh = ({ accent, darkMode }: { accent: string; darkMode: bo
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none opacity-80 will-change-transform"
-      style={{ mixBlendMode: darkMode ? 'screen' : 'multiply' }}
+      style={{ mixBlendMode: darkMode ? "screen" : "multiply" }}
     />
   );
 };
 
 // ── FloatingArtifact ──────────────────────────────────────────────────────────
 
-export const FloatingArtifact = ({ accent, idx }: { accent: string; idx: number }) => {
-  const ref    = useRef<HTMLDivElement>(null);
+export const FloatingArtifact = ({
+  accent,
+  idx,
+}: {
+  accent: string;
+  idx: number;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context>(undefined);
 
   useEffect(() => {
@@ -429,14 +477,14 @@ export const FloatingArtifact = ({ accent, idx }: { accent: string; idx: number 
 
     ctxRef.current = gsap.context(() => {
       gsap.to(ref.current, {
-        y:        `${-16 - idx * 4}`,
-        x:        `${Math.sin(idx) * 12}`,
-        rotate:   idx % 2 === 0 ? 360 : -360,
+        y: `${-16 - idx * 4}`,
+        x: `${Math.sin(idx) * 12}`,
+        rotate: idx % 2 === 0 ? 360 : -360,
         duration: 3.6 + idx * 0.45,
-        repeat:   -1,
-        yoyo:     true,
-        ease:     'power1.inOut',
-        force3D:  true,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut",
+        force3D: true,
       });
     });
 
@@ -444,16 +492,32 @@ export const FloatingArtifact = ({ accent, idx }: { accent: string; idx: number 
   }, [idx]);
 
   const shapes = [
-    <div key="1" className="w-2 h-2 rounded-full"  style={{ background: accent, opacity: 0.4 }} />,
-    <div key="2" className="w-4 h-4 border rotate-45" style={{ borderColor: accent, opacity: 0.3 }} />,
-    <div key="3" className="w-6 h-[1px]"           style={{ background: accent, opacity: 0.2 }} />,
+    <div
+      key="1"
+      className="w-2 h-2 rounded-full"
+      style={{ background: accent, opacity: 0.4 }}
+    />,
+    <div
+      key="2"
+      className="w-4 h-4 border rotate-45"
+      style={{ borderColor: accent, opacity: 0.3 }}
+    />,
+    <div
+      key="3"
+      className="w-6 h-[1px]"
+      style={{ background: accent, opacity: 0.2 }}
+    />,
   ];
 
   return (
     <div
       ref={ref}
       className="absolute pointer-events-none will-change-transform"
-      style={{ top: `${20 + idx * 12}%`, left: idx % 2 === 0 ? '10%' : '85%', transform: 'translate3d(0, 0, 0)' }}
+      style={{
+        top: `${20 + idx * 12}%`,
+        left: idx % 2 === 0 ? "10%" : "85%",
+        transform: "translate3d(0, 0, 0)",
+      }}
     >
       {shapes[idx % 3]}
     </div>
@@ -466,14 +530,33 @@ export const SandwichDiagram = ({ accent }: { accent: string }) => {
   return (
     <div className="w-full space-y-4 font-mono text-[10px]">
       <div className="flex items-stretch gap-2 h-14">
-        <div className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]" style={{ background: accent }}>ACTIVE_01</div>
-        <div className="w-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden" style={{ borderColor: `${accent}50`, color: accent }}>
-          <span className="opacity-50">WAIT</span>
-          <div className="absolute bottom-0 left-0 h-1 bg-current animate-pulse" style={{ width: '100%', animationDuration: '2s' }} />
+        <div
+          className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]"
+          style={{ background: accent }}
+        >
+          ACTIVE_01
         </div>
-        <div className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]" style={{ background: accent }}>ACTIVE_02</div>
+        <div
+          className="w-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden"
+          style={{ borderColor: `${accent}50`, color: accent }}
+        >
+          <span className="opacity-50">WAIT</span>
+          <div
+            className="absolute bottom-0 left-0 h-1 bg-current animate-pulse"
+            style={{ width: "100%", animationDuration: "2s" }}
+          />
+        </div>
+        <div
+          className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]"
+          style={{ background: accent }}
+        >
+          ACTIVE_02
+        </div>
       </div>
-      <div className="h-10 rounded-xl flex items-center justify-center font-bold tracking-widest bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10" style={{ color: accent }}>
+      <div
+        className="h-10 rounded-xl flex items-center justify-center font-bold tracking-widest bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10"
+        style={{ color: accent }}
+      >
         ✨ PARALLEL SLOT INJECTED
       </div>
     </div>
@@ -489,9 +572,21 @@ export const MVCTerminal = ({ accent }: { accent: string }) => {
         <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
       </div>
       <div className="p-5 flex-1 flex flex-col justify-center space-y-2 text-ink">
-        <div className="flex items-center gap-2"><span style={{ color: accent }}>❯</span><span className="opacity-70">GET /api/v1/players</span></div>
-        <div className="flex items-center gap-2 opacity-40"><span>[Router]</span><span>Executing aggregation pipeline...</span></div>
-        <div className="flex items-center gap-2 font-bold" style={{ color: '#27c93f' }}><span>✔</span><span>200 OK (Latency: 12ms)</span></div>
+        <div className="flex items-center gap-2">
+          <span style={{ color: accent }}>❯</span>
+          <span className="opacity-70">GET /api/v1/players</span>
+        </div>
+        <div className="flex items-center gap-2 opacity-40">
+          <span>[Router]</span>
+          <span>Executing aggregation pipeline...</span>
+        </div>
+        <div
+          className="flex items-center gap-2 font-bold"
+          style={{ color: "#27c93f" }}
+        >
+          <span>✔</span>
+          <span>200 OK (Latency: 12ms)</span>
+        </div>
       </div>
     </div>
   );
@@ -499,7 +594,9 @@ export const MVCTerminal = ({ accent }: { accent: string }) => {
 
 export const DistributedNodes = ({ accent }: { accent: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const nodesRef = useRef<{x: number, y: number, vx: number, vy: number}[]>([]);
+  const nodesRef = useRef<{ x: number; y: number; vx: number; vy: number }[]>(
+    [],
+  );
 
   useEffect(() => {
     nodesRef.current = Array.from({ length: 12 }).map(() => ({
@@ -513,16 +610,16 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext("2d")!;
     let raf: number;
 
     const draw = () => {
       ctx.clearRect(0, 0, 300, 200);
-      
+
       const nodes = nodesRef.current;
 
       // Update nodes positions directly (no React state updates to trigger re-renders!)
-      nodes.forEach(n => {
+      nodes.forEach((n) => {
         n.x = (n.x + n.vx + 300) % 300;
         n.y = (n.y + n.vy + 200) % 200;
       });
@@ -545,7 +642,7 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
       }
 
       // Draw nodes
-      nodes.forEach(n => {
+      nodes.forEach((n) => {
         ctx.beginPath();
         ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = accent;
@@ -561,7 +658,12 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
 
   return (
     <div className="relative h-44 flex items-center justify-center overflow-hidden">
-      <canvas ref={canvasRef} width={300} height={200} className="w-full h-full" />
+      <canvas
+        ref={canvasRef}
+        width={300}
+        height={200}
+        className="w-full h-full"
+      />
       <div className="absolute w-20 h-20 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center backdrop-blur-md shadow-xl z-10">
         <Server size={24} style={{ color: accent }} />
       </div>
@@ -577,8 +679,15 @@ export const WCAGVisualizer = ({ accent }: { accent: string }) => {
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="space-y-1">
-          <div className="text-[10px] font-mono opacity-40 uppercase tracking-widest text-ink">Contrast</div>
-          <div className="text-xl font-bold font-mono" style={{ color: accent }}>21.0:1</div>
+          <div className="text-[10px] font-mono opacity-40 uppercase tracking-widest text-ink">
+            Contrast
+          </div>
+          <div
+            className="text-xl font-bold font-mono"
+            style={{ color: accent }}
+          >
+            21.0:1
+          </div>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 text-green-500 font-mono text-[10px] font-bold">
           <CheckCircle2 size={14} /> AAA PASS
@@ -591,13 +700,32 @@ export const WCAGVisualizer = ({ accent }: { accent: string }) => {
 export const SpotshareHeatmap = ({ accent }: { accent: string }) => {
   return (
     <div className="relative h-44 rounded-xl bg-black/5 dark:bg-[#050505] border border-black/10 dark:border-white/10 overflow-hidden flex items-center justify-center group shadow-inner">
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at center, ${accent} 1px, transparent 1px)`, backgroundSize: '15px 15px' }} />
-      <div className="absolute w-[200%] h-[200%] origin-center animate-spin" style={{ background: `conic-gradient(from 0deg, transparent 70%, ${accent}40 100%)`, animationDuration: '3s', animationTimingFunction: 'linear' }} />
+      <div
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: `radial-gradient(circle at center, ${accent} 1px, transparent 1px)`,
+          backgroundSize: "15px 15px",
+        }}
+      />
+      <div
+        className="absolute w-[200%] h-[200%] origin-center animate-spin"
+        style={{
+          background: `conic-gradient(from 0deg, transparent 70%, ${accent}40 100%)`,
+          animationDuration: "3s",
+          animationTimingFunction: "linear",
+        }}
+      />
       <div className="relative z-10 w-16 h-16 rounded-full bg-page/80 backdrop-blur-xl border border-black/10 dark:border-white/20 flex items-center justify-center shadow-xl">
         <Radar size={24} style={{ color: accent }} className="animate-pulse" />
       </div>
-      <div className="absolute top-10 left-10 w-2 h-2 rounded-full animate-ping" style={{ background: accent }} />
-      <div className="absolute bottom-12 right-16 w-2 h-2 rounded-full animate-ping" style={{ background: accent, animationDelay: '1s' }} />
+      <div
+        className="absolute top-10 left-10 w-2 h-2 rounded-full animate-ping"
+        style={{ background: accent }}
+      />
+      <div
+        className="absolute bottom-12 right-16 w-2 h-2 rounded-full animate-ping"
+        style={{ background: accent, animationDelay: "1s" }}
+      />
     </div>
   );
 };

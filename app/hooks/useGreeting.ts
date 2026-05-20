@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * useGreeting — flexible i18n greeting
@@ -11,14 +11,16 @@ export function useGreeting(
   times: [string, string, string],
   greetingFn: (timeGreeting: string) => string,
 ): string {
-  const [greeting, setGreeting] = useState('');
+  const [greeting, setGreeting] = useState("");
 
   useEffect(() => {
     const hour = new Date().getHours();
     const timeOfDay =
-      hour >= 6 && hour < 14  ? times[0]
-      : hour >= 14 && hour < 21 ? times[1]
-      : times[2];
+      hour >= 6 && hour < 14
+        ? times[0]
+        : hour >= 14 && hour < 21
+          ? times[1]
+          : times[2];
     setGreeting(greetingFn(timeOfDay));
   }, [times, greetingFn]);
 

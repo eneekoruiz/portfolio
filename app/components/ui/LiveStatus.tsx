@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { MapPin, Clock } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { MapPin, Clock } from "lucide-react";
 
 const fmt = () =>
-  new Intl.DateTimeFormat('es-ES', {
-    timeZone: 'Europe/Madrid',
-    hour: '2-digit',
-    minute: '2-digit',
+  new Intl.DateTimeFormat("es-ES", {
+    timeZone: "Europe/Madrid",
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(new Date());
 
 export function LiveStatus({ label }: { label: string }) {
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState("");
 
   useEffect(() => {
     setTime(fmt());
@@ -40,7 +40,9 @@ export function LiveStatus({ label }: { label: string }) {
       )}
       <span>·</span>
       <span className="w-[6px] h-[6px] rounded-full bg-[#34c759] shadow-[0_0_7px_#34c759] shrink-0" />
-      <span className="text-[#1a7a2e] dark:text-[#34c759] font-bold">{label}</span>
+      <span className="text-[#1a7a2e] dark:text-[#34c759] font-bold">
+        {label}
+      </span>
     </div>
   );
 }

@@ -1,20 +1,24 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
 export function NetworkParticles() {
   const cvRef = useRef<HTMLCanvasElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
     const cv = cvRef.current!;
-    const ctx = cv.getContext('2d')!;
-    let W = 0, H = 0, raf = 0;
-    
+    const ctx = cv.getContext("2d")!;
+    let W = 0,
+      H = 0,
+      raf = 0;
+
     // x, y, velocity x, velocity y, radius
     type Pt = { x: number; y: number; vx: number; vy: number; r: number };
     const pts: Pt[] = [];
-    
-    const NUM_PTS = 140; 
+
+    const NUM_PTS = 140;
     const mouse = { x: -999, y: -999 };
 
     const resize = () => {
@@ -22,14 +26,14 @@ export function NetworkParticles() {
       H = cv.height = cv.offsetHeight;
     };
     resize();
-    window.addEventListener('resize', resize);
-    
+    window.addEventListener("resize", resize);
+
     const mm = (e: MouseEvent) => {
       const rect = cv.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
     };
-    
+
     const touch = (e: TouchEvent) => {
       if (e.touches.length > 0) {
         const rect = cv.getBoundingClientRect();
@@ -37,17 +41,38 @@ export function NetworkParticles() {
         mouse.y = e.touches[0].clientY - rect.top;
       }
     };
-    
-    const ml = () => { mouse.x = -999; mouse.y = -999; };
-    
+
+    const ml = () => {
+      mouse.x = -999;
+      mouse.y = -999;
+    };
+
     // Delegate event listeners to the parent section to capture interaction over text/cards
-    const container = cv.closest('section') || cv;
-    container.addEventListener('mousemove', mm as EventListener);
-    container.addEventListener('mouseleave', ml);
-    container.addEventListener('touchstart', touch as EventListener, { passive: true });
-    container.addEventListener('touchmove', touch as EventListener, { passive: true });
-    container.addEventListener('touchend', ml);
-    container.addEventListener('touchcancel', ml);
+    const container = cv.closest("section") || cv;
+    container.addEventListener("mousemove", mm as EventListener);
+    container.addEventListener("mouseleave", ml);
+    container.addEventListener("touchstart", touch as EventListener, {
+      passive: true,
+    });
+    container.addEventListener("touchmove", touch as EventListener, {
+      passive: true,
+    });
+    container.addEventListener("touchend", ml);
+    container.addEventListener("touchcancel", ml);
+
+    if (!motionEnabled) {
+      ctx.clearRect(0, 0, W, H);
+      return () => {
+        ctx.clearRect(0, 0, W, H);
+        window.removeEventListener("resize", resize);
+        container.removeEventListener("mousemove", mm as EventListener);
+        container.removeEventListener("mouseleave", ml);
+        container.removeEventListener("touchstart", touch as EventListener);
+        container.removeEventListener("touchmove", touch as EventListener);
+        container.removeEventListener("touchend", ml);
+        container.removeEventListener("touchcancel", ml);
+      };
+    }
 
     for (let i = 0; i < NUM_PTS; i++) {
       pts.push({
@@ -55,14 +80,14 @@ export function NetworkParticles() {
         y: Math.random() * H,
         vx: (Math.random() - 0.5) * 0.8,
         vy: (Math.random() - 0.5) * 0.8,
-        r: Math.random() * 1.5 + 1.2
+        r: Math.random() * 1.5 + 1.2,
       });
     }
 
     const loop = () => {
       ctx.clearRect(0, 0, W, H);
-      
-      const maxDist = 160; 
+
+      const maxDist = 160;
       const mouseDist = 220; // Ratón atrae desde más lejos
 
       pts.forEach((p, i) => {
@@ -75,7 +100,7 @@ export function NetworkParticles() {
         // Dibujar el punto
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 102, 255, 0.8)';
+        ctx.fillStyle = "rgba(0, 102, 255, 0.8)";
         ctx.fill();
 
         // Conectar con otros puntos
@@ -90,7 +115,7 @@ export function NetworkParticles() {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            const alpha = (1 - dist / maxDist) * 0.45; 
+            const alpha = (1 - dist / maxDist) * 0.45;
             ctx.strokeStyle = `rgba(0, 102, 255, ${alpha})`;
             ctx.lineWidth = 1;
             ctx.stroke();
@@ -127,22 +152,28 @@ export function NetworkParticles() {
           }
         }
       });
-      
+
       raf = requestAnimationFrame(loop);
     };
-    
+
     loop();
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('resize', resize);
-      container.removeEventListener('mousemove', mm as EventListener);
-      container.removeEventListener('mouseleave', ml);
-      container.removeEventListener('touchstart', touch as EventListener);
-      container.removeEventListener('touchmove', touch as EventListener);
-      container.removeEventListener('touchend', ml);
-      container.removeEventListener('touchcancel', ml);
+      window.removeEventListener("resize", resize);
+      container.removeEventListener("mousemove", mm as EventListener);
+      container.removeEventListener("mouseleave", ml);
+      container.removeEventListener("touchstart", touch as EventListener);
+      container.removeEventListener("touchmove", touch as EventListener);
+      container.removeEventListener("touchend", ml);
+      container.removeEventListener("touchcancel", ml);
     };
-  }, []);
+  }, [motionEnabled]);
 
-  return <canvas ref={cvRef} className="absolute inset-0 w-full h-full pointer-events-auto z-0 print:hidden" aria-hidden="true" />;
+  return (
+    <canvas
+      ref={cvRef}
+      className="absolute inset-0 w-full h-full pointer-events-auto z-0 print:hidden"
+      aria-hidden="true"
+    />
+  );
 }

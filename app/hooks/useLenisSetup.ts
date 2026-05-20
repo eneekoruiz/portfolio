@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from "react";
 
 export function useLenisSetup() {
   const start = useCallback(() => {

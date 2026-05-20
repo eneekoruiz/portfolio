@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useSectionObserver } from './useSectionObserver';
-import type { Tx } from '../types';
+import { useState } from "react";
+import { useSectionObserver } from "./useSectionObserver";
+import type { Tx } from "../types";
 
 export function useActiveSection(
   ready: boolean,
   t: Tx,
   navInnerRef: React.RefObject<HTMLDivElement | null>,
   indRef: React.RefObject<HTMLDivElement | null>,
-  activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>
+  activeLinkRef: React.MutableRefObject<HTMLAnchorElement | null>,
 ) {
-  const [activeSection, setActiveSection] = useState('hero');
+  const [activeSection, setActiveSection] = useState("hero");
 
   useSectionObserver(
     ready,
@@ -19,7 +19,7 @@ export function useActiveSection(
     navInnerRef,
     indRef,
     activeLinkRef,
-    setActiveSection
+    setActiveSection,
   );
 
   return activeSection;

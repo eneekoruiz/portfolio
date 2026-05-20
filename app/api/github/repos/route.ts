@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GitHub API Route - Hardened Error Handling & Security Audit Ready
@@ -6,20 +6,20 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
-const GITHUB_USER = 'eneekoruiz';
+const GITHUB_USER = "eneekoruiz";
 const CACHE_TTL = 3600; // 1 hour
 
-const ALLOWED_SORT = ['updated', 'pushed', 'created', 'full_name'] as const;
-const ALLOWED_DIRECTION = ['asc', 'desc'] as const;
+const ALLOWED_SORT = ["updated", "pushed", "created", "full_name"] as const;
+const ALLOWED_DIRECTION = ["asc", "desc"] as const;
 
 type SortOption = (typeof ALLOWED_SORT)[number];
 type DirectionOption = (typeof ALLOWED_DIRECTION)[number];
 
 const ERRORS = {
-  INVALID_PARAMS: 'Invalid request parameters',
-  RATE_LIMIT: 'GitHub rate limit reached',
-  FETCH_FAILED: 'Unable to fetch repositories',
-  INTERNAL: 'Internal Server Error',
+  INVALID_PARAMS: "Invalid request parameters",
+  RATE_LIMIT: "GitHub rate limit reached",
+  FETCH_FAILED: "Unable to fetch repositories",
+  INTERNAL: "Internal Server Error",
 } as const;
 
 interface GitHubRepo {
@@ -53,19 +53,24 @@ function parseRequestParams(urlStr: string): ValidatedParams | null {
   try {
     const { searchParams } = new URL(urlStr);
 
-    const sortParam = searchParams.get('sort') ?? 'updated';
+    const sortParam = searchParams.get("sort") ?? "updated";
     if (!ALLOWED_SORT.includes(sortParam as SortOption)) {
       return null;
     }
 
-    const directionParam = searchParams.get('direction') ?? 'desc';
+    const directionParam = searchParams.get("direction") ?? "desc";
     if (!ALLOWED_DIRECTION.includes(directionParam as DirectionOption)) {
       return null;
     }
 
-    const perPageParam = searchParams.get('per_page') ?? '30';
+    const perPageParam = searchParams.get("per_page") ?? "30";
     const parsed = Number.parseInt(perPageParam, 10);
-    if (!Number.isInteger(parsed) || !Number.isFinite(parsed) || parsed < 1 || parsed > 100) {
+    if (
+      !Number.isInteger(parsed) ||
+      !Number.isFinite(parsed) ||
+      parsed < 1 ||
+      parsed > 100
+    ) {
       return null;
     }
 
@@ -82,7 +87,10 @@ function parseRequestParams(urlStr: string): ValidatedParams | null {
 /**
  * Enriches a repository with its language details.
  */
-async function enrichRepoLanguages(repo: GitHubRepo, headers: HeadersInit): Promise<GitHubRepo> {
+async function enrichRepoLanguages(
+  repo: GitHubRepo,
+  headers: HeadersInit,
+): Promise<GitHubRepo> {
   try {
     const langRes = await fetch(repo.languages_url, {
       headers,
@@ -110,13 +118,13 @@ export async function GET(request: NextRequest) {
     sort,
     direction,
     per_page: perPage.toString(),
-    type: 'owner',
+    type: "owner",
   });
 
   const endpoint = `https://api.github.com/users/${GITHUB_USER}/repos?${cleanParams.toString()}`;
   const requestHeaders: HeadersInit = {
-    Accept: 'application/vnd.github+json',
-    'User-Agent': 'Eneko-Portfolio-Backend',
+    Accept: "application/vnd.github+json",
+    "User-Agent": "Eneko-Portfolio-Backend",
   };
 
   if (GITHUB_TOKEN) {
@@ -131,7 +139,7 @@ export async function GET(request: NextRequest) {
 
     // Handle Rate Limiting (403/429)
     if (res.status === 403 || res.status === 429) {
-      const resetTime = res.headers.get('X-RateLimit-Reset');
+      const resetTime = res.headers.get("X-RateLimit-Reset");
       console.warn(`GitHub Rate Limit hit. Reset at: ${resetTime}`);
 
       return NextResponse.json(
@@ -139,10 +147,10 @@ export async function GET(request: NextRequest) {
         {
           status: 429,
           headers: {
-            'Retry-After': resetTime ?? '3600',
-            'Cache-Control': 'no-store',
+            "Retry-After": resetTime ?? "3600",
+            "Cache-Control": "no-store",
           },
-        }
+        },
       );
     }
 
@@ -153,8 +161,8 @@ export async function GET(request: NextRequest) {
         { error: ERRORS.FETCH_FAILED },
         {
           status: res.status === 404 ? 404 : 502,
-          headers: { 'Cache-Control': 'no-store' },
-        }
+          headers: { "Cache-Control": "no-store" },
+        },
       );
     }
 
@@ -165,7 +173,7 @@ export async function GET(request: NextRequest) {
       repos
         .filter((r) => !r.fork)
         .slice(0, 8)
-        .map((repo) => enrichRepoLanguages(repo, requestHeaders))
+        .map((repo) => enrichRepoLanguages(repo, requestHeaders)),
     );
 
     const finalData = repos.map((r) => {
@@ -176,17 +184,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(finalData, {
       status: 200,
       headers: {
-        'Cache-Control': `public, s-maxage=${CACHE_TTL}, stale-while-revalidate=${CACHE_TTL / 2}`,
-        'X-Content-Type-Options': 'nosniff',
+        "Cache-Control": `public, s-maxage=${CACHE_TTL}, stale-while-revalidate=${CACHE_TTL / 2}`,
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (err) {
-    const logMsg = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Critical GitHub Route Failure:', logMsg);
+    const logMsg = err instanceof Error ? err.message : "Unknown error";
+    console.error("Critical GitHub Route Failure:", logMsg);
 
-    return NextResponse.json(
-      { error: ERRORS.INTERNAL },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: ERRORS.INTERNAL }, { status: 500 });
   }
 }

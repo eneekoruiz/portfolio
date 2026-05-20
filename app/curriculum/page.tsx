@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -8,19 +8,19 @@
  * with smooth transitions and liquid curtain effects for navigation
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTheme } from 'next-themes';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ChevronLeft, ExternalLink, Download } from 'lucide-react';
-import { useTranslations } from '../hooks/useTranslations';
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ChevronLeft, ExternalLink, Download } from "lucide-react";
+import { useTranslations } from "../hooks/useTranslations";
 
 export default function CurriculumPage() {
   const { t } = useTranslations();
   const router = useRouter();
   const { theme, resolvedTheme } = useTheme();
-  const [iframeHeight, setIframeHeight] = useState('100%');
+  const [iframeHeight, setIframeHeight] = useState("100%");
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
@@ -31,28 +31,28 @@ export default function CurriculumPage() {
 
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
-      if (e.data.type === 'trigger-cv-print') {
+      if (e.data.type === "trigger-cv-print") {
         const iframe = iframeRef.current;
         if (iframe && iframe.contentWindow) {
           iframe.contentWindow.focus();
           iframe.contentWindow.print();
         }
       }
-      if (e.data.type === 'set-cv-height') {
+      if (e.data.type === "set-cv-height") {
         setIframeHeight(`${e.data.height}px`);
         setLoading(false);
         setHasError(false);
         setShowFallback(false);
       }
     };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   useEffect(() => {
-    document.title = 'Currículum | Eneko Ruiz';
+    document.title = "Currículum | Eneko Ruiz";
     return () => {
-      document.title = 'Eneko Ruiz — Portfolio';
+      document.title = "Eneko Ruiz — Portfolio";
     };
   }, []);
 
@@ -68,36 +68,76 @@ export default function CurriculumPage() {
   }, [loading]);
 
   // ── ENTRANCE ANIMATION ──────────────────────────────────────────────
-  useGSAP(() => {
-    if (!containerRef.current || !headerRef.current) return;
-    const tl = gsap.timeline();
-    tl.from(headerRef.current, { opacity: 0, y: -30, duration: 0.6, ease: 'power3.out' }, 0);
-    
-    const hasCurriculum = containerRef.current.querySelectorAll('.curriculum-content').length > 0;
-    if (hasCurriculum) {
-      tl.from('.curriculum-content', { opacity: 0, scale: 0.98, duration: 0.8, ease: 'power3.out' }, 0.2);
-    }
-  }, { scope: containerRef });
+  useGSAP(
+    () => {
+      if (!containerRef.current || !headerRef.current) return;
+      const tl = gsap.timeline();
+      tl.from(
+        headerRef.current,
+        { opacity: 0, y: -30, duration: 0.6, ease: "power3.out" },
+        0,
+      );
+
+      const hasCurriculum =
+        containerRef.current.querySelectorAll(".curriculum-content").length > 0;
+      if (hasCurriculum) {
+        tl.from(
+          ".curriculum-content",
+          { opacity: 0, scale: 0.98, duration: 0.8, ease: "power3.out" },
+          0.2,
+        );
+      }
+    },
+    { scope: containerRef },
+  );
 
   useGSAP(() => {
     if (!loading && iframeRef.current) {
-      gsap.fromTo(iframeRef.current, 
-        { opacity: 0, y: 30, scale: 0.98, filter: 'blur(10px)' },
-        { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.2, ease: 'expo.out', delay: 0.1 }
+      gsap.fromTo(
+        iframeRef.current,
+        { opacity: 0, y: 30, scale: 0.98, filter: "blur(10px)" },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 1.2,
+          ease: "expo.out",
+          delay: 0.1,
+        },
       );
     }
   }, [loading]);
 
   const handleReturn = () => {
     if (iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({ type: 'leaving' }, '*');
+      iframeRef.current.contentWindow.postMessage({ type: "leaving" }, "*");
     }
-    const tl = gsap.timeline({ onComplete: () => { router.push('/#hero'); } });
+    const tl = gsap.timeline({
+      onComplete: () => {
+        router.push("/#hero");
+      },
+    });
     if (headerRef.current) {
-      tl.to(headerRef.current, { opacity: 0, y: -20, duration: 0.4, ease: 'power2.in' });
+      tl.to(headerRef.current, {
+        opacity: 0,
+        y: -20,
+        duration: 0.4,
+        ease: "power2.in",
+      });
     }
     if (containerRef.current) {
-      tl.to(containerRef.current, { opacity: 0, scale: 0.98, filter: 'blur(10px)', duration: 0.6, ease: 'power2.inOut' }, headerRef.current ? '-=0.2' : undefined);
+      tl.to(
+        containerRef.current,
+        {
+          opacity: 0,
+          scale: 0.98,
+          filter: "blur(10px)",
+          duration: 0.6,
+          ease: "power2.inOut",
+        },
+        headerRef.current ? "-=0.2" : undefined,
+      );
     }
   };
 
@@ -115,7 +155,10 @@ export default function CurriculumPage() {
           onClick={handleReturn}
           className="group flex items-center gap-2 font-bold text-[11px] uppercase tracking-[0.2em] text-lead hover:text-ink transition-colors"
         >
-          <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+          <ChevronLeft
+            size={16}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
           <span>{t.back}</span>
         </button>
 
@@ -157,7 +200,7 @@ export default function CurriculumPage() {
               </div>
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
-               <div className="w-6 h-6 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
             </div>
           </div>
         )}
@@ -168,7 +211,7 @@ export default function CurriculumPage() {
             src="https://eneko-ruiz-curriculum.vercel.app"
             title="Eneko Ruiz Curriculum"
             style={{ height: iframeHeight }}
-            className={`w-full border-none transition-all duration-1000 ${loading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+            className={`w-full border-none transition-all duration-1000 ${loading ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
             allow="web-share; clipboard-write"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
             onLoad={() => {
@@ -183,7 +226,7 @@ export default function CurriculumPage() {
             }}
           />
         </div>
-        
+
         {/* FALLBACK: Si no carga por seguridad (X-Frame-Options) */}
         {showFallback && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-page z-10 animate-in fade-in duration-700">
@@ -191,12 +234,14 @@ export default function CurriculumPage() {
               <ExternalLink size={32} />
             </div>
             <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-4 text-ink">
-              {t.back === 'Volver' ? 'Contenido Protegido' : 'Protected Content'}
+              {t.back === "Volver"
+                ? "Contenido Protegido"
+                : "Protected Content"}
             </h2>
             <p className="max-w-md text-lead text-sm leading-relaxed mb-8">
-              {t.back === 'Volver' 
-                ? 'Por motivos de seguridad (X-Frame-Options), algunos navegadores bloquean la visualización incrustada. Pulsa el botón de arriba para ver el currículum a pantalla completa.'
-                : 'For security reasons (X-Frame-Options), some browsers block embedded viewing. Click the button above to view the resume in full screen.'}
+              {t.back === "Volver"
+                ? "Por motivos de seguridad (X-Frame-Options), algunos navegadores bloquean la visualización incrustada. Pulsa el botón de arriba para ver el currículum a pantalla completa."
+                : "For security reasons (X-Frame-Options), some browsers block embedded viewing. Click the button above to view the resume in full screen."}
             </p>
             <div className="pointer-events-auto">
               <a

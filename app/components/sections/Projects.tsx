@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * PROJECTS SECTION — Selected Works & GitHub Activity
@@ -7,23 +7,27 @@
  * Includes scroll-based skew inertia and responsive layout handling.
  */
 
-import { useRef, useEffect, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowUpRight } from 'lucide-react';
-import type { ProjectCard, RepoFull, Tx } from '../../types';
+import { useRef, useEffect, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowUpRight } from "lucide-react";
+import type { ProjectCard, RepoFull, Tx } from "../../types";
 
 // Custom Hooks & Utilities
-import { useMobile } from '../../hooks/useMobile';
-import { useProjectsAnimations } from '../../hooks/useProjectsAnimations';
-import { loadNavState, saveNavState, clearNavState } from '../../lib/navigationPersistence';
+import { useMobile } from "../../hooks/useMobile";
+import { useProjectsAnimations } from "../../hooks/useProjectsAnimations";
+import {
+  loadNavState,
+  saveNavState,
+  clearNavState,
+} from "../../lib/navigationPersistence";
 
 // Subcomponents
-import { RepoRow } from './projects/RepoRow';
-import { PremiumWorkRow } from './projects/PremiumWorkRow';
-import { SkeletonRow } from './projects/SkeletonRow';
+import { RepoRow } from "./projects/RepoRow";
+import { PremiumWorkRow } from "./projects/PremiumWorkRow";
+import { SkeletonRow } from "./projects/SkeletonRow";
 
-if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger);
+if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 interface ProjectsProps {
   t: Tx;
@@ -38,8 +42,17 @@ interface ProjectsProps {
   onToggleProject: (idx: number | null) => void;
 }
 
-export function Projects({ 
-  t, top3, repos, load, offline, errorMsg, BranchMergeBtn, onHoverProject, expandedIdx, onToggleProject 
+export function Projects({
+  t,
+  top3,
+  repos,
+  load,
+  offline,
+  errorMsg,
+  BranchMergeBtn,
+  onHoverProject,
+  expandedIdx,
+  onToggleProject,
 }: ProjectsProps) {
   const [activeRepo, setActiveRepo] = useState<number | null>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -92,23 +105,33 @@ export function Projects({
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 md:w-10 bg-ink opacity-12" />
             <p className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.32em] uppercase text-lead/50">
-              {t.woLb || 'PORTFOLIO DE INGENIERÍA'}
+              {t.woLb || "PORTFOLIO DE INGENIERÍA"}
             </p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
-            <h2 
+            <h2
               className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tight leading-[0.95] text-ink uppercase italic perspective-1000"
               aria-label="Selected Works"
             >
               <span className="overflow-hidden inline-block py-2 pl-4 pr-12 -my-2 -ml-4 -mr-12">
-                { "Selected".split('').map((c, i) => (
-                  <span key={i} className="title-char inline-block will-change-transform pr-[0.1em]">{c}</span>
+                {"Selected".split("").map((c, i) => (
+                  <span
+                    key={i}
+                    className="title-char inline-block will-change-transform pr-[0.1em]"
+                  >
+                    {c}
+                  </span>
                 ))}
               </span>
-              <br/>
+              <br />
               <span className="overflow-hidden inline-block py-2 pl-4 pr-12 -my-2 -ml-4 -mr-12">
-                { "Works.".split('').map((c, i) => (
-                  <span key={i} className="title-char inline-block will-change-transform pr-[0.1em]">{c}</span>
+                {"Works.".split("").map((c, i) => (
+                  <span
+                    key={i}
+                    className="title-char inline-block will-change-transform pr-[0.1em]"
+                  >
+                    {c}
+                  </span>
                 ))}
               </span>
             </h2>
@@ -120,16 +143,13 @@ export function Projects({
 
         <div className="projects-list border-t border-black/10 dark:border-white/10">
           {top3.length === 0
-            ? [0, 1, 2, 3, 4].map(i => (
+            ? [0, 1, 2, 3, 4].map((i) => (
                 <div key={i} className="work-row-anim">
                   <SkeletonRow idx={i} />
                 </div>
               ))
             : top3.map((p, i) => (
-                <div 
-                  key={p.n} 
-                  className="work-row-anim"
-                >
+                <div key={p.n} className="work-row-anim">
                   <PremiumWorkRow
                     proj={p}
                     idx={i}
@@ -139,10 +159,8 @@ export function Projects({
                     skipAnimation={isReturning.current && expandedIdx === i}
                   />
                 </div>
-              ))
-          }
+              ))}
         </div>
-
       </section>
 
       <section
@@ -153,10 +171,10 @@ export function Projects({
       >
         <div className="flex items-end justify-between pb-4 border-b border-black/7 dark:border-white/10 mb-1">
           <p className="text-[9px] font-bold tracking-[0.22em] uppercase text-lead/60">
-            {t.ghLb || 'ACTIVIDAD'}
+            {t.ghLb || "ACTIVIDAD"}
           </p>
           <span className="font-mono text-[9px] text-lead/40">
-            {offline ? 'offline' : `${repos?.length || 0}_repos`}
+            {offline ? "offline" : `${repos?.length || 0}_repos`}
           </span>
         </div>
 
@@ -165,8 +183,18 @@ export function Projects({
             <div className="my-6 px-5 py-6 rounded-2xl border border-red-500/15 dark:border-red-500/10 bg-gradient-to-br from-red-50/40 via-transparent to-transparent dark:from-red-950/15 dark:via-transparent backdrop-blur-sm">
               <div className="flex items-start gap-4">
                 <div className="mt-0.5 flex-shrink-0 w-9 h-9 rounded-xl bg-red-500/10 dark:bg-red-500/5 border border-red-500/15 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                  <svg
+                    className="w-4 h-4 text-red-500 dark:text-red-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -179,7 +207,8 @@ export function Projects({
                     </code>
                   )}
                   <p className="text-[12px] leading-relaxed text-lead/60 mb-4">
-                    Para ver mis últimos repositorios, visita mi perfil de GitHub directamente.
+                    Para ver mis últimos repositorios, visita mi perfil de
+                    GitHub directamente.
                   </p>
                   <a
                     href="https://github.com/eneekoruiz"
@@ -196,7 +225,7 @@ export function Projects({
           )}
           {load ? (
             <div className="py-4">
-              {[0, 1, 2, 3].map(i => (
+              {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
                   className="border-b border-black/7 dark:border-white/10 py-5 flex items-center gap-5 animate-pulse"
@@ -216,7 +245,9 @@ export function Projects({
                   idx={i}
                   activeRepo={activeRepo}
                   setActiveRepo={setActiveRepo}
-                  lineRef={el => { lineRefs.current[i] = el; }}
+                  lineRef={(el) => {
+                    lineRefs.current[i] = el;
+                  }}
                   isMobile={isMobile}
                 />
               ))}
@@ -226,7 +257,7 @@ export function Projects({
 
         <div className="flex justify-center mt-10 md:mt-12">
           <BranchMergeBtn
-            label={t.moreGh || 'VER TODO EN GITHUB'}
+            label={t.moreGh || "VER TODO EN GITHUB"}
             href="https://github.com/eneekoruiz"
           />
         </div>

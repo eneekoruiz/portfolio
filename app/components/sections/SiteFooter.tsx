@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Github, Linkedin } from 'lucide-react';
-import { useMagnetic } from '../../hooks/useMagnetic';
-import { useSound } from '../../hooks/useSound';
-import { LiveStatus } from '../ui/LiveStatus';
-import { PortalWarpBtn } from '../ui/Buttons';
-import type { Tx } from '../../types';
+import { Github, Linkedin } from "lucide-react";
+import { useMagnetic } from "../../hooks/useMagnetic";
+import { useSound } from "../../hooks/useSound";
+import { LiveStatus } from "../ui/LiveStatus";
+import { PortalWarpBtn } from "../ui/Buttons";
+import type { Tx } from "../../types";
 
 export function SiteFooter({ t }: { t: Tx }) {
   const { playClick } = useSound();
@@ -58,7 +58,9 @@ export function SiteFooter({ t }: { t: Tx }) {
           className="no-underline text-lead transition-colors duration-200 hover:text-brand"
           onClick={handleClick}
         >
-          <p className="font-mono text-[10px] leading-none opacity-80">{t.footerTech}</p>
+          <p className="font-mono text-[10px] leading-none opacity-80">
+            {t.footerTech}
+          </p>
         </a>
       </div>
 

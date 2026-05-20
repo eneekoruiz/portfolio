@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -21,210 +21,231 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { useRef, useState, useEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-import { Activity, MousePointer2, X, ExternalLink, MoveUp, Github } from 'lucide-react';
+import { useRef, useState, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import {
+  Activity,
+  MousePointer2,
+  X,
+  ExternalLink,
+  MoveUp,
+  Github,
+} from "lucide-react";
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-const STUDIO_TX: Record<string, {
-  sourceCode: string;
-  closeSession: string;
-  enterStudio: string;
-  clickToInteract: string;
-  initializing: string;
-  mounting: string;
-  preparing: string;
-  demoWorking: string;
-  comingSoon: string;
-  scrollDownInit: string;
-  auditDesc: string;
-  deepScroll: string;
-  keepScrolling: string;
-}> = {
+const STUDIO_TX: Record<
+  string,
+  {
+    sourceCode: string;
+    closeSession: string;
+    enterStudio: string;
+    clickToInteract: string;
+    initializing: string;
+    mounting: string;
+    preparing: string;
+    demoWorking: string;
+    comingSoon: string;
+    scrollDownInit: string;
+    auditDesc: string;
+    deepScroll: string;
+    keepScrolling: string;
+  }
+> = {
   es: {
-    sourceCode: 'Código Fuente',
-    closeSession: 'Cerrar Sesión',
-    enterStudio: 'Entrar al Estudio',
-    clickToInteract: 'Haz clic para interactuar',
-    initializing: 'Inicializando Estudio',
-    mounting: 'Montando entorno remoto...',
-    preparing: 'Preparando Entorno',
-    demoWorking: 'Estamos trabajando en la demo todavía',
-    comingSoon: 'Próximamente',
-    scrollDownInit: 'Desplaza hacia abajo para inicializar la vista previa del sistema.',
-    auditDesc: 'Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.',
-    deepScroll: 'Desplaza para Entrar',
-    keepScrolling: 'Sigue desplazándote',
+    sourceCode: "Código Fuente",
+    closeSession: "Cerrar Sesión",
+    enterStudio: "Entrar al Estudio",
+    clickToInteract: "Haz clic para interactuar",
+    initializing: "Inicializando Estudio",
+    mounting: "Montando entorno remoto...",
+    preparing: "Preparando Entorno",
+    demoWorking: "Estamos trabajando en la demo todavía",
+    comingSoon: "Próximamente",
+    scrollDownInit:
+      "Desplaza hacia abajo para inicializar la vista previa del sistema.",
+    auditDesc:
+      "Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.",
+    deepScroll: "Desplaza para Entrar",
+    keepScrolling: "Sigue desplazándote",
   },
   en: {
-    sourceCode: 'Source Code',
-    closeSession: 'Close Session',
-    enterStudio: 'Enter Studio',
-    clickToInteract: 'Click to Interact',
-    initializing: 'Initializing Studio',
-    mounting: 'Mounting remote environment...',
-    preparing: 'Preparing Environment',
-    demoWorking: 'We are still working on the demo',
-    comingSoon: 'Coming Soon',
-    scrollDownInit: 'Scroll down to initialize the system preview.',
-    auditDesc: 'This project is being audited for final deployment in the test environment.',
-    deepScroll: 'Deep Scroll to Enter',
-    keepScrolling: 'Keep scrolling',
+    sourceCode: "Source Code",
+    closeSession: "Close Session",
+    enterStudio: "Enter Studio",
+    clickToInteract: "Click to Interact",
+    initializing: "Initializing Studio",
+    mounting: "Mounting remote environment...",
+    preparing: "Preparing Environment",
+    demoWorking: "We are still working on the demo",
+    comingSoon: "Coming Soon",
+    scrollDownInit: "Scroll down to initialize the system preview.",
+    auditDesc:
+      "This project is being audited for final deployment in the test environment.",
+    deepScroll: "Deep Scroll to Enter",
+    keepScrolling: "Keep scrolling",
   },
   eu: {
-    sourceCode: 'Iturburu Kodea',
-    closeSession: 'Saioa Itxi',
-    enterStudio: 'Estudioan Sartu',
-    clickToInteract: 'Klikatu elkarreragiteko',
-    initializing: 'Estudioa Hasieratzen',
-    mounting: 'Urruneko ingurunea muntatzen...',
-    preparing: 'Ingurunea Prestatzen',
-    demoWorking: 'Demolanean ari gara oraindik',
-    comingSoon: 'Laster',
-    scrollDownInit: 'Mugitu behera sistemaren aurrebista kargatzeko.',
-    auditDesc: 'Proiektu hau proba-ingurunean azken hedapenerako ikuskatzen ari da.',
-    deepScroll: 'Mugitu Gehiago Sartzeko',
-    keepScrolling: 'Jarraitu mugitzen',
+    sourceCode: "Iturburu Kodea",
+    closeSession: "Saioa Itxi",
+    enterStudio: "Estudioan Sartu",
+    clickToInteract: "Klikatu elkarreragiteko",
+    initializing: "Estudioa Hasieratzen",
+    mounting: "Urruneko ingurunea muntatzen...",
+    preparing: "Ingurunea Prestatzen",
+    demoWorking: "Demolanean ari gara oraindik",
+    comingSoon: "Laster",
+    scrollDownInit: "Mugitu behera sistemaren aurrebista kargatzeko.",
+    auditDesc:
+      "Proiektu hau proba-ingurunean azken hedapenerako ikuskatzen ari da.",
+    deepScroll: "Mugitu Gehiago Sartzeko",
+    keepScrolling: "Jarraitu mugitzen",
   },
   fr: {
-    sourceCode: 'Code Source',
-    closeSession: 'Quitter l\'Atelier',
-    enterStudio: 'Entrer dans l\'Atelier',
-    clickToInteract: 'Cliquer pour interagir',
-    initializing: 'Initialisation de l\'Atelier',
-    mounting: 'Montage de l\'environnement distant...',
-    preparing: 'Préparation de l\'Environnement',
-    demoWorking: 'Nous travaillons encore sur la démo',
-    comingSoon: 'Prochainement',
-    scrollDownInit: 'Faites défiler vers le bas pour initialiser l\'aperçu.',
-    auditDesc: 'Ce projet est en cours d\'audit pour déploiement final dans l\'environnement de test.',
-    deepScroll: 'Défiler pour Entrer',
-    keepScrolling: 'Continuez à défiler',
+    sourceCode: "Code Source",
+    closeSession: "Quitter l'Atelier",
+    enterStudio: "Entrer dans l'Atelier",
+    clickToInteract: "Cliquer pour interagir",
+    initializing: "Initialisation de l'Atelier",
+    mounting: "Montage de l'environnement distant...",
+    preparing: "Préparation de l'Environnement",
+    demoWorking: "Nous travaillons encore sur la démo",
+    comingSoon: "Prochainement",
+    scrollDownInit: "Faites défiler vers le bas pour initialiser l'aperçu.",
+    auditDesc:
+      "Ce projet est en cours d'audit pour déploiement final dans l'environnement de test.",
+    deepScroll: "Défiler pour Entrer",
+    keepScrolling: "Continuez à défiler",
   },
   it: {
-    sourceCode: 'Codice Sorgente',
-    closeSession: 'Chiudi Sessione',
-    enterStudio: 'Entra nello Studio',
-    clickToInteract: 'Clicca per interagire',
-    initializing: 'Inizializzazione Studio',
-    mounting: 'Montaggio dell\'ambiente remoto...',
-    preparing: 'Preparazione Ambiente',
-    demoWorking: 'Stiamo ancora lavorando alla demo',
-    comingSoon: 'Prossimamente',
-    scrollDownInit: 'Scorri verso il basso per inizializzare l\'anteprima.',
-    auditDesc: 'Questo progetto è in fase di verifica per il rilascio finale nell\'ambiente di test.',
-    deepScroll: 'Scorri per Entrare',
-    keepScrolling: 'Continua a scorrere',
+    sourceCode: "Codice Sorgente",
+    closeSession: "Chiudi Sessione",
+    enterStudio: "Entra nello Studio",
+    clickToInteract: "Clicca per interagire",
+    initializing: "Inizializzazione Studio",
+    mounting: "Montaggio dell'ambiente remoto...",
+    preparing: "Preparazione Ambiente",
+    demoWorking: "Stiamo ancora lavorando alla demo",
+    comingSoon: "Prossimamente",
+    scrollDownInit: "Scorri verso il basso per inizializzare l'anteprima.",
+    auditDesc:
+      "Questo progetto è in fase di verifica per il rilascio finale nell'ambiente di test.",
+    deepScroll: "Scorri per Entrare",
+    keepScrolling: "Continua a scorrere",
   },
   de: {
-    sourceCode: 'Quellcode',
-    closeSession: 'Sitzung beenden',
-    enterStudio: 'Studio betreten',
-    clickToInteract: 'Klicken zum Interagieren',
-    initializing: 'Studio wird initialisiert',
-    mounting: 'Remote-Umgebung wird geladen...',
-    preparing: 'Umgebung wird vorbereitet',
-    demoWorking: 'Wir arbeiten noch an der Demo',
-    comingSoon: 'Demnächst',
-    scrollDownInit: 'Nach unten scrollen, um die Systemvorschau zu laden.',
-    auditDesc: 'Dieses Projekt wird für die endgültige Bereitstellung in der Testumgebung geprüft.',
-    deepScroll: 'Scrollen zum Betreten',
-    keepScrolling: 'Weiter scrollen',
+    sourceCode: "Quellcode",
+    closeSession: "Sitzung beenden",
+    enterStudio: "Studio betreten",
+    clickToInteract: "Klicken zum Interagieren",
+    initializing: "Studio wird initialisiert",
+    mounting: "Remote-Umgebung wird geladen...",
+    preparing: "Umgebung wird vorbereitet",
+    demoWorking: "Wir arbeiten noch an der Demo",
+    comingSoon: "Demnächst",
+    scrollDownInit: "Nach unten scrollen, um die Systemvorschau zu laden.",
+    auditDesc:
+      "Dieses Projekt wird für die endgültige Bereitstellung in der Testumgebung geprüft.",
+    deepScroll: "Scrollen zum Betreten",
+    keepScrolling: "Weiter scrollen",
   },
   pt: {
-    sourceCode: 'Código Fonte',
-    closeSession: 'Fechar Sessão',
-    enterStudio: 'Entrar no Estúdio',
-    clickToInteract: 'Clique para interagir',
-    initializing: 'Inicializando Estúdio',
-    mounting: 'Montando ambiente remoto...',
-    preparing: 'Preparando Ambiente',
-    demoWorking: 'Ainda estamos trabalhando na demo',
-    comingSoon: 'Em breve',
-    scrollDownInit: 'Role para baixo para inicializar a pré-visualização.',
-    auditDesc: 'Este projeto está sendo auditado para implantação final no ambiente de testes.',
-    deepScroll: 'Rolar para Entrar',
-    keepScrolling: 'Continue a rolar',
+    sourceCode: "Código Fonte",
+    closeSession: "Fechar Sessão",
+    enterStudio: "Entrar no Estúdio",
+    clickToInteract: "Clique para interagir",
+    initializing: "Inicializando Estúdio",
+    mounting: "Montando ambiente remoto...",
+    preparing: "Preparando Ambiente",
+    demoWorking: "Ainda estamos trabalhando na demo",
+    comingSoon: "Em breve",
+    scrollDownInit: "Role para baixo para inicializar a pré-visualização.",
+    auditDesc:
+      "Este projeto está sendo auditado para implantação final no ambiente de testes.",
+    deepScroll: "Rolar para Entrar",
+    keepScrolling: "Continue a rolar",
   },
   ca: {
-    sourceCode: 'Codi Font',
-    closeSession: 'Tancar Sessió',
-    enterStudio: 'Entrar a l\'Estudi',
-    clickToInteract: 'Fes clic per interactuar',
-    initializing: 'Inicialitzant Estudi',
-    mounting: 'Muntant entorn remot...',
-    preparing: 'Preparant Entorn',
-    demoWorking: 'Encara estem treballant en la demo',
-    comingSoon: 'Properament',
-    scrollDownInit: 'Desplaça cap avall per inicialitzar la vista prèvia.',
-    auditDesc: 'Aquest projecte està sent auditat per al seu desplegament final a l\'entorn de proves.',
-    deepScroll: 'Desplaça per Entrar',
-    keepScrolling: 'Continua desplaçant-te',
+    sourceCode: "Codi Font",
+    closeSession: "Tancar Sessió",
+    enterStudio: "Entrar a l'Estudi",
+    clickToInteract: "Fes clic per interactuar",
+    initializing: "Inicialitzant Estudi",
+    mounting: "Muntant entorn remot...",
+    preparing: "Preparant Entorn",
+    demoWorking: "Encara estem treballant en la demo",
+    comingSoon: "Properament",
+    scrollDownInit: "Desplaça cap avall per inicialitzar la vista prèvia.",
+    auditDesc:
+      "Aquest projecte està sent auditat per al seu desplegament final a l'entorn de proves.",
+    deepScroll: "Desplaça per Entrar",
+    keepScrolling: "Continua desplaçant-te",
   },
   gl: {
-    sourceCode: 'Código Fonte',
-    closeSession: 'Pechar Sesión',
-    enterStudio: 'Entrar no Estudio',
-    clickToInteract: 'Fai clic para interactuar',
-    initializing: 'Inicializando Estudio',
-    mounting: 'Montando contorno remoto...',
-    preparing: 'Preparando Contorno',
-    demoWorking: 'Aínda estamos traballando na demo',
-    comingSoon: 'Proximamente',
-    scrollDownInit: 'Despraza cara a baixo para inicializar a vista previa.',
-    auditDesc: 'Este proxecto está sendo auditado para o seu despregue final no contorno de probas.',
-    deepScroll: 'Desprazar para Entrar',
-    keepScrolling: 'Continúa desprazándote',
+    sourceCode: "Código Fonte",
+    closeSession: "Pechar Sesión",
+    enterStudio: "Entrar no Estudio",
+    clickToInteract: "Fai clic para interactuar",
+    initializing: "Inicializando Estudio",
+    mounting: "Montando contorno remoto...",
+    preparing: "Preparando Contorno",
+    demoWorking: "Aínda estamos traballando na demo",
+    comingSoon: "Proximamente",
+    scrollDownInit: "Despraza cara a baixo para inicializar a vista previa.",
+    auditDesc:
+      "Este proxecto está sendo auditado para o seu despregue final no contorno de probas.",
+    deepScroll: "Desprazar para Entrar",
+    keepScrolling: "Continúa desprazándote",
   },
   ja: {
-    sourceCode: 'ソースコード',
-    closeSession: 'セッションを終了',
-    enterStudio: 'スタジオに入る',
-    clickToInteract: 'クリックして操作',
-    initializing: 'スタジオを初期化中',
-    mounting: 'リモート環境をマウント中...',
-    preparing: '環境を準備中',
-    demoWorking: 'デモ版は現在開発中です',
-    comingSoon: '近日公開',
-    scrollDownInit: '下へスクロールしてシステムプレビューを起動してください。',
-    auditDesc: 'このプロジェクトは、テスト環境への最終デプロイに向けて監査中です。',
-    deepScroll: 'スクロールして入場',
-    keepScrolling: 'スクロールを続けてください',
+    sourceCode: "ソースコード",
+    closeSession: "セッションを終了",
+    enterStudio: "スタジオに入る",
+    clickToInteract: "クリックして操作",
+    initializing: "スタジオを初期化中",
+    mounting: "リモート環境をマウント中...",
+    preparing: "環境を準備中",
+    demoWorking: "デモ版は現在開発中です",
+    comingSoon: "近日公開",
+    scrollDownInit: "下へスクロールしてシステムプレビューを起動してください。",
+    auditDesc:
+      "このプロジェクトは、テスト環境への最終デプロイに向けて監査中です。",
+    deepScroll: "スクロールして入場",
+    keepScrolling: "スクロールを続けてください",
   },
   zh: {
-    sourceCode: '源代码',
-    closeSession: '关闭会话',
-    enterStudio: '进入工作台',
-    clickToInteract: '点击以进行交互',
-    initializing: '正在初始化工作台',
-    mounting: '正在挂载远程环境...',
-    preparing: '正在准备环境',
-    demoWorking: '我们仍在开发演示版',
-    comingSoon: '即将推出',
-    scrollDownInit: '向下滚动以启动系统预览。',
-    auditDesc: '该项目正在进行审计，以进行测试环境의 最终部署。',
-    deepScroll: '向下滚动以进入',
-    keepScrolling: '请继续滚动',
+    sourceCode: "源代码",
+    closeSession: "关闭会话",
+    enterStudio: "进入工作台",
+    clickToInteract: "点击以进行交互",
+    initializing: "正在初始化工作台",
+    mounting: "正在挂载远程环境...",
+    preparing: "正在准备环境",
+    demoWorking: "我们仍在开发演示版",
+    comingSoon: "即将推出",
+    scrollDownInit: "向下滚动以启动系统预览。",
+    auditDesc: "该项目正在进行审计，以进行测试环境의 最终部署。",
+    deepScroll: "向下滚动以进入",
+    keepScrolling: "请继续滚动",
   },
   ar: {
-    sourceCode: 'كود المصدر',
-    closeSession: 'إغلاق الجلسة',
-    enterStudio: 'دخول الاستوديو',
-    clickToInteract: 'انقر للتفاعل',
-    initializing: 'جاري تهيئة الاستوديو',
-    mounting: 'جاري تحميل البيئة عن بعد...',
-    preparing: 'جاري تحضير البيئة',
-    demoWorking: 'ما زلنا نعمل على العرض التجريبي',
-    comingSoon: 'قريباً',
-    scrollDownInit: 'مرر لأسفل لتهيئة معاينة النظام.',
-    auditDesc: 'يتم تدقيق هذا المشروع من أجل النشر النهائي في بيئة الاختبار.',
-    deepScroll: 'مرر للدخول',
-    keepScrolling: 'استمر في التمرير',
+    sourceCode: "كود المصدر",
+    closeSession: "إغلاق الجلسة",
+    enterStudio: "دخول الاستوديو",
+    clickToInteract: "انقر للتفاعل",
+    initializing: "جاري تهيئة الاستوديو",
+    mounting: "جاري تحميل البيئة عن بعد...",
+    preparing: "جاري تحضير البيئة",
+    demoWorking: "ما زلنا نعمل على العرض التجريبي",
+    comingSoon: "قريباً",
+    scrollDownInit: "مرر لأسفل لتهيئة معاينة النظام.",
+    auditDesc: "يتم تدقيق هذا المشروع من أجل النشر النهائي في بيئة الاختبار.",
+    deepScroll: "مرر للدخول",
+    keepScrolling: "استمر في التمرير",
   },
 };
 
@@ -255,15 +276,15 @@ export function ProjectHero({
   liveUrl,
   githubUrl,
   videoUrl,
-  iframeTitle = 'Preview',
+  iframeTitle = "Preview",
   label,
   langs,
   darkMode,
   index = 1,
   isReady = true,
-  lang = 'es',
+  lang = "es",
 }: ProjectHeroProps) {
-  const s = STUDIO_TX[lang] ?? STUDIO_TX['en'];
+  const s = STUDIO_TX[lang] ?? STUDIO_TX["en"];
   const heroRef = useRef<HTMLDivElement>(null);
   const bgImageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -272,7 +293,7 @@ export function ProjectHero({
   const screenRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  
+
   // HUD scroll progress refs
   const scrollProgressRef = useRef<HTMLDivElement>(null);
   const scrollTextRef = useRef<HTMLSpanElement>(null);
@@ -284,18 +305,24 @@ export function ProjectHero({
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
   const interRef = useRef(false);
-  const canRef   = useRef(false);
+  const canRef = useRef(false);
 
   // ── DEFERRED LOADING STATE FOR PERFORMANCE ──
   const [shouldLoad, setShouldLoad] = useState(false);
   const shouldLoadRef = useRef(false);
 
   // Sync refs with state for use in event listeners
-  useEffect(() => { interRef.current = isInteracting; }, [isInteracting]);
-  useEffect(() => { canRef.current   = canInteract;   }, [canInteract]);
-  useEffect(() => { shouldLoadRef.current = shouldLoad; }, [shouldLoad]);
+  useEffect(() => {
+    interRef.current = isInteracting;
+  }, [isInteracting]);
+  useEffect(() => {
+    canRef.current = canInteract;
+  }, [canInteract]);
+  useEffect(() => {
+    shouldLoadRef.current = shouldLoad;
+  }, [shouldLoad]);
 
-  const disableStudio = projectId === 'rides24ofiziala';
+  const disableStudio = projectId === "rides24ofiziala";
 
   // Iframe loading safety fallback
   useEffect(() => {
@@ -307,169 +334,202 @@ export function ProjectHero({
   }, [liveUrl, iframeLoaded, shouldLoad]);
 
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
-  useGSAP(() => {
-    if (!isReady || !heroRef.current || !bgImageRef.current || !titleRef.current || !screenRef.current) return;
+  useGSAP(
+    () => {
+      if (
+        !isReady ||
+        !heroRef.current ||
+        !bgImageRef.current ||
+        !titleRef.current ||
+        !screenRef.current
+      )
+        return;
 
-    // 1. Cinematic Scroll Sequence — INCREASED END for better pacing
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: 'top top',
-        end: disableStudio ? '+=120%' : '+=250%', // More space for a grander transition
-        scrub: 1.2,
-        pin: true,
-        anticipatePin: 1,
-        onUpdate: (self: ScrollTrigger) => {
-          const isLocked = self.progress > 0.88; // Trigger CTA earlier
-          if (!disableStudio && canRef.current !== isLocked) {
-            canRef.current = isLocked;
-            setCanInteract(isLocked);
-          }
-          
-          // Trigger deferred loading when the user begins to scroll down
-          if (self.progress > 0.05 && !shouldLoadRef.current) {
-            shouldLoadRef.current = true;
-            setShouldLoad(true);
-          }
-          
-          if (screenRef.current && !interRef.current) {
-            screenRef.current.style.setProperty('--shield-opacity', isLocked ? '0.4' : '1');
-            screenRef.current.style.setProperty('--shield-pointer', isLocked ? 'all' : 'none');
-          }
-
-          // Update scroll telemetry HUD
-          const progressPercent = Math.round(self.progress * 100);
-          if (scrollTextRef.current) {
-            scrollTextRef.current.textContent = `${progressPercent}%`;
-          }
-          if (scrollBarRef.current) {
-            scrollBarRef.current.style.width = `${progressPercent}%`;
-          }
-
-          if (scrollProgressRef.current) {
-            if (self.progress > 0.85) {
-              scrollProgressRef.current.style.opacity = '0';
-              scrollProgressRef.current.style.pointerEvents = 'none';
-            } else if (self.progress > 0.02) {
-              scrollProgressRef.current.style.opacity = '1';
-              scrollProgressRef.current.style.pointerEvents = 'auto';
-              if (scrollHintDefaultRef.current) scrollHintDefaultRef.current.style.display = 'none';
-              if (scrollHintProgressRef.current) scrollHintProgressRef.current.style.display = 'flex';
-            } else {
-              scrollProgressRef.current.style.opacity = '1';
-              scrollProgressRef.current.style.pointerEvents = 'auto';
-              if (scrollHintDefaultRef.current) scrollHintDefaultRef.current.style.display = 'flex';
-              if (scrollHintProgressRef.current) scrollHintProgressRef.current.style.display = 'none';
+      // 1. Cinematic Scroll Sequence — INCREASED END for better pacing
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: disableStudio ? "+=120%" : "+=250%", // More space for a grander transition
+          scrub: 1.2,
+          pin: true,
+          anticipatePin: 1,
+          onUpdate: (self: ScrollTrigger) => {
+            const isLocked = self.progress > 0.88; // Trigger CTA earlier
+            if (!disableStudio && canRef.current !== isLocked) {
+              canRef.current = isLocked;
+              setCanInteract(isLocked);
             }
-          }
-        }
-      },
-    });
 
-    if (contentRef.current && bgImageRef.current) {
-      tl
-        // Phase 1: Background & Content Fade
-        .to(contentRef.current, {
-          y: -120,
-          opacity: 0,
-          scale: 0.9,
-          force3D: true,
-          ease: 'power2.in',
-          duration: 1.2,
-        }, 0)
-        .to(bgImageRef.current, {
-          scale: disableStudio ? 1.4 : 2.2,
-          opacity: disableStudio ? 0.3 : 0.1,
-          force3D: true,
-          ease: 'power2.inOut',
-          duration: 2.5,
-        }, 0);
-    }
+            // Trigger deferred loading when the user begins to scroll down
+            if (self.progress > 0.05 && !shouldLoadRef.current) {
+              shouldLoadRef.current = true;
+              setShouldLoad(true);
+            }
 
-    if (!disableStudio && screenRef.current && overlayRef.current) {
-      tl
-        // Phase 2: Screen reveals with a "Window" effect
-        .fromTo(screenRef.current,
-          { 
-            scale: 0.05, 
-            opacity: 0,
-            z: -1500,
-            filter: 'blur(30px)',
-            borderRadius: '50rem',
+            if (screenRef.current && !interRef.current) {
+              screenRef.current.style.setProperty(
+                "--shield-opacity",
+                isLocked ? "0.4" : "1",
+              );
+              screenRef.current.style.setProperty(
+                "--shield-pointer",
+                isLocked ? "all" : "none",
+              );
+            }
+
+            // Update scroll telemetry HUD
+            const progressPercent = Math.round(self.progress * 100);
+            if (scrollTextRef.current) {
+              scrollTextRef.current.textContent = `${progressPercent}%`;
+            }
+            if (scrollBarRef.current) {
+              scrollBarRef.current.style.width = `${progressPercent}%`;
+            }
+
+            if (scrollProgressRef.current) {
+              if (self.progress > 0.85) {
+                scrollProgressRef.current.style.opacity = "0";
+                scrollProgressRef.current.style.pointerEvents = "none";
+              } else if (self.progress > 0.02) {
+                scrollProgressRef.current.style.opacity = "1";
+                scrollProgressRef.current.style.pointerEvents = "auto";
+                if (scrollHintDefaultRef.current)
+                  scrollHintDefaultRef.current.style.display = "none";
+                if (scrollHintProgressRef.current)
+                  scrollHintProgressRef.current.style.display = "flex";
+              } else {
+                scrollProgressRef.current.style.opacity = "1";
+                scrollProgressRef.current.style.pointerEvents = "auto";
+                if (scrollHintDefaultRef.current)
+                  scrollHintDefaultRef.current.style.display = "flex";
+                if (scrollHintProgressRef.current)
+                  scrollHintProgressRef.current.style.display = "none";
+              }
+            }
           },
-          { 
-            scale: 1, 
-            opacity: 1,
-            z: 0,
-            filter: 'blur(0px)',
-            borderRadius: '2.5rem',
-            xPercent: -50,
-            yPercent: -50,
-            left: '50%',
-            top: '50%',
-            // RESPONSIVE DIMENSIONS - Use relative units for better mobile behavior
-            width: '94vw', 
-            maxWidth: window.innerWidth < 768 ? '100%' : '1400px',
-            height: window.innerWidth < 768 ? '65dvh' : '82dvh',
-            force3D: true,
-            ease: 'expo.inOut',
-            duration: 2.2, 
-          },
-          0.5
-        )
-        
-        // Phase 3: Darkening for focus
-        .to(overlayRef.current, {
-          opacity: 1,
-          backgroundColor: 'rgba(0,0,0,0.94)',
-          duration: 1.8,
-        }, 0.8);
-    }
-
-    // 2. Idle floating
-    if (titleRef.current) {
-      gsap.to(titleRef.current, {
-        y: '+=12',
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        force3D: true,
+        },
       });
-    }
 
-    // 3. Mouse Interaction (Optimized)
-    const onMove = (e: MouseEvent) => {
-      if (!titleRef.current || interRef.current) return;
-      const { clientX, clientY } = e;
-      const { innerWidth, innerHeight } = window;
-      const mx = (clientX / innerWidth - 0.5) * 2;
-      const my = (clientY / innerHeight - 0.5) * 2;
-      
+      if (contentRef.current && bgImageRef.current) {
+        tl
+          // Phase 1: Background & Content Fade
+          .to(
+            contentRef.current,
+            {
+              y: -120,
+              opacity: 0,
+              scale: 0.9,
+              force3D: true,
+              ease: "power2.in",
+              duration: 1.2,
+            },
+            0,
+          )
+          .to(
+            bgImageRef.current,
+            {
+              scale: disableStudio ? 1.4 : 2.2,
+              opacity: disableStudio ? 0.3 : 0.1,
+              force3D: true,
+              ease: "power2.inOut",
+              duration: 2.5,
+            },
+            0,
+          );
+      }
+
+      if (!disableStudio && screenRef.current && overlayRef.current) {
+        tl
+          // Phase 2: Screen reveals with a "Window" effect
+          .fromTo(
+            screenRef.current,
+            {
+              scale: 0.05,
+              opacity: 0,
+              z: -1500,
+              filter: "blur(30px)",
+              borderRadius: "50rem",
+            },
+            {
+              scale: 1,
+              opacity: 1,
+              z: 0,
+              filter: "blur(0px)",
+              borderRadius: "2.5rem",
+              xPercent: -50,
+              yPercent: -50,
+              left: "50%",
+              top: "50%",
+              // RESPONSIVE DIMENSIONS - Use relative units for better mobile behavior
+              width: "94vw",
+              maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
+              height: window.innerWidth < 768 ? "65dvh" : "82dvh",
+              force3D: true,
+              ease: "expo.inOut",
+              duration: 2.2,
+            },
+            0.5,
+          )
+
+          // Phase 3: Darkening for focus
+          .to(
+            overlayRef.current,
+            {
+              opacity: 1,
+              backgroundColor: "rgba(0,0,0,0.94)",
+              duration: 1.8,
+            },
+            0.8,
+          );
+      }
+
+      // 2. Idle floating
       if (titleRef.current) {
         gsap.to(titleRef.current, {
-          rotateY: mx * 10,
-          rotateX: -my * 10,
-          scale: 1.01,
-          duration: 0.8,
-          ease: 'power2.out',
-          overwrite: 'auto',
+          y: "+=12",
+          duration: 4,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          force3D: true,
         });
       }
-      
-      if (glareRef.current) {
-        gsap.to(glareRef.current, {
-          x: mx * 20,
-          y: my * 20,
-          opacity: 0.2,
-          duration: 1,
-        });
-      }
-    };
 
-    window.addEventListener('mousemove', onMove);
-    return () => window.removeEventListener('mousemove', onMove);
-  }, { scope: heroRef, dependencies: [isReady] });
+      // 3. Mouse Interaction (Optimized)
+      const onMove = (e: MouseEvent) => {
+        if (!titleRef.current || interRef.current) return;
+        const { clientX, clientY } = e;
+        const { innerWidth, innerHeight } = window;
+        const mx = (clientX / innerWidth - 0.5) * 2;
+        const my = (clientY / innerHeight - 0.5) * 2;
+
+        if (titleRef.current) {
+          gsap.to(titleRef.current, {
+            rotateY: mx * 10,
+            rotateX: -my * 10,
+            scale: 1.01,
+            duration: 0.8,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        }
+
+        if (glareRef.current) {
+          gsap.to(glareRef.current, {
+            x: mx * 20,
+            y: my * 20,
+            opacity: 0.2,
+            duration: 1,
+          });
+        }
+      };
+
+      window.addEventListener("mousemove", onMove);
+      return () => window.removeEventListener("mousemove", onMove);
+    },
+    { scope: heroRef, dependencies: [isReady] },
+  );
 
   // ── 🚀 STUDIO MODE TRANSITION (Fullscreen Takeover) ────────────────
   useGSAP(() => {
@@ -477,9 +537,10 @@ export function ProjectHero({
 
     if (isInteracting) {
       const tl = gsap.timeline();
-      tl.fromTo('.studio-bar', 
+      tl.fromTo(
+        ".studio-bar",
         { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'back.out(1.7)' }
+        { y: 0, opacity: 1, duration: 0.6, ease: "back.out(1.7)" },
       );
     }
   }, [isInteracting]);
@@ -488,8 +549,8 @@ export function ProjectHero({
   useEffect(() => {
     if (isInteracting) {
       // 1. Strict Scroll Lock & UI Cleanups
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('studio-active');
+      document.body.style.overflow = "hidden";
+      document.body.classList.add("studio-active");
       window.__lenis?.stop();
 
       // 2. Prevent Zoom (pinch-to-zoom and Ctrl+wheel) and standard scroll events on parent
@@ -499,47 +560,67 @@ export function ProjectHero({
 
       const preventZoomKeys = (e: KeyboardEvent) => {
         const isCtrlCmd = e.ctrlKey || e.metaKey;
-        if (isCtrlCmd && (e.key === '=' || e.key === '-' || e.key === '+' || e.key === '0')) {
+        if (
+          isCtrlCmd &&
+          (e.key === "=" || e.key === "-" || e.key === "+" || e.key === "0")
+        ) {
           e.preventDefault();
         }
       };
 
       const preventScrollKeys = (e: KeyboardEvent) => {
-        const keys = [' ', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
+        const keys = [
+          " ",
+          "ArrowUp",
+          "ArrowDown",
+          "PageUp",
+          "PageDown",
+          "Home",
+          "End",
+        ];
         if (keys.includes(e.key)) {
           const active = document.activeElement;
-          if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || (active as HTMLElement).isContentEditable)) {
+          if (
+            active &&
+            (active.tagName === "INPUT" ||
+              active.tagName === "TEXTAREA" ||
+              (active as HTMLElement).isContentEditable)
+          ) {
             return;
           }
           e.preventDefault();
         }
       };
 
-      window.addEventListener('wheel', preventScrollAndZoom, { passive: false });
-      window.addEventListener('touchmove', preventScrollAndZoom, { passive: false });
-      window.addEventListener('keydown', preventZoomKeys, { passive: false });
-      window.addEventListener('keydown', preventScrollKeys, { passive: false });
+      window.addEventListener("wheel", preventScrollAndZoom, {
+        passive: false,
+      });
+      window.addEventListener("touchmove", preventScrollAndZoom, {
+        passive: false,
+      });
+      window.addEventListener("keydown", preventZoomKeys, { passive: false });
+      window.addEventListener("keydown", preventScrollKeys, { passive: false });
 
       // 3. ESC Key Listener
       const handleEsc = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setIsInteracting(false);
+        if (e.key === "Escape") setIsInteracting(false);
       };
-      window.addEventListener('keydown', handleEsc);
-      
+      window.addEventListener("keydown", handleEsc);
+
       return () => {
-        document.body.style.overflow = '';
-        document.body.classList.remove('studio-active');
+        document.body.style.overflow = "";
+        document.body.classList.remove("studio-active");
         window.__lenis?.start();
-        window.removeEventListener('wheel', preventScrollAndZoom);
-        window.removeEventListener('touchmove', preventScrollAndZoom);
-        window.removeEventListener('keydown', preventZoomKeys);
-        window.removeEventListener('keydown', preventScrollKeys);
-        window.removeEventListener('keydown', handleEsc);
+        window.removeEventListener("wheel", preventScrollAndZoom);
+        window.removeEventListener("touchmove", preventScrollAndZoom);
+        window.removeEventListener("keydown", preventZoomKeys);
+        window.removeEventListener("keydown", preventScrollKeys);
+        window.removeEventListener("keydown", handleEsc);
       };
     } else {
       // 🚀 When exiting, force ScrollTrigger to refresh immediately and reapply its exact active styles (scale, opacity, etc.)
       ScrollTrigger.refresh();
-      ScrollTrigger.getAll().forEach(t => t.update());
+      ScrollTrigger.getAll().forEach((t) => t.update());
     }
   }, [isInteracting]);
 
@@ -551,7 +632,7 @@ export function ProjectHero({
       <div
         ref={heroRef}
         className="relative h-[100dvh] w-full overflow-hidden flex items-center justify-center bg-transparent"
-        style={{ perspective: isInteracting ? 'none' : '2000px' }}
+        style={{ perspective: isInteracting ? "none" : "2000px" }}
       >
         {/* ── Background Layer ── */}
         <div
@@ -559,7 +640,7 @@ export function ProjectHero({
           className="absolute inset-0 will-change-transform z-0"
           style={{
             background: `linear-gradient(135deg, ${accent}15 0%, ${accent}08 100%)`,
-            transformOrigin: 'center center',
+            transformOrigin: "center center",
           }}
         />
 
@@ -573,22 +654,25 @@ export function ProjectHero({
           ref={contentRef}
           className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full pt-[20vh] md:pt-[24vh] will-change-transform"
         >
-          <div className="relative group mb-12" style={{ transformStyle: 'preserve-3d' }}>
+          <div
+            className="relative group mb-12"
+            style={{ transformStyle: "preserve-3d" }}
+          >
             <div
               ref={titleRef}
               className="relative flex flex-col items-center justify-center will-change-transform pointer-events-none"
             >
-              <span 
+              <span
                 className="font-mono text-[clamp(0.9rem,1.5vw,1.2rem)] opacity-40 mb-3 tracking-[0.4em]"
                 style={{ color: accent }}
               >
-                PROJECT // {index.toString().padStart(2, '0')}
+                PROJECT // {index.toString().padStart(2, "0")}
               </span>
-              
+
               <h1
                 className="font-black uppercase italic tracking-[-0.05em] leading-[0.85] text-center max-w-[1200px]"
                 style={{
-                  fontSize: 'clamp(3.5rem, 15vw, 12rem)',
+                  fontSize: "clamp(3.5rem, 15vw, 12rem)",
                   color: accent,
                   textShadow: `0 30px 100px ${accent}40`,
                 }}
@@ -600,13 +684,13 @@ export function ProjectHero({
 
           <p
             className="text-xl md:text-2xl font-light tracking-tight max-w-2xl mb-12 opacity-50"
-            style={{ color: darkMode ? '#fff' : '#000' }}
+            style={{ color: darkMode ? "#fff" : "#000" }}
           >
             {subtitle}
           </p>
 
           <div className="flex items-center gap-6 flex-wrap justify-center opacity-40">
-            {langs.slice(0, 3).map(lang => (
+            {langs.slice(0, 3).map((lang) => (
               <div
                 key={lang}
                 className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border"
@@ -621,31 +705,36 @@ export function ProjectHero({
         {!disableStudio && (
           <div
             ref={screenRef}
-            className={isInteracting 
-              ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none" 
-              : `absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10`
+            className={
+              isInteracting
+                ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                : `absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10`
             }
-            style={isInteracting ? {
-              position: 'fixed',
-              left: 0,
-              top: 0,
-              width: '100vw',
-              height: '100vh',
-              maxWidth: '100vw',
-              maxHeight: '100vh',
-              transform: 'none',
-              borderRadius: 0,
-              zIndex: 2000,
-              display: 'flex',
-              flexDirection: 'column',
-              backgroundColor: '#0d0d0d',
-            } : {
-              transformStyle: 'preserve-3d',
-              willChange: 'transform, width, height, border-radius',
-              borderColor: 'rgba(255,255,255,0.1)',
-              opacity: 0,
-              transform: 'translate(-50%, -50%) scale(0.05)',
-            }}
+            style={
+              isInteracting
+                ? {
+                    position: "fixed",
+                    left: 0,
+                    top: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    maxWidth: "100vw",
+                    maxHeight: "100vh",
+                    transform: "none",
+                    borderRadius: 0,
+                    zIndex: 2000,
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor: "#0d0d0d",
+                  }
+                : {
+                    transformStyle: "preserve-3d",
+                    willChange: "transform, width, height, border-radius",
+                    borderColor: "rgba(255,255,255,0.1)",
+                    opacity: 0,
+                    transform: "translate(-50%, -50%) scale(0.05)",
+                  }
+            }
           >
             {/* Studio HUD - Top Control Bar */}
             {isInteracting && (
@@ -654,10 +743,13 @@ export function ProjectHero({
                   <div className="flex items-center gap-3 pr-6 border-r border-white/10">
                     <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
                     <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[120px] md:max-w-none">
-                      {title} <span className="hidden xs:inline">{" // SYSTEM.ACTIVE"}</span>
+                      {title}{" "}
+                      <span className="hidden xs:inline">
+                        {" // SYSTEM.ACTIVE"}
+                      </span>
                     </span>
                   </div>
-                  
+
                   {/* Real-time Telemetry (Decorative) */}
                   <div className="hidden md:flex items-center gap-6 text-white/40 font-mono text-[8px] uppercase tracking-widest">
                     <div className="flex flex-col">
@@ -678,38 +770,45 @@ export function ProjectHero({
                 <div className="flex items-center gap-3">
                   {/* Source Code Access */}
                   {githubUrl && (
-                    <a 
-                      href={githubUrl} 
-                      target="_blank" 
+                    <a
+                      href={githubUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group flex items-center gap-2"
                       title="View Source Code"
                     >
                       <Github size={16} className="group-hover:scale-110" />
-                      <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">{s.sourceCode}</span>
+                      <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
+                        {s.sourceCode}
+                      </span>
                     </a>
                   )}
 
                   {/* External Access */}
                   {liveUrl && (
-                    <a 
-                      href={liveUrl} 
-                      target="_blank" 
+                    <a
+                      href={liveUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group"
                       title="Open External"
                     >
-                      <ExternalLink size={16} className="group-hover:scale-110" />
+                      <ExternalLink
+                        size={16}
+                        className="group-hover:scale-110"
+                      />
                     </a>
                   )}
-                  
+
                   {/* Close Session */}
-                  <button 
+                  <button
                     onClick={() => setIsInteracting(false)}
                     className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group"
                   >
                     <X size={16} className="font-bold" />
-                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">{s.closeSession}</span>
+                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">
+                      {s.closeSession}
+                    </span>
                   </button>
                 </div>
               </header>
@@ -718,26 +817,30 @@ export function ProjectHero({
             {/* Viewport Area */}
             <div className="flex-1 w-full h-full relative overflow-hidden bg-black flex items-center justify-center z-[2005]">
               {/* Interaction Shield */}
-              <div 
+              <div
                 className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-700 group/shield cursor-pointer"
-                style={{ 
+                style={{
                   opacity: isInteracting ? 0 : 1,
-                  pointerEvents: isInteracting ? 'none' : 'all',
-                  backgroundColor: canInteract ? 'rgba(0,0,0,0.6)' : 'transparent',
-                  backdropFilter: canInteract ? 'blur(15px)' : 'none',
+                  pointerEvents: isInteracting ? "none" : "all",
+                  backgroundColor: canInteract
+                    ? "rgba(0,0,0,0.6)"
+                    : "transparent",
+                  backdropFilter: canInteract ? "blur(15px)" : "none",
                 }}
                 onClick={() => canInteract && setIsInteracting(true)}
               >
                 {canInteract && !isInteracting && (
                   <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000">
                     <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.2)] group-hover/shield:scale-110 transition-transform studio-pulse">
-                       <MousePointer2 size={32} className="animate-pulse" />
+                      <MousePointer2 size={32} className="animate-pulse" />
                     </div>
                     <div className="flex flex-col items-center gap-2 text-center">
                       <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
                         {s.enterStudio}
                       </span>
-                      <span className="text-[10px] text-white/40 uppercase tracking-widest">{s.clickToInteract}</span>
+                      <span className="text-[10px] text-white/40 uppercase tracking-widest">
+                        {s.clickToInteract}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -759,73 +862,91 @@ export function ProjectHero({
                         </div>
                       </div>
                       <div className="flex flex-col items-center gap-2">
-                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">{s.initializing}</span>
-                        <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">{s.mounting}</span>
+                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">
+                          {s.initializing}
+                        </span>
+                        <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">
+                          {s.mounting}
+                        </span>
                       </div>
                     </div>
                   )}
-                  <iframe 
+                  <iframe
                     ref={iframeRef}
-                    src={liveUrl} 
+                    src={liveUrl}
                     onLoad={() => setIframeLoaded(true)}
                     title={iframeTitle}
-                    className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? 'opacity-100' : 'opacity-0'} ${isInteracting ? 'scale-100' : 'scale-[1.05]'}`}
-                    style={{ 
-                      background: '#000',
-                      filter: (canInteract && !isInteracting) ? 'blur(15px) brightness(0.4) saturate(0.5)' : 'none',
+                    className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? "opacity-100" : "opacity-0"} ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
+                    style={{
+                      background: "#000",
+                      filter:
+                        canInteract && !isInteracting
+                          ? "blur(15px) brightness(0.4) saturate(0.5)"
+                          : "none",
                     }}
                   />
                 </>
               ) : shouldLoad && videoUrl ? (
-                 <div className="w-full h-full bg-black relative">
-                    <video
-                      src={videoUrl}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? 'scale-100' : 'scale-[1.05]'}`}
-                      style={{ 
-                        filter: (canInteract && !isInteracting) ? 'blur(15px) brightness(0.4) saturate(0.5)' : 'none',
-                      }}
-                    />
-                    {/* HUD Overlay for Video */}
-                    {!isInteracting && (
-                      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-                    )}
-                 </div>
+                <div className="w-full h-full bg-black relative">
+                  <video
+                    src={videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
+                    style={{
+                      filter:
+                        canInteract && !isInteracting
+                          ? "blur(15px) brightness(0.4) saturate(0.5)"
+                          : "none",
+                    }}
+                  />
+                  {/* HUD Overlay for Video */}
+                  {!isInteracting && (
+                    <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+                  )}
+                </div>
               ) : (
-                 <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-6 p-10 text-center">
-                    <div className="relative">
-                      {liveUrl || videoUrl ? (
-                        <div className="relative">
-                          <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
-                          </div>
+                <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-6 p-10 text-center">
+                  <div className="relative">
+                    {liveUrl || videoUrl ? (
+                      <div className="relative">
+                        <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
                         </div>
-                      ) : (
-                        <Activity size={48} className="text-white/20 animate-pulse" />
-                      )}
-                      <div className="absolute inset-0 blur-2xl bg-white/5 animate-pulse" />
-                    </div>
-                    <div className="flex flex-col items-center gap-3">
-                      <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
-                        {liveUrl || videoUrl ? s.preparing : projectId === 'rides24ofiziala' ? s.demoWorking : s.comingSoon}
-                      </span>
-                      <div className="w-12 h-px bg-white/10" />
-                      <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
-                        {liveUrl || videoUrl ? s.scrollDownInit : s.auditDesc}
-                      </span>
-                    </div>
-                 </div>
+                      </div>
+                    ) : (
+                      <Activity
+                        size={48}
+                        className="text-white/20 animate-pulse"
+                      />
+                    )}
+                    <div className="absolute inset-0 blur-2xl bg-white/5 animate-pulse" />
+                  </div>
+                  <div className="flex flex-col items-center gap-3">
+                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
+                      {liveUrl || videoUrl
+                        ? s.preparing
+                        : projectId === "rides24ofiziala"
+                          ? s.demoWorking
+                          : s.comingSoon}
+                    </span>
+                    <div className="w-12 h-px bg-white/10" />
+                    <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
+                      {liveUrl || videoUrl ? s.scrollDownInit : s.auditDesc}
+                    </span>
+                  </div>
+                </div>
               )}
-              
-              <div 
+
+              <div
                 ref={glareRef}
                 className="absolute inset-0 pointer-events-none opacity-0 mix-blend-overlay"
-                style={{ 
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%)',
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%)",
                 }}
               />
             </div>
@@ -834,18 +955,20 @@ export function ProjectHero({
             {isInteracting && (
               <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[2010]">
                 <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-                  Auth: <span className="text-brand">Developer_Privileges</span> {" // "} Root_Access: <span className="text-green-400">True</span>
+                  Auth: <span className="text-brand">Developer_Privileges</span>{" "}
+                  {" // "} Root_Access:{" "}
+                  <span className="text-green-400">True</span>
                 </div>
 
                 <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-                   <div className="flex items-center gap-2">
-                     <div className="w-1 h-1 rounded-full bg-white/20" />
-                     <span>Signal_Strength: 98%</span>
-                   </div>
-                   <div className="flex items-center gap-2">
-                     <div className="w-1 h-1 rounded-full bg-white/20" />
-                     <span>Data_integrity: Verified</span>
-                   </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full bg-white/20" />
+                    <span>Signal_Strength: 98%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full bg-white/20" />
+                    <span>Data_integrity: Verified</span>
+                  </div>
                 </div>
               </footer>
             )}
@@ -854,22 +977,24 @@ export function ProjectHero({
 
         {/* Dynamic Scroll HUD Indicator */}
         {!disableStudio && (
-          <div 
+          <div
             ref={scrollProgressRef}
             className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 w-[300px] px-6 py-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
             style={{ opacity: 1 }}
           >
             {/* Layout 1: Default hint before scroll */}
-            <div 
+            <div
               ref={scrollHintDefaultRef}
               className="flex flex-col items-center gap-3"
             >
-              <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/50">{s.deepScroll}</p>
+              <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/50">
+                {s.deepScroll}
+              </p>
               <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent animate-pulse" />
             </div>
 
             {/* Layout 2: Progress telemetry during scroll */}
-            <div 
+            <div
               ref={scrollHintProgressRef}
               className="hidden flex-col items-center gap-2 w-full"
             >
@@ -878,14 +1003,17 @@ export function ProjectHero({
                 <span ref={scrollTextRef}>0%</span>
               </div>
               <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/5 shadow-inner">
-                <div 
+                <div
                   ref={scrollBarRef}
                   className="h-full transition-all duration-75 ease-out rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                  style={{ width: '0%', backgroundColor: accent }}
+                  style={{ width: "0%", backgroundColor: accent }}
                 />
               </div>
               <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-white font-bold animate-pulse mt-2 flex items-center gap-1.5">
-                {s.keepScrolling} <span className="inline-block animate-bounce font-sans text-xs">↓</span>
+                {s.keepScrolling}{" "}
+                <span className="inline-block animate-bounce font-sans text-xs">
+                  ↓
+                </span>
               </span>
             </div>
           </div>

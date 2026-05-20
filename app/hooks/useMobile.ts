@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import gsap from 'gsap';
+import { useState, useEffect } from "react";
+import gsap from "gsap";
 
 /**
  * Custom hook for standard, responsive mobile detection matching the GSAP media query.

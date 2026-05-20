@@ -1,22 +1,24 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import Lenis from 'lenis';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef } from "react";
+import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function SmoothScroll() {
   const tickerFnRef = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (reducedMotion) return;
 
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'both',
+      orientation: "vertical",
+      gestureOrientation: "both",
       smoothWheel: true,
       wheelMultiplier: 1.05,
       touchMultiplier: 1.6,
@@ -24,7 +26,7 @@ export function SmoothScroll() {
     });
 
     window.__lenis = lenis;
-    lenis.on('scroll', ScrollTrigger.update);
+    lenis.on("scroll", ScrollTrigger.update);
 
     tickerFnRef.current = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tickerFnRef.current);
@@ -32,15 +34,15 @@ export function SmoothScroll() {
 
     // Scroll Progress Bar Logic
     const ctx = gsap.context(() => {
-      gsap.to('#scroll-progress', {
+      gsap.to("#scroll-progress", {
         scaleX: 1,
-        ease: 'none',
+        ease: "none",
         scrollTrigger: {
-          trigger: 'body',
-          start: 'top top',
-          end: 'bottom bottom',
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
           scrub: 0.3,
-        }
+        },
       });
     });
 
