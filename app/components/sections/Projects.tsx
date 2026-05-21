@@ -40,6 +40,7 @@ interface ProjectsProps {
   onHoverProject: (proj: { name: string; color: string } | null) => void;
   expandedIdx: number | null;
   onToggleProject: (idx: number | null) => void;
+  motionEnabled: boolean;
 }
 
 export function Projects({
@@ -53,6 +54,7 @@ export function Projects({
   onHoverProject,
   expandedIdx,
   onToggleProject,
+  motionEnabled,
 }: ProjectsProps) {
   const [activeRepo, setActiveRepo] = useState<number | null>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -81,7 +83,7 @@ export function Projects({
   }, [expandedIdx]);
 
   // 3. Bind GSAP entrance reveals and inertial scrolling (Efecto Ola)
-  useProjectsAnimations({ sectionRef, load, expandedIdx });
+  useProjectsAnimations({ sectionRef, load, expandedIdx, motionEnabled });
 
   const handleToggle = (idx: number) => {
     const next = expandedIdx === idx ? null : idx;
@@ -157,6 +159,7 @@ export function Projects({
                     onToggle={() => handleToggle(i)}
                     onHoverProject={onHoverProject}
                     skipAnimation={isReturning.current && expandedIdx === i}
+                    motionEnabled={motionEnabled}
                   />
                 </div>
               ))}

@@ -34,6 +34,7 @@ import { PROJECTS_CONTENT, CODE_SNIPPETS } from "../../data/projects";
 import { LANG_COLORS, getTechColor } from "../../lib/constants";
 import type { Lang } from "../../types";
 import { useMagnetic } from "../../hooks/useMagnetic";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { useTextScramble } from "../../hooks/useTextScramble";
 import { ProjectHero } from "./components/ProjectHero";
 import {
@@ -264,6 +265,7 @@ export default function ProjectPage() {
 
   const [lang, setLang] = useState<Lang>("es");
   const [darkMode, setDarkMode] = useState(false);
+  const motionEnabled = useMotionEnabled();
 
   // Sync language from localStorage on mount
   useEffect(() => {
@@ -330,12 +332,13 @@ export default function ProjectPage() {
 
   // 🎯 Punto 7 — Text scramble for project title
   const titleText = content?.title ?? summary?.name ?? safeId;
-  const { text: scrambledTitle } = useTextScramble(titleText, {
+  const { text: scrambledText } = useTextScramble(titleText, {
     trigger: "mount",
-    charSpeed: 35,
-    iterations: 4,
-    delay: 200,
+    charSpeed: 10,
+    iterations: 2,
+    delay: 50,
   });
+  const scrambledTitle = motionEnabled ? scrambledText : titleText;
 
   // Detect dark mode
   useEffect(() => {
@@ -442,7 +445,7 @@ export default function ProjectPage() {
   // ── Section reveals (Static, only run once when content is ready) ──────────
   useGSAP(
     () => {
-      if (!main.current || !content) return;
+      if (!main.current || !content || !motionEnabled) return;
 
       const sections = gsap.utils.toArray<HTMLElement>(".reveal-sec");
       sections.forEach((el) => {
@@ -465,7 +468,7 @@ export default function ProjectPage() {
         );
       });
     },
-    { scope: main, dependencies: [content] },
+    { scope: main, dependencies: [content, motionEnabled] },
   );
 
   // ── Helix Animation is now handled internally in Canvas-based DNAHelix ─────
@@ -482,7 +485,7 @@ export default function ProjectPage() {
       className="relative min-h-[350vh] overflow-x-hidden selection:bg-brand/20 bg-page text-ink transition-colors duration-300"
     >
       {/* ── 3D BACKGROUND (DEFERRED LOADING) ── */}
-      {isReadyToAnimate && (
+      {isReadyToAnimate && motionEnabled && (
         <>
           <div
             className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden"

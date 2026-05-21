@@ -8,17 +8,21 @@ interface UseProjectsAnimationsProps {
   sectionRef: React.RefObject<HTMLElement | null>;
   load: boolean;
   expandedIdx: number | null;
+  motionEnabled: boolean;
 }
 
 export function useProjectsAnimations({
   sectionRef,
   load,
   expandedIdx,
+  motionEnabled,
 }: UseProjectsAnimationsProps) {
   const expandedIdxRef = useRef<number | null>(expandedIdx);
 
   // Keep ref up to date
   useEffect(() => {
+    if (!motionEnabled) return;
+
     expandedIdxRef.current = expandedIdx;
     if (
       expandedIdx !== null &&
@@ -32,10 +36,10 @@ export function useProjectsAnimations({
         overwrite: "auto",
       });
     }
-  }, [expandedIdx]);
+  }, [expandedIdx, motionEnabled]);
 
   useEffect(() => {
-    if (load) return;
+    if (load || !motionEnabled) return;
 
     let onScrollEnd: (() => void) | undefined;
 
@@ -149,5 +153,5 @@ export function useProjectsAnimations({
         ScrollTrigger.removeEventListener("scrollEnd", onScrollEnd);
       }
     };
-  }, [load, sectionRef]);
+  }, [load, sectionRef, motionEnabled]);
 }

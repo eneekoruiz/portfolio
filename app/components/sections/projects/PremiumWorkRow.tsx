@@ -28,6 +28,7 @@ interface WorkRowProps {
   onToggle: () => void;
   onHoverProject: (p: { name: string; color: string } | null) => void;
   skipAnimation?: boolean;
+  motionEnabled: boolean;
 }
 
 export function PremiumWorkRow({
@@ -37,6 +38,7 @@ export function PremiumWorkRow({
   onToggle,
   onHoverProject,
   skipAnimation,
+  motionEnabled,
 }: WorkRowProps) {
   const [isNavigating, setIsNavigating] = useState(false);
   const [isPrefetched, setIsPrefetched] = useState(false);
@@ -67,8 +69,18 @@ export function PremiumWorkRow({
     const body = bodyRef.current;
     if (!body) return;
 
+    if (!motionEnabled) {
+      gsap.killTweensOf(body);
+      gsap.set(body, {
+        height: isExpanded ? "auto" : 0,
+        opacity: isExpanded ? 1 : 0,
+        y: 0,
+      });
+      return;
+    }
+
     if (skipAnimation && isExpanded) {
-      gsap.set(body, { height: "auto", opacity: 1 });
+      gsap.set(body, { height: "auto", opacity: 1, y: 0 });
       body.offsetHeight;
       return;
     }
@@ -99,10 +111,10 @@ export function PremiumWorkRow({
     });
 
     return () => ctxRef.current?.revert();
-  }, [isExpanded, skipAnimation]);
+  }, [isExpanded, skipAnimation, motionEnabled]);
 
   useEffect(() => {
-    if (skipAnimation) return;
+    if (skipAnimation || !motionEnabled) return;
     if (!isExpanded || !rowRef.current) return;
 
     const mm = gsap.matchMedia();
@@ -115,7 +127,7 @@ export function PremiumWorkRow({
     });
 
     return () => mm.revert();
-  }, [isExpanded, skipAnimation]);
+  }, [isExpanded, skipAnimation, motionEnabled]);
 
   const onMouseMove = useCallback((e: React.MouseEvent) => {
     const el = rowRef.current;

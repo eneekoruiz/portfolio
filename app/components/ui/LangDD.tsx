@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { LANG_LABELS } from "../../lib/constants";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import type { Lang } from "../../types";
 
 export function LangDD({
@@ -14,6 +15,7 @@ export function LangDD({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
     const h = (e: MouseEvent) => {
@@ -38,18 +40,16 @@ export function LangDD({
         {lang.toUpperCase()}
         <ChevronDown
           size={11}
-          className="transition-transform duration-300 ease-spring"
+          className={motionEnabled ? "transition-transform duration-300 ease-spring" : ""}
           style={{ transform: open ? "rotate(180deg)" : "" }}
         />
       </button>
 
       {open && (
-        /* ── EL ARREGLO ESTÁ AQUÍ: Contenedor rígido estilo iOS ── */
         <div
-          className="absolute top-[120%] right-0 w-44 p-2 rounded-2xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-2xl z-[999] origin-top-right animate-in fade-in zoom-in-95 duration-200"
+          className={`absolute top-[120%] right-0 w-44 p-2 rounded-2xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-2xl z-[999] origin-top-right ${motionEnabled ? "animate-in fade-in zoom-in-95 duration-200" : ""}`}
           role="menu"
         >
-          {/* Scroll interno seguro para móviles */}
           <div className="max-h-[40vh] overflow-y-auto scrollbar-hide flex flex-col gap-1">
             {(Object.entries(LANG_LABELS) as [Lang, string][]).map(
               ([k, label]) => (
@@ -67,9 +67,10 @@ export function LangDD({
                     setOpen(false);
                   }}
                 >
-                  {/* ── Indicador: Raya de color a la izquierda ── */}
                   {lang === k && (
-                    <span className="absolute left-[4px] top-1/2 -translate-y-1/2 w-[3px] h-[16px] bg-brand rounded-full animate-in slide-in-from-left-1 duration-300" />
+                    <span
+                      className={`absolute left-[4px] top-1/2 -translate-y-1/2 w-[3px] h-[16px] bg-brand rounded-full ${motionEnabled ? "animate-in slide-in-from-left-1 duration-300" : ""}`}
+                    />
                   )}
 
                   <span>{label}</span>
