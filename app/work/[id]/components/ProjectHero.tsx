@@ -670,7 +670,7 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full ${staticMotionMode ? "min-h-[100dvh]" : "h-full -mt-12"} will-change-transform`}
+          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full ${staticMotionMode ? "min-h-[100dvh]" : "h-full pb-48"} will-change-transform`}
         >
           <div
             className="relative group mb-12"

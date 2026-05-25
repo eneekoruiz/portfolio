@@ -113,9 +113,14 @@ export function PremiumWorkRow({
     return () => ctxRef.current?.revert();
   }, [isExpanded, skipAnimation, motionEnabled]);
 
+  const prevExpandedRef = useRef(isExpanded);
+
   useEffect(() => {
+    const justExpanded = isExpanded && !prevExpandedRef.current;
+    prevExpandedRef.current = isExpanded;
+
     if (skipAnimation || !motionEnabled) return;
-    if (!isExpanded || !rowRef.current) return;
+    if (!justExpanded || !rowRef.current) return;
 
     const mm = gsap.matchMedia();
     mm.add("(max-width: 768px)", () => {
