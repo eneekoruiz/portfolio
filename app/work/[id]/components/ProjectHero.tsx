@@ -670,7 +670,7 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full ${staticMotionMode ? "min-h-[100dvh]" : "pt-[20vh] md:pt-[24vh]"} will-change-transform`}
+          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full ${staticMotionMode ? "min-h-[100dvh]" : "h-full -mt-12"} will-change-transform`}
         >
           <div
             className="relative group mb-12"
@@ -711,8 +711,8 @@ export function ProjectHero({
             {langs.slice(0, 3).map((lang) => (
               <div
                 key={lang}
-                className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border"
-                style={{ borderColor: `${accent}40`, color: accent }}
+                className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border backdrop-blur-sm"
+                style={{ borderColor: `${accent}40`, color: accent, backgroundColor: "rgba(0,0,0,0.7)" }}
               >
                 {lang}
               </div>
