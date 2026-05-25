@@ -122,26 +122,29 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     let v = 0;
     let rafId: number;
 
-    const tick = () => {
-      // Significantly faster increments
-      const inc = Math.random() * 4 + 2;
-      v += inc;
+    const duration = 1500; // 1.5 seconds
+    let startTime: number | null = null;
 
-      if (v >= 100) {
+    const tick = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const percentage = Math.min((progress / duration) * 100, 100);
+      
+      // Easing function for smoother finish
+      const easeProgress = percentage === 100 ? 100 : 100 * (1 - Math.pow(2, -8 * (percentage / 100)));
+      
+      setN(Math.round(easeProgress));
+
+      if (percentage >= 100) {
         setN(100);
-        // Instant exit to feel more snappy
-        setTimeout(() => playExit(), 80);
+        setTimeout(() => playExit(), 150);
         return;
       }
 
-      setN(Math.round(v));
-      rafId = requestAnimationFrame(() => {
-        // Reduced latency for faster feel
-        setTimeout(tick, 5);
-      });
+      rafId = requestAnimationFrame(tick);
     };
 
-    tick();
+    rafId = requestAnimationFrame(tick);
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
     };

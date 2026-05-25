@@ -230,9 +230,16 @@ export const DNAHelix = ({
             if (idx === 0) ctx.moveTo(pt.x, pt.y);
             else ctx.lineTo(pt.x, pt.y);
           });
-          ctx.lineWidth = 15;
+          // Thicker and much brighter glow for better mobile visibility
+          ctx.lineWidth = 18;
           ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
-          ctx.globalAlpha = 0.65;
+          ctx.globalAlpha = 0.95;
+          ctx.stroke();
+          
+          // Inner bright glow
+          ctx.lineWidth = 8;
+          ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
+          ctx.globalAlpha = 1;
           ctx.stroke();
         }
 
@@ -242,12 +249,11 @@ export const DNAHelix = ({
           if (idx === 0) ctx.moveTo(pt.x, pt.y);
           else ctx.lineTo(pt.x, pt.y);
         });
-        ctx.lineWidth = darkMode ? 3.5 : 4;
+        ctx.lineWidth = darkMode ? 4.5 : 4;
+        // In dark mode, mix white with the accent color or use pure accent for maximum impact
         ctx.strokeStyle = darkMode
-          ? "#ffffff"
-          : s === 0
-            ? accentColor
-            : secondaryColor;
+          ? (s === 0 ? accentColor : secondaryColor)
+          : (s === 0 ? accentColor : secondaryColor);
         ctx.globalAlpha = darkMode ? 0.98 : 0.8;
         ctx.stroke();
       }

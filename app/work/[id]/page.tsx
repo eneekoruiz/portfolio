@@ -275,13 +275,13 @@ export default function ProjectPage() {
     }
   }, []);
 
-  // Force scroll to top on mount
+  // Force scroll to top on mount and when motion is toggled (prevents layout snap)
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
     if (window.__lenis) {
       window.__lenis.scrollTo(0, { immediate: true });
     }
-  }, []);
+  }, [motionEnabled]);
 
   // 💎 KEY STATE: Defers heavy animation loading until after route transition completes
   const [isReadyToAnimate, setIsReadyToAnimate] = useState(false);

@@ -401,9 +401,11 @@ export function ProjectHero({
             if (scrollProgressRef.current) {
               if (self.progress > 0.85) {
                 scrollProgressRef.current.style.opacity = "0";
+                scrollProgressRef.current.style.visibility = "hidden";
                 scrollProgressRef.current.style.pointerEvents = "none";
               } else if (self.progress > 0.02) {
                 scrollProgressRef.current.style.opacity = "1";
+                scrollProgressRef.current.style.visibility = "visible";
                 scrollProgressRef.current.style.pointerEvents = "auto";
                 if (scrollHintDefaultRef.current)
                   scrollHintDefaultRef.current.style.display = "none";
@@ -411,6 +413,7 @@ export function ProjectHero({
                   scrollHintProgressRef.current.style.display = "flex";
               } else {
                 scrollProgressRef.current.style.opacity = "1";
+                scrollProgressRef.current.style.visibility = "visible";
                 scrollProgressRef.current.style.pointerEvents = "auto";
                 if (scrollHintDefaultRef.current)
                   scrollHintDefaultRef.current.style.display = "flex";
@@ -461,6 +464,10 @@ export function ProjectHero({
               z: -1500,
               filter: "blur(30px)",
               borderRadius: "50rem",
+              xPercent: -50,
+              yPercent: -50,
+              left: "50%",
+              top: "50%",
             },
             {
               scale: 1,
@@ -902,7 +909,7 @@ export function ProjectHero({
                   )}
                   <iframe
                     ref={iframeRef}
-                    src={liveUrl}
+                    src={liveUrl.includes('?') ? `${liveUrl}&ref=portfolio#top` : `${liveUrl}?ref=portfolio#top`}
                     onLoad={() => setIframeLoaded(true)}
                     title={iframeTitle}
                     className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? "opacity-100" : "opacity-0"} ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
