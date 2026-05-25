@@ -649,7 +649,7 @@ export function ProjectHero({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className="relative w-full h-[100dvh] overflow-hidden flex items-center justify-center bg-transparent"
+        className={`relative w-full ${staticMotionMode ? "min-h-[100dvh] pb-32" : "h-[100dvh] overflow-hidden flex items-center justify-center"} bg-transparent`}
         style={{ perspective: isInteracting || !motionEnabled ? "none" : "2000px" }}
       >
         {/* ── Background Layer ── */}
@@ -670,7 +670,7 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full pt-[20vh] md:pt-[24vh] will-change-transform"
+          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full ${staticMotionMode ? "min-h-[100dvh]" : "pt-[20vh] md:pt-[24vh]"} will-change-transform`}
         >
           <div
             className="relative group mb-12"
@@ -727,7 +727,7 @@ export function ProjectHero({
               isInteracting
                 ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : staticMotionMode
-                  ? "absolute left-1/2 top-1/2 z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10"
+                  ? "relative z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 mx-auto rounded-[2.5rem]"
                   : `absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10`
             }
             style={
@@ -753,7 +753,6 @@ export function ProjectHero({
                       willChange: "auto",
                       borderColor: "rgba(255,255,255,0.1)",
                       opacity: 1,
-                      transform: "translate(-50%, -50%)",
                       width: "94vw",
                       maxWidth: "1400px",
                       height: "75dvh",
