@@ -31,32 +31,16 @@ import {
   X,
   ExternalLink,
   MoveUp,
-  Github,
+  GithubIcon,
 } from "lucide-react";
 import { useMotionEnabled } from "../../../hooks/useMotionEnabled";
+import type { Lang, StudioTx } from "../../../types";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-const STUDIO_TX: Record<
-  string,
-  {
-    sourceCode: string;
-    closeSession: string;
-    enterStudio: string;
-    clickToInteract: string;
-    initializing: string;
-    mounting: string;
-    preparing: string;
-    demoWorking: string;
-    comingSoon: string;
-    scrollDownInit: string;
-    auditDesc: string;
-    deepScroll: string;
-    keepScrolling: string;
-  }
-> = {
+const STUDIO_TX: Record<Lang, StudioTx> = {
   es: {
     sourceCode: "Código Fuente",
     closeSession: "Cerrar Sesión",
@@ -265,7 +249,7 @@ interface ProjectHeroProps {
   darkMode: boolean;
   index?: number;
   isReady?: boolean;
-  lang?: string;
+  lang?: Lang;
 }
 
 export function ProjectHero({
@@ -401,11 +385,9 @@ export function ProjectHero({
             if (scrollProgressRef.current) {
               if (self.progress > 0.85) {
                 scrollProgressRef.current.style.opacity = "0";
-                scrollProgressRef.current.style.visibility = "hidden";
                 scrollProgressRef.current.style.pointerEvents = "none";
               } else if (self.progress > 0.02) {
                 scrollProgressRef.current.style.opacity = "1";
-                scrollProgressRef.current.style.visibility = "visible";
                 scrollProgressRef.current.style.pointerEvents = "auto";
                 if (scrollHintDefaultRef.current)
                   scrollHintDefaultRef.current.style.display = "none";
@@ -413,7 +395,6 @@ export function ProjectHero({
                   scrollHintProgressRef.current.style.display = "flex";
               } else {
                 scrollProgressRef.current.style.opacity = "1";
-                scrollProgressRef.current.style.visibility = "visible";
                 scrollProgressRef.current.style.pointerEvents = "auto";
                 if (scrollHintDefaultRef.current)
                   scrollHintDefaultRef.current.style.display = "flex";
@@ -464,10 +445,6 @@ export function ProjectHero({
               z: -1500,
               filter: "blur(30px)",
               borderRadius: "50rem",
-              xPercent: -50,
-              yPercent: -50,
-              left: "50%",
-              top: "50%",
             },
             {
               scale: 1,
@@ -481,8 +458,8 @@ export function ProjectHero({
               top: "50%",
               // RESPONSIVE DIMENSIONS - Use relative units for better mobile behavior
               width: "94vw",
-              maxWidth: "1400px",
-              height: "75dvh",
+              maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
+              height: window.innerWidth < 768 ? "65dvh" : "82dvh",
               force3D: true,
               ease: "expo.inOut",
               duration: 2.2,
@@ -638,7 +615,9 @@ export function ProjectHero({
     } else {
       // 🚀 When exiting, force ScrollTrigger to refresh immediately and reapply its exact active styles (scale, opacity, etc.)
       ScrollTrigger.refresh();
-      ScrollTrigger.getAll().forEach((t) => t.update());
+      ScrollTrigger.getAll().forEach((t: globalThis.ScrollTrigger) =>
+        t.update(),
+      );
     }
   }, [isInteracting]);
 
@@ -649,8 +628,10 @@ export function ProjectHero({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className={`relative w-full ${staticMotionMode ? "min-h-[100dvh] pb-32" : "h-[100dvh] overflow-hidden flex items-center justify-center"} bg-transparent`}
-        style={{ perspective: isInteracting || !motionEnabled ? "none" : "2000px" }}
+        className="relative h-[100dvh] w-full overflow-hidden flex items-center justify-center bg-transparent"
+        style={{
+          perspective: isInteracting || !motionEnabled ? "none" : "2000px",
+        }}
       >
         {/* ── Background Layer ── */}
         <div
@@ -670,7 +651,7 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full ${staticMotionMode ? "min-h-[100dvh]" : "h-full pb-48"} will-change-transform`}
+          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full pt-[20vh] md:pt-[24vh] will-change-transform"
         >
           <div
             className="relative group mb-12"
@@ -711,8 +692,8 @@ export function ProjectHero({
             {langs.slice(0, 3).map((lang) => (
               <div
                 key={lang}
-                className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border backdrop-blur-sm"
-                style={{ borderColor: `${accent}40`, color: accent, backgroundColor: "rgba(0,0,0,0.7)" }}
+                className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border"
+                style={{ borderColor: `${accent}40`, color: accent }}
               >
                 {lang}
               </div>
@@ -727,7 +708,7 @@ export function ProjectHero({
               isInteracting
                 ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : staticMotionMode
-                  ? "relative z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 mx-auto rounded-[2.5rem]"
+                  ? "absolute left-1/2 top-1/2 z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10"
                   : `absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10`
             }
             style={
@@ -753,19 +734,18 @@ export function ProjectHero({
                       willChange: "auto",
                       borderColor: "rgba(255,255,255,0.1)",
                       opacity: 1,
-                      width: "94vw",
-                      maxWidth: "1400px",
-                      height: "75dvh",
-                      boxShadow: `0 40px 150px -20px ${accent}40, 0 0 60px -10px ${accent}30, inset 0 0 0 1px rgba(255,255,255,0.1)`,
+                      transform: "translate(-50%, -50%)",
+                      width: window.innerWidth < 768 ? "94vw" : "94vw",
+                      maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
+                      height: window.innerWidth < 768 ? "65dvh" : "72dvh",
                     }
-                : {
-                    transformStyle: "preserve-3d",
-                    willChange: "transform, width, height, border-radius",
-                    borderColor: "rgba(255,255,255,0.1)",
-                    opacity: 0,
-                    transform: "translate(-50%, -50%) scale(0.05)",
-                    boxShadow: `0 40px 150px -20px ${accent}40, 0 0 60px -10px ${accent}30, inset 0 0 0 1px rgba(255,255,255,0.1)`,
-                  }
+                  : {
+                      transformStyle: "preserve-3d",
+                      willChange: "transform, width, height, border-radius",
+                      borderColor: "rgba(255,255,255,0.1)",
+                      opacity: 0,
+                      transform: "translate(-50%, -50%) scale(0.05)",
+                    }
             }
           >
             {/* Studio HUD - Top Control Bar */}
@@ -809,7 +789,7 @@ export function ProjectHero({
                       className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group flex items-center gap-2"
                       title="View Source Code"
                     >
-                      <Github size={16} className="group-hover:scale-110" />
+                      <GithubIcon size={16} className="group-hover:scale-110" />
                       <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
                         {s.sourceCode}
                       </span>
@@ -862,12 +842,20 @@ export function ProjectHero({
                 onClick={() => canInteract && setIsInteracting(true)}
               >
                 {canInteract && !isInteracting && (
-                  <div className={motionEnabled ? "flex flex-col items-center gap-6 animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000" : "flex flex-col items-center gap-6"}>
-                    <div 
-                      className={`w-20 h-20 rounded-full bg-white/5 backdrop-blur-2xl border border-white/20 flex items-center justify-center text-white ${motionEnabled ? "group-hover/shield:scale-110 transition-all duration-500 studio-pulse" : ""}`}
-                      style={{ boxShadow: `0 0 60px -10px ${accent}60, inset 0 0 20px -5px ${accent}40` }}
+                  <div
+                    className={
+                      motionEnabled
+                        ? "flex flex-col items-center gap-6 animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000"
+                        : "flex flex-col items-center gap-6"
+                    }
+                  >
+                    <div
+                      className={`w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.2)] ${motionEnabled ? "group-hover/shield:scale-110 transition-transform studio-pulse" : ""}`}
                     >
-                      <MousePointer2 size={32} className={motionEnabled ? "animate-pulse" : ""} style={{ filter: `drop-shadow(0 0 8px ${accent})` }} />
+                      <MousePointer2
+                        size={32}
+                        className={motionEnabled ? "animate-pulse" : ""}
+                      />
                     </div>
                     <div className="flex flex-col items-center gap-2 text-center">
                       <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
@@ -908,7 +896,7 @@ export function ProjectHero({
                   )}
                   <iframe
                     ref={iframeRef}
-                    src={liveUrl.includes('?') ? `${liveUrl}&ref=portfolio#top` : `${liveUrl}?ref=portfolio#top`}
+                    src={liveUrl}
                     onLoad={() => setIframeLoaded(true)}
                     title={iframeTitle}
                     className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? "opacity-100" : "opacity-0"} ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
@@ -1014,7 +1002,8 @@ export function ProjectHero({
         {!disableStudio && (
           <div
             ref={scrollProgressRef}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-0 flex flex-col items-center pointer-events-none transition-all duration-300 w-[300px] px-6 py-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 w-[300px] px-6 py-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+            style={{ opacity: 1 }}
           >
             {/* Layout 1: Default hint before scroll */}
             <div

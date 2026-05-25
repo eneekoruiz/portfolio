@@ -40,7 +40,9 @@ export function LangDD({
         {lang.toUpperCase()}
         <ChevronDown
           size={11}
-          className={motionEnabled ? "transition-transform duration-300 ease-spring" : ""}
+          className={
+            motionEnabled ? "transition-transform duration-300 ease-spring" : ""
+          }
           style={{ transform: open ? "rotate(180deg)" : "" }}
         />
       </button>

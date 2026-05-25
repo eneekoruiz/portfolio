@@ -81,7 +81,7 @@ export function useTextScramble(
       }
     };
 
-    window.setTimeout(tick, delay);
+    frameRef.current = window.setTimeout(tick, delay);
   }, [finalText, charSpeed, iterations, delay]);
 
   useEffect(() => {

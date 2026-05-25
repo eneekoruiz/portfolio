@@ -28,7 +28,10 @@ export function useMotionEnabled(): boolean {
     window.addEventListener("storage", handleStorage);
 
     return () => {
-      window.removeEventListener("portfolio-motion-changed", handleMotionChange);
+      window.removeEventListener(
+        "portfolio-motion-changed",
+        handleMotionChange,
+      );
       window.removeEventListener("storage", handleStorage);
     };
   }, []);

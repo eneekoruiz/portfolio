@@ -41,9 +41,12 @@ export function PortalTransition() {
   }, [active, pendingUrl]);
 
   useEffect(() => {
-    const handlePortal = (e: any) => {
-      if (e.detail?.url) {
-        startPortal(e.detail.url);
+    const handlePortal = (e: Event) => {
+      if (!(e instanceof CustomEvent)) return;
+
+      const url = e.detail?.url;
+      if (typeof url === "string" && url.length > 0) {
+        startPortal(url);
       }
     };
 

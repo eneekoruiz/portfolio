@@ -7,6 +7,10 @@ interface Tilt {
   y: number;
 }
 
+type DeviceOrientationEventWithPermission = typeof DeviceOrientationEvent & {
+  requestPermission?: () => Promise<PermissionState>;
+};
+
 export function useDeviceTilt() {
   const [tilt, setTilt] = useState<Tilt>({ x: 0, y: 0 });
 
@@ -25,14 +29,13 @@ export function useDeviceTilt() {
     };
 
     const requestPermission = async () => {
-      if (
-        typeof DeviceOrientationEvent !== "undefined" &&
-        typeof (DeviceOrientationEvent as any).requestPermission === "function"
-      ) {
+      const eventConstructor = DeviceOrientationEvent as
+        | DeviceOrientationEventWithPermission
+        | undefined;
+
+      if (typeof eventConstructor?.requestPermission === "function") {
         try {
-          const permission = await (
-            DeviceOrientationEvent as any
-          ).requestPermission();
+          const permission = await eventConstructor.requestPermission();
           if (permission === "granted") {
             window.addEventListener("deviceorientation", handleMotion);
           }

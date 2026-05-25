@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Linkedin } from "lucide-react";
+import { GithubIcon, LinkedinIcon } from "lucide-react";
 import { useMagnetic } from "../../hooks/useMagnetic";
 import { useSound } from "../../hooks/useSound";
 import { LiveStatus } from "../ui/LiveStatus";
@@ -35,7 +35,7 @@ export function SiteFooter({ t }: { t: Tx }) {
           onClick={handleClick}
           aria-label="GitHub"
         >
-          <Github size={18} strokeWidth={2} />
+          <GithubIcon size={18} strokeWidth={2} />
         </a>
         <a
           ref={magLinkedin}
@@ -46,7 +46,7 @@ export function SiteFooter({ t }: { t: Tx }) {
           onClick={handleClick}
           aria-label="LinkedIn"
         >
-          <Linkedin size={18} strokeWidth={2} />
+          <LinkedinIcon size={18} strokeWidth={2} />
         </a>
         <div className="w-[1px] h-4 bg-line mx-2" />
         <a

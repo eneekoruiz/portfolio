@@ -16,7 +16,7 @@ import type { NextRequest } from "next/server";
  * 4. Protocol Safety: All 'http:' protocols are stripped; only secure 'https:' or 'self' allowed.
  */
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Generate a random nonce for each request
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";

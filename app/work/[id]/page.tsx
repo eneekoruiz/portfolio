@@ -14,7 +14,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import {
-  Github,
   ArrowUpRight,
   Database,
   Terminal,
@@ -448,7 +447,7 @@ export default function ProjectPage() {
       if (!main.current || !content || !motionEnabled) return;
 
       const sections = gsap.utils.toArray<HTMLElement>(".reveal-sec");
-      sections.forEach((el) => {
+      sections.forEach((el: HTMLElement) => {
         gsap.fromTo(
           el,
           { opacity: 0, y: 40 },

@@ -27,6 +27,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   const lightRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const exitFired = useRef(false);
+  const exitDelayRef = useRef<number | null>(null);
 
   // Stable ref to onDone
   const onDoneRef = useRef(onDone);
@@ -129,15 +130,21 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       if (!startTime) startTime = timestamp;
       const progress = timestamp - startTime;
       const percentage = Math.min((progress / duration) * 100, 100);
-      
+
       // Easing function for smoother finish
-      const easeProgress = percentage === 100 ? 100 : 100 * (1 - Math.pow(2, -8 * (percentage / 100)));
-      
+      const easeProgress =
+        percentage === 100
+          ? 100
+          : 100 * (1 - Math.pow(2, -8 * (percentage / 100)));
+
       setN(Math.round(easeProgress));
 
       if (percentage >= 100) {
         setN(100);
-        setTimeout(() => playExit(), 150);
+        exitDelayRef.current = window.setTimeout(() => {
+          exitDelayRef.current = null;
+          playExit();
+        }, 150);
         return;
       }
 
@@ -147,6 +154,10 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     rafId = requestAnimationFrame(tick);
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
+      if (exitDelayRef.current !== null) {
+        clearTimeout(exitDelayRef.current);
+        exitDelayRef.current = null;
+      }
     };
   }, [motionEnabled, playExit]);
 

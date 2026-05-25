@@ -47,7 +47,7 @@ export default function NotFound() {
             O simplemente te has perdido. Volvamos al código limpio.
           </p>
           <Link
-            ref={btn as any}
+            ref={btn}
             href="/"
             onClick={(e) => {
               e.preventDefault();

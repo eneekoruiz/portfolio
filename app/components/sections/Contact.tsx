@@ -2,7 +2,13 @@
 
 import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
-import { Mail, Github, Linkedin, ArrowUpRight, Check } from "lucide-react";
+import {
+  Mail,
+  GithubIcon,
+  LinkedinIcon,
+  ArrowUpRight,
+  Check,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { useMagnetic } from "../../hooks/useMagnetic";
 import { BinaryStreamBtn } from "../ui/Buttons";
@@ -24,7 +30,7 @@ const CONTACTS = [
   },
   {
     href: "https://github.com/eneekoruiz",
-    icon: Github,
+    icon: GithubIcon,
     label: "GitHub",
     val: "github.com/eneekoruiz",
     bg: "#24292F",
@@ -35,7 +41,7 @@ const CONTACTS = [
   },
   {
     href: "https://linkedin.com/in/eneekoruiz",
-    icon: Linkedin,
+    icon: LinkedinIcon,
     label: "LinkedIn",
     val: "linkedin.com/in/eneekoruiz",
     bg: "#0077B5",

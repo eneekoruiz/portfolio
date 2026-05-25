@@ -89,6 +89,22 @@ export interface Tx {
   openDirect: string;
 }
 
+export interface StudioTx {
+  sourceCode: string;
+  closeSession: string;
+  enterStudio: string;
+  clickToInteract: string;
+  initializing: string;
+  mounting: string;
+  preparing: string;
+  demoWorking: string;
+  comingSoon: string;
+  scrollDownInit: string;
+  auditDesc: string;
+  deepScroll: string;
+  keepScrolling: string;
+}
+
 export interface ProjectCard {
   n: string;
   name: string;
@@ -106,7 +122,7 @@ export interface ProjectCard {
 // ── Global Window Interface ──────────────────────────────────────────────────
 declare global {
   interface Window {
-    __lenis?: any;
+    __lenis?: Lenis | null;
     __galaxy?: {
       setAttract: (v: boolean) => void;
       setSpeed: (v: number) => void;

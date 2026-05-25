@@ -16,15 +16,17 @@ export function LiveStatus({ label }: { label: string }) {
   useEffect(() => {
     setTime(fmt());
 
-    // Sync to next exact minute boundary
+    let intervalId: NodeJS.Timeout;
     const delay = 60_000 - (Date.now() % 60_000);
     const firstTick = setTimeout(() => {
       setTime(fmt());
-      const interval = setInterval(() => setTime(fmt()), 60_000);
-      return () => clearInterval(interval);
+      intervalId = setInterval(() => setTime(fmt()), 60_000);
     }, delay);
 
-    return () => clearTimeout(firstTick);
+    return () => {
+      clearTimeout(firstTick);
+      if (intervalId) clearInterval(intervalId);
+    };
   }, []);
 
   return (

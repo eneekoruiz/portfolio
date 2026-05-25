@@ -230,13 +230,13 @@ export const DNAHelix = ({
             if (idx === 0) ctx.moveTo(pt.x, pt.y);
             else ctx.lineTo(pt.x, pt.y);
           });
-          
+
           // Soft ambient aura (Wide, low opacity)
           ctx.lineWidth = 22;
           ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
           ctx.globalAlpha = 0.2;
           ctx.stroke();
-          
+
           // Focused core glow
           ctx.lineWidth = 8;
           ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
@@ -250,7 +250,7 @@ export const DNAHelix = ({
           if (idx === 0) ctx.moveTo(pt.x, pt.y);
           else ctx.lineTo(pt.x, pt.y);
         });
-        
+
         ctx.lineWidth = darkMode ? 2.5 : 3.5;
         // In dark mode, use the pure accent color to make it vibrant but classic
         ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;

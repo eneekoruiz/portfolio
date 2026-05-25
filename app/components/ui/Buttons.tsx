@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ArrowUpRight, Github, Zap } from "lucide-react";
+import { Check, ArrowUpRight, GithubIcon, Zap } from "lucide-react";
 import { useMagnetic } from "../../hooks/useMagnetic";
 import { triggerPortal } from "./PortalTransition";
 import { useTranslations } from "../../hooks/useTranslations";
@@ -67,7 +67,7 @@ export function WorkScrollBtn({ label }: { label: string }) {
     toRef.current = setTimeout(() => {
       setState("done");
       document.getElementById("work")?.scrollIntoView({ behavior: "smooth" });
-      setTimeout(() => setState("idle"), 1800);
+      toRef.current = setTimeout(() => setState("idle"), 1800);
     }, 700);
   };
 
@@ -337,10 +337,10 @@ export function BranchMergeBtn({
     setDrawn(false);
     toRef.current = setTimeout(() => {
       setDrawn(true);
-      setTimeout(() => {
+      toRef.current = setTimeout(() => {
         setState("done");
         window.open(href, "_blank", "noopener,noreferrer");
-        setTimeout(() => {
+        toRef.current = setTimeout(() => {
           setState("idle");
           setDrawn(false);
         }, 1800);
@@ -370,7 +370,7 @@ export function BranchMergeBtn({
     >
       {state === "idle" && (
         <>
-          <Github size={15} aria-hidden="true" />
+          <GithubIcon size={15} aria-hidden="true" />
           <span>{label}</span>
           <span className="font-mono opacity-40 text-[11px]">_</span>
         </>
@@ -426,7 +426,7 @@ export function BranchMergeBtn({
                 zIndex: 1,
               }}
             >
-              <Github size={14} aria-hidden="true" />
+              <GithubIcon size={14} aria-hidden="true" />
             </span>
           </span>
           <span>{mergingText}</span>
@@ -434,7 +434,7 @@ export function BranchMergeBtn({
       )}
       {state === "done" && (
         <>
-          <Github size={15} aria-hidden="true" />
+          <GithubIcon size={15} aria-hidden="true" />
           <span>{abriendoText}</span>
         </>
       )}
