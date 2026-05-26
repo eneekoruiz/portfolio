@@ -402,6 +402,27 @@ export function ProjectHero({
                 if (scrollHintProgressRef.current)
                   scrollHintProgressRef.current.style.display = "none";
               }
+
+              // Ensure the screen element ends perfectly centered after the cinematic
+              // (fixes cases where GSAP leaves transform state inconsistent)
+              if (screenRef.current) {
+                try {
+                  if (self.progress > 0.96) {
+                    gsap.set(screenRef.current, {
+                      left: "50%",
+                      top: "50%",
+                      xPercent: -50,
+                      yPercent: -50,
+                      overwrite: true,
+                    });
+                    // defensive: force inline left/top in case layout shifted during pin
+                    screenRef.current.style.left = "50%";
+                    screenRef.current.style.top = "50%";
+                  }
+                } catch (e) {
+                  // swallow any timing errors during SSR/hydration or quick unmounts
+                }
+              }
             }
           },
         },
