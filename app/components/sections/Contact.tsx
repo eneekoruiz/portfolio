@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   Mail,
   GithubIcon,
@@ -13,6 +14,10 @@ import { useTheme } from "next-themes";
 import { useMagnetic } from "../../hooks/useMagnetic";
 import { BinaryStreamBtn } from "../ui/Buttons";
 import type { Tx } from "../../types";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const EMAIL = "eneekoruiz@gmail.com";
 
@@ -99,7 +104,7 @@ function EmailCard({ c }: { c: (typeof CONTACTS)[0] }) {
   };
 
   return (
-    <div ref={cardRef} className="flip-wrap sr">
+    <div ref={cardRef} className="flip-wrap contact-card">
       <button
         onClick={handleClick}
         aria-label={copied ? "Copiado!" : `Copiar email: ${EMAIL}`}
@@ -208,7 +213,7 @@ function SocialCard({ c }: { c: (typeof CONTACTS)[0] }) {
   const isDark = mounted && (theme === "dark" || resolvedTheme === "dark");
 
   return (
-    <div ref={cardRef} className="flip-wrap sr">
+    <div ref={cardRef} className="flip-wrap contact-card">
       <a
         href={c.href}
         target="_blank"
@@ -299,6 +304,28 @@ export function Contact({ t }: { t: Tx }) {
             stagger: 0.02,
             ease: "expo.out",
             scrollTrigger: { trigger: containerRef.current, start: "top 85%" },
+          },
+        );
+      }
+
+      const cards = containerRef.current?.querySelectorAll<HTMLElement>(
+        ".contact-card",
+      );
+      if (cards && cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 80%",
+              once: true,
+            },
           },
         );
       }

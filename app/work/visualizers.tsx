@@ -30,13 +30,11 @@ export const DNAHelix = ({
     pausedRef.current = paused;
   }, [paused]);
 
-  // Spring physics states for both strands (61 points each) to achieve organic elastic wiggling/damping
+  // Shared spring physics keeps both strands mirrored instead of drifting apart.
   const physicsRef = useRef<{
-    strandA: { x: number; y: number; vx: number; vy: number }[];
-    strandB: { x: number; y: number; vx: number; vy: number }[];
+    nodes: { x: number; y: number; vx: number; vy: number }[];
   }>({
-    strandA: Array.from({ length: 61 }, () => ({ x: 0, y: 0, vx: 0, vy: 0 })),
-    strandB: Array.from({ length: 61 }, () => ({ x: 0, y: 0, vx: 0, vy: 0 })),
+    nodes: Array.from({ length: 61 }, () => ({ x: 0, y: 0, vx: 0, vy: 0 })),
   });
 
   useEffect(() => {
@@ -97,7 +95,7 @@ export const DNAHelix = ({
       const dpr = window.devicePixelRatio || 1;
       canvas.width = canvas.offsetWidth * dpr;
       canvas.height = canvas.offsetHeight * dpr;
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const draw = () => {
@@ -178,51 +176,52 @@ export const DNAHelix = ({
       const strandPoints: { x: number; y: number }[][] = [[], []];
 
       // Update Physics & Draw Strands
-      for (let s = 0; s < 2; s++) {
-        const offset = s === 0 ? 0 : Math.PI;
-        const nodes = s === 0 ? physics.strandA : physics.strandB;
+      for (let i = 0; i <= steps; i++) {
+        const progress = i / steps;
+        const y = progress * h;
+        const angle = progress * Math.PI * 4 + activeRotation;
+        const r = Math.min(w * 0.15, 140);
+        const centerX = w / 2;
+        const xOffset = Math.cos(angle) * r;
 
-        for (let i = 0; i <= steps; i++) {
-          const progress = i / steps;
-          const y = progress * h;
-          const angle = progress * Math.PI * 4 + activeRotation + offset;
-          const r = Math.min(w * 0.15, 140);
-          const x = w / 2 + Math.cos(angle) * r;
+        // Shared attraction keeps the pair perfectly mirrored around center.
+        const dx = mouseX - centerX;
+        const dy = mouseY - y;
+        const distSq = dx * dx + dy * dy;
 
-          // Calculate elastic attraction vector to mouse (spider web stick)
-          const dx = mouseX - x;
-          const dy = mouseY - y;
-          const distSq = dx * dx + dy * dy;
-
-          let targetX = 0;
-          let targetY = 0;
-          if (distSq < range * range) {
-            const dist = Math.sqrt(distSq);
-            const force = Math.pow((range - dist) / range, 1.8);
-            targetX = dx * force * 0.65;
-            targetY = dy * force * 0.35;
-          }
-
-          // Spring Physics Integration
-          const node = nodes[i];
-          const stiffness = 0.06;
-          const damping = 0.84;
-
-          const ax = (targetX - node.x) * stiffness;
-          const ay = (targetY - node.y) * stiffness;
-
-          node.vx = (node.vx + ax) * damping;
-          node.vy = (node.vy + ay) * damping;
-
-          node.x += node.vx;
-          node.y += node.vy;
-
-          const rx = x + node.x;
-          const ry = y + node.y;
-
-          strandPoints[s].push({ x: rx, y: ry });
+        let targetX = 0;
+        let targetY = 0;
+        if (distSq < range * range) {
+          const dist = Math.sqrt(distSq);
+          const force = Math.pow((range - dist) / range, 1.8);
+          targetX = dx * force * 0.2;
+          targetY = dy * force * 0.35;
         }
 
+        const node = physics.nodes[i];
+        const stiffness = 0.06;
+        const damping = 0.84;
+
+        const ax = (targetX - node.x) * stiffness;
+        const ay = (targetY - node.y) * stiffness;
+
+        node.vx = (node.vx + ax) * damping;
+        node.vy = (node.vy + ay) * damping;
+
+        node.x += node.vx;
+        node.y += node.vy;
+
+        strandPoints[0].push({
+          x: centerX + xOffset + node.x,
+          y: y + node.y,
+        });
+        strandPoints[1].push({
+          x: centerX - xOffset - node.x,
+          y: y + node.y,
+        });
+      }
+
+      for (let s = 0; s < 2; s++) {
         // Draw Glow Line (Only in Dark Mode for that beautiful outer neon glow)
         if (darkMode) {
           ctx.beginPath();

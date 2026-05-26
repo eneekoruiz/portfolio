@@ -271,6 +271,7 @@ export function ProjectHero({
 }: ProjectHeroProps) {
   const s = STUDIO_TX[lang] ?? STUDIO_TX["en"];
   const motionEnabled = useMotionEnabled();
+  const staticStudioLayout = !motionEnabled;
   const heroRef = useRef<HTMLDivElement>(null);
   const bgImageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -628,7 +629,7 @@ export function ProjectHero({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className="relative h-[100dvh] w-full overflow-hidden flex items-center justify-center bg-transparent"
+        className={`relative min-h-[100dvh] w-full overflow-hidden flex flex-col items-center bg-transparent ${staticStudioLayout ? "justify-start pt-10 md:pt-16" : "justify-center"}`}
         style={{
           perspective: isInteracting || !motionEnabled ? "none" : "2000px",
         }}
@@ -651,7 +652,7 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full pt-[20vh] md:pt-[24vh] will-change-transform"
+          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full will-change-transform ${staticStudioLayout ? "pt-0 pb-8 md:pb-10" : "pt-[20vh] md:pt-[24vh]"}`}
         >
           <div
             className="relative group mb-12"
@@ -708,7 +709,7 @@ export function ProjectHero({
               isInteracting
                 ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : staticMotionMode
-                  ? "absolute left-1/2 top-1/2 z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10"
+                  ? "relative z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 mx-auto w-[min(94vw,1400px)]"
                   : `absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10`
             }
             style={
@@ -734,9 +735,9 @@ export function ProjectHero({
                       willChange: "auto",
                       borderColor: "rgba(255,255,255,0.1)",
                       opacity: 1,
-                      transform: "translate(-50%, -50%)",
-                      width: window.innerWidth < 768 ? "94vw" : "94vw",
-                      maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
+                      transform: "none",
+                      width: "min(94vw, 1400px)",
+                      maxWidth: "1400px",
                       height: window.innerWidth < 768 ? "65dvh" : "72dvh",
                     }
                   : {

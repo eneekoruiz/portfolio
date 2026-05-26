@@ -28,6 +28,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   const spotlightRef = useRef<HTMLDivElement>(null);
   const exitFired = useRef(false);
   const exitDelayRef = useRef<number | null>(null);
+  const counterTweenRef = useRef<gsap.core.Tween | null>(null);
 
   // Stable ref to onDone
   const onDoneRef = useRef(onDone);
@@ -120,40 +121,28 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       return;
     }
 
-    let v = 0;
-    let rafId: number;
-
     const duration = 1500; // 1.5 seconds
-    let startTime: number | null = null;
+    const counter = { value: 0 };
 
-    const tick = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = timestamp - startTime;
-      const percentage = Math.min((progress / duration) * 100, 100);
-
-      // Easing function for smoother finish
-      const easeProgress =
-        percentage === 100
-          ? 100
-          : 100 * (1 - Math.pow(2, -8 * (percentage / 100)));
-
-      setN(Math.round(easeProgress));
-
-      if (percentage >= 100) {
+    counterTweenRef.current = gsap.to(counter, {
+      value: 100,
+      duration: duration / 1000,
+      ease: "power2.out",
+      onUpdate: () => {
+        setN(Math.round(counter.value));
+      },
+      onComplete: () => {
         setN(100);
         exitDelayRef.current = window.setTimeout(() => {
           exitDelayRef.current = null;
           playExit();
         }, 150);
-        return;
-      }
+      },
+    });
 
-      rafId = requestAnimationFrame(tick);
-    };
-
-    rafId = requestAnimationFrame(tick);
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
+      counterTweenRef.current?.kill();
+      counterTweenRef.current = null;
       if (exitDelayRef.current !== null) {
         clearTimeout(exitDelayRef.current);
         exitDelayRef.current = null;
