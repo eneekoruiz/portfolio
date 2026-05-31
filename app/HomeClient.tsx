@@ -211,7 +211,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               accent={dnaColors.accent}
               secondary={dnaColors.secondary}
               darkMode={isDark}
-              paused={expandedIdx !== null}
+              paused={false}
             />
           </div>
         </div>

@@ -771,6 +771,251 @@ export function ProjectHero({
     }
   }, [isInteracting]);
 
+  const renderScreenContents = () => {
+    return (
+      <>
+        {/* Studio HUD - Top Control Bar */}
+        {isInteracting && (
+          <header className="w-full bg-[#121212] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0 z-[2010]">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 pr-6 border-r border-white/10">
+                <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
+                <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[120px] md:max-w-none">
+                  {title}{" "}
+                  <span className="hidden xs:inline">
+                    {" // SYSTEM.ACTIVE"}
+                  </span>
+                </span>
+              </div>
+
+              {/* Real-time Telemetry (Decorative) */}
+              <div className="hidden md:flex items-center gap-6 text-white/40 font-mono text-[8px] uppercase tracking-widest">
+                <div className="flex flex-col">
+                  <span className="text-white/20">Latency</span>
+                  <span className="text-brand">24ms</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-white/20">Security</span>
+                  <span className="text-green-400">Hardened</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-white/20">Environment</span>
+                  <span className="text-white/60">Vercel.Edge</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Source Code Access */}
+              {githubUrl && (
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group flex items-center gap-2"
+                  title="View Source Code"
+                >
+                  <GithubIcon size={16} className="group-hover:scale-110" />
+                  <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
+                    {s.sourceCode}
+                  </span>
+                </a>
+              )}
+
+              {/* External Access */}
+              {liveUrl && (
+                <a
+                  href={liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group"
+                  title="Open External"
+                >
+                  <ExternalLink size={16} className="group-hover:scale-110" />
+                </a>
+              )}
+
+              {/* Close Session */}
+              <button
+                onClick={() => setIsInteracting(false)}
+                className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group"
+              >
+                <X size={16} className="font-bold" />
+                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">
+                  {s.closeSession}
+                </span>
+              </button>
+            </div>
+          </header>
+        )}
+
+        {/* Viewport Area */}
+        <div className="flex-1 w-full h-full relative overflow-hidden bg-black flex items-center justify-center z-[2005]">
+          {/* Interaction Shield */}
+          <div
+            className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-700 group/shield cursor-pointer"
+            style={{
+              opacity: isInteracting ? 0 : 1,
+              pointerEvents: isInteracting ? "none" : "all",
+              backgroundColor: canInteract ? "rgba(0,0,0,0.6)" : "transparent",
+              backdropFilter: canInteract ? "blur(15px)" : "none",
+            }}
+            onClick={() => canInteract && setIsInteracting(true)}
+          >
+            {canInteract && !isInteracting && (
+              <div
+                className={
+                  motionEnabled
+                    ? "flex flex-col items-center gap-6 animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000"
+                    : "flex flex-col items-center gap-6"
+                }
+              >
+                <div
+                  className={`w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.2)] ${motionEnabled ? "group-hover/shield:scale-110 transition-transform studio-pulse" : ""}`}
+                >
+                  <MousePointer2
+                    size={32}
+                    className={motionEnabled ? "animate-pulse" : ""}
+                  />
+                </div>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
+                    {s.enterStudio}
+                  </span>
+                  <span className="text-[10px] text-white/40 uppercase tracking-widest">
+                    {s.clickToInteract}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 🌌 Scanning Lines / CRT Effect */}
+          {isInteracting && (
+            <div className="absolute inset-0 z-[105] pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,210,0.06))] bg-[length:100%_2px,3px_100%] select-none" />
+          )}
+
+          {shouldLoad && liveUrl ? (
+            <>
+              {!iframeLoaded && (
+                <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black gap-6">
+                  <div className="relative">
+                    <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">
+                      {s.initializing}
+                    </span>
+                    <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">
+                      {s.mounting}
+                    </span>
+                  </div>
+                </div>
+              )}
+              <iframe
+                ref={iframeRef}
+                src={liveUrl}
+                onLoad={() => setIframeLoaded(true)}
+                title={iframeTitle}
+                className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? "opacity-100" : "opacity-0"} ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
+                style={{
+                  background: "#000",
+                  filter:
+                    canInteract && !isInteracting
+                      ? "blur(15px) brightness(0.4) saturate(0.5)"
+                      : "none",
+                }}
+              />
+            </>
+          ) : shouldLoad && videoUrl ? (
+            <div className="w-full h-full bg-black relative">
+              <video
+                src={videoUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
+                style={{
+                  filter:
+                    canInteract && !isInteracting
+                      ? "blur(15px) brightness(0.4) saturate(0.5)"
+                      : "none",
+                }}
+              />
+              {/* HUD Overlay for Video */}
+              {!isInteracting && (
+                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+              )}
+            </div>
+          ) : (
+            <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-6 p-10 text-center">
+              <div className="relative">
+                {liveUrl || videoUrl ? (
+                  <div className="relative">
+                    <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
+                    </div>
+                  </div>
+                ) : (
+                  <Activity size={48} className="text-white/20 animate-pulse" />
+                )}
+                <div className="absolute inset-0 blur-2xl bg-white/5 animate-pulse" />
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
+                  {liveUrl || videoUrl
+                    ? s.preparing
+                    : projectId === "rides24ofiziala"
+                      ? s.demoWorking
+                      : s.comingSoon}
+                </span>
+                <div className="w-12 h-px bg-white/10" />
+                <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
+                  {liveUrl || videoUrl ? s.scrollDownInit : s.auditDesc}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div
+            ref={glareRef}
+            className="absolute inset-0 pointer-events-none opacity-0 mix-blend-overlay"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%)",
+            }}
+          />
+        </div>
+
+        {/* Studio HUD - Bottom Status Bar */}
+        {isInteracting && (
+          <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[2010]">
+            <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
+              Auth: <span className="text-brand">Developer_Privileges</span>{" "}
+              {" // "} Root_Access: <span className="text-green-400">True</span>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-white/20" />
+                <span>Signal_Strength: 98%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-white/20" />
+                <span>Data_integrity: Verified</span>
+              </div>
+            </div>
+          </footer>
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       {/* ═══════════════════════════════════════════════════════════════════ */}
@@ -851,15 +1096,14 @@ export function ProjectHero({
           </div>
         </div>
 
-        {!disableStudio && (
+        {/* If motion is enabled, render the screen ref inside the hero for GSAP pinning / zoom */}
+        {!disableStudio && !staticStudioLayout && (
           <div
             ref={screenRef}
             className={
               isInteracting
                 ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
-                : staticMotionMode
-                  ? "relative z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 mx-auto w-[min(94vw,1400px)]"
-                  : `absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10`
+                : "absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10"
             }
             style={
               isInteracting
@@ -878,278 +1122,20 @@ export function ProjectHero({
                     flexDirection: "column",
                     backgroundColor: "#0d0d0d",
                   }
-                : staticMotionMode
-                  ? {
-                      transformStyle: "preserve-3d",
-                      willChange: "auto",
-                      borderColor: "rgba(255,255,255,0.1)",
-                      opacity: 1,
-                      transform: "none",
-                      width: "min(94vw, 1400px)",
-                      maxWidth: "1400px",
-                      height: window.innerWidth < 768 ? "65dvh" : "72dvh",
-                    }
-                  : {
-                      transformStyle: "preserve-3d",
-                      willChange: "transform, width, height, border-radius",
-                      borderColor: "rgba(255,255,255,0.1)",
-                      opacity: 0,
-                      transform: "translate(-50%, -50%) scale(0.05)",
-                    }
+                : {
+                    transformStyle: "preserve-3d",
+                    willChange: "transform, width, height, border-radius",
+                    borderColor: "rgba(255,255,255,0.1)",
+                    opacity: 0,
+                  }
             }
           >
-            {/* Studio HUD - Top Control Bar */}
-            {isInteracting && (
-              <header className="w-full bg-[#121212] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0 z-[2010]">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-3 pr-6 border-r border-white/10">
-                    <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
-                    <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[120px] md:max-w-none">
-                      {title}{" "}
-                      <span className="hidden xs:inline">
-                        {" // SYSTEM.ACTIVE"}
-                      </span>
-                    </span>
-                  </div>
-
-                  {/* Real-time Telemetry (Decorative) */}
-                  <div className="hidden md:flex items-center gap-6 text-white/40 font-mono text-[8px] uppercase tracking-widest">
-                    <div className="flex flex-col">
-                      <span className="text-white/20">Latency</span>
-                      <span className="text-brand">24ms</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-white/20">Security</span>
-                      <span className="text-green-400">Hardened</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-white/20">Environment</span>
-                      <span className="text-white/60">Vercel.Edge</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {/* Source Code Access */}
-                  {githubUrl && (
-                    <a
-                      href={githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group flex items-center gap-2"
-                      title="View Source Code"
-                    >
-                      <GithubIcon size={16} className="group-hover:scale-110" />
-                      <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
-                        {s.sourceCode}
-                      </span>
-                    </a>
-                  )}
-
-                  {/* External Access */}
-                  {liveUrl && (
-                    <a
-                      href={liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group"
-                      title="Open External"
-                    >
-                      <ExternalLink
-                        size={16}
-                        className="group-hover:scale-110"
-                      />
-                    </a>
-                  )}
-
-                  {/* Close Session */}
-                  <button
-                    onClick={() => setIsInteracting(false)}
-                    className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group"
-                  >
-                    <X size={16} className="font-bold" />
-                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">
-                      {s.closeSession}
-                    </span>
-                  </button>
-                </div>
-              </header>
-            )}
-
-            {/* Viewport Area */}
-            <div className="flex-1 w-full h-full relative overflow-hidden bg-black flex items-center justify-center z-[2005]">
-              {/* Interaction Shield */}
-              <div
-                className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-700 group/shield cursor-pointer"
-                style={{
-                  opacity: isInteracting ? 0 : 1,
-                  pointerEvents: isInteracting ? "none" : "all",
-                  backgroundColor: canInteract
-                    ? "rgba(0,0,0,0.6)"
-                    : "transparent",
-                  backdropFilter: canInteract ? "blur(15px)" : "none",
-                }}
-                onClick={() => canInteract && setIsInteracting(true)}
-              >
-                {canInteract && !isInteracting && (
-                  <div
-                    className={
-                      motionEnabled
-                        ? "flex flex-col items-center gap-6 animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000"
-                        : "flex flex-col items-center gap-6"
-                    }
-                  >
-                    <div
-                      className={`w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.2)] ${motionEnabled ? "group-hover/shield:scale-110 transition-transform studio-pulse" : ""}`}
-                    >
-                      <MousePointer2
-                        size={32}
-                        className={motionEnabled ? "animate-pulse" : ""}
-                      />
-                    </div>
-                    <div className="flex flex-col items-center gap-2 text-center">
-                      <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
-                        {s.enterStudio}
-                      </span>
-                      <span className="text-[10px] text-white/40 uppercase tracking-widest">
-                        {s.clickToInteract}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 🌌 Scanning Lines / CRT Effect */}
-              {isInteracting && (
-                <div className="absolute inset-0 z-[105] pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,210,0.06))] bg-[length:100%_2px,3px_100%] select-none" />
-              )}
-
-              {shouldLoad && liveUrl ? (
-                <>
-                  {!iframeLoaded && (
-                    <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black gap-6">
-                      <div className="relative">
-                        <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">
-                          {s.initializing}
-                        </span>
-                        <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">
-                          {s.mounting}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  <iframe
-                    ref={iframeRef}
-                    src={liveUrl}
-                    onLoad={() => setIframeLoaded(true)}
-                    title={iframeTitle}
-                    className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? "opacity-100" : "opacity-0"} ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
-                    style={{
-                      background: "#000",
-                      filter:
-                        canInteract && !isInteracting
-                          ? "blur(15px) brightness(0.4) saturate(0.5)"
-                          : "none",
-                    }}
-                  />
-                </>
-              ) : shouldLoad && videoUrl ? (
-                <div className="w-full h-full bg-black relative">
-                  <video
-                    src={videoUrl}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
-                    style={{
-                      filter:
-                        canInteract && !isInteracting
-                          ? "blur(15px) brightness(0.4) saturate(0.5)"
-                          : "none",
-                    }}
-                  />
-                  {/* HUD Overlay for Video */}
-                  {!isInteracting && (
-                    <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-                  )}
-                </div>
-              ) : (
-                <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center gap-6 p-10 text-center">
-                  <div className="relative">
-                    {liveUrl || videoUrl ? (
-                      <div className="relative">
-                        <div className="w-16 h-16 border-2 border-white/5 border-t-brand rounded-full animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-8 h-8 border border-white/10 border-b-brand rounded-full animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
-                        </div>
-                      </div>
-                    ) : (
-                      <Activity
-                        size={48}
-                        className="text-white/20 animate-pulse"
-                      />
-                    )}
-                    <div className="absolute inset-0 blur-2xl bg-white/5 animate-pulse" />
-                  </div>
-                  <div className="flex flex-col items-center gap-3">
-                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
-                      {liveUrl || videoUrl
-                        ? s.preparing
-                        : projectId === "rides24ofiziala"
-                          ? s.demoWorking
-                          : s.comingSoon}
-                    </span>
-                    <div className="w-12 h-px bg-white/10" />
-                    <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
-                      {liveUrl || videoUrl ? s.scrollDownInit : s.auditDesc}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <div
-                ref={glareRef}
-                className="absolute inset-0 pointer-events-none opacity-0 mix-blend-overlay"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%)",
-                }}
-              />
-            </div>
-
-            {/* Studio HUD - Bottom Status Bar */}
-            {isInteracting && (
-              <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[2010]">
-                <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-                  Auth: <span className="text-brand">Developer_Privileges</span>{" "}
-                  {" // "} Root_Access:{" "}
-                  <span className="text-green-400">True</span>
-                </div>
-
-                <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-1 rounded-full bg-white/20" />
-                    <span>Signal_Strength: 98%</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-1 rounded-full bg-white/20" />
-                    <span>Data_integrity: Verified</span>
-                  </div>
-                </div>
-              </footer>
-            )}
+            {renderScreenContents()}
           </div>
         )}
 
         {/* Dynamic Scroll HUD Indicator */}
-        {!disableStudio && (
+        {!disableStudio && motionEnabled && (
           <div
             ref={scrollProgressRef}
             className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 w-[300px] px-6 py-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
@@ -1193,11 +1179,48 @@ export function ProjectHero({
         )}
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* CONTENIDO POR DEBAJO (desliza sobre el hero) */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* El contenido que viene después debe tener z-10 para aparecer encima */}
-      {/* Esto se maneja en la página parent usando z-[10] */}
+      {/* If motion is disabled, render the screen ref as a separate, scrollable section beneath the hero */}
+      {!disableStudio && staticStudioLayout && (
+        <div className="relative py-20 bg-[#0a0a0a] flex flex-col items-center justify-center border-t border-white/10 w-full min-h-[85dvh]">
+          <div
+            ref={screenRef}
+            className={
+              isInteracting
+                ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                : "relative z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 mx-auto w-[min(94vw,1400px)] h-[65dvh] md:h-[72dvh] rounded-[2.5rem]"
+            }
+            style={
+              isInteracting
+                ? {
+                    position: "fixed",
+                    left: 0,
+                    top: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    maxWidth: "100vw",
+                    maxHeight: "100vh",
+                    transform: "none",
+                    borderRadius: 0,
+                    zIndex: 2000,
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor: "#0d0d0d",
+                  }
+                : {
+                    transformStyle: "preserve-3d",
+                    willChange: "auto",
+                    borderColor: "rgba(255,255,255,0.1)",
+                    opacity: 1,
+                    transform: "none",
+                    width: "min(94vw, 1400px)",
+                    maxWidth: "1400px",
+                  }
+            }
+          >
+            {renderScreenContents()}
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -33,6 +33,7 @@ function TextPillCylinder({
   const [paused, setPaused] = useState(false);
   const motionEnabled = useMotionEnabled();
   const angleRef = useRef(0); // Stable initial value for hydration (Error #418)
+  const targetAngleRef = useRef(0);
   const animRef = useRef<number>(undefined);
   const isDragging = useRef(false);
   const startX = useRef(0);
@@ -42,6 +43,11 @@ function TextPillCylinder({
   const angleStep = (2 * Math.PI) / N;
   const radius = Math.max(100, N * 18);
 
+  const pausedRef = useRef(paused);
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
+
   useEffect(() => {
     const items =
       containerRef.current?.querySelectorAll<HTMLDivElement>(".mini-cyl-item");
@@ -50,7 +56,12 @@ function TextPillCylinder({
     let isVisible = false;
 
     const animate = () => {
-      if (!paused && motionEnabled && isVisible) angleRef.current += 0.004;
+      if (!pausedRef.current && motionEnabled && isVisible) {
+        targetAngleRef.current += 0.004;
+      }
+
+      // Smooth LERP interpolation
+      angleRef.current += (targetAngleRef.current - angleRef.current) * 0.08;
       const a = angleRef.current;
 
       // We always run the positioning loop even if isVisible is briefly false during first frame
@@ -93,21 +104,21 @@ function TextPillCylinder({
 
     const handleWheel = (e: WheelEvent) => {
       // Sensitivity factor
-      angleRef.current += e.deltaY * 0.001;
+      targetAngleRef.current += e.deltaY * 0.0015;
     };
 
     const handleMouseDown = (e: MouseEvent) => {
       isDragging.current = true;
       startX.current = e.clientX;
-      startAngle.current = angleRef.current;
+      startAngle.current = targetAngleRef.current;
       setPaused(true);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
       const dx = e.clientX - startX.current;
-      // Map drag distance to angle
-      angleRef.current = startAngle.current + dx * 0.01;
+      // Map drag distance to target angle smoothly
+      targetAngleRef.current = startAngle.current + dx * 0.015;
     };
 
     const handleMouseUp = () => {
@@ -118,14 +129,14 @@ function TextPillCylinder({
     const handleTouchStart = (e: TouchEvent) => {
       isDragging.current = true;
       startX.current = e.touches[0].clientX;
-      startAngle.current = angleRef.current;
+      startAngle.current = targetAngleRef.current;
       setPaused(true);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging.current) return;
       const dx = e.touches[0].clientX - startX.current;
-      angleRef.current = startAngle.current + dx * 0.01;
+      targetAngleRef.current = startAngle.current + dx * 0.015;
     };
 
     const el = containerRef.current?.parentElement;
@@ -153,7 +164,7 @@ function TextPillCylinder({
         window.removeEventListener("touchend", handleMouseUp);
       }
     };
-  }, [paused, motionEnabled, N, radius, angleStep]);
+  }, [motionEnabled, N, radius, angleStep]);
 
   return (
     <div

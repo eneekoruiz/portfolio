@@ -231,15 +231,15 @@ export const DNAHelix = ({
           });
 
           // Soft ambient aura (Wide, low opacity)
-          ctx.lineWidth = 22;
+          ctx.lineWidth = 38;
           ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
-          ctx.globalAlpha = 0.2;
+          ctx.globalAlpha = 0.35;
           ctx.stroke();
 
           // Focused core glow
-          ctx.lineWidth = 8;
+          ctx.lineWidth = 14;
           ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
-          ctx.globalAlpha = 0.5;
+          ctx.globalAlpha = 0.7;
           ctx.stroke();
         }
 
@@ -250,10 +250,10 @@ export const DNAHelix = ({
           else ctx.lineTo(pt.x, pt.y);
         });
 
-        ctx.lineWidth = darkMode ? 2.5 : 3.5;
+        ctx.lineWidth = darkMode ? 4 : 5;
         // In dark mode, use the pure accent color to make it vibrant but classic
         ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
-        ctx.globalAlpha = darkMode ? 1 : 0.8;
+        ctx.globalAlpha = 1.0;
         ctx.stroke();
       }
 
@@ -273,8 +273,8 @@ export const DNAHelix = ({
           ctx.moveTo(pt1.x, pt1.y);
           ctx.lineTo(pt2.x, pt2.y);
           ctx.strokeStyle = darkMode ? "#eeeeee" : secondaryColor;
-          ctx.globalAlpha = ((darkMode ? 0.45 : 0.18) * (z1 + z2 + 2)) / 2;
-          ctx.lineWidth = darkMode ? 2 : 1.5;
+          ctx.globalAlpha = ((darkMode ? 0.55 : 0.28) * (z1 + z2 + 2)) / 2;
+          ctx.lineWidth = darkMode ? 2.5 : 2;
           ctx.stroke();
         }
 
@@ -284,13 +284,13 @@ export const DNAHelix = ({
           z: number,
           isSecondaryStrand: boolean,
         ) => {
-          const size = 3 + (z + 1) * 3;
+          const size = 4 + (z + 1) * 4;
           const nodeColor = isSecondaryStrand ? secondaryColor : accentColor;
 
           // Outer Glow
-          ctx.globalAlpha = darkMode ? 0.65 : 0.1;
+          ctx.globalAlpha = darkMode ? 0.75 : 0.15;
           ctx.beginPath();
-          ctx.arc(rx, ry, size * 2.5, 0, Math.PI * 2);
+          ctx.arc(rx, ry, size * 2.8, 0, Math.PI * 2);
           ctx.fillStyle = nodeColor;
           ctx.fill();
 
@@ -305,7 +305,7 @@ export const DNAHelix = ({
           if (darkMode) {
             ctx.beginPath();
             ctx.arc(rx, ry, size, 0, Math.PI * 2);
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 2.0;
             ctx.strokeStyle = nodeColor;
             ctx.stroke();
           }
