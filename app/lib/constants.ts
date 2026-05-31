@@ -82,6 +82,14 @@ export const LANG_LABELS: Record<Lang, string> = {
   ja: "日本語",
   zh: "中文",
   ar: "العربية",
+  ru: "Русский",
+  ko: "한국어",
+  hi: "हिन्दी",
+  tr: "Türkçe",
+  nl: "Nederlands",
+  sv: "Svenska",
+  pl: "Polski",
+  vi: "Tiếng Việt",
 };
 
 /**

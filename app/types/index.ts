@@ -14,7 +14,15 @@ export type Lang =
   | "gl"
   | "ja"
   | "zh"
-  | "ar";
+  | "ar"
+  | "ru"
+  | "ko"
+  | "hi"
+  | "tr"
+  | "nl"
+  | "sv"
+  | "pl"
+  | "vi";
 
 // GitHub repository types
 export interface Repo {

@@ -43,6 +43,14 @@ const WELCOME_TEXT: Record<Lang, string> = {
   ja: "ようこそ",
   zh: "欢迎",
   ar: "مرحباً",
+  ru: "Добро пожаловать",
+  ko: "환영합니다",
+  hi: "स्वागत है",
+  tr: "Hoş geldiniz",
+  nl: "Welkom",
+  sv: "Välkommen",
+  pl: "Witaj",
+  vi: "Chào mừng",
 };
 
 interface IdentitySplashProps {

@@ -253,6 +253,14 @@ const BACK_TO_PROJECTS: Record<Lang, string> = {
   ja: "すべてのプロジェクト",
   zh: "所有项目",
   ar: "جميع المشاريع",
+  ru: "Все проекты",
+  ko: "모든 프로젝트",
+  hi: "सभी परियोजनाएं",
+  tr: "Tüm Projeler",
+  nl: "Alle Projecten",
+  sv: "Alla projekt",
+  pl: "Wszystkie Projekty",
+  vi: "Tất cả dự án",
 };
 
 // ── PÁGINA PRINCIPAL ──────────────────────────────────────────────────────────

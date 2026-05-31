@@ -308,9 +308,8 @@ export function Contact({ t }: { t: Tx }) {
         );
       }
 
-      const cards = containerRef.current?.querySelectorAll<HTMLElement>(
-        ".contact-card",
-      );
+      const cards =
+        containerRef.current?.querySelectorAll<HTMLElement>(".contact-card");
       if (cards && cards.length > 0) {
         gsap.fromTo(
           cards,
