@@ -127,15 +127,4 @@ export interface ProjectCard {
   video?: string;
 }
 
-// ── Global Window Interface ──────────────────────────────────────────────────
-declare global {
-  interface Window {
-    __lenis?: Lenis | null;
-    __galaxy?: {
-      setAttract: (v: boolean) => void;
-      setSpeed: (v: number) => void;
-    };
-    __LITE?: boolean;
-    webkitAudioContext?: typeof AudioContext;
-  }
-}
+

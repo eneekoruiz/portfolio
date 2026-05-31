@@ -418,7 +418,9 @@ export default function ProjectPage() {
       .forEach((el) => el.remove());
 
     const navigate = () => {
-      sessionStorage.setItem("hasSeenIntro", "true");
+      if (typeof window !== "undefined") {
+        window.__hasSeenIntro = true;
+      }
       window.__lenis?.start?.(); // Start before navigating
       router.replace("/", { scroll: false });
 
@@ -466,7 +468,7 @@ export default function ProjectPage() {
             ease: "power2.out",
             scrollTrigger: {
               trigger: el,
-              start: "top 88%",
+              start: "top 95%",
               once: true,
               // Prevent interference with pinning
               fastScrollEnd: true,
@@ -489,7 +491,7 @@ export default function ProjectPage() {
   return (
     <div
       ref={main}
-      className="relative min-h-[350vh] overflow-x-hidden selection:bg-brand/20 bg-page text-ink transition-colors duration-300"
+      className={`relative overflow-x-hidden selection:bg-brand/20 bg-page text-ink transition-colors duration-300 ${motionEnabled ? "min-h-[350vh]" : "min-h-screen"}`}
     >
       {/* ── 3D BACKGROUND (DEFERRED LOADING) ── */}
       {isReadyToAnimate && motionEnabled && (

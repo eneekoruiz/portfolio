@@ -10,7 +10,7 @@ export function useIntroPhase(mounted: boolean) {
     phase === "ready" ||
     (mounted &&
       typeof window !== "undefined" &&
-      sessionStorage.getItem("hasSeenIntro") === "true");
+      window.__hasSeenIntro === true);
 
   const onPreloaderDone = useCallback(() => {
     setPhase("splash");

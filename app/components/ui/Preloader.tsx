@@ -39,16 +39,20 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     if (exitFired.current) return;
     exitFired.current = true;
 
+    const isMotionActuallyEnabled = typeof window !== "undefined"
+      ? localStorage.getItem("portfolio-motion-enabled") !== "false"
+      : true;
+
     const tl = gsap.timeline({
       onComplete: () => onDoneRef.current(),
     });
 
     if (numRef.current) {
       tl.to(numRef.current, {
-        scale: 60,
+        scale: isMotionActuallyEnabled ? 60 : 1,
         opacity: 0,
-        duration: 1.0,
-        ease: "power4.inOut",
+        duration: isMotionActuallyEnabled ? 1.0 : 0.4,
+        ease: isMotionActuallyEnabled ? "power4.inOut" : "power2.out",
         force3D: true, // GPU acceleration to avoid pixelation
       });
     }
@@ -72,12 +76,12 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       tl.to(
         lightRef.current,
         {
-          scale: 4,
+          scale: isMotionActuallyEnabled ? 4 : 1,
           opacity: 0,
-          duration: 1,
-          ease: "power3.inOut",
+          duration: isMotionActuallyEnabled ? 1 : 0.4,
+          ease: isMotionActuallyEnabled ? "power3.inOut" : "power2.out",
         },
-        0.2,
+        isMotionActuallyEnabled ? 0.2 : 0,
       );
     }
 
@@ -85,12 +89,12 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       tl.to(
         containerRef.current,
         {
-          backgroundColor: "transparent",
+          backgroundColor: isMotionActuallyEnabled ? "transparent" : "var(--page)",
           opacity: 0,
-          duration: 0.8,
-          ease: "power2.inOut",
+          duration: isMotionActuallyEnabled ? 0.8 : 0.4,
+          ease: isMotionActuallyEnabled ? "power2.inOut" : "power2.out",
         },
-        0.6,
+        isMotionActuallyEnabled ? 0.6 : 0,
       );
     }
   }, []);
@@ -115,13 +119,12 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
   // ── Counter Logic (High precision) ──────────────────────────────────────
   useEffect(() => {
-    if (!motionEnabled) {
-      setN(100);
-      onDoneRef.current();
-      return;
-    }
+    const isMotionActuallyEnabled = typeof window !== "undefined"
+      ? localStorage.getItem("portfolio-motion-enabled") !== "false"
+      : true;
 
-    const duration = 1500; // 1.5 seconds
+    // Run a faster counter if motion is disabled to not block the user too long
+    const duration = isMotionActuallyEnabled ? 1500 : 800;
     const counter = { value: 0 };
 
     counterTweenRef.current = gsap.to(counter, {

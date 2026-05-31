@@ -47,15 +47,15 @@ export function useProjectsAnimations({
       // 1. Header Entrance
       gsap.fromTo(
         ".projects-header",
-        { opacity: 0, y: 32 },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.26,
+          duration: 0.2,
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 85%",
+            start: "top 99%",
             once: true,
           },
         },
@@ -71,12 +71,12 @@ export function useProjectsAnimations({
             y: 0,
             rotateX: 0,
             opacity: 1,
-            duration: 1.2,
-            stagger: 0.03,
+            duration: 0.8,
+            stagger: 0.015,
             ease: "expo.out",
             scrollTrigger: {
               trigger: ".projects-header",
-              start: "top 85%",
+              start: "top 99%",
             },
           },
         );
@@ -85,16 +85,16 @@ export function useProjectsAnimations({
       // 3. Project Rows entrance fade and slide
       gsap.fromTo(
         ".work-row-anim",
-        { opacity: 0, y: 16 },
+        { opacity: 0, y: 12 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.18,
-          stagger: 0.015,
+          duration: 0.15,
+          stagger: 0.012,
           ease: "power2.out",
           scrollTrigger: {
             trigger: ".projects-list",
-            start: "top 90%",
+            start: "top 99%",
             once: true,
           },
         },

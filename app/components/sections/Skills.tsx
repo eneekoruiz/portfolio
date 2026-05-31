@@ -61,7 +61,8 @@ function TextPillCylinder({
       }
 
       // Smooth LERP interpolation
-      angleRef.current += (targetAngleRef.current - angleRef.current) * 0.08;
+      const diff = targetAngleRef.current - angleRef.current;
+      angleRef.current += diff * 0.08;
       const a = angleRef.current;
 
       // We always run the positioning loop even if isVisible is briefly false during first frame
@@ -79,32 +80,44 @@ function TextPillCylinder({
         el.style.zIndex = String(Math.round(z + radius));
       });
 
-      if (isVisible && motionEnabled) {
+      const needsFrame = motionEnabled || Math.abs(diff) > 0.0001 || isDragging.current;
+      if (isVisible && needsFrame) {
+        animRef.current = requestAnimationFrame(animate);
+      } else {
+        animRef.current = undefined;
+      }
+    };
+
+    const ensureAnimating = () => {
+      if (isVisible && animRef.current === undefined) {
         animRef.current = requestAnimationFrame(animate);
       }
     };
+
+    const el = containerRef.current?.parentElement;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         const wasVisible = isVisible;
         isVisible = entry.isIntersecting;
         if (isVisible && !wasVisible) {
-          if (animRef.current !== undefined)
-            cancelAnimationFrame(animRef.current);
-          animRef.current = requestAnimationFrame(animate);
+          ensureAnimating();
         } else if (!isVisible) {
-          if (animRef.current !== undefined)
+          if (animRef.current !== undefined) {
             cancelAnimationFrame(animRef.current);
+            animRef.current = undefined;
+          }
         }
       },
       { threshold: 0.01 }, // Lower threshold for faster activation
     );
 
-    if (containerRef.current) observer.observe(containerRef.current);
+    if (el) observer.observe(el);
 
     const handleWheel = (e: WheelEvent) => {
       // Sensitivity factor
       targetAngleRef.current += e.deltaY * 0.0015;
+      ensureAnimating();
     };
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -112,6 +125,7 @@ function TextPillCylinder({
       startX.current = e.clientX;
       startAngle.current = targetAngleRef.current;
       setPaused(true);
+      ensureAnimating();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -119,11 +133,13 @@ function TextPillCylinder({
       const dx = e.clientX - startX.current;
       // Map drag distance to target angle smoothly
       targetAngleRef.current = startAngle.current + dx * 0.015;
+      ensureAnimating();
     };
 
     const handleMouseUp = () => {
       isDragging.current = false;
       setPaused(false);
+      ensureAnimating();
     };
 
     const handleTouchStart = (e: TouchEvent) => {
@@ -131,15 +147,16 @@ function TextPillCylinder({
       startX.current = e.touches[0].clientX;
       startAngle.current = targetAngleRef.current;
       setPaused(true);
+      ensureAnimating();
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging.current) return;
       const dx = e.touches[0].clientX - startX.current;
       targetAngleRef.current = startAngle.current + dx * 0.015;
+      ensureAnimating();
     };
 
-    const el = containerRef.current?.parentElement;
     if (el) {
       el.addEventListener("wheel", handleWheel, { passive: true });
       el.addEventListener("mousedown", handleMouseDown);
@@ -242,6 +259,7 @@ export function Skills({ t }: SkillsProps) {
   const [mounted, setMounted] = useState(false);
   const isDark = mounted && resolvedTheme === "dark";
   const containerRef = useRef<HTMLElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
     setMounted(true);
@@ -255,6 +273,18 @@ export function Skills({ t }: SkillsProps) {
       let mm = gsap.matchMedia();
 
       const ctx = gsap.context(() => {
+        if (!motionEnabled) {
+          // Instantly reveal everything
+          gsap.set(".title-char, .skills-header-label, .skill-card-wrapper", {
+            opacity: 1,
+            scale: 1,
+            x: 0,
+            y: 0,
+            rotateX: 0,
+          });
+          return;
+        }
+
         // 1. Animación del Título (Igual para todos)
         const titleChars =
           containerRef.current?.querySelectorAll(".title-char");
@@ -266,12 +296,12 @@ export function Skills({ t }: SkillsProps) {
               y: 0,
               rotateX: 0,
               opacity: 1,
-              duration: 1.2,
-              stagger: 0.02,
+              duration: 0.8,
+              stagger: 0.015,
               ease: "expo.out",
               scrollTrigger: {
                 trigger: containerRef.current,
-                start: "top 85%",
+                start: "top 99%",
               },
             },
           );
@@ -280,15 +310,15 @@ export function Skills({ t }: SkillsProps) {
         if (document.querySelector(".skills-header-label")) {
           gsap.fromTo(
             ".skills-header-label",
-            { opacity: 0, y: -20 },
+            { opacity: 0, y: -15 },
             {
               opacity: 1,
               y: 0,
-              duration: 0.58,
+              duration: 0.4,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: containerRef.current,
-                start: "top 75%",
+                start: "top 99%",
                 once: true,
               },
             },
@@ -312,12 +342,12 @@ export function Skills({ t }: SkillsProps) {
                 opacity: 1,
                 x: 0,
                 y: 0,
-                duration: 0.72,
-                stagger: 0.05,
+                duration: 0.5,
+                stagger: 0.04,
                 ease: "back.out(1.2)",
                 scrollTrigger: {
                   trigger: ".skill-cards-grid",
-                  start: "top 80%",
+                  start: "top 99%",
                   once: true,
                 },
               },
@@ -334,18 +364,18 @@ export function Skills({ t }: SkillsProps) {
               {
                 scale: 0.9,
                 opacity: 0,
-                y: 60,
+                y: 40,
               },
               {
                 scale: 1,
                 opacity: 1,
                 y: 0,
-                duration: 0.46,
-                stagger: 0.08,
+                duration: 0.35,
+                stagger: 0.06,
                 ease: "power3.out",
                 scrollTrigger: {
                   trigger: ".skill-cards-grid",
-                  start: "top 85%",
+                  start: "top 99%",
                   once: true,
                 },
               },
@@ -360,7 +390,7 @@ export function Skills({ t }: SkillsProps) {
         mm.revert();
       };
     },
-    { scope: containerRef },
+    { scope: containerRef, dependencies: [motionEnabled] },
   );
 
   return (

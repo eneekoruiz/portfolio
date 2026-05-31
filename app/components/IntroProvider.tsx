@@ -47,27 +47,8 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Determine the initial phase on the client after hydration
     const checkSeen = () => {
-      try {
-        // If it's a reload (F5), we ignore the session flag to show the preloader again
-        const isReload =
-          typeof window !== "undefined" &&
-          (
-            window.performance?.getEntriesByType(
-              "navigation",
-            )[0] as PerformanceNavigationTiming
-          )?.type === "reload";
-
-        if (isReload) {
-          sessionStorage.removeItem("hasSeenIntro");
-          return false;
-        }
-
-        return (
-          hasSeenGlobal || sessionStorage.getItem("hasSeenIntro") === "true"
-        );
-      } catch (_) {
-        return false;
-      }
+      if (typeof window === "undefined") return false;
+      return window.__hasSeenIntro === true;
     };
 
     if (checkSeen()) {
@@ -78,10 +59,9 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const markSeen = useCallback(() => {
-    hasSeenGlobal = true;
-    try {
-      sessionStorage.setItem("hasSeenIntro", "true");
-    } catch (_) {}
+    if (typeof window !== "undefined") {
+      window.__hasSeenIntro = true;
+    }
     setPhase("ready");
   }, []);
 

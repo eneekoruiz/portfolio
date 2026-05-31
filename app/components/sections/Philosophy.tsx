@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { NetworkParticles } from "../motion/Particles";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import type { Tx, Val } from "../../types";
 
 if (typeof window !== "undefined") {
@@ -32,25 +33,31 @@ function BentoCard({
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
+    if (!motionEnabled) {
+      gsap.set(el, { opacity: 1, y: 0 });
+      return;
+    }
+
     // 1. Animación de entrada al hacer scroll (Stagger effect)
     const ctx = gsap.context(() => {
       gsap.fromTo(
         el,
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.5,
           ease: "power3.out",
-          delay: index * 0.1,
+          delay: index * 0.08,
           scrollTrigger: {
             trigger: el,
-            start: "top 95%",
+            start: "top 99%",
             once: true,
           },
         },
@@ -174,9 +181,15 @@ function BentoCard({
 
 export function Philosophy({ t }: { t: Tx }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      if (!motionEnabled) {
+        gsap.set(".title-char", { opacity: 1, y: 0, rotateX: 0 });
+        return;
+      }
+
       const titleChars = containerRef.current?.querySelectorAll(".title-char");
       if (titleChars && titleChars.length > 0) {
         gsap.fromTo(
@@ -186,16 +199,16 @@ export function Philosophy({ t }: { t: Tx }) {
             y: 0,
             rotateX: 0,
             opacity: 1,
-            duration: 1.2,
-            stagger: 0.02,
+            duration: 0.8,
+            stagger: 0.015,
             ease: "expo.out",
-            scrollTrigger: { trigger: containerRef.current, start: "top 95%" },
+            scrollTrigger: { trigger: containerRef.current, start: "top 99%" },
           },
         );
       }
     });
     return () => ctx.revert();
-  }, []);
+  }, [motionEnabled]);
 
   return (
     <section

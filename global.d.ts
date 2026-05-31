@@ -9,12 +9,16 @@ declare module "*.png";
 declare module "*.jpg";
 declare module "*.jpeg";
 
-interface Window {
-  __NEXT_DATA__?: Record<string, unknown>;
-  __LITE?: boolean;
-  __galaxy?: {
-    setAttract: (v: boolean) => void;
-    setSpeed: (v: number) => void;
-  };
-  __lenis?: Lenis;
+declare global {
+  interface Window {
+    __NEXT_DATA__?: Record<string, unknown>;
+    __LITE?: boolean;
+    __galaxy?: {
+      setAttract: (v: boolean) => void;
+      setSpeed: (v: number) => void;
+    };
+    __lenis?: Lenis | null;
+    __hasSeenIntro?: boolean;
+    webkitAudioContext?: typeof AudioContext;
+  }
 }

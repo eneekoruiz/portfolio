@@ -530,27 +530,6 @@ export function ProjectHero({
                 if (scrollHintProgressRef.current)
                   scrollHintProgressRef.current.style.display = "none";
               }
-
-              // Ensure the screen element ends perfectly centered after the cinematic
-              // (fixes cases where GSAP leaves transform state inconsistent)
-              if (screenRef.current) {
-                try {
-                  if (self.progress > 0.96) {
-                    gsap.set(screenRef.current, {
-                      left: "50%",
-                      top: "50%",
-                      xPercent: -50,
-                      yPercent: -50,
-                      overwrite: true,
-                    });
-                    // defensive: force inline left/top in case layout shifted during pin
-                    screenRef.current.style.left = "50%";
-                    screenRef.current.style.top = "50%";
-                  }
-                } catch (e) {
-                  // swallow any timing errors during SSR/hydration or quick unmounts
-                }
-              }
             }
           },
         },
@@ -776,7 +755,7 @@ export function ProjectHero({
       <>
         {/* Studio HUD - Top Control Bar */}
         {isInteracting && (
-          <header className="w-full bg-[#121212] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0 z-[2010]">
+          <header className="w-full bg-[#121212] border-b border-white/10 px-6 pb-4 pt-[calc(env(safe-area-inset-top,0px)+2rem)] md:py-4 flex items-center justify-between shrink-0 z-[2010]">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 pr-6 border-r border-white/10">
                 <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
@@ -1023,7 +1002,7 @@ export function ProjectHero({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
-        className={`relative min-h-[100dvh] w-full overflow-hidden flex flex-col items-center bg-transparent ${staticStudioLayout ? "justify-start pt-10 md:pt-16" : "justify-center"}`}
+        className="relative h-[100dvh] w-full overflow-hidden flex flex-col items-center justify-center bg-transparent"
         style={{
           perspective: isInteracting || !motionEnabled ? "none" : "2000px",
         }}
@@ -1046,7 +1025,7 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className={`relative z-20 flex flex-col items-center justify-center text-center px-6 w-full will-change-transform ${staticStudioLayout ? "pt-0 pb-8 md:pb-10" : "pt-[20vh] md:pt-[24vh]"}`}
+          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full will-change-transform"
         >
           <div
             className="relative group mb-12"
@@ -1102,8 +1081,8 @@ export function ProjectHero({
             ref={screenRef}
             className={
               isInteracting
-                ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
-                : "absolute left-1/2 top-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10"
+                ? "fixed inset-0 z-[2000] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                : "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
             }
             style={
               isInteracting
@@ -1111,10 +1090,10 @@ export function ProjectHero({
                     position: "fixed",
                     left: 0,
                     top: 0,
-                    width: "100vw",
-                    height: "100vh",
+                    width: "100%",
+                    height: "100dvh",
                     maxWidth: "100vw",
-                    maxHeight: "100vh",
+                    maxHeight: "100dvh",
                     transform: "none",
                     borderRadius: 0,
                     zIndex: 2000,
@@ -1126,7 +1105,6 @@ export function ProjectHero({
                     transformStyle: "preserve-3d",
                     willChange: "transform, width, height, border-radius",
                     borderColor: "rgba(255,255,255,0.1)",
-                    opacity: 0,
                   }
             }
           >
@@ -1186,7 +1164,7 @@ export function ProjectHero({
             ref={screenRef}
             className={
               isInteracting
-                ? "fixed inset-0 z-[2000] w-screen h-screen bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                ? "fixed inset-0 z-[2000] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : "relative z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 mx-auto w-[min(94vw,1400px)] h-[65dvh] md:h-[72dvh] rounded-[2.5rem]"
             }
             style={
@@ -1195,10 +1173,10 @@ export function ProjectHero({
                     position: "fixed",
                     left: 0,
                     top: 0,
-                    width: "100vw",
-                    height: "100vh",
+                    width: "100%",
+                    height: "100dvh",
                     maxWidth: "100vw",
-                    maxHeight: "100vh",
+                    maxHeight: "100dvh",
                     transform: "none",
                     borderRadius: 0,
                     zIndex: 2000,

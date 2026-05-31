@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useMagnetic } from "../../hooks/useMagnetic";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { BinaryStreamBtn } from "../ui/Buttons";
 import type { Tx } from "../../types";
 
@@ -288,9 +289,21 @@ function SocialCard({ c }: { c: (typeof CONTACTS)[0] }) {
 
 export function Contact({ t }: { t: Tx }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      if (!motionEnabled) {
+        // Instantly reveal everything
+        gsap.set(".title-char, .contact-card, .sec-h", {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          scale: 1,
+        });
+        return;
+      }
+
       const titleChars = containerRef.current?.querySelectorAll(".title-char");
       if (titleChars && titleChars.length > 0) {
         gsap.fromTo(
@@ -300,10 +313,10 @@ export function Contact({ t }: { t: Tx }) {
             y: 0,
             rotateX: 0,
             opacity: 1,
-            duration: 1.2,
-            stagger: 0.02,
+            duration: 0.8,
+            stagger: 0.015,
             ease: "expo.out",
-            scrollTrigger: { trigger: containerRef.current, start: "top 85%" },
+            scrollTrigger: { trigger: containerRef.current, start: "top 99%" },
           },
         );
       }
@@ -313,16 +326,16 @@ export function Contact({ t }: { t: Tx }) {
       if (cards && cards.length > 0) {
         gsap.fromTo(
           cards,
-          { y: 24, opacity: 0 },
+          { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
+            duration: 0.45,
+            stagger: 0.05,
             ease: "power3.out",
             scrollTrigger: {
               trigger: containerRef.current,
-              start: "top 80%",
+              start: "top 99%",
               once: true,
             },
           },
@@ -330,7 +343,7 @@ export function Contact({ t }: { t: Tx }) {
       }
     });
     return () => ctx.revert();
-  }, []);
+  }, [motionEnabled]);
 
   return (
     <section

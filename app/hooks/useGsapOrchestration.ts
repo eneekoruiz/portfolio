@@ -72,7 +72,7 @@ export function useGsapOrchestration(
               ease: "power2.out",
               scrollTrigger: {
                 trigger: el,
-                start: "top 83%",
+                start: "top 99%",
                 once: true,
               },
             },

@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { NetworkParticles } from "../motion/Particles";
 import { useMagnetic } from "../../hooks/useMagnetic";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import type { Tx } from "../../types";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
@@ -41,9 +42,21 @@ function MetricCard({ v, l }: MetricCardProps) {
 function AboutContent({ t }: { t: Tx }) {
   const sectionRef = useRef<HTMLElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      if (!motionEnabled) {
+        // Instantly reveal everything
+        gsap.set(".title-char, .about-reveal, .word-inner", {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          scale: 1,
+        });
+        return;
+      }
+
       // 1. Título con animación de caracteres
       const titleChars = sectionRef.current?.querySelectorAll(".title-char");
       if (titleChars && titleChars.length > 0) {
@@ -54,10 +67,10 @@ function AboutContent({ t }: { t: Tx }) {
             y: 0,
             rotateX: 0,
             opacity: 1,
-            duration: 1.2,
-            stagger: 0.02,
+            duration: 0.7,
+            stagger: 0.015,
             ease: "expo.out",
-            scrollTrigger: { trigger: sectionRef.current, start: "top 85%" },
+            scrollTrigger: { trigger: sectionRef.current, start: "top 99%" },
           },
         );
       }
@@ -65,12 +78,12 @@ function AboutContent({ t }: { t: Tx }) {
       // 2. Entrada de métricas
       if (document.querySelector(".about-reveal")) {
         gsap.from(".about-reveal", {
-          y: 30,
+          y: 20,
           opacity: 0,
-          stagger: 0.06,
-          duration: 0.48,
+          stagger: 0.04,
+          duration: 0.35,
           ease: "power3.out",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 85%" },
+          scrollTrigger: { trigger: sectionRef.current, start: "top 99%" },
         });
       }
 
@@ -82,12 +95,12 @@ function AboutContent({ t }: { t: Tx }) {
           {
             y: "0%",
             opacity: 1,
-            duration: 0.42,
-            stagger: 0.015,
+            duration: 0.32,
+            stagger: 0.01,
             ease: "expo.out",
             scrollTrigger: {
               trigger: textContainerRef.current,
-              start: "top 85%",
+              start: "top 99%",
               toggleActions: "play none none reverse",
             },
           },
@@ -95,7 +108,7 @@ function AboutContent({ t }: { t: Tx }) {
       }
     }, sectionRef);
     return () => ctx.revert();
-  }, [t.mf]);
+  }, [t.mf, motionEnabled]);
 
   // Función para crear la "máscara" palabra por palabra
   const renderMaskedWords = (text: string) => {
