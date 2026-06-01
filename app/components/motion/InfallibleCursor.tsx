@@ -124,7 +124,8 @@ export function InfallibleCursor() {
       if (!target) return;
       isHover.current = false;
       setIsHovered(false);
-      if (!followerEl.classList.contains("cursor-shake-pulse")) targetScale.current = 1;
+      if (!followerEl.classList.contains("cursor-shake-pulse"))
+        targetScale.current = 1;
       setMode("default");
     };
 
@@ -142,7 +143,9 @@ export function InfallibleCursor() {
       let skewYVal = 0;
 
       // Find hovered interactive elements for magnetic snapping
-      const hoveredEl = document.querySelector("a:hover, button:hover, [data-h]:hover, input:hover, select:hover, [data-cursor-plus]:hover, [data-cursor-minus]:hover");
+      const hoveredEl = document.querySelector(
+        "a:hover, button:hover, [data-h]:hover, input:hover, select:hover, [data-cursor-plus]:hover, [data-cursor-minus]:hover",
+      );
       if (hoveredEl && window.matchMedia("(pointer:fine)").matches) {
         const rect = hoveredEl.getBoundingClientRect();
         const bx = rect.left + rect.width / 2;
@@ -184,15 +187,23 @@ export function InfallibleCursor() {
         followerRef.current.style.opacity = String(opacity.current);
 
         // Morph style dynamically to avoid React re-renders on every animation frame
-        followerRef.current.style.backgroundColor = isHover.current ? "white" : "transparent";
-        followerRef.current.style.borderColor = isHover.current ? "white" : "rgba(255, 255, 255, 0.45)";
+        followerRef.current.style.backgroundColor = isHover.current
+          ? "white"
+          : "transparent";
+        followerRef.current.style.borderColor = isHover.current
+          ? "white"
+          : "rgba(255, 255, 255, 0.45)";
       }
 
       rafRef.current = requestAnimationFrame(animate);
     };
 
     const handleVisibility = () => {
-      if (!disposed && document.visibilityState === "visible" && !rafRef.current) {
+      if (
+        !disposed &&
+        document.visibilityState === "visible" &&
+        !rafRef.current
+      ) {
         rafRef.current = requestAnimationFrame(animate);
       }
     };
@@ -220,7 +231,16 @@ export function InfallibleCursor() {
   if (!mounted || !motionEnabled) return null;
 
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, zIndex: 9999999, pointerEvents: "none" }} data-noprint>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        zIndex: 9999999,
+        pointerEvents: "none",
+      }}
+      data-noprint
+    >
       {/* Inner Dot: Zero Latency */}
       <div
         ref={dotRef}
@@ -260,7 +280,8 @@ export function InfallibleCursor() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          transition: "opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease",
+          transition:
+            "opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease",
         }}
       >
         <div

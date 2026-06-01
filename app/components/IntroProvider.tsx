@@ -36,10 +36,7 @@ if (
   typeof Element !== "undefined" &&
   !Element.prototype.animate
 ) {
-  Element.prototype.animate = function (
-    keyframes: any,
-    options: any,
-  ): any {
+  Element.prototype.animate = function (keyframes: any, options: any): any {
     const el = this as HTMLElement;
     const finalFrame = Array.isArray(keyframes)
       ? keyframes[keyframes.length - 1]
@@ -63,9 +60,7 @@ if (
     };
 
     const duration =
-      typeof options === "number"
-        ? options
-        : options?.duration || 0;
+      typeof options === "number" ? options : options?.duration || 0;
 
     setTimeout(() => {
       if (typeof mockAnimation.onfinish === "function") {

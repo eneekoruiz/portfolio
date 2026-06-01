@@ -4,8 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { Database, Server, Radar, CheckCircle2, Layers } from "lucide-react";
 
-const getAdaptivePixelRatio = () =>
-  Math.min(window.devicePixelRatio || 1, 1.5);
+const getAdaptivePixelRatio = () => Math.min(window.devicePixelRatio || 1, 1.5);
 
 // ── DNAHelix ──────────────────────────────────────────────────────────────────
 

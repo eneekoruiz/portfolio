@@ -143,7 +143,10 @@ export function PremiumWorkRow({
   useEffect(() => {
     if (!motionEnabled || !rowRef.current) return;
     const el = rowRef.current;
-    const setSkew = gsap.quickTo(el, "skewY", { duration: 0.6, ease: "power3.out" });
+    const setSkew = gsap.quickTo(el, "skewY", {
+      duration: 0.6,
+      ease: "power3.out",
+    });
 
     const handleScroll = (e: any) => {
       const vel = e.velocity || 0;
@@ -187,12 +190,15 @@ export function PremiumWorkRow({
     const follower = document.getElementById("project-preview-follower");
     if (follower) {
       const rect = follower.getBoundingClientRect();
-      sessionStorage.setItem("flip_rect", JSON.stringify({
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-      }));
+      sessionStorage.setItem(
+        "flip_rect",
+        JSON.stringify({
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height,
+        }),
+      );
     }
 
     const targetRoute = `/work/${safeId}`;
@@ -232,7 +238,8 @@ export function PremiumWorkRow({
         boxShadow: isExpanded
           ? `inset 0 1px 0 0 rgba(255,255,255,${isDark ? "0.05" : "0.1"}), inset 0 -1px 0 0 rgba(0,0,0,${isDark ? "0.1" : "0.05"})`
           : "none",
-        transitionProperty: "background, border-color, box-shadow, backdrop-filter, opacity",
+        transitionProperty:
+          "background, border-color, box-shadow, backdrop-filter, opacity",
         transitionDuration: "700ms",
         transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
         willChange: "transform",
@@ -473,10 +480,14 @@ export function PremiumWorkRow({
                     ctaAnim.current?.cancel();
                     ctaAnim.current = el.animate(
                       [
-                        { transform: 'scale(1)', opacity: 1 },
-                        { transform: 'scale(1.05)', opacity: 1 },
+                        { transform: "scale(1)", opacity: 1 },
+                        { transform: "scale(1.05)", opacity: 1 },
                       ],
-                      { duration: 140, easing: 'cubic-bezier(0.2,0.9,0.2,1)', fill: 'forwards' },
+                      {
+                        duration: 140,
+                        easing: "cubic-bezier(0.2,0.9,0.2,1)",
+                        fill: "forwards",
+                      },
                     );
                   }
                   onHoverProject({ name: proj.name, color: theme.color });
@@ -490,12 +501,24 @@ export function PremiumWorkRow({
                   const el = ctaRef.current;
                   if (el) {
                     ctaAnim.current = el.animate(
-                      [{ transform: getComputedStyle(el).transform || 'scale(1)', opacity: 1 }, { transform: 'scale(0.98)', opacity: 0.98 }, { transform: 'scale(0.72)', opacity: 0 }],
-                      { duration: 120, easing: 'cubic-bezier(0.22,1,0.36,1)', fill: 'forwards' },
+                      [
+                        {
+                          transform:
+                            getComputedStyle(el).transform || "scale(1)",
+                          opacity: 1,
+                        },
+                        { transform: "scale(0.98)", opacity: 0.98 },
+                        { transform: "scale(0.72)", opacity: 0 },
+                      ],
+                      {
+                        duration: 120,
+                        easing: "cubic-bezier(0.22,1,0.36,1)",
+                        fill: "forwards",
+                      },
                     );
                     // revert visually after short time
                     ctaAnim.current.onfinish = () => {
-                      el.style.transform = '';
+                      el.style.transform = "";
                     };
                   }
                   onHoverProject(null);
@@ -545,8 +568,15 @@ export function PremiumWorkRow({
                   if (el) {
                     ghAnim.current?.cancel();
                     ghAnim.current = el.animate(
-                      [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.04)', opacity: 1 }],
-                      { duration: 120, easing: 'cubic-bezier(0.2,0.9,0.2,1)', fill: 'forwards' },
+                      [
+                        { transform: "scale(1)", opacity: 1 },
+                        { transform: "scale(1.04)", opacity: 1 },
+                      ],
+                      {
+                        duration: 120,
+                        easing: "cubic-bezier(0.2,0.9,0.2,1)",
+                        fill: "forwards",
+                      },
                     );
                   }
                   onHoverProject({ name: proj.name, color: theme.color });
@@ -556,11 +586,22 @@ export function PremiumWorkRow({
                   const el = ghRef.current;
                   if (el) {
                     ghAnim.current = el.animate(
-                      [{ transform: getComputedStyle(el).transform || 'scale(1)', opacity: 1 }, { transform: 'scale(0.98)', opacity: 0.98 }],
-                      { duration: 90, easing: 'cubic-bezier(0.22,1,0.36,1)', fill: 'forwards' },
+                      [
+                        {
+                          transform:
+                            getComputedStyle(el).transform || "scale(1)",
+                          opacity: 1,
+                        },
+                        { transform: "scale(0.98)", opacity: 0.98 },
+                      ],
+                      {
+                        duration: 90,
+                        easing: "cubic-bezier(0.22,1,0.36,1)",
+                        fill: "forwards",
+                      },
                     );
                     ghAnim.current.onfinish = () => {
-                      el.style.transform = '';
+                      el.style.transform = "";
                     };
                   }
                   onHoverProject(null);

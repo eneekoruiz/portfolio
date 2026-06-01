@@ -89,19 +89,36 @@ export function useGsapOrchestration(
 
       if (hasNel || hasHln || hasHfd || hasMemoji) {
         if (hasNel) {
-          tl.to(".n-el", { opacity: 1, y: 0, duration: 0.28, ease: "back.out(1.15)", stagger: 0.025 });
+          tl.to(".n-el", {
+            opacity: 1,
+            y: 0,
+            duration: 0.28,
+            ease: "back.out(1.15)",
+            stagger: 0.025,
+          });
         }
         if (hasHln) {
           tl.to(
             ".h-ln",
-            { yPercent: 0, duration: 0.45, ease: "back.out(1.2)", stagger: 0.035 },
+            {
+              yPercent: 0,
+              duration: 0.45,
+              ease: "back.out(1.2)",
+              stagger: 0.035,
+            },
             hasNel ? "-=0.22" : undefined,
           );
         }
         if (hasHfd) {
           tl.to(
             ".h-fd",
-            { opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.15)", stagger: 0.03 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.35,
+              ease: "back.out(1.15)",
+              stagger: 0.03,
+            },
             hasNel || hasHln ? "-=0.32" : undefined,
           );
         }

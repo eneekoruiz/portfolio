@@ -288,7 +288,7 @@ export default function ProjectPage() {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    
+
     if (window.__lenis) {
       window.__lenis.scrollTo(0, { immediate: true });
     }

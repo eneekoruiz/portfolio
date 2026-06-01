@@ -8,7 +8,9 @@ export function useNavbarInteractions(
   indRef: React.RefObject<HTMLDivElement | null>,
   activeLinkRef: React.RefObject<HTMLAnchorElement | null>,
 ) {
-  const activeAnimRef = useRef<gsap.core.Tween | gsap.core.Timeline | null>(null);
+  const activeAnimRef = useRef<gsap.core.Tween | gsap.core.Timeline | null>(
+    null,
+  );
 
   const onNavEnter = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {

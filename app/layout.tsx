@@ -96,7 +96,11 @@ export default async function RootLayout({
           className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0"
         />
         {/* Hidden global SVG filter for velocity-based liquid distortion */}
-        <svg className="hidden" aria-hidden="true" style={{ position: "absolute", width: 0, height: 0 }}>
+        <svg
+          className="hidden"
+          aria-hidden="true"
+          style={{ position: "absolute", width: 0, height: 0 }}
+        >
           <defs>
             <filter id="liquid-distort-filter">
               <feTurbulence

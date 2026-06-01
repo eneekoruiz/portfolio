@@ -4,7 +4,10 @@ import { useEffect, useRef } from "react";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
 const getAdaptivePixelRatio = () =>
-  Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 1.5);
+  Math.min(
+    typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
+    1.5,
+  );
 
 export function NetworkParticles() {
   const cvRef = useRef<HTMLCanvasElement>(null);
@@ -37,13 +40,15 @@ export function NetworkParticles() {
     // Get live config from shared panel variables
     const getConfig = () => {
       const win = typeof window !== "undefined" ? (window as any) : null;
-      return win?.__PARTICLE_CONFIG || {
-        density: 0.0012,
-        maxLinks: 1,
-        glowStrength: 1,
-        maxDist: 120,
-        parallax: 0.045,
-      };
+      return (
+        win?.__PARTICLE_CONFIG || {
+          density: 0.0012,
+          maxLinks: 1,
+          glowStrength: 1,
+          maxDist: 120,
+          parallax: 0.045,
+        }
+      );
     };
 
     let cfg = getConfig();
@@ -66,8 +71,8 @@ export function NetworkParticles() {
             Math.random() > 0.86
               ? 8 + Math.random() * 22
               : Math.random() > 0.985
-              ? 28 + Math.random() * 60
-              : 0,
+                ? 28 + Math.random() * 60
+                : 0,
         };
       });
     };
@@ -84,7 +89,10 @@ export function NetworkParticles() {
 
       const area = Math.max(1, W * H);
       const baseCount = Math.round(area * cfg.density);
-      const count = Math.max(40, Math.min(800, Math.round(baseCount * performanceScale)));
+      const count = Math.max(
+        40,
+        Math.min(800, Math.round(baseCount * performanceScale)),
+      );
       createStars(count);
     };
 
@@ -110,8 +118,12 @@ export function NetworkParticles() {
     const container = cv.closest("section") || cv;
     container.addEventListener("mousemove", mm as EventListener);
     container.addEventListener("mouseleave", ml);
-    container.addEventListener("touchstart", touch as EventListener, { passive: true });
-    container.addEventListener("touchmove", touch as EventListener, { passive: true });
+    container.addEventListener("touchstart", touch as EventListener, {
+      passive: true,
+    });
+    container.addEventListener("touchmove", touch as EventListener, {
+      passive: true,
+    });
     container.addEventListener("touchend", ml);
     container.addEventListener("touchcancel", ml);
 
@@ -138,7 +150,10 @@ export function NetworkParticles() {
       return () => {
         ctx.clearRect(0, 0, cv.width, cv.height);
         window.removeEventListener("resize", resize);
-        window.removeEventListener("portfolio-config-update", handleConfigUpdate);
+        window.removeEventListener(
+          "portfolio-config-update",
+          handleConfigUpdate,
+        );
         document.removeEventListener("visibilitychange", handleVisibility);
         container.removeEventListener("mousemove", mm as EventListener);
         container.removeEventListener("mouseleave", ml);
@@ -177,10 +192,15 @@ export function NetworkParticles() {
           performanceScale = Math.max(0.25, performanceScale * 0.8);
           const area = Math.max(1, W * H);
           const baseCount = Math.round(area * cfg.density);
-          const newCount = Math.max(40, Math.min(800, Math.round(baseCount * performanceScale)));
-          
+          const newCount = Math.max(
+            40,
+            Math.min(800, Math.round(baseCount * performanceScale)),
+          );
+
           stars = stars.slice(0, newCount);
-          console.warn(`[FPS Guard] Frame rate dropped to ${fps.toFixed(1)} FPS. Reducing particle count to ${newCount} (scale: ${performanceScale.toFixed(2)}) to maintain 60 FPS.`);
+          console.warn(
+            `[FPS Guard] Frame rate dropped to ${fps.toFixed(1)} FPS. Reducing particle count to ${newCount} (scale: ${performanceScale.toFixed(2)}) to maintain 60 FPS.`,
+          );
         }
 
         frameCount = 0;
@@ -190,8 +210,10 @@ export function NetworkParticles() {
       // Smooth parallax offset based on mouse position
       const cx = W / 2;
       const cy = H / 2;
-      const targetOffsetX = mouse.x === -999 ? 0 : (mouse.x - cx) * cfg.parallax;
-      const targetOffsetY = mouse.y === -999 ? 0 : (mouse.y - cy) * cfg.parallax;
+      const targetOffsetX =
+        mouse.x === -999 ? 0 : (mouse.x - cx) * cfg.parallax;
+      const targetOffsetY =
+        mouse.y === -999 ? 0 : (mouse.y - cy) * cfg.parallax;
       drawOffset.x = lerp(drawOffset.x, targetOffsetX, 0.06);
       drawOffset.y = lerp(drawOffset.y, targetOffsetY, 0.06);
 
@@ -220,8 +242,14 @@ export function NetworkParticles() {
           const alpha = (1 - dist / maxDist) * 0.11;
           if (alpha <= 0) continue;
           ctx.beginPath();
-          ctx.moveTo(a.x + drawOffset.x * (a.r + 0.5), a.y + drawOffset.y * (a.r + 0.5));
-          ctx.lineTo(b.x + drawOffset.x * (b.r + 0.5), b.y + drawOffset.y * (b.r + 0.5));
+          ctx.moveTo(
+            a.x + drawOffset.x * (a.r + 0.5),
+            a.y + drawOffset.y * (a.r + 0.5),
+          );
+          ctx.lineTo(
+            b.x + drawOffset.x * (b.r + 0.5),
+            b.y + drawOffset.y * (b.r + 0.5),
+          );
           ctx.strokeStyle = `rgba(170,195,255,${Math.min(0.95, alpha)})`;
           ctx.stroke();
           connCounts[i]++;
@@ -234,8 +262,8 @@ export function NetworkParticles() {
         const p = stars[i];
 
         // Motion — slow organic float + tiny rotational noise
-        p.x += p.vx + Math.sin((performance.now() / 10000) + i) * 0.02;
-        p.y += p.vy + Math.cos((performance.now() / 10000) + i * 1.1) * 0.02;
+        p.x += p.vx + Math.sin(performance.now() / 10000 + i) * 0.02;
+        p.y += p.vy + Math.cos(performance.now() / 10000 + i * 1.1) * 0.02;
 
         // Loop edges softly
         if (p.x < -10) p.x = W + 10;

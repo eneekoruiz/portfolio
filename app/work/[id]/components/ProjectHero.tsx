@@ -788,53 +788,61 @@ export function ProjectHero({
   }, [isInteracting]);
 
   // Entrance animation for scroll HUD and reduced-motion handling
-  useGSAP(() => {
-    if (!scrollProgressRef.current || !motionEnabled) return;
+  useGSAP(
+    () => {
+      if (!scrollProgressRef.current || !motionEnabled) return;
 
-    const prefersReduced =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const prefersReduced =
+        typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // If user prefers reduced motion, strip decorative animations inside the HUD
-    if (prefersReduced && scrollProgressRef.current) {
-      scrollProgressRef.current
-        .querySelectorAll(".animate-bounce, .animate-pulse")
-        .forEach((el) => el.classList.remove("animate-bounce", "animate-pulse"));
-      return;
-    }
+      // If user prefers reduced motion, strip decorative animations inside the HUD
+      if (prefersReduced && scrollProgressRef.current) {
+        scrollProgressRef.current
+          .querySelectorAll(".animate-bounce, .animate-pulse")
+          .forEach((el) =>
+            el.classList.remove("animate-bounce", "animate-pulse"),
+          );
+        return;
+      }
 
-    // Subtle entrance - only when motion enabled and not reduced-motion
-    gsap.fromTo(
-      scrollProgressRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
-    );
-  }, { dependencies: [motionEnabled] });
+      // Subtle entrance - only when motion enabled and not reduced-motion
+      gsap.fromTo(
+        scrollProgressRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+      );
+    },
+    { dependencies: [motionEnabled] },
+  );
 
   // Mobile CTA sheen animation (subtle). Respect reduced-motion preferences.
-  useGSAP(() => {
-    if (!mobileCtaRef.current || !sheenRef.current || !motionEnabled) return;
+  useGSAP(
+    () => {
+      if (!mobileCtaRef.current || !sheenRef.current || !motionEnabled) return;
 
-    const prefersReduced =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const prefersReduced =
+        typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (prefersReduced) return;
+      if (prefersReduced) return;
 
-    const anim = gsap.to(sheenRef.current, {
-      x: '160%',
-      duration: 1.4,
-      repeat: -1,
-      ease: 'power1.inOut',
-      repeatDelay: 1.2,
-      yoyo: false,
-      overwrite: 'auto',
-    });
+      const anim = gsap.to(sheenRef.current, {
+        x: "160%",
+        duration: 1.4,
+        repeat: -1,
+        ease: "power1.inOut",
+        repeatDelay: 1.2,
+        yoyo: false,
+        overwrite: "auto",
+      });
 
-    return () => anim.kill();
-  }, { dependencies: [motionEnabled] });
+      return () => anim.kill();
+    },
+    { dependencies: [motionEnabled] },
+  );
 
   const renderScreenContents = () => {
     return (
@@ -928,7 +936,11 @@ export function ProjectHero({
             onClick={() => canInteract && setIsInteracting(true)}
           >
             {canInteract && !isInteracting && (
-              <div className={motionEnabled ? "animate-in fade-in duration-700" : ""}>
+              <div
+                className={
+                  motionEnabled ? "animate-in fade-in duration-700" : ""
+                }
+              >
                 {/* Desktop/Tablet CTA (md+) */}
                 <div className="hidden md:flex flex-col items-center gap-6">
                   <div
@@ -959,20 +971,59 @@ export function ProjectHero({
                     onPointerDown={() => setMobilePressed(true)}
                     onPointerUp={() => setMobilePressed(false)}
                     onPointerCancel={() => setMobilePressed(false)}
-                    className={`relative w-20 h-20 rounded-full bg-gradient-to-br from-white/6 to-transparent border border-white/10 flex items-center justify-center shadow-[0_18px_60px_rgba(0,0,0,0.6)] overflow-visible transition-transform duration-150 ease-out ${mobilePressed ? 'scale-95 translate-y-0.5' : 'scale-100'}`}
+                    className={`relative w-20 h-20 rounded-full bg-gradient-to-br from-white/6 to-transparent border border-white/10 flex items-center justify-center shadow-[0_18px_60px_rgba(0,0,0,0.6)] overflow-visible transition-transform duration-150 ease-out ${mobilePressed ? "scale-95 translate-y-0.5" : "scale-100"}`}
                   >
                     <div className="absolute inset-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_40%)] blur-sm" />
                     {/* Finger icon */}
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 text-white/90">
-                      <path d="M12 2v8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M9 11v6a3 3 0 0 0 6 0v-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M7 11c0-1.657 1.343-3 3-3h0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="relative z-10 text-white/90"
+                    >
+                      <path
+                        d="M12 2v8"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9 11v6a3 3 0 0 0 6 0v-6"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M7 11c0-1.657 1.343-3 3-3h0"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                     {/* Ripple / tactile ping */}
-                    <span className="absolute -bottom-2 w-10 h-10 rounded-full bg-white/8 opacity-60" aria-hidden />
-                    <span className="absolute -bottom-2 w-10 h-10 rounded-full border border-white/10" aria-hidden />
+                    <span
+                      className="absolute -bottom-2 w-10 h-10 rounded-full bg-white/8 opacity-60"
+                      aria-hidden
+                    />
+                    <span
+                      className="absolute -bottom-2 w-10 h-10 rounded-full border border-white/10"
+                      aria-hidden
+                    />
                     {/* Sheen layer (animated with GSAP) */}
-                    <div ref={sheenRef} className="absolute left-[-60%] top-0 h-full w-[60%] rounded-full opacity-20 pointer-events-none" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02))', transform: 'skewX(-15deg)' }} />
+                    <div
+                      ref={sheenRef}
+                      className="absolute left-[-60%] top-0 h-full w-[60%] rounded-full opacity-20 pointer-events-none"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02))",
+                        transform: "skewX(-15deg)",
+                      }}
+                    />
                   </button>
 
                   <div className="flex flex-col items-center gap-1 text-center px-4">
@@ -1234,10 +1285,14 @@ export function ProjectHero({
         {/* Dynamic Scroll HUD Indicator */}
         {!disableStudio && motionEnabled && (
           <div
-              ref={scrollProgressRef}
-              className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 px-4 py-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-              style={{ opacity: 1, width: "min(88vw, 340px)", bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)" }}
-            >
+            ref={scrollProgressRef}
+            className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 px-4 py-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+            style={{
+              opacity: 1,
+              width: "min(88vw, 340px)",
+              bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)",
+            }}
+          >
             {/* Layout 1: Default hint before scroll */}
             <div
               ref={scrollHintDefaultRef}
@@ -1254,7 +1309,11 @@ export function ProjectHero({
               ref={scrollHintProgressRef}
               className="hidden md:flex flex-col items-center gap-2 w-full"
             >
-              <div className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/70" role="status" aria-live="polite">
+              <div
+                className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/70"
+                role="status"
+                aria-live="polite"
+              >
                 <span>{s.initializing}</span>
                 <span ref={scrollTextRef}>0%</span>
               </div>
@@ -1266,8 +1325,17 @@ export function ProjectHero({
                 />
               </div>
               <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">
-                <span className="truncate" style={{ textShadow: `0 6px 30px ${accent}40` }}>{s.keepScrolling}</span>
-                <span ref={chevronRef} className="inline-block animate-bounce font-sans text-xs" aria-hidden>
+                <span
+                  className="truncate"
+                  style={{ textShadow: `0 6px 30px ${accent}40` }}
+                >
+                  {s.keepScrolling}
+                </span>
+                <span
+                  ref={chevronRef}
+                  className="inline-block animate-bounce font-sans text-xs"
+                  aria-hidden
+                >
                   ↓
                 </span>
               </span>

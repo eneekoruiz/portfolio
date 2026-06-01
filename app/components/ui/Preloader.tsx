@@ -39,9 +39,10 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     if (exitFired.current) return;
     exitFired.current = true;
 
-    const isMotionActuallyEnabled = typeof window !== "undefined"
-      ? localStorage.getItem("portfolio-motion-enabled") !== "false"
-      : true;
+    const isMotionActuallyEnabled =
+      typeof window !== "undefined"
+        ? localStorage.getItem("portfolio-motion-enabled") !== "false"
+        : true;
 
     const tl = gsap.timeline({
       onComplete: () => onDoneRef.current(),
@@ -89,7 +90,9 @@ export function Preloader({ onDone }: { onDone: () => void }) {
       tl.to(
         containerRef.current,
         {
-          backgroundColor: isMotionActuallyEnabled ? "transparent" : "var(--page)",
+          backgroundColor: isMotionActuallyEnabled
+            ? "transparent"
+            : "var(--page)",
           opacity: 0,
           duration: isMotionActuallyEnabled ? 0.8 : 0.4,
           ease: isMotionActuallyEnabled ? "power2.inOut" : "power2.out",
@@ -119,9 +122,10 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
   // ── Counter Logic (High precision) ──────────────────────────────────────
   useEffect(() => {
-    const isMotionActuallyEnabled = typeof window !== "undefined"
-      ? localStorage.getItem("portfolio-motion-enabled") !== "false"
-      : true;
+    const isMotionActuallyEnabled =
+      typeof window !== "undefined"
+        ? localStorage.getItem("portfolio-motion-enabled") !== "false"
+        : true;
 
     // Run a faster counter if motion is disabled to not block the user too long
     const duration = isMotionActuallyEnabled ? 1500 : 800;

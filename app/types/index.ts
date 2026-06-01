@@ -126,5 +126,3 @@ export interface ProjectCard {
   outcome: string;
   video?: string;
 }
-
-

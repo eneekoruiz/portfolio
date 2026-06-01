@@ -17,8 +17,7 @@ const FPS_CAP = 1000 / 144;
 // Particle: [x, y, vx, vy, baseR, baseTheta, arm, hue, size]
 const STRIDE = 9;
 
-const getAdaptivePixelRatio = () =>
-  Math.min(window.devicePixelRatio || 1, 1.5);
+const getAdaptivePixelRatio = () => Math.min(window.devicePixelRatio || 1, 1.5);
 
 function initParticles(count: number, W: number, H: number): Float32Array {
   const buf = new Float32Array(count * STRIDE);

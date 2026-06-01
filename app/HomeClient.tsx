@@ -236,17 +236,20 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {!ready && (phase === "loading" || phase === "splash" || phase === "checking") && (
-        <>
-          <IdentitySplash
-            lang={lang}
-            onComplete={onSplashComplete}
-            onReveal={() => {}}
-            active={phase === "splash"}
-          />
-          {(phase === "loading" || phase === "checking") && <Preloader onDone={onPreloaderDone} />}
-        </>
-      )}
+      {!ready &&
+        (phase === "loading" || phase === "splash" || phase === "checking") && (
+          <>
+            <IdentitySplash
+              lang={lang}
+              onComplete={onSplashComplete}
+              onReveal={() => {}}
+              active={phase === "splash"}
+            />
+            {(phase === "loading" || phase === "checking") && (
+              <Preloader onDone={onPreloaderDone} />
+            )}
+          </>
+        )}
 
       {/* 🧬 DNA Background — Deepest Layer */}
       {ready && !isLite && !reduced && motionEnabled && (

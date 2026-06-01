@@ -31,4 +31,3 @@ export function useIntroPhase(mounted: boolean) {
     onSplashComplete,
   };
 }
-

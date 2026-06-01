@@ -27,7 +27,9 @@ export function SmoothScroll() {
 
     window.__lenis = lenis;
     const dispMap = document.getElementById("liquid-displacement-map");
-    const setDispScale = dispMap ? gsap.quickTo(dispMap, "scale", { duration: 0.4, ease: "power2.out" }) : null;
+    const setDispScale = dispMap
+      ? gsap.quickTo(dispMap, "scale", { duration: 0.4, ease: "power2.out" })
+      : null;
 
     lenis.on("scroll", (e: any) => {
       ScrollTrigger.update();

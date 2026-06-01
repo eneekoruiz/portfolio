@@ -78,14 +78,19 @@ export function RepoRow({
         // Play enter animation from current computed values
         const cs = getComputedStyle(el);
         const fromOpacity = parseFloat(cs.opacity || "0");
-        const fromTransform = cs.transform === "none" ? "translateY(-6px)" : cs.transform;
+        const fromTransform =
+          cs.transform === "none" ? "translateY(-6px)" : cs.transform;
 
         animRef.current = el.animate(
           [
             { opacity: fromOpacity, transform: fromTransform },
             { opacity: 1, transform: "translateY(0)" },
           ],
-          { duration: 160, easing: "cubic-bezier(0.2,0.8,0.2,1)", fill: "forwards" },
+          {
+            duration: 160,
+            easing: "cubic-bezier(0.2,0.8,0.2,1)",
+            fill: "forwards",
+          },
         );
       }, 50);
     } else {
@@ -97,14 +102,19 @@ export function RepoRow({
       // If an animation is running, capture current state and animate out
       const cs = getComputedStyle(el);
       const curOpacity = parseFloat(cs.opacity || "0");
-      const curTransform = cs.transform === "none" ? "translateY(0)" : cs.transform;
+      const curTransform =
+        cs.transform === "none" ? "translateY(0)" : cs.transform;
       animRef.current?.cancel();
       animRef.current = el.animate(
         [
           { opacity: curOpacity, transform: curTransform },
           { opacity: 0, transform: "translateY(-6px)" },
         ],
-        { duration: 120, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "forwards" },
+        {
+          duration: 120,
+          easing: "cubic-bezier(0.22,1,0.36,1)",
+          fill: "forwards",
+        },
       );
       // After exit, ensure pointer events disabled
       animRef.current.onfinish = () => {

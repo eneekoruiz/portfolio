@@ -81,7 +81,8 @@ function TextPillCylinder({
         el.style.zIndex = String(Math.round(z + radius));
       }
 
-      const needsFrame = motionEnabled || Math.abs(diff) > 0.0001 || isDragging.current;
+      const needsFrame =
+        motionEnabled || Math.abs(diff) > 0.0001 || isDragging.current;
       if (isVisible && needsFrame) {
         animRef.current = requestAnimationFrame(animate);
       } else {

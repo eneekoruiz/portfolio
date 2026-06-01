@@ -16,7 +16,7 @@ export function DevTuningPanel() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
+
     // Initialize global config if not present
     const win = window as any;
     win.__PARTICLE_CONFIG = win.__PARTICLE_CONFIG || {
@@ -28,19 +28,21 @@ export function DevTuningPanel() {
       followerDuration: 0.12,
       followerScale: 0.88,
     };
-    
+
     setConfig({ ...win.__PARTICLE_CONFIG });
   }, []);
 
   const handleChange = (key: keyof typeof config, val: number) => {
     if (typeof window === "undefined") return;
     const win = window as any;
-    
+
     win.__PARTICLE_CONFIG[key] = val;
     setConfig({ ...win.__PARTICLE_CONFIG });
-    
+
     // Dispatch update event to let visual components know they need to read new values
-    window.dispatchEvent(new CustomEvent("portfolio-config-update", { detail: { key, val } }));
+    window.dispatchEvent(
+      new CustomEvent("portfolio-config-update", { detail: { key, val } }),
+    );
   };
 
   // Render nothing in production build to completely exclude panel assets
@@ -90,8 +92,18 @@ export function DevTuningPanel() {
             gap: "12px",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255, 255, 255, 0.1)", paddingBottom: "8px" }}>
-            <span style={{ fontWeight: "bold", color: "#0066ff" }}>Dev Live Tuner</span>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+              paddingBottom: "8px",
+            }}
+          >
+            <span style={{ fontWeight: "bold", color: "#0066ff" }}>
+              Dev Live Tuner
+            </span>
             <button
               onClick={() => setIsOpen(false)}
               style={{
@@ -118,7 +130,9 @@ export function DevTuningPanel() {
               max="0.003"
               step="0.0001"
               value={config.density}
-              onChange={(e) => handleChange("density", parseFloat(e.target.value))}
+              onChange={(e) =>
+                handleChange("density", parseFloat(e.target.value))
+              }
               style={{ width: "100%" }}
             />
           </div>
@@ -134,7 +148,9 @@ export function DevTuningPanel() {
               max="5"
               step="1"
               value={config.maxLinks}
-              onChange={(e) => handleChange("maxLinks", parseInt(e.target.value))}
+              onChange={(e) =>
+                handleChange("maxLinks", parseInt(e.target.value))
+              }
               style={{ width: "100%" }}
             />
           </div>
@@ -150,7 +166,9 @@ export function DevTuningPanel() {
               max="3"
               step="0.1"
               value={config.glowStrength}
-              onChange={(e) => handleChange("glowStrength", parseFloat(e.target.value))}
+              onChange={(e) =>
+                handleChange("glowStrength", parseFloat(e.target.value))
+              }
               style={{ width: "100%" }}
             />
           </div>
@@ -166,7 +184,9 @@ export function DevTuningPanel() {
               max="300"
               step="5"
               value={config.maxDist}
-              onChange={(e) => handleChange("maxDist", parseInt(e.target.value))}
+              onChange={(e) =>
+                handleChange("maxDist", parseInt(e.target.value))
+              }
               style={{ width: "100%" }}
             />
           </div>
@@ -182,7 +202,9 @@ export function DevTuningPanel() {
               max="0.2"
               step="0.005"
               value={config.parallax}
-              onChange={(e) => handleChange("parallax", parseFloat(e.target.value))}
+              onChange={(e) =>
+                handleChange("parallax", parseFloat(e.target.value))
+              }
               style={{ width: "100%" }}
             />
           </div>
@@ -198,7 +220,9 @@ export function DevTuningPanel() {
               max="0.4"
               step="0.01"
               value={config.followerDuration}
-              onChange={(e) => handleChange("followerDuration", parseFloat(e.target.value))}
+              onChange={(e) =>
+                handleChange("followerDuration", parseFloat(e.target.value))
+              }
               style={{ width: "100%" }}
             />
           </div>
@@ -214,12 +238,22 @@ export function DevTuningPanel() {
               max="1.5"
               step="0.05"
               value={config.followerScale}
-              onChange={(e) => handleChange("followerScale", parseFloat(e.target.value))}
+              onChange={(e) =>
+                handleChange("followerScale", parseFloat(e.target.value))
+              }
               style={{ width: "100%" }}
             />
           </div>
 
-          <div style={{ fontSize: "9px", color: "#666", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "8px" }}>
+          <div
+            style={{
+              fontSize: "9px",
+              color: "#666",
+              textAlign: "center",
+              borderTop: "1px solid rgba(255,255,255,0.05)",
+              paddingTop: "8px",
+            }}
+          >
             Changes apply live. Reducer caps at 60 FPS.
           </div>
         </div>
