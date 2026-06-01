@@ -6,11 +6,14 @@ import { useIntro } from "../components/IntroProvider";
 export function useIntroPhase(mounted: boolean) {
   const { phase, setPhase, markSeen } = useIntro();
 
-  const ready =
-    phase === "ready" ||
-    (mounted &&
-      typeof window !== "undefined" &&
-      window.__hasSeenIntro === true);
+  const hasSeen =
+    typeof window !== "undefined" && window.__hasSeenIntro === true;
+
+  if (hasSeen && phase !== "ready") {
+    setPhase("ready");
+  }
+
+  const ready = phase === "ready" || hasSeen;
 
   const onPreloaderDone = useCallback(() => {
     setPhase("splash");
@@ -22,9 +25,10 @@ export function useIntroPhase(mounted: boolean) {
   }, [setPhase, markSeen]);
 
   return {
-    phase,
+    phase: hasSeen ? "ready" : phase,
     ready,
     onPreloaderDone,
     onSplashComplete,
   };
 }
+

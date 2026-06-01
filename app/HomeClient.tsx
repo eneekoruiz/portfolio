@@ -173,7 +173,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {(phase === "loading" || phase === "splash" || phase === "checking") && (
+      {!ready && (phase === "loading" || phase === "splash" || phase === "checking") && (
         <>
           <IdentitySplash
             lang={lang}
