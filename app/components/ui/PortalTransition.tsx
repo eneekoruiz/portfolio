@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 
 export function PortalTransition() {
@@ -15,11 +16,17 @@ export function PortalTransition() {
     document.body.style.overflow = "hidden";
   }, []);
 
+  const router = useRouter();
+
   useEffect(() => {
     if (active && pendingUrl) {
       const tl = gsap.timeline({
         onComplete: () => {
-          window.location.href = pendingUrl;
+          if (pendingUrl.startsWith("/") && !pendingUrl.startsWith("//")) {
+            router.push(pendingUrl);
+          } else {
+            window.location.href = pendingUrl;
+          }
         },
       });
 
@@ -38,7 +45,7 @@ export function PortalTransition() {
         "-=0.3",
       );
     }
-  }, [active, pendingUrl]);
+  }, [active, pendingUrl, router]);
 
   useEffect(() => {
     const handlePortal = (e: Event) => {

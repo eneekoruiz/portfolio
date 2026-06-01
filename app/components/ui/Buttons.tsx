@@ -451,7 +451,7 @@ export function PortalWarpBtn({ className }: { className?: string }) {
     if (state !== "idle") return;
     setState("animating");
     toRef.current = setTimeout(() => {
-      window.location.href = "/lab";
+      triggerPortal("/lab");
     }, 820);
   };
 

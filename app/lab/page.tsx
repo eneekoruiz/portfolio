@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import gsap from "gsap";
 
 /* ══════════════════════════════════════════════════════════════════
    GALACTIC SPIRAL — 2500 particles, 144fps Canvas2D
@@ -55,6 +57,8 @@ function initParticles(count: number, W: number, H: number): Float32Array {
 }
 
 export default function LabPage() {
+  const router = useRouter();
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const cvRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0.5, y: 0.5, active: false });
   const timeRef = useRef(0);
@@ -62,6 +66,27 @@ export default function LabPage() {
   const [particles, setParticles] = useState(N);
   const [attract, setAttract] = useState(false);
   const [speed, setSpeed] = useState(1.0);
+
+  const handleExit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== "undefined") {
+      window.__hasSeenIntro = true;
+    }
+    if (wrapperRef.current) {
+      gsap.to(wrapperRef.current, {
+        opacity: 0,
+        scale: 0.95,
+        filter: "blur(15px)",
+        duration: 0.5,
+        ease: "power2.inOut",
+        onComplete: () => {
+          router.push("/");
+        },
+      });
+    } else {
+      router.push("/");
+    }
+  };
 
   useEffect(() => {
     const cv = cvRef.current!;
@@ -301,6 +326,7 @@ export default function LabPage() {
 
   return (
     <div
+      ref={wrapperRef}
       className="fixed inset-0 overflow-hidden select-none"
       style={{ background: "#020208" }}
     >
@@ -326,9 +352,9 @@ export default function LabPage() {
             {particles.toLocaleString()} PARTICLES · {fps} FPS
           </p>
         </div>
-        <a
-          href="/"
-          className="pointer-events-auto bg-black/40 backdrop-blur-md border border-white/[0.08] hover:border-white/20 rounded-xl px-4 py-2 font-mono text-[11px] text-white/50 hover:text-white/80 transition-all flex items-center gap-2"
+        <button
+          onClick={handleExit}
+          className="pointer-events-auto cursor-pointer bg-black/40 backdrop-blur-md border border-white/[0.08] hover:border-white/20 rounded-xl px-4 py-2 font-mono text-[11px] text-white/50 hover:text-white/80 transition-all flex items-center gap-2 border-none"
         >
           <svg
             width="11"
@@ -341,7 +367,7 @@ export default function LabPage() {
             <path d="M19 12H5M12 5l-7 7 7 7" />
           </svg>
           EXIT
-        </a>
+        </button>
       </div>
 
       {/* ── Controls — glassmorphism panel ── */}
