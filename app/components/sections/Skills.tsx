@@ -60,14 +60,15 @@ function TextPillCylinder({
         targetAngleRef.current += 0.004;
       }
 
-      // Smooth LERP interpolation
+      // Smooth LERP interpolation - increased from 0.08 to 0.12 for snappier responsiveness
       const diff = targetAngleRef.current - angleRef.current;
-      angleRef.current += diff * 0.08;
+      angleRef.current += diff * 0.12;
       const a = angleRef.current;
 
-      // We always run the positioning loop even if isVisible is briefly false during first frame
-      // to ensure they are never clumped in the center.
-      items.forEach((el: HTMLDivElement, i: number) => {
+      // Optimize array iteration using standard for loop to prevent garbage collection inside requestAnimationFrame
+      const len = items.length;
+      for (let i = 0; i < len; i++) {
+        const el = items[i];
         const theta = i * angleStep + a;
         const x = Math.sin(theta) * radius;
         const z = Math.cos(theta) * radius;
@@ -78,7 +79,7 @@ function TextPillCylinder({
         el.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, 0, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
         el.style.opacity = String(opacity.toFixed(3));
         el.style.zIndex = String(Math.round(z + radius));
-      });
+      }
 
       const needsFrame = motionEnabled || Math.abs(diff) > 0.0001 || isDragging.current;
       if (isVisible && needsFrame) {
