@@ -380,6 +380,15 @@ export default function ProjectPage() {
     // 🌊 Punto 8 — Liquid curtain reveal or fallback
     const overlay = document.getElementById("project-transition-layer");
 
+    const forceScrollReset = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      if (window.__lenis) {
+        window.__lenis.scrollTo(0, { immediate: true });
+      }
+    };
+
     if (overlay) {
       let done = false;
       const reveal = () => {
@@ -391,7 +400,14 @@ export default function ProjectPage() {
         if (isSVG) {
           animateLiquidCurtainOut(overlay as unknown as SVGSVGElement, {
             duration: 0.6,
-            onComplete: () => setIsReadyToAnimate(true),
+            onComplete: () => {
+              forceScrollReset();
+              setIsReadyToAnimate(true);
+              setTimeout(() => {
+                forceScrollReset();
+                ScrollTrigger.refresh();
+              }, 40);
+            },
           });
         } else {
           gsap.to(overlay, {
@@ -399,7 +415,12 @@ export default function ProjectPage() {
             duration: 0.3,
             onComplete: () => {
               overlay.remove();
+              forceScrollReset();
               setIsReadyToAnimate(true);
+              setTimeout(() => {
+                forceScrollReset();
+                ScrollTrigger.refresh();
+              }, 40);
             },
           });
         }
@@ -417,7 +438,12 @@ export default function ProjectPage() {
       };
     } else {
       // No overlay found (direct link or fast navigation), enable effects immediately
+      forceScrollReset();
       setIsReadyToAnimate(true);
+      setTimeout(() => {
+        forceScrollReset();
+        ScrollTrigger.refresh();
+      }, 40);
     }
   }, []);
 

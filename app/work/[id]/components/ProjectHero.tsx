@@ -483,7 +483,7 @@ export function ProjectHero({
           pin: true,
           anticipatePin: 1,
           onUpdate: (self: ScrollTrigger) => {
-            const isLocked = self.progress > 0.88; // Trigger CTA earlier
+            const isLocked = self.progress > 0.96; // Trigger CTA earlier
             if (!disableStudio && canRef.current !== isLocked) {
               canRef.current = isLocked;
               setCanInteract(isLocked);
@@ -516,7 +516,7 @@ export function ProjectHero({
             }
 
             if (scrollProgressRef.current) {
-              if (self.progress >= 0.88) {
+              if (self.progress >= 0.96) {
                 scrollProgressRef.current.style.opacity = "0";
                 scrollProgressRef.current.style.transform = "translate3d(-50%, 25px, 0) scale(0.92)";
                 scrollProgressRef.current.style.pointerEvents = "none";
@@ -972,7 +972,7 @@ export function ProjectHero({
             onClick={() => canInteract && setIsInteracting(true)}
           >
             {canInteract && !isInteracting && (
-              <div className={motionEnabled ? "animate-in fade-in duration-700" : ""}>
+              <div className={`w-full flex flex-col items-center justify-center ${motionEnabled ? "animate-in fade-in duration-700" : ""}`}>
                 {/* Desktop/Tablet CTA (md+) */}
                 <div className="hidden md:flex flex-col items-center gap-6">
                   <div
@@ -1013,8 +1013,8 @@ export function ProjectHero({
                       <path d="M7 11c0-1.657 1.343-3 3-3h0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     {/* Ripple / tactile ping */}
-                    <span className="absolute -bottom-2 w-10 h-10 rounded-full bg-white/8 opacity-60" aria-hidden />
-                    <span className="absolute -bottom-2 w-10 h-10 rounded-full border border-white/10" aria-hidden />
+                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white/8 opacity-60" aria-hidden />
+                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full border border-white/10" aria-hidden />
                     {/* Sheen layer (animated with GSAP) */}
                     <div ref={sheenRef} className="absolute left-[-60%] top-0 h-full w-[60%] rounded-full opacity-20 pointer-events-none" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02))', transform: 'skewX(-15deg)' }} />
                   </button>

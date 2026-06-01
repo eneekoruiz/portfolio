@@ -63,12 +63,17 @@ export function createLiquidCurtain(opts: LiquidCurtainOptions): SVGSVGElement {
 
   Object.assign(svg.style, {
     position: "fixed",
-    top: "-10dvh",
-    left: "-5vw",
-    width: "110vw",
-    height: "120dvh",
+    top: "-15vh",
+    left: "-10vw",
+    width: "120vw",
+    height: "135vh",
     zIndex: "99999",
     pointerEvents: "all",
+    display: "block",
+    margin: "0",
+    padding: "0",
+    border: "none",
+    overflow: "hidden",
   });
 
   const path1 = document.createElementNS(ns, "path");
