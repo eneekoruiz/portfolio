@@ -901,28 +901,50 @@ export function ProjectHero({
             onClick={() => canInteract && setIsInteracting(true)}
           >
             {canInteract && !isInteracting && (
-              <div
-                className={
-                  motionEnabled
-                    ? "flex flex-col items-center gap-6 animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000"
-                    : "flex flex-col items-center gap-6"
-                }
-              >
-                <div
-                  className={`w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.2)] ${motionEnabled ? "group-hover/shield:scale-110 transition-transform studio-pulse" : ""}`}
-                >
-                  <MousePointer2
-                    size={32}
-                    className={motionEnabled ? "animate-pulse" : ""}
-                  />
+              <div className={motionEnabled ? "animate-in fade-in duration-700" : ""}>
+                {/* Desktop/Tablet CTA (md+) */}
+                <div className="hidden md:flex flex-col items-center gap-6">
+                  <div
+                    className={`w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.12)] ${motionEnabled ? "group-hover/shield:scale-110 transition-transform studio-pulse" : ""}`}
+                  >
+                    <MousePointer2
+                      size={32}
+                      className={motionEnabled ? "animate-pulse" : ""}
+                    />
+                  </div>
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
+                      {s.enterStudio}
+                    </span>
+                    <span className="text-[10px] text-white/40 uppercase tracking-widest">
+                      {s.clickToInteract}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col items-center gap-2 text-center">
-                  <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
-                    {s.enterStudio}
-                  </span>
-                  <span className="text-[10px] text-white/40 uppercase tracking-widest">
-                    {s.clickToInteract}
-                  </span>
+
+                {/* Mobile tactile CTA (sm) — more artistic and realistic */}
+                <div className="md:hidden flex flex-col items-center gap-4">
+                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-white/6 to-transparent border border-white/10 flex items-center justify-center shadow-[0_18px_60px_rgba(0,0,0,0.6)] overflow-visible">
+                    <div className="absolute inset-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_40%)] blur-sm" />
+                    {/* Finger icon */}
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 text-white/90">
+                      <path d="M12 2v8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M9 11v6a3 3 0 0 0 6 0v-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7 11c0-1.657 1.343-3 3-3h0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {/* Ripple / tactile ping */}
+                    <span className="absolute -bottom-2 w-8 h-8 rounded-full bg-white/8 animate-ping opacity-60" aria-hidden />
+                    <span className="absolute -bottom-2 w-8 h-8 rounded-full border border-white/10" aria-hidden />
+                  </div>
+
+                  <div className="flex flex-col items-center gap-1 text-center px-4">
+                    <span className="font-mono text-[12px] font-black uppercase tracking-[0.2em] text-white">
+                      {s.enterStudio}
+                    </span>
+                    <span className="text-[11px] text-white/50 leading-snug max-w-[220px]">
+                      {s.clickToInteract}
+                    </span>
+                  </div>
                 </div>
               </div>
             )}
