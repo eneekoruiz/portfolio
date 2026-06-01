@@ -4,6 +4,9 @@ import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { Database, Server, Radar, CheckCircle2, Layers } from "lucide-react";
 
+const getAdaptivePixelRatio = () =>
+  Math.min(window.devicePixelRatio || 1, 1.5);
+
 // ── DNAHelix ──────────────────────────────────────────────────────────────────
 
 export const DNAHelix = ({
@@ -25,6 +28,10 @@ export const DNAHelix = ({
   const colorsRef = useRef({ accent, secondary });
   const motionEnabledRef = useRef(true);
   const pausedRef = useRef(paused);
+  const strandPointsRef = useRef([
+    Array.from({ length: 61 }, () => ({ x: 0, y: 0 })),
+    Array.from({ length: 61 }, () => ({ x: 0, y: 0 })),
+  ]);
 
   useEffect(() => {
     pausedRef.current = paused;
@@ -92,7 +99,7 @@ export const DNAHelix = ({
     let hoverIntensity = 0;
 
     const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = getAdaptivePixelRatio();
       canvas.width = canvas.offsetWidth * dpr;
       canvas.height = canvas.offsetHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -173,7 +180,7 @@ export const DNAHelix = ({
 
       const range = 220;
       const physics = physicsRef.current;
-      const strandPoints: { x: number; y: number }[][] = [[], []];
+      const strandPoints = strandPointsRef.current;
 
       // Update Physics & Draw Strands
       for (let i = 0; i <= steps; i++) {
@@ -211,14 +218,10 @@ export const DNAHelix = ({
         node.x += node.vx;
         node.y += node.vy;
 
-        strandPoints[0].push({
-          x: centerX + xOffset + node.x,
-          y: y + node.y,
-        });
-        strandPoints[1].push({
-          x: centerX - xOffset - node.x,
-          y: y + node.y,
-        });
+        strandPoints[0][i].x = centerX + xOffset + node.x;
+        strandPoints[0][i].y = y + node.y;
+        strandPoints[1][i].x = centerX - xOffset - node.x;
+        strandPoints[1][i].y = y + node.y;
       }
 
       for (let s = 0; s < 2; s++) {
@@ -360,6 +363,9 @@ export const TerrainMesh = ({
   const animRef = useRef<number>(undefined);
   const tRef = useRef(0);
   const activeRef = useRef(false);
+  const pointsRef = useRef<{ x: number; y: number }[]>(
+    Array.from({ length: (12 + 1) * (20 + 1) }, () => ({ x: 0, y: 0 })),
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -367,7 +373,7 @@ export const TerrainMesh = ({
     const ctx = canvas.getContext("2d")!;
 
     const resize = () => {
-      const ratio = window.devicePixelRatio || 1;
+      const ratio = getAdaptivePixelRatio();
       canvas.width = Math.floor(canvas.offsetWidth * ratio);
       canvas.height = Math.floor(canvas.offsetHeight * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -386,7 +392,8 @@ export const TerrainMesh = ({
 
       const rows = 12;
       const cols = 20;
-      const points: { x: number; y: number }[] = [];
+      const points = pointsRef.current;
+      let pointIndex = 0;
 
       ctx.strokeStyle = accent;
       ctx.lineWidth = 0.4;
@@ -401,7 +408,9 @@ export const TerrainMesh = ({
             Math.sin(c * 0.3 + tRef.current * 2) * 15 +
             Math.sin(r * 0.5 + tRef.current * 1.5) * 10;
           const y = r * (H / rows) + wave;
-          points.push({ x, y });
+          points[pointIndex].x = x;
+          points[pointIndex].y = y;
+          pointIndex++;
           if (c === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }

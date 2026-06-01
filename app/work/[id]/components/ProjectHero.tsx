@@ -415,6 +415,7 @@ export function ProjectHero({
   const scrollBarRef = useRef<HTMLDivElement>(null);
   const scrollHintDefaultRef = useRef<HTMLDivElement>(null);
   const scrollHintProgressRef = useRef<HTMLDivElement>(null);
+  const chevronRef = useRef<HTMLSpanElement>(null);
 
   const [isInteracting, setIsInteracting] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -620,6 +621,51 @@ export function ProjectHero({
         });
       }
 
+      const title = titleRef.current;
+      const glare = glareRef.current;
+      const setTitleRotateY = title
+        ? gsap.quickTo(title, "rotateY", {
+            duration: 0.8,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        : null;
+      const setTitleRotateX = title
+        ? gsap.quickTo(title, "rotateX", {
+            duration: 0.8,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        : null;
+      const setTitleScale = title
+        ? gsap.quickTo(title, "scale", {
+            duration: 0.8,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        : null;
+      const setGlareX = glare
+        ? gsap.quickTo(glare, "x", {
+            duration: 1,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        : null;
+      const setGlareY = glare
+        ? gsap.quickTo(glare, "y", {
+            duration: 1,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        : null;
+      const setGlareOpacity = glare
+        ? gsap.quickTo(glare, "opacity", {
+            duration: 1,
+            ease: "power2.out",
+            overwrite: "auto",
+          })
+        : null;
+
       // 3. Mouse Interaction (Optimized)
       const onMove = (e: MouseEvent) => {
         if (!titleRef.current || interRef.current) return;
@@ -628,25 +674,13 @@ export function ProjectHero({
         const mx = (clientX / innerWidth - 0.5) * 2;
         const my = (clientY / innerHeight - 0.5) * 2;
 
-        if (titleRef.current) {
-          gsap.to(titleRef.current, {
-            rotateY: mx * 10,
-            rotateX: -my * 10,
-            scale: 1.01,
-            duration: 0.8,
-            ease: "power2.out",
-            overwrite: "auto",
-          });
-        }
+        setTitleRotateY?.(mx * 10);
+        setTitleRotateX?.(-my * 10);
+        setTitleScale?.(1.01);
 
-        if (glareRef.current) {
-          gsap.to(glareRef.current, {
-            x: mx * 20,
-            y: my * 20,
-            opacity: 0.2,
-            duration: 1,
-          });
-        }
+        setGlareX?.(mx * 20);
+        setGlareY?.(my * 20);
+        setGlareOpacity?.(0.2);
       };
 
       window.addEventListener("mousemove", onMove);
@@ -749,6 +783,31 @@ export function ProjectHero({
       );
     }
   }, [isInteracting]);
+
+  // Entrance animation for scroll HUD and reduced-motion handling
+  useGSAP(() => {
+    if (!scrollProgressRef.current || !motionEnabled) return;
+
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // If user prefers reduced motion, strip decorative animations inside the HUD
+    if (prefersReduced && scrollProgressRef.current) {
+      scrollProgressRef.current
+        .querySelectorAll(".animate-bounce, .animate-pulse")
+        .forEach((el) => el.classList.remove("animate-bounce", "animate-pulse"));
+      return;
+    }
+
+    // Subtle entrance - only when motion enabled and not reduced-motion
+    gsap.fromTo(
+      scrollProgressRef.current,
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+    );
+  }, { dependencies: [motionEnabled] });
 
   const renderScreenContents = () => {
     return (
@@ -1115,10 +1174,10 @@ export function ProjectHero({
         {/* Dynamic Scroll HUD Indicator */}
         {!disableStudio && motionEnabled && (
           <div
-            ref={scrollProgressRef}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 w-[300px] px-6 py-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-            style={{ opacity: 1 }}
-          >
+              ref={scrollProgressRef}
+              className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 px-4 py-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+              style={{ opacity: 1, width: "min(88vw, 340px)", bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)" }}
+            >
             {/* Layout 1: Default hint before scroll */}
             <div
               ref={scrollHintDefaultRef}
@@ -1133,9 +1192,9 @@ export function ProjectHero({
             {/* Layout 2: Progress telemetry during scroll */}
             <div
               ref={scrollHintProgressRef}
-              className="hidden flex-col items-center gap-2 w-full"
+              className="hidden md:flex flex-col items-center gap-2 w-full"
             >
-              <div className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/70">
+              <div className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/70" role="status" aria-live="polite">
                 <span>{s.initializing}</span>
                 <span ref={scrollTextRef}>0%</span>
               </div>
@@ -1146,9 +1205,9 @@ export function ProjectHero({
                   style={{ width: "0%", backgroundColor: accent }}
                 />
               </div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-white font-bold animate-pulse mt-2 flex items-center gap-1.5">
-                {s.keepScrolling}{" "}
-                <span className="inline-block animate-bounce font-sans text-xs">
+              <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">
+                <span className="truncate" style={{ textShadow: `0 6px 30px ${accent}40` }}>{s.keepScrolling}</span>
+                <span ref={chevronRef} className="inline-block animate-bounce font-sans text-xs" aria-hidden>
                   ↓
                 </span>
               </span>

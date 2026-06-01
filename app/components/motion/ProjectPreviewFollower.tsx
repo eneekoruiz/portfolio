@@ -23,31 +23,46 @@ export function ProjectPreviewFollower({
   useEffect(() => {
     if (!motionEnabled) return;
 
+    const container = containerRef.current;
+    const inner = innerRef.current;
+    if (!container || !inner) return;
+
+    const moveX = gsap.quickTo(container, "x", {
+      duration: 1,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+    const moveY = gsap.quickTo(container, "y", {
+      duration: 1,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+    const tiltZ = gsap.quickTo(inner, "rotateZ", {
+      duration: 0.4,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    const skewX = gsap.quickTo(inner, "skewX", {
+      duration: 0.4,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+
     const onMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
 
-      if (isVisible && containerRef.current) {
-        gsap.to(containerRef.current, {
-          x: e.clientX,
-          y: e.clientY,
-          duration: 1.0,
-          ease: "power3.out",
-        });
+      if (isVisible) {
+        moveX(e.clientX);
+        moveY(e.clientY);
 
         // Add a slight tilt based on velocity/direction
-        if (innerRef.current) {
-          const dx = e.movementX || 0;
-          gsap.to(innerRef.current, {
-            rotateZ: dx * 0.5,
-            skewX: dx * 0.2,
-            duration: 0.4,
-            ease: "power2.out",
-          });
-        }
+        const dx = e.movementX || 0;
+        tiltZ(dx * 0.5);
+        skewX(dx * 0.2);
       }
     };
 
-    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMouseMove);
   }, [isVisible, motionEnabled]);
 

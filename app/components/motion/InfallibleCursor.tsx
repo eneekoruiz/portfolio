@@ -38,6 +38,8 @@ export function InfallibleCursor() {
     const el = cursorRef.current;
     if (!el) return;
 
+    let disposed = false;
+
     setTimeout(() => {
       opacity.current = 1;
     }, 100);
@@ -117,10 +119,13 @@ export function InfallibleCursor() {
     };
 
     const animate = () => {
+      if (disposed) return;
+
       if (document.visibilityState !== "visible") {
-        rafRef.current = requestAnimationFrame(animate);
+        rafRef.current = 0;
         return;
       }
+
       cx.current += (mx.current - cx.current) * 0.15;
       cy.current += (my.current - cy.current) * 0.15;
       scale.current += (targetScale.current - scale.current) * 0.18;
@@ -132,17 +137,26 @@ export function InfallibleCursor() {
       rafRef.current = requestAnimationFrame(animate);
     };
 
-    window.addEventListener("mousemove", onMove);
+    const handleVisibility = () => {
+      if (!disposed && document.visibilityState === "visible" && !rafRef.current) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("message", onMessage);
     window.addEventListener("mouseenter", onEnter, true);
     window.addEventListener("mouseleave", onLeave, true);
+    document.addEventListener("visibilitychange", handleVisibility);
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
+      disposed = true;
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("message", onMessage);
       window.removeEventListener("mouseenter", onEnter, true);
       window.removeEventListener("mouseleave", onLeave, true);
+      document.removeEventListener("visibilitychange", handleVisibility);
       cancelAnimationFrame(rafRef.current);
       clearTimeout(shakeTO.current);
     };

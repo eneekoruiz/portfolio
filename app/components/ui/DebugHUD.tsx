@@ -23,6 +23,14 @@ export function DebugHUD() {
       }
     };
 
+    window.addEventListener("keydown", handleKeyDown);
+
+    if (!active) {
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       setCoords({ x: e.clientX, y: e.clientY });
     };
@@ -31,7 +39,6 @@ export function DebugHUD() {
       setViewport({ w: window.innerWidth, h: window.innerHeight });
     };
 
-    window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("resize", handleResize);
     handleResize();
@@ -57,7 +64,7 @@ export function DebugHUD() {
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [active]);
 
   if (!active) return null;
 

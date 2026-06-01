@@ -3,6 +3,9 @@
 import { useEffect, useRef } from "react";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
+const getAdaptivePixelRatio = () =>
+  Math.min(window.devicePixelRatio || 1, 1.5);
+
 export function NetworkParticles() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const motionEnabled = useMotionEnabled();
@@ -13,6 +16,7 @@ export function NetworkParticles() {
     let W = 0,
       H = 0,
       raf = 0;
+    let paused = false;
 
     // x, y, velocity x, velocity y, radius
     type Pt = { x: number; y: number; vx: number; vy: number; r: number };
@@ -22,8 +26,12 @@ export function NetworkParticles() {
     const mouse = { x: -999, y: -999 };
 
     const resize = () => {
-      W = cv.width = cv.offsetWidth;
-      H = cv.height = cv.offsetHeight;
+      const ratio = getAdaptivePixelRatio();
+      W = cv.width = Math.floor(cv.offsetWidth * ratio);
+      H = cv.height = Math.floor(cv.offsetHeight * ratio);
+      cv.style.width = `${cv.offsetWidth}px`;
+      cv.style.height = `${cv.offsetHeight}px`;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
@@ -60,11 +68,24 @@ export function NetworkParticles() {
     container.addEventListener("touchend", ml);
     container.addEventListener("touchcancel", ml);
 
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        paused = false;
+        if (!raf && motionEnabled) raf = requestAnimationFrame(loop);
+      } else {
+        paused = true;
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
     if (!motionEnabled) {
       ctx.clearRect(0, 0, W, H);
       return () => {
         ctx.clearRect(0, 0, W, H);
         window.removeEventListener("resize", resize);
+        document.removeEventListener("visibilitychange", handleVisibility);
         container.removeEventListener("mousemove", mm as EventListener);
         container.removeEventListener("mouseleave", ml);
         container.removeEventListener("touchstart", touch as EventListener);
@@ -85,10 +106,17 @@ export function NetworkParticles() {
     }
 
     const loop = () => {
+      if (paused || document.visibilityState !== "visible") {
+        raf = 0;
+        return;
+      }
+
       ctx.clearRect(0, 0, W, H);
 
       const maxDist = 160;
       const mouseDist = 220; // Ratón atrae desde más lejos
+      const maxDistSq = maxDist * maxDist;
+      const mouseDistSq = mouseDist * mouseDist;
 
       pts.forEach((p, i) => {
         p.x += p.vx;
@@ -110,7 +138,7 @@ export function NetworkParticles() {
           const dy = p.y - p2.y;
           const distSq = dx * dx + dy * dy;
 
-          if (distSq < maxDist * maxDist) {
+          if (distSq < maxDistSq) {
             const dist = Math.sqrt(distSq);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -128,7 +156,7 @@ export function NetworkParticles() {
           const dy = p.y - mouse.y;
           const distSq = dx * dx + dy * dy;
 
-          if (distSq < mouseDist * mouseDist) {
+          if (distSq < mouseDistSq) {
             const dist = Math.sqrt(distSq);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -160,6 +188,7 @@ export function NetworkParticles() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       container.removeEventListener("mousemove", mm as EventListener);
       container.removeEventListener("mouseleave", ml);
       container.removeEventListener("touchstart", touch as EventListener);
