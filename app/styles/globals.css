@@ -89,14 +89,14 @@ body {
 
 /* ── 3. CUSTOM CURSOR ── */
 @media (hover: hover) and (pointer: fine) {
-  html,
-  body,
-  a,
-  button,
-  [role="button"],
-  input,
-  textarea,
-  select {
+  .has-custom-cursor,
+  .has-custom-cursor body,
+  .has-custom-cursor a,
+  .has-custom-cursor button,
+  .has-custom-cursor [role="button"],
+  .has-custom-cursor input,
+  .has-custom-cursor textarea,
+  .has-custom-cursor select {
     cursor: none !important;
   }
   .cur-dot,
@@ -112,6 +112,22 @@ body {
   .custom-cursor-dot {
     mix-blend-mode: difference;
   }
+}
+
+/* When motion is disabled or user prefers reduced motion, reveal native cursor and hide custom cursor */
+html.reveal-cursor,
+html.reveal-cursor body,
+html.reveal-cursor a,
+html.reveal-cursor button,
+html.reveal-cursor [role="button"],
+html.reveal-cursor input,
+html.reveal-cursor textarea,
+html.reveal-cursor select {
+  cursor: auto !important;
+}
+html.reveal-cursor .cur-dot,
+html.reveal-cursor .cur-ring {
+  display: none !important;
 }
 
 /* Cursor Shake Pulse */
@@ -217,6 +233,46 @@ body {
 .title-char {
   display: inline-block;
   will-change: transform, opacity;
+}
+
+/* Button Aura: subtle diffused glow using a pseudo-element behind the button */
+.btn-aura {
+  position: relative;
+  /* allow glow to escape the element bounds */
+  overflow: visible !important;
+}
+.btn-aura::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 220%;
+  height: 220%;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(var(--brand-rgb), 0.22);
+  filter: blur(22px);
+  opacity: 0;
+  transition: opacity 0.18s cubic-bezier(0.2,0.9,0.2,1), transform 0.28s cubic-bezier(0.2,0.9,0.2,1);
+}
+.btn-aura[data-aura-color]::before {
+  background: var(--aura-color);
+}
+.btn-aura:hover::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn-aura::before,
+  .btn-aura:hover::before {
+    transition: none !important;
+    opacity: 0 !important;
+    transform: none !important;
+  }
 }
 @keyframes grain {
   0%,

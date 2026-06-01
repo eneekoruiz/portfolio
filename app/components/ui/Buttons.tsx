@@ -78,8 +78,9 @@ export function WorkScrollBtn({ label }: { label: string }) {
       onClick={handleClick}
       data-h
       aria-label={label}
+      style={{ ['--aura-color' as any]: 'rgba(var(--brand-rgb), 0.22)' }}
       className={[
-        "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full overflow-hidden",
+        "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full btn-aura",
         "font-bold text-[14px] tracking-[-0.2px] transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]",
         state === "done"
           ? "bg-[#34c759] text-white scale-[1.02] shadow-[0_8px_28px_rgba(52,199,89,.35)]"
@@ -225,8 +226,9 @@ export function BinaryStreamBtn({
       disabled={state !== "idle"}
       data-h
       aria-label={label}
+      style={{ ['--aura-color' as any]: 'rgba(var(--brand-rgb), 0.18)' }}
       className={[
-        "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full",
+        "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full btn-aura",
         "font-bold text-[14px] tracking-[-0.2px] overflow-hidden",
         "transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]",
         state === "done"
@@ -358,8 +360,9 @@ export function BranchMergeBtn({
       disabled={state !== "idle"}
       data-h
       aria-label={label}
+      style={{ ['--aura-color' as any]: 'rgba(var(--brand-rgb), 0.2)' }}
       className={[
-        "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full overflow-hidden",
+        "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full btn-aura",
         "font-bold text-[13px] tracking-[-0.2px]",
         "transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]",
         state === "done"

@@ -43,6 +43,9 @@ export function InfallibleCursor() {
 
     let disposed = false;
 
+    // Toggle cursor class on body only when custom cursor successfully initializes
+    document.documentElement.classList.add("has-custom-cursor");
+
     setTimeout(() => {
       opacity.current = 1;
     }, 100);
@@ -203,6 +206,7 @@ export function InfallibleCursor() {
 
     return () => {
       disposed = true;
+      document.documentElement.classList.remove("has-custom-cursor");
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("message", onMessage);
       window.removeEventListener("mouseenter", onEnter, true);

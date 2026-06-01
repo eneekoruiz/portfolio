@@ -27,6 +27,7 @@ interface WorkRowProps {
   isExpanded: boolean;
   onToggle: () => void;
   onHoverProject: (p: { name: string; color: string } | null) => void;
+  menu?: boolean;
   skipAnimation?: boolean;
   motionEnabled: boolean;
 }
@@ -37,6 +38,7 @@ export function PremiumWorkRow({
   isExpanded,
   onToggle,
   onHoverProject,
+  menu,
   skipAnimation,
   motionEnabled,
 }: WorkRowProps) {
@@ -48,6 +50,10 @@ export function PremiumWorkRow({
   const router = useRouter();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const ctaRef = useRef<HTMLAnchorElement | null>(null);
+  const ctaAnim = useRef<Animation | null>(null);
+  const ghRef = useRef<HTMLAnchorElement | null>(null);
+  const ghAnim = useRef<Animation | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -459,14 +465,41 @@ export function PremiumWorkRow({
               <a
                 href={`/work/${safeId}`}
                 onClick={handleNavigate}
+                ref={ctaRef}
                 onMouseEnter={() => {
+                  // Project preview handled centrally; here we play a quick WAAPI micro-interaction
+                  const el = ctaRef.current;
+                  if (el) {
+                    ctaAnim.current?.cancel();
+                    ctaAnim.current = el.animate(
+                      [
+                        { transform: 'scale(1)', opacity: 1 },
+                        { transform: 'scale(1.05)', opacity: 1 },
+                      ],
+                      { duration: 140, easing: 'cubic-bezier(0.2,0.9,0.2,1)', fill: 'forwards' },
+                    );
+                  }
                   onHoverProject({ name: proj.name, color: theme.color });
                   if (!isPrefetched) {
                     router.prefetch(`/work/${safeId}`);
                     setIsPrefetched(true);
                   }
                 }}
-                onMouseLeave={() => onHoverProject(null)}
+                onMouseLeave={() => {
+                  ctaAnim.current?.cancel();
+                  const el = ctaRef.current;
+                  if (el) {
+                    ctaAnim.current = el.animate(
+                      [{ transform: getComputedStyle(el).transform || 'scale(1)', opacity: 1 }, { transform: 'scale(0.98)', opacity: 0.98 }, { transform: 'scale(0.72)', opacity: 0 }],
+                      { duration: 120, easing: 'cubic-bezier(0.22,1,0.36,1)', fill: 'forwards' },
+                    );
+                    // revert visually after short time
+                    ctaAnim.current.onfinish = () => {
+                      el.style.transform = '';
+                    };
+                  }
+                  onHoverProject(null);
+                }}
                 onFocus={() => {
                   if (!isPrefetched) {
                     router.prefetch(`/work/${safeId}`);
@@ -506,10 +539,32 @@ export function PremiumWorkRow({
                 href={`https://github.com/eneekoruiz/${proj.name}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onMouseEnter={() =>
-                  onHoverProject({ name: proj.name, color: theme.color })
-                }
-                onMouseLeave={() => onHoverProject(null)}
+                ref={ghRef}
+                onMouseEnter={() => {
+                  const el = ghRef.current;
+                  if (el) {
+                    ghAnim.current?.cancel();
+                    ghAnim.current = el.animate(
+                      [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.04)', opacity: 1 }],
+                      { duration: 120, easing: 'cubic-bezier(0.2,0.9,0.2,1)', fill: 'forwards' },
+                    );
+                  }
+                  onHoverProject({ name: proj.name, color: theme.color });
+                }}
+                onMouseLeave={() => {
+                  ghAnim.current?.cancel();
+                  const el = ghRef.current;
+                  if (el) {
+                    ghAnim.current = el.animate(
+                      [{ transform: getComputedStyle(el).transform || 'scale(1)', opacity: 1 }, { transform: 'scale(0.98)', opacity: 0.98 }],
+                      { duration: 90, easing: 'cubic-bezier(0.22,1,0.36,1)', fill: 'forwards' },
+                    );
+                    ghAnim.current.onfinish = () => {
+                      el.style.transform = '';
+                    };
+                  }
+                  onHoverProject(null);
+                }}
                 className="relative z-10 mt-4 flex items-center justify-between px-6 py-[12px] rounded-full transition-all duration-300 text-white font-black border backdrop-blur-md hover:scale-[1.05] hover:shadow-[0_12px_30px_rgba(0,0,0,0.15)] active:scale-95"
                 style={{
                   background: isDark

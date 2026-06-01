@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import gsap from "gsap";
 
 /* ══════════════════════════════════════════════════════════════════
    GALACTIC SPIRAL — 2500 particles, 144fps Canvas2D
@@ -57,8 +55,6 @@ function initParticles(count: number, W: number, H: number): Float32Array {
 }
 
 export default function LabPage() {
-  const router = useRouter();
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const cvRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0.5, y: 0.5, active: false });
   const timeRef = useRef(0);
@@ -66,27 +62,6 @@ export default function LabPage() {
   const [particles, setParticles] = useState(N);
   const [attract, setAttract] = useState(false);
   const [speed, setSpeed] = useState(1.0);
-
-  const handleExit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (typeof window !== "undefined") {
-      window.__hasSeenIntro = true;
-    }
-    if (wrapperRef.current) {
-      gsap.to(wrapperRef.current, {
-        opacity: 0,
-        scale: 0.95,
-        filter: "blur(15px)",
-        duration: 0.5,
-        ease: "power2.inOut",
-        onComplete: () => {
-          router.push("/");
-        },
-      });
-    } else {
-      router.push("/");
-    }
-  };
 
   useEffect(() => {
     const cv = cvRef.current!;
@@ -132,39 +107,8 @@ export default function LabPage() {
       !!window.__LITE ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let localN = LITE ? Math.max(400, Math.floor(N * 0.22)) : N;
+    const localN = LITE ? Math.max(400, Math.floor(N * 0.22)) : N;
     setParticles(localN);
-
-    // Create offscreen cached canvases for particle sprites
-    const createParticleSprite = (hue: number) => {
-      const spriteCv = document.createElement("canvas");
-      const diameter = 32; // size in pixels
-      spriteCv.width = diameter;
-      spriteCv.height = diameter;
-      const sCtx = spriteCv.getContext("2d")!;
-      const center = diameter / 2;
-      const grad = sCtx.createRadialGradient(center, center, 0, center, center, center);
-      if (hue === 0) { // White core
-        grad.addColorStop(0, "rgba(255, 255, 255, 1.0)");
-        grad.addColorStop(0.3, "rgba(255, 255, 255, 0.8)");
-        grad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      } else if (hue === 189) { // Cyan
-        grad.addColorStop(0, "rgba(0, 240, 255, 1.0)");
-        grad.addColorStop(0.3, "rgba(0, 200, 255, 0.8)");
-        grad.addColorStop(1, "rgba(0, 180, 255, 0)");
-      } else { // Blue
-        grad.addColorStop(0, "rgba(0, 102, 255, 1.0)");
-        grad.addColorStop(0.3, "rgba(0, 70, 255, 0.7)");
-        grad.addColorStop(1, "rgba(0, 50, 255, 0)");
-      }
-      sCtx.fillStyle = grad;
-      sCtx.fillRect(0, 0, diameter, diameter);
-      return spriteCv;
-    };
-
-    const whiteSprite = createParticleSprite(0);
-    const cyanSprite = createParticleSprite(189);
-    const blueSprite = createParticleSprite(220);
 
     let buf = initParticles(localN, W, H);
     let raf = 0,
@@ -199,17 +143,9 @@ export default function LabPage() {
 
       frames++;
       if (t - lastFpsT >= 1000) {
-        const currentFps = frames;
-        setFps(currentFps);
+        setFps(frames);
         frames = 0;
         lastFpsT = t;
-
-        // Dynamic load degradation: decrease particle count if frame rate drops
-        if (currentFps < 48 && localN > 600) {
-          localN = Math.max(600, localN - 400);
-          buf = initParticles(localN, W, H);
-          setParticles(localN);
-        }
       }
 
       const cx = W / 2,
@@ -277,23 +213,22 @@ export default function LabPage() {
         /* ── Draw ── */
         const depth = Math.min(1, r / (Math.min(W, H) * 0.45));
         const alpha = 0.25 + (1 - depth) * 0.7;
+        const bright = 45 + (1 - depth) * 40;
+        const sat = hue === 0 ? 0 : 80 + (1 - depth) * 15;
 
-        // Select pre-cached sprite canvas
-        const sprite = hue === 0 ? whiteSprite : hue === 189 ? cyanSprite : blueSprite;
-        const dSize = size * 1.6; // Scale factor
-
-        ctx.globalAlpha = alpha;
-        ctx.drawImage(sprite, px - dSize/2, py - dSize/2, dSize, dSize);
+        ctx.beginPath();
+        ctx.arc(px, py, size * 0.8, 0, TWO_PI);
+        ctx.fillStyle = `hsla(${hue},${sat}%,${bright}%,${alpha})`;
+        ctx.fill();
 
         /* Bright core glow on innermost particles */
         if (r < 80 && size > 1.5) {
-          ctx.globalAlpha = 0.08;
-          ctx.drawImage(whiteSprite, px - dSize, py - dSize, dSize * 2, dSize * 2);
+          ctx.beginPath();
+          ctx.arc(px, py, size * 2, 0, TWO_PI);
+          ctx.fillStyle = `hsla(${hue},${sat}%,95%,0.08)`;
+          ctx.fill();
         }
       }
-      
-      // Restore alpha context setting
-      ctx.globalAlpha = 1.0;
 
       // Slight center glow (reduced in LITE mode to avoid extra work)
       if (!LITE) {
@@ -326,7 +261,6 @@ export default function LabPage() {
 
   return (
     <div
-      ref={wrapperRef}
       className="fixed inset-0 overflow-hidden select-none"
       style={{ background: "#020208" }}
     >
@@ -352,9 +286,9 @@ export default function LabPage() {
             {particles.toLocaleString()} PARTICLES · {fps} FPS
           </p>
         </div>
-        <button
-          onClick={handleExit}
-          className="pointer-events-auto cursor-pointer bg-black/40 backdrop-blur-md border border-white/[0.08] hover:border-white/20 rounded-xl px-4 py-2 font-mono text-[11px] text-white/50 hover:text-white/80 transition-all flex items-center gap-2 border-none"
+        <a
+          href="/"
+          className="pointer-events-auto bg-black/40 backdrop-blur-md border border-white/[0.08] hover:border-white/20 rounded-xl px-4 py-2 font-mono text-[11px] text-white/50 hover:text-white/80 transition-all flex items-center gap-2"
         >
           <svg
             width="11"
@@ -367,7 +301,7 @@ export default function LabPage() {
             <path d="M19 12H5M12 5l-7 7 7 7" />
           </svg>
           EXIT
-        </button>
+        </a>
       </div>
 
       {/* ── Controls — glassmorphism panel ── */}

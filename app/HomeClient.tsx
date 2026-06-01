@@ -40,6 +40,7 @@ import { MobileMenu } from "./components/navigation/MobileMenu";
 import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollower";
 import { DebugHUD } from "./components/ui/DebugHUD";
 import { PortalTransition } from "./components/ui/PortalTransition";
+import { DevTuningPanel } from "./components/ui/DevTuningPanel";
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
 import { IdentitySplash } from "./components/motion/IdentitySplash";
@@ -155,6 +156,68 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const greeting = useGreeting(t.times, t.greetingFn);
   const { repos, top3, load, offline, errorMsg } = initialGitHubData;
 
+  // Hover intent controller: debounce entry (~50ms) and allow immediate cancel
+  const hoverTimer = useRef<number | null>(null);
+  const pendingHover = useRef<{ name: string; color: string } | null>(null);
+
+  const handleHoverProject = (proj: { name: string; color: string } | null) => {
+    // If the mobile menu (dropdown) is open, don't show previews
+    if (menu) {
+      if (hoverTimer.current) {
+        window.clearTimeout(hoverTimer.current);
+        hoverTimer.current = null;
+        pendingHover.current = null;
+      }
+      setHoveredProject(null);
+      return;
+    }
+
+    // Entering: debounce before committing (50ms)
+    if (proj) {
+      pendingHover.current = proj;
+      if (hoverTimer.current) window.clearTimeout(hoverTimer.current);
+      hoverTimer.current = window.setTimeout(() => {
+        setHoveredProject(pendingHover.current);
+        hoverTimer.current = null;
+        pendingHover.current = null;
+      }, 50);
+    } else {
+      // Leaving: cancel pending and hide immediately
+      if (hoverTimer.current) {
+        window.clearTimeout(hoverTimer.current);
+        hoverTimer.current = null;
+        pendingHover.current = null;
+      }
+      setHoveredProject(null);
+    }
+  };
+
+  // When the menu opens, ensure previews are hidden and cancel pending hovers
+  useEffect(() => {
+    if (menu) {
+      if (hoverTimer.current) {
+        window.clearTimeout(hoverTimer.current);
+        hoverTimer.current = null;
+        pendingHover.current = null;
+      }
+      setHoveredProject(null);
+    }
+  }, [menu]);
+
+  // Ensure the native cursor is visible when motion is disabled or user prefers reduced motion
+  useEffect(() => {
+    const shouldReveal = reduced || !motionEnabled;
+    const el = document.documentElement;
+    if (shouldReveal) {
+      el.classList.add("reveal-cursor");
+    } else {
+      el.classList.remove("reveal-cursor");
+    }
+    return () => {
+      el.classList.remove("reveal-cursor");
+    };
+  }, [reduced, motionEnabled]);
+
   // ── Nav Handlers ──
   const { onNavEnter, onNavContainerLeave } = useNavbarInteractions(
     navInner,
@@ -256,7 +319,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           offline={offline}
           errorMsg={errorMsg}
           BranchMergeBtn={BranchMergeBtn}
-          onHoverProject={setHoveredProject}
+          onHoverProject={handleHoverProject}
+          menu={menu}
           expandedIdx={expandedIdx}
           onToggleProject={setExpandedIdx}
           motionEnabled={motionEnabled}
@@ -290,6 +354,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       <div className="hud-vignette" aria-hidden="true" />
       <DebugHUD />
       <PortalTransition />
+      {process.env.NODE_ENV === "development" && <DevTuningPanel />}
     </>
   );
 }

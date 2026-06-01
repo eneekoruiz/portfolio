@@ -38,6 +38,7 @@ interface ProjectsProps {
   errorMsg: string;
   BranchMergeBtn: React.ComponentType<{ label: string; href: string }>;
   onHoverProject: (proj: { name: string; color: string } | null) => void;
+  menu?: boolean;
   expandedIdx: number | null;
   onToggleProject: (idx: number | null) => void;
   motionEnabled: boolean;
@@ -52,6 +53,7 @@ export function Projects({
   errorMsg,
   BranchMergeBtn,
   onHoverProject,
+  menu,
   expandedIdx,
   onToggleProject,
   motionEnabled,
@@ -158,6 +160,7 @@ export function Projects({
                     isExpanded={expandedIdx === i}
                     onToggle={() => handleToggle(i)}
                     onHoverProject={onHoverProject}
+                    menu={menu}
                     skipAnimation={isReturning.current && expandedIdx === i}
                     motionEnabled={motionEnabled}
                   />
@@ -252,6 +255,7 @@ export function Projects({
                     lineRefs.current[i] = el;
                   }}
                   isMobile={isMobile}
+                  menu={menu}
                 />
               ))}
             </div>

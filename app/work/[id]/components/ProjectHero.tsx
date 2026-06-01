@@ -483,7 +483,7 @@ export function ProjectHero({
           pin: true,
           anticipatePin: 1,
           onUpdate: (self: ScrollTrigger) => {
-            const isLocked = self.progress > 0.96; // Trigger CTA earlier
+            const isLocked = self.progress > 0.88; // Trigger CTA earlier
             if (!disableStudio && canRef.current !== isLocked) {
               canRef.current = isLocked;
               setCanInteract(isLocked);
@@ -516,42 +516,23 @@ export function ProjectHero({
             }
 
             if (scrollProgressRef.current) {
-              if (self.progress >= 0.96) {
+              if (self.progress > 0.85) {
                 scrollProgressRef.current.style.opacity = "0";
-                scrollProgressRef.current.style.transform = "translate3d(-50%, 25px, 0) scale(0.92)";
                 scrollProgressRef.current.style.pointerEvents = "none";
               } else if (self.progress > 0.02) {
                 scrollProgressRef.current.style.opacity = "1";
-                scrollProgressRef.current.style.transform = "translate3d(-50%, 0, 0) scale(1)";
                 scrollProgressRef.current.style.pointerEvents = "auto";
-                if (scrollHintDefaultRef.current) {
-                  scrollHintDefaultRef.current.style.opacity = "0";
-                  scrollHintDefaultRef.current.style.transform = "scale(0.92) translateY(-10px)";
-                  scrollHintDefaultRef.current.style.pointerEvents = "none";
-                  scrollHintDefaultRef.current.style.position = "absolute";
-                }
-                if (scrollHintProgressRef.current) {
-                  scrollHintProgressRef.current.style.opacity = "1";
-                  scrollHintProgressRef.current.style.transform = "scale(1) translateY(0)";
-                  scrollHintProgressRef.current.style.pointerEvents = "auto";
-                  scrollHintProgressRef.current.style.position = "relative";
-                }
+                if (scrollHintDefaultRef.current)
+                  scrollHintDefaultRef.current.style.display = "none";
+                if (scrollHintProgressRef.current)
+                  scrollHintProgressRef.current.style.display = "flex";
               } else {
                 scrollProgressRef.current.style.opacity = "1";
-                scrollProgressRef.current.style.transform = "translate3d(-50%, 0, 0) scale(1)";
                 scrollProgressRef.current.style.pointerEvents = "auto";
-                if (scrollHintDefaultRef.current) {
-                  scrollHintDefaultRef.current.style.opacity = "1";
-                  scrollHintDefaultRef.current.style.transform = "scale(1) translateY(0)";
-                  scrollHintDefaultRef.current.style.pointerEvents = "auto";
-                  scrollHintDefaultRef.current.style.position = "relative";
-                }
-                if (scrollHintProgressRef.current) {
-                  scrollHintProgressRef.current.style.opacity = "0";
-                  scrollHintProgressRef.current.style.transform = "scale(0.92) translateY(10px)";
-                  scrollHintProgressRef.current.style.pointerEvents = "none";
-                  scrollHintProgressRef.current.style.position = "absolute";
-                }
+                if (scrollHintDefaultRef.current)
+                  scrollHintDefaultRef.current.style.display = "flex";
+                if (scrollHintProgressRef.current)
+                  scrollHintProgressRef.current.style.display = "none";
               }
             }
           },
@@ -587,55 +568,19 @@ export function ProjectHero({
       }
 
       if (!disableStudio && screenRef.current && overlayRef.current) {
-        let fromProps: gsap.TweenVars = {
-          scale: 0.05,
-          opacity: 0,
-          z: -1500,
-          filter: "blur(30px)",
-          borderRadius: "50rem",
-        };
-
-        const flipData = sessionStorage.getItem("flip_rect");
-        if (flipData) {
-          sessionStorage.removeItem("flip_rect");
-          try {
-            const first = JSON.parse(flipData);
-            const lastWidth = window.innerWidth * 0.94;
-            const lastHeight = window.innerHeight * 0.65;
-            
-            const scaleX = first.width / (window.innerWidth < 768 ? lastWidth : Math.min(1400, window.innerWidth * 0.94));
-            const scaleY = first.height / (window.innerWidth < 768 ? lastHeight : window.innerHeight * 0.82);
-            
-            const firstCenterX = first.left + first.width / 2;
-            const firstCenterY = first.top + first.height / 2;
-            const deltaX = firstCenterX - window.innerWidth / 2;
-            const deltaY = firstCenterY - window.innerHeight / 2;
-
-            fromProps = {
-              scaleX: scaleX,
-              scaleY: scaleY,
-              x: deltaX,
-              y: deltaY,
-              opacity: 0.8,
-              z: 0,
-              filter: "blur(5px)",
-              borderRadius: "1rem",
-              transformOrigin: "center center",
-            };
-          } catch (_) {}
-        }
-
         tl
           // Phase 2: Screen reveals with a "Window" effect
           .fromTo(
             screenRef.current,
-            fromProps,
+            {
+              scale: 0.05,
+              opacity: 0,
+              z: -1500,
+              filter: "blur(30px)",
+              borderRadius: "50rem",
+            },
             {
               scale: 1,
-              scaleX: 1,
-              scaleY: 1,
-              x: 0,
-              y: 0,
               opacity: 1,
               z: 0,
               filter: "blur(0px)",
@@ -667,41 +612,16 @@ export function ProjectHero({
           );
       }
 
-      // 2. Initial title entrance animation & Idle floating
+      // 2. Idle floating
       if (titleRef.current) {
-        gsap.fromTo(
-          titleRef.current,
-          {
-            opacity: 0,
-            y: 70,
-            scale: 0.92,
-            filter: "blur(20px)",
-            rotationX: 18,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: "blur(0px)",
-            rotationX: 0,
-            duration: 1.8,
-            ease: "power4.out",
-            force3D: true,
-            clearProps: "transform,filter,opacity",
-            onComplete: () => {
-              if (titleRef.current) {
-                gsap.to(titleRef.current, {
-                  y: "+=12",
-                  duration: 4,
-                  repeat: -1,
-                  yoyo: true,
-                  ease: "sine.inOut",
-                  force3D: true,
-                });
-              }
-            },
-          }
-        );
+        gsap.to(titleRef.current, {
+          y: "+=12",
+          duration: 4,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          force3D: true,
+        });
       }
 
       const title = titleRef.current;
@@ -1008,7 +928,7 @@ export function ProjectHero({
             onClick={() => canInteract && setIsInteracting(true)}
           >
             {canInteract && !isInteracting && (
-              <div className={`w-full flex flex-col items-center justify-center ${motionEnabled ? "animate-in fade-in duration-700" : ""}`}>
+              <div className={motionEnabled ? "animate-in fade-in duration-700" : ""}>
                 {/* Desktop/Tablet CTA (md+) */}
                 <div className="hidden md:flex flex-col items-center gap-6">
                   <div
@@ -1049,8 +969,8 @@ export function ProjectHero({
                       <path d="M7 11c0-1.657 1.343-3 3-3h0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     {/* Ripple / tactile ping */}
-                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white/8 opacity-60" aria-hidden />
-                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full border border-white/10" aria-hidden />
+                    <span className="absolute -bottom-2 w-10 h-10 rounded-full bg-white/8 opacity-60" aria-hidden />
+                    <span className="absolute -bottom-2 w-10 h-10 rounded-full border border-white/10" aria-hidden />
                     {/* Sheen layer (animated with GSAP) */}
                     <div ref={sheenRef} className="absolute left-[-60%] top-0 h-full w-[60%] rounded-full opacity-20 pointer-events-none" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02))', transform: 'skewX(-15deg)' }} />
                   </button>
@@ -1315,47 +1235,24 @@ export function ProjectHero({
         {!disableStudio && motionEnabled && (
           <div
               ref={scrollProgressRef}
-              className="absolute left-1/2 z-[40] flex flex-col items-center pointer-events-none px-5 py-4 rounded-2xl bg-black/60 backdrop-blur-xl border shadow-2xl overflow-hidden"
-              style={{
-                opacity: 1,
-                width: "min(88vw, 340px)",
-                bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)",
-                transform: "translate3d(-50%, 0, 0) scale(1)",
-                borderColor: `${accent}35`,
-                boxShadow: `0 0 25px ${accent}25, 0 10px 40px rgba(0,0,0,0.6)`,
-                transition: "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s ease, box-shadow 0.6s ease",
-              }}
+              className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 px-4 py-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+              style={{ opacity: 1, width: "min(88vw, 340px)", bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)" }}
             >
-            <style dangerouslySetInnerHTML={{__html: `
-              @keyframes scrollDotCustom {
-                0% { transform: translateY(0); opacity: 0; }
-                20% { opacity: 1; }
-                65% { transform: translateY(8px); opacity: 0; }
-                100% { transform: translateY(8px); opacity: 0; }
-              }
-            `}} />
-
             {/* Layout 1: Default hint before scroll */}
             <div
               ref={scrollHintDefaultRef}
-              className="flex flex-col items-center gap-2.5 transition-all duration-500 ease-out"
-              style={{ transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)" }}
+              className="flex flex-col items-center gap-3"
             >
-              <div className="w-[16px] h-[26px] rounded-full border border-white/40 flex justify-center p-[3px] relative overflow-hidden" aria-hidden="true" style={{ borderColor: `${accent}60` }}>
-                <div className="w-[2.5px] h-[5px] bg-white rounded-full" style={{
-                  animation: "scrollDotCustom 2s cubic-bezier(0.65, 0, 0.35, 1) infinite"
-                }} />
-              </div>
               <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/50">
                 {s.deepScroll}
               </p>
+              <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent animate-pulse" />
             </div>
 
             {/* Layout 2: Progress telemetry during scroll */}
             <div
               ref={scrollHintProgressRef}
-              className="flex flex-col items-center gap-2 w-full transition-all duration-500 ease-out opacity-0 absolute pointer-events-none scale-95"
-              style={{ transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)" }}
+              className="hidden md:flex flex-col items-center gap-2 w-full"
             >
               <div className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/70" role="status" aria-live="polite">
                 <span>{s.initializing}</span>
@@ -1370,7 +1267,7 @@ export function ProjectHero({
               </div>
               <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">
                 <span className="truncate" style={{ textShadow: `0 6px 30px ${accent}40` }}>{s.keepScrolling}</span>
-                <span ref={chevronRef} className="inline-block animate-bounce font-sans text-xs animate-pulse" aria-hidden style={{ color: accent }}>
+                <span ref={chevronRef} className="inline-block animate-bounce font-sans text-xs" aria-hidden>
                   ↓
                 </span>
               </span>

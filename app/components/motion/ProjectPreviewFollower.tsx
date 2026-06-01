@@ -27,23 +27,30 @@ export function ProjectPreviewFollower({
     const inner = innerRef.current;
     if (!container || !inner) return;
 
-    const moveX = gsap.quickTo(container, "x", {
-      duration: 1,
+    const getConfig = () => {
+      const win = typeof window !== "undefined" ? (window as any) : null;
+      return win?.__PARTICLE_CONFIG || { followerDuration: 0.12 };
+    };
+
+    let cfg = getConfig();
+
+    let moveX = gsap.quickTo(container, "x", {
+      duration: cfg.followerDuration,
       ease: "power3.out",
       overwrite: "auto",
     });
-    const moveY = gsap.quickTo(container, "y", {
-      duration: 1,
+    let moveY = gsap.quickTo(container, "y", {
+      duration: cfg.followerDuration,
       ease: "power3.out",
       overwrite: "auto",
     });
     const tiltZ = gsap.quickTo(inner, "rotateZ", {
-      duration: 0.4,
+      duration: 0.18,
       ease: "power2.out",
       overwrite: "auto",
     });
     const skewX = gsap.quickTo(inner, "skewX", {
-      duration: 0.4,
+      duration: 0.18,
       ease: "power2.out",
       overwrite: "auto",
     });
@@ -55,45 +62,78 @@ export function ProjectPreviewFollower({
         moveX(e.clientX);
         moveY(e.clientY);
 
-        // Add a slight tilt based on velocity/direction
         const dx = e.movementX || 0;
-        tiltZ(dx * 0.5);
-        skewX(dx * 0.2);
+        tiltZ(dx * 0.28);
+        skewX(dx * 0.12);
       }
     };
 
+    const handleConfigUpdate = () => {
+      cfg = getConfig();
+      moveX = gsap.quickTo(container, "x", {
+        duration: cfg.followerDuration,
+        ease: "power3.out",
+        overwrite: "auto",
+      });
+      moveY = gsap.quickTo(container, "y", {
+        duration: cfg.followerDuration,
+        ease: "power3.out",
+        overwrite: "auto",
+      });
+    };
+
     window.addEventListener("mousemove", onMouseMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMouseMove);
+    window.addEventListener("portfolio-config-update", handleConfigUpdate);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("portfolio-config-update", handleConfigUpdate);
+    };
   }, [isVisible, motionEnabled]);
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const getConfig = () => {
+      const win = typeof window !== "undefined" ? (window as any) : null;
+      return win?.__PARTICLE_CONFIG || { followerScale: 0.88 };
+    };
+
+    const cfg = getConfig();
+    const scaleVal = cfg.followerScale;
+    const startScale = scaleVal - 0.16;
+
     if (activeProject) {
       setIsVisible(true);
-      if (containerRef.current) {
-        gsap.to(containerRef.current, {
-          scale: 1,
-          opacity: 1,
-          duration: 0.4,
-          ease: "back.out(1.7)",
-        });
-      }
+      container.animate(
+        [
+          { opacity: 0, transform: `scale(${startScale})` },
+          { opacity: 1, transform: `scale(${scaleVal})` },
+        ],
+        {
+          duration: 160,
+          easing: "cubic-bezier(0.2, 0.9, 0.2, 1)",
+          fill: "forwards",
+        },
+      );
     } else {
-      if (containerRef.current) {
-        gsap.to(containerRef.current, {
-          scale: 0.5,
-          opacity: 0,
-          duration: 0.3,
-          ease: "power2.in",
-          onComplete: () => setIsVisible(false),
-        });
-      } else {
-        setIsVisible(false);
-      }
+      const animation = container.animate(
+        [
+          { opacity: 1, transform: `scale(${scaleVal})` },
+          { opacity: 0, transform: `scale(${startScale})` },
+        ],
+        {
+          duration: 120,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "forwards",
+        },
+      );
+      animation.onfinish = () => setIsVisible(false);
     }
   }, [activeProject]);
 
   if (!motionEnabled) return null;
-
   if (!isVisible && !activeProject) return null;
 
   return (
@@ -102,25 +142,23 @@ export function ProjectPreviewFollower({
       id="project-preview-follower"
       className="fixed top-0 left-0 z-[30] pointer-events-none will-change-transform flex items-center justify-center"
       style={{
-        width: "280px",
-        height: "180px",
-        marginLeft: "-140px",
-        marginTop: "-220px",
+        width: "240px",
+        height: "150px",
+        marginLeft: "-120px",
+        marginTop: "-180px",
         opacity: 0,
-        transform: "scale(0.5)",
+        transform: "scale(0.72)",
       }}
     >
       <div
         ref={innerRef}
-        className="w-full h-full rounded-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.4)] border border-white/20 relative liquid-distort-scroll"
+        className="w-full h-full rounded-2xl overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.34)] border border-white/20 relative"
         style={{
           backgroundColor: activeProject?.color || "#000",
         }}
       >
-        {/* Decorative elements to make it look "techy" */}
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_transparent_0%,_black_100%)]" />
 
-        {/* Actual Video Preview */}
         {activeProject && (
           <video
             src={`/projects/${activeProject.name}.webm`}
@@ -161,7 +199,6 @@ export function ProjectPreviewFollower({
           </div>
         </div>
 
-        {/* Digital HUD Elements */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">
           <div className="w-8 h-[1px] bg-white/30" />
           <div className="w-4 h-[1px] bg-white/30" />
@@ -171,7 +208,6 @@ export function ProjectPreviewFollower({
           <div className="w-8 h-[1px] bg-white/30" />
         </div>
 
-        {/* Floating geometric lines */}
         <svg className="absolute inset-0 w-full h-full opacity-20">
           <line
             x1="0"

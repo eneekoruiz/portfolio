@@ -30,6 +30,53 @@ import {
 
 export type IntroPhase = "checking" | "loading" | "splash" | "ready";
 
+// Lightweight WAAPI fallback polyfill for older browsers (prevents animation failures)
+if (
+  typeof window !== "undefined" &&
+  typeof Element !== "undefined" &&
+  !Element.prototype.animate
+) {
+  Element.prototype.animate = function (
+    keyframes: any,
+    options: any,
+  ): any {
+    const el = this as HTMLElement;
+    const finalFrame = Array.isArray(keyframes)
+      ? keyframes[keyframes.length - 1]
+      : keyframes;
+
+    if (finalFrame) {
+      Object.keys(finalFrame).forEach((prop) => {
+        try {
+          const val = finalFrame[prop];
+          (el.style as any)[prop] = val;
+        } catch (e) {}
+      });
+    }
+
+    const mockAnimation = {
+      play: () => {},
+      pause: () => {},
+      cancel: () => {},
+      finish: () => {},
+      onfinish: null as any,
+    };
+
+    const duration =
+      typeof options === "number"
+        ? options
+        : options?.duration || 0;
+
+    setTimeout(() => {
+      if (typeof mockAnimation.onfinish === "function") {
+        mockAnimation.onfinish();
+      }
+    }, duration);
+
+    return mockAnimation;
+  };
+}
+
 interface IntroContextValue {
   phase: IntroPhase;
   setPhase: (phase: IntroPhase) => void;
