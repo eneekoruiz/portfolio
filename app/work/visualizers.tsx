@@ -250,20 +250,14 @@ export const DNAHelix = ({
             }
           }
 
-          // Soft ambient aura (Wide, low opacity)
-          ctx.lineWidth = 38;
+          // Subtle ambient glow (finer, premium blur aura)
+          ctx.lineWidth = 6;
           ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
-          ctx.globalAlpha = 0.35;
-          ctx.stroke();
-
-          // Focused core glow
-          ctx.lineWidth = 14;
-          ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
-          ctx.globalAlpha = 0.7;
+          ctx.globalAlpha = 0.32;
           ctx.stroke();
         }
 
-        // Draw Main/Core Line (Thin, elegant, vibrant)
+        // Draw Main/Core Line (Thin, elegant, high-precision)
         ctx.beginPath();
         if (pointsArray.length > 0) {
           ctx.moveTo(pointsArray[0].x, pointsArray[0].y);
@@ -272,7 +266,7 @@ export const DNAHelix = ({
           }
         }
 
-        ctx.lineWidth = darkMode ? 4 : 5;
+        ctx.lineWidth = 1.6;
         ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
         ctx.globalAlpha = 1.0;
         ctx.stroke();
@@ -295,30 +289,31 @@ export const DNAHelix = ({
           ctx.beginPath();
           ctx.moveTo(pt1.x, pt1.y);
           ctx.lineTo(pt2.x, pt2.y);
-          ctx.strokeStyle = darkMode ? "#eeeeee" : secondaryColor;
-          ctx.globalAlpha = ((darkMode ? 0.55 : 0.28) * (z1 + z2 + 2)) / 2;
-          ctx.lineWidth = darkMode ? 2.5 : 2;
+          ctx.strokeStyle = darkMode ? "#ffffff" : secondaryColor;
+          ctx.globalAlpha = ((darkMode ? 0.16 : 0.08) * (z1 + z2 + 2)) / 2;
+          ctx.lineWidth = 0.8;
           ctx.stroke();
         }
 
-        // Optimized Inline Node Rendering (Prevents function creation overhead inside frame loop)
-        const size1 = 4 + (z1 + 1) * 4;
+        // Highly refined Node rendering (Smaller, glossy and discrete)
+        const size1 = 2.0 + (z1 + 1) * 2.2;
         
-        // Node 1
+        // Node 1 Glow
         if (darkMode && !isLite) {
-          ctx.globalAlpha = 0.75;
+          ctx.globalAlpha = 0.22;
           ctx.beginPath();
-          ctx.arc(pt1.x, pt1.y, size1 * 2.8, 0, Math.PI * 2);
+          ctx.arc(pt1.x, pt1.y, size1 * 1.6, 0, Math.PI * 2);
           ctx.fillStyle = accentColor;
           ctx.fill();
         } else if (!darkMode && !isLite) {
-          ctx.globalAlpha = 0.15;
+          ctx.globalAlpha = 0.08;
           ctx.beginPath();
-          ctx.arc(pt1.x, pt1.y, size1 * 2.8, 0, Math.PI * 2);
+          ctx.arc(pt1.x, pt1.y, size1 * 1.6, 0, Math.PI * 2);
           ctx.fillStyle = accentColor;
           ctx.fill();
         }
 
+        // Node 1 Core
         ctx.globalAlpha = 1.0;
         ctx.beginPath();
         ctx.arc(pt1.x, pt1.y, size1, 0, Math.PI * 2);
@@ -328,27 +323,28 @@ export const DNAHelix = ({
         if (darkMode) {
           ctx.beginPath();
           ctx.arc(pt1.x, pt1.y, size1, 0, Math.PI * 2);
-          ctx.lineWidth = 2.0;
+          ctx.lineWidth = 1.0;
           ctx.strokeStyle = accentColor;
           ctx.stroke();
         }
 
-        // Node 2
-        const size2 = 4 + (z2 + 1) * 4;
+        // Node 2 Glow
+        const size2 = 2.0 + (z2 + 1) * 2.2;
         if (darkMode && !isLite) {
-          ctx.globalAlpha = 0.75;
+          ctx.globalAlpha = 0.22;
           ctx.beginPath();
-          ctx.arc(pt2.x, pt2.y, size2 * 2.8, 0, Math.PI * 2);
+          ctx.arc(pt2.x, pt2.y, size2 * 1.6, 0, Math.PI * 2);
           ctx.fillStyle = secondaryColor;
           ctx.fill();
         } else if (!darkMode && !isLite) {
-          ctx.globalAlpha = 0.15;
+          ctx.globalAlpha = 0.08;
           ctx.beginPath();
-          ctx.arc(pt2.x, pt2.y, size2 * 2.8, 0, Math.PI * 2);
+          ctx.arc(pt2.x, pt2.y, size2 * 1.6, 0, Math.PI * 2);
           ctx.fillStyle = secondaryColor;
           ctx.fill();
         }
 
+        // Node 2 Core
         ctx.globalAlpha = 1.0;
         ctx.beginPath();
         ctx.arc(pt2.x, pt2.y, size2, 0, Math.PI * 2);
@@ -358,7 +354,7 @@ export const DNAHelix = ({
         if (darkMode) {
           ctx.beginPath();
           ctx.arc(pt2.x, pt2.y, size2, 0, Math.PI * 2);
-          ctx.lineWidth = 2.0;
+          ctx.lineWidth = 1.0;
           ctx.strokeStyle = secondaryColor;
           ctx.stroke();
         }

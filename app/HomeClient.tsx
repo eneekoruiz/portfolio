@@ -173,7 +173,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {(phase === "loading" || phase === "splash") && (
+      {(phase === "loading" || phase === "splash" || phase === "checking") && (
         <>
           <IdentitySplash
             lang={lang}
@@ -181,7 +181,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
             onReveal={() => {}}
             active={phase === "splash"}
           />
-          {phase === "loading" && <Preloader onDone={onPreloaderDone} />}
+          {(phase === "loading" || phase === "checking") && <Preloader onDone={onPreloaderDone} />}
         </>
       )}
 
