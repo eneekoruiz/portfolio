@@ -416,6 +416,9 @@ export function ProjectHero({
   const scrollHintDefaultRef = useRef<HTMLDivElement>(null);
   const scrollHintProgressRef = useRef<HTMLDivElement>(null);
   const chevronRef = useRef<HTMLSpanElement>(null);
+  const mobileCtaRef = useRef<HTMLButtonElement>(null);
+  const sheenRef = useRef<HTMLDivElement>(null);
+  const [mobilePressed, setMobilePressed] = useState(false);
 
   const [isInteracting, setIsInteracting] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -809,6 +812,30 @@ export function ProjectHero({
     );
   }, { dependencies: [motionEnabled] });
 
+  // Mobile CTA sheen animation (subtle). Respect reduced-motion preferences.
+  useGSAP(() => {
+    if (!mobileCtaRef.current || !sheenRef.current || !motionEnabled) return;
+
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReduced) return;
+
+    const anim = gsap.to(sheenRef.current, {
+      x: '160%',
+      duration: 1.4,
+      repeat: -1,
+      ease: 'power1.inOut',
+      repeatDelay: 1.2,
+      yoyo: false,
+      overwrite: 'auto',
+    });
+
+    return () => anim.kill();
+  }, { dependencies: [motionEnabled] });
+
   const renderScreenContents = () => {
     return (
       <>
@@ -924,7 +951,16 @@ export function ProjectHero({
 
                 {/* Mobile tactile CTA (sm) — more artistic and realistic */}
                 <div className="md:hidden flex flex-col items-center gap-4">
-                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-white/6 to-transparent border border-white/10 flex items-center justify-center shadow-[0_18px_60px_rgba(0,0,0,0.6)] overflow-visible">
+                  <button
+                    ref={mobileCtaRef}
+                    type="button"
+                    aria-label={s.enterStudio}
+                    onClick={() => canInteract && setIsInteracting(true)}
+                    onPointerDown={() => setMobilePressed(true)}
+                    onPointerUp={() => setMobilePressed(false)}
+                    onPointerCancel={() => setMobilePressed(false)}
+                    className={`relative w-20 h-20 rounded-full bg-gradient-to-br from-white/6 to-transparent border border-white/10 flex items-center justify-center shadow-[0_18px_60px_rgba(0,0,0,0.6)] overflow-visible transition-transform duration-150 ease-out ${mobilePressed ? 'scale-95 translate-y-0.5' : 'scale-100'}`}
+                  >
                     <div className="absolute inset-0 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_40%)] blur-sm" />
                     {/* Finger icon */}
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 text-white/90">
@@ -933,9 +969,11 @@ export function ProjectHero({
                       <path d="M7 11c0-1.657 1.343-3 3-3h0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     {/* Ripple / tactile ping */}
-                    <span className="absolute -bottom-2 w-8 h-8 rounded-full bg-white/8 animate-ping opacity-60" aria-hidden />
-                    <span className="absolute -bottom-2 w-8 h-8 rounded-full border border-white/10" aria-hidden />
-                  </div>
+                    <span className="absolute -bottom-2 w-10 h-10 rounded-full bg-white/8 opacity-60" aria-hidden />
+                    <span className="absolute -bottom-2 w-10 h-10 rounded-full border border-white/10" aria-hidden />
+                    {/* Sheen layer (animated with GSAP) */}
+                    <div ref={sheenRef} className="absolute left-[-60%] top-0 h-full w-[60%] rounded-full opacity-20 pointer-events-none" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02))', transform: 'skewX(-15deg)' }} />
+                  </button>
 
                   <div className="flex flex-col items-center gap-1 text-center px-4">
                     <span className="font-mono text-[12px] font-black uppercase tracking-[0.2em] text-white">
