@@ -63,9 +63,10 @@ export function createLiquidCurtain(opts: LiquidCurtainOptions): SVGSVGElement {
 
   Object.assign(svg.style, {
     position: "fixed",
-    inset: "0",
-    width: "100vw",
-    height: "100vh",
+    top: "-10dvh",
+    left: "-5vw",
+    width: "110vw",
+    height: "120dvh",
     zIndex: "99999",
     pointerEvents: "all",
   });

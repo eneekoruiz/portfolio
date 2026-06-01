@@ -163,7 +163,12 @@ export function PremiumWorkRow({
     animateLiquidCurtainIn(svg, {
       duration: 1.0,
       onMidway: () => {
-        router.push(targetRoute);
+        if (typeof window !== "undefined") {
+          window.scrollTo(0, 0);
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        }
+        router.push(targetRoute, { scroll: false });
         setIsNavigating(false);
       },
       onComplete: () => {
