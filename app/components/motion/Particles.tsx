@@ -3,8 +3,15 @@
 import { useEffect, useRef } from "react";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
-const getAdaptivePixelRatio = () =>
-  Math.min(window.devicePixelRatio || 1, 1.5);
+const getAdaptivePixelRatio = () => {
+  if (typeof window !== "undefined") {
+    const LITE =
+      !!window.__LITE ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (LITE) return 1.0;
+  }
+  return Math.min(window.devicePixelRatio || 1, 1.5);
+};
 
 export function NetworkParticles() {
   const cvRef = useRef<HTMLCanvasElement>(null);
@@ -18,11 +25,17 @@ export function NetworkParticles() {
       raf = 0;
     let paused = false;
 
+    // Detect lightweight mode
+    const LITE =
+      typeof window !== "undefined" &&
+      (!!window.__LITE ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
     // x, y, velocity x, velocity y, radius
     type Pt = { x: number; y: number; vx: number; vy: number; r: number };
     const pts: Pt[] = [];
 
-    const NUM_PTS = 140;
+    const NUM_PTS = LITE ? 55 : 130;
     const mouse = { x: -999, y: -999 };
 
     const resize = () => {
@@ -117,8 +130,10 @@ export function NetworkParticles() {
       const mouseDist = 220; // Ratón atrae desde más lejos
       const maxDistSq = maxDist * maxDist;
       const mouseDistSq = mouseDist * mouseDist;
+      const len = pts.length;
 
-      pts.forEach((p, i) => {
+      for (let i = 0; i < len; i++) {
+        const p = pts[i];
         p.x += p.vx;
         p.y += p.vy;
 
@@ -132,7 +147,7 @@ export function NetworkParticles() {
         ctx.fill();
 
         // Conectar con otros puntos
-        for (let j = i + 1; j < pts.length; j++) {
+        for (let j = i + 1; j < len; j++) {
           const p2 = pts[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
@@ -179,7 +194,7 @@ export function NetworkParticles() {
             }
           }
         }
-      });
+      }
 
       raf = requestAnimationFrame(loop);
     };

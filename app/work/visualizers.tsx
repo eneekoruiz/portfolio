@@ -4,8 +4,15 @@ import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { Database, Server, Radar, CheckCircle2, Layers } from "lucide-react";
 
-const getAdaptivePixelRatio = () =>
-  Math.min(window.devicePixelRatio || 1, 1.5);
+const getAdaptivePixelRatio = () => {
+  if (typeof window !== "undefined") {
+    const LITE =
+      !!window.__LITE ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (LITE) return 1.0;
+  }
+  return Math.min(window.devicePixelRatio || 1, 1.5);
+};
 
 // ── DNAHelix ──────────────────────────────────────────────────────────────────
 
@@ -28,7 +35,12 @@ export const DNAHelix = ({
   const colorsRef = useRef({ accent, secondary });
   const motionEnabledRef = useRef(true);
   const pausedRef = useRef(paused);
-  const strandPointsRef = useRef([
+  
+  // Use LITE check to decide structure dynamically
+  const isLite = typeof window !== "undefined" && (!!window.__LITE || window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const steps = isLite ? 36 : 60;
+
+  const strandPointsRef = useRef<[{x: number; y: number}[], {x: number; y: number}[]]>([
     Array.from({ length: 61 }, () => ({ x: 0, y: 0 })),
     Array.from({ length: 61 }, () => ({ x: 0, y: 0 })),
   ]);
@@ -120,7 +132,6 @@ export const DNAHelix = ({
 
       ctx.clearRect(0, 0, w, h);
 
-      const steps = 60;
       const baseSpeed = 0.012;
 
       // Calculate scroll velocity
@@ -128,8 +139,8 @@ export const DNAHelix = ({
       const scrollVelocity = Math.abs(
         currentScroll -
           (canvas.dataset.lastScroll
-            ? parseFloat(canvas.dataset.lastScroll)
-            : currentScroll),
+             ? parseFloat(canvas.dataset.lastScroll)
+             : currentScroll),
       );
       canvas.dataset.lastScroll = currentScroll.toString();
 
@@ -142,7 +153,9 @@ export const DNAHelix = ({
       let minDistanceSq = 99999999;
       const baseRotation = rotationRef.current;
 
-      for (let i = 0; i <= steps; i += 2) {
+      // Loop increment: larger step size on LITE to scan faster
+      const stepInc = isLite ? 4 : 2;
+      for (let i = 0; i <= steps; i += stepInc) {
         const progress = i / steps;
         const y = progress * h;
         const angle = progress * Math.PI * 4 + baseRotation;
@@ -225,13 +238,17 @@ export const DNAHelix = ({
       }
 
       for (let s = 0; s < 2; s++) {
-        // Draw Glow Line (Only in Dark Mode for that beautiful outer neon glow)
-        if (darkMode) {
+        const pointsArray = strandPoints[s];
+        
+        // Draw Glow Line (Only in Dark Mode for that beautiful outer neon glow, skip heaviest layers in LITE mode)
+        if (darkMode && !isLite) {
           ctx.beginPath();
-          strandPoints[s].forEach((pt, idx) => {
-            if (idx === 0) ctx.moveTo(pt.x, pt.y);
-            else ctx.lineTo(pt.x, pt.y);
-          });
+          if (pointsArray.length > 0) {
+            ctx.moveTo(pointsArray[0].x, pointsArray[0].y);
+            for (let idx = 1; idx <= steps; idx++) {
+              ctx.lineTo(pointsArray[idx].x, pointsArray[idx].y);
+            }
+          }
 
           // Soft ambient aura (Wide, low opacity)
           ctx.lineWidth = 38;
@@ -248,19 +265,22 @@ export const DNAHelix = ({
 
         // Draw Main/Core Line (Thin, elegant, vibrant)
         ctx.beginPath();
-        strandPoints[s].forEach((pt, idx) => {
-          if (idx === 0) ctx.moveTo(pt.x, pt.y);
-          else ctx.lineTo(pt.x, pt.y);
-        });
+        if (pointsArray.length > 0) {
+          ctx.moveTo(pointsArray[0].x, pointsArray[0].y);
+          for (let idx = 1; idx <= steps; idx++) {
+            ctx.lineTo(pointsArray[idx].x, pointsArray[idx].y);
+          }
+        }
 
         ctx.lineWidth = darkMode ? 4 : 5;
-        // In dark mode, use the pure accent color to make it vibrant but classic
         ctx.strokeStyle = s === 0 ? accentColor : secondaryColor;
         ctx.globalAlpha = 1.0;
         ctx.stroke();
       }
 
       // Draw Crossbars and Nodes using physical coordinates
+      // Optimization: Increment by 3 or 4 if lightweight mode to draw fewer bars
+      const crossbarStep = isLite ? 4 : 3;
       for (let i = 0; i <= steps; i++) {
         const progress = i / steps;
         const angle = progress * Math.PI * 4 + activeRotation;
@@ -271,7 +291,7 @@ export const DNAHelix = ({
         const z1 = Math.sin(angle);
         const z2 = Math.sin(angle + Math.PI);
 
-        if (i % 3 === 0) {
+        if (i % crossbarStep === 0) {
           ctx.beginPath();
           ctx.moveTo(pt1.x, pt1.y);
           ctx.lineTo(pt2.x, pt2.y);
@@ -281,41 +301,67 @@ export const DNAHelix = ({
           ctx.stroke();
         }
 
-        const drawNode = (
-          rx: number,
-          ry: number,
-          z: number,
-          isSecondaryStrand: boolean,
-        ) => {
-          const size = 4 + (z + 1) * 4;
-          const nodeColor = isSecondaryStrand ? secondaryColor : accentColor;
-
-          // Outer Glow
-          ctx.globalAlpha = darkMode ? 0.75 : 0.15;
+        // Optimized Inline Node Rendering (Prevents function creation overhead inside frame loop)
+        const size1 = 4 + (z1 + 1) * 4;
+        
+        // Node 1
+        if (darkMode && !isLite) {
+          ctx.globalAlpha = 0.75;
           ctx.beginPath();
-          ctx.arc(rx, ry, size * 2.8, 0, Math.PI * 2);
-          ctx.fillStyle = nodeColor;
+          ctx.arc(pt1.x, pt1.y, size1 * 2.8, 0, Math.PI * 2);
+          ctx.fillStyle = accentColor;
           ctx.fill();
-
-          // Solid Core
-          ctx.globalAlpha = 1.0;
+        } else if (!darkMode && !isLite) {
+          ctx.globalAlpha = 0.15;
           ctx.beginPath();
-          ctx.arc(rx, ry, size, 0, Math.PI * 2);
-          ctx.fillStyle = darkMode ? "#ffffff" : nodeColor;
+          ctx.arc(pt1.x, pt1.y, size1 * 2.8, 0, Math.PI * 2);
+          ctx.fillStyle = accentColor;
           ctx.fill();
+        }
 
-          // Outermost brand stroke for styling in dark mode
-          if (darkMode) {
-            ctx.beginPath();
-            ctx.arc(rx, ry, size, 0, Math.PI * 2);
-            ctx.lineWidth = 2.0;
-            ctx.strokeStyle = nodeColor;
-            ctx.stroke();
-          }
-        };
+        ctx.globalAlpha = 1.0;
+        ctx.beginPath();
+        ctx.arc(pt1.x, pt1.y, size1, 0, Math.PI * 2);
+        ctx.fillStyle = darkMode ? "#ffffff" : accentColor;
+        ctx.fill();
 
-        drawNode(pt1.x, pt1.y, z1, false); // Strand A
-        drawNode(pt2.x, pt2.y, z2, true); // Strand B
+        if (darkMode) {
+          ctx.beginPath();
+          ctx.arc(pt1.x, pt1.y, size1, 0, Math.PI * 2);
+          ctx.lineWidth = 2.0;
+          ctx.strokeStyle = accentColor;
+          ctx.stroke();
+        }
+
+        // Node 2
+        const size2 = 4 + (z2 + 1) * 4;
+        if (darkMode && !isLite) {
+          ctx.globalAlpha = 0.75;
+          ctx.beginPath();
+          ctx.arc(pt2.x, pt2.y, size2 * 2.8, 0, Math.PI * 2);
+          ctx.fillStyle = secondaryColor;
+          ctx.fill();
+        } else if (!darkMode && !isLite) {
+          ctx.globalAlpha = 0.15;
+          ctx.beginPath();
+          ctx.arc(pt2.x, pt2.y, size2 * 2.8, 0, Math.PI * 2);
+          ctx.fillStyle = secondaryColor;
+          ctx.fill();
+        }
+
+        ctx.globalAlpha = 1.0;
+        ctx.beginPath();
+        ctx.arc(pt2.x, pt2.y, size2, 0, Math.PI * 2);
+        ctx.fillStyle = darkMode ? "#ffffff" : secondaryColor;
+        ctx.fill();
+
+        if (darkMode) {
+          ctx.beginPath();
+          ctx.arc(pt2.x, pt2.y, size2, 0, Math.PI * 2);
+          ctx.lineWidth = 2.0;
+          ctx.strokeStyle = secondaryColor;
+          ctx.stroke();
+        }
       }
 
       frame = requestAnimationFrame(draw);
@@ -363,6 +409,11 @@ export const TerrainMesh = ({
   const animRef = useRef<number>(undefined);
   const tRef = useRef(0);
   const activeRef = useRef(false);
+  
+  const isLite = typeof window !== "undefined" && (!!window.__LITE || window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const rows = isLite ? 8 : 12;
+  const cols = isLite ? 12 : 20;
+
   const pointsRef = useRef<{ x: number; y: number }[]>(
     Array.from({ length: (12 + 1) * (20 + 1) }, () => ({ x: 0, y: 0 })),
   );
@@ -390,8 +441,6 @@ export const TerrainMesh = ({
       ctx.clearRect(0, 0, W, H);
       tRef.current += 0.0035;
 
-      const rows = 12;
-      const cols = 20;
       const points = pointsRef.current;
       let pointIndex = 0;
 
@@ -429,16 +478,18 @@ export const TerrainMesh = ({
       }
 
       // Draw Pulsing Intersections
+      const totalPoints = (rows + 1) * (cols + 1);
       ctx.globalAlpha = darkMode ? 0.15 : 0.08;
-      points.forEach((p, i) => {
+      for (let i = 0; i < totalPoints; i++) {
         if (i % 7 === 0) {
+          const p = points[i];
           const pulse = (Math.sin(tRef.current * 3 + i) + 1) * 0.5;
           ctx.beginPath();
           ctx.arc(p.x, p.y, 1.2 + pulse * 1.5, 0, Math.PI * 2);
           ctx.fillStyle = accent;
           ctx.fill();
         }
-      });
+      }
 
       animRef.current = requestAnimationFrame(draw);
     };
@@ -633,10 +684,11 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
       const nodes = nodesRef.current;
 
       // Update nodes positions directly (no React state updates to trigger re-renders!)
-      nodes.forEach((n) => {
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
         n.x = (n.x + n.vx + 300) % 300;
         n.y = (n.y + n.vy + 200) % 200;
-      });
+      }
 
       // Draw connections using squared distance to avoid Math.sqrt in hot path
       ctx.lineWidth = 0.5;
@@ -656,12 +708,13 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
       }
 
       // Draw nodes
-      nodes.forEach((n) => {
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
         ctx.beginPath();
         ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = accent;
         ctx.fill();
-      });
+      }
 
       raf = requestAnimationFrame(draw);
     };

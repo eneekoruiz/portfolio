@@ -107,8 +107,39 @@ export default function LabPage() {
       !!window.__LITE ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const localN = LITE ? Math.max(400, Math.floor(N * 0.22)) : N;
+    let localN = LITE ? Math.max(400, Math.floor(N * 0.22)) : N;
     setParticles(localN);
+
+    // Create offscreen cached canvases for particle sprites
+    const createParticleSprite = (hue: number) => {
+      const spriteCv = document.createElement("canvas");
+      const diameter = 32; // size in pixels
+      spriteCv.width = diameter;
+      spriteCv.height = diameter;
+      const sCtx = spriteCv.getContext("2d")!;
+      const center = diameter / 2;
+      const grad = sCtx.createRadialGradient(center, center, 0, center, center, center);
+      if (hue === 0) { // White core
+        grad.addColorStop(0, "rgba(255, 255, 255, 1.0)");
+        grad.addColorStop(0.3, "rgba(255, 255, 255, 0.8)");
+        grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+      } else if (hue === 189) { // Cyan
+        grad.addColorStop(0, "rgba(0, 240, 255, 1.0)");
+        grad.addColorStop(0.3, "rgba(0, 200, 255, 0.8)");
+        grad.addColorStop(1, "rgba(0, 180, 255, 0)");
+      } else { // Blue
+        grad.addColorStop(0, "rgba(0, 102, 255, 1.0)");
+        grad.addColorStop(0.3, "rgba(0, 70, 255, 0.7)");
+        grad.addColorStop(1, "rgba(0, 50, 255, 0)");
+      }
+      sCtx.fillStyle = grad;
+      sCtx.fillRect(0, 0, diameter, diameter);
+      return spriteCv;
+    };
+
+    const whiteSprite = createParticleSprite(0);
+    const cyanSprite = createParticleSprite(189);
+    const blueSprite = createParticleSprite(220);
 
     let buf = initParticles(localN, W, H);
     let raf = 0,
@@ -143,9 +174,17 @@ export default function LabPage() {
 
       frames++;
       if (t - lastFpsT >= 1000) {
-        setFps(frames);
+        const currentFps = frames;
+        setFps(currentFps);
         frames = 0;
         lastFpsT = t;
+
+        // Dynamic load degradation: decrease particle count if frame rate drops
+        if (currentFps < 48 && localN > 600) {
+          localN = Math.max(600, localN - 400);
+          buf = initParticles(localN, W, H);
+          setParticles(localN);
+        }
       }
 
       const cx = W / 2,
@@ -213,22 +252,23 @@ export default function LabPage() {
         /* ── Draw ── */
         const depth = Math.min(1, r / (Math.min(W, H) * 0.45));
         const alpha = 0.25 + (1 - depth) * 0.7;
-        const bright = 45 + (1 - depth) * 40;
-        const sat = hue === 0 ? 0 : 80 + (1 - depth) * 15;
 
-        ctx.beginPath();
-        ctx.arc(px, py, size * 0.8, 0, TWO_PI);
-        ctx.fillStyle = `hsla(${hue},${sat}%,${bright}%,${alpha})`;
-        ctx.fill();
+        // Select pre-cached sprite canvas
+        const sprite = hue === 0 ? whiteSprite : hue === 189 ? cyanSprite : blueSprite;
+        const dSize = size * 1.6; // Scale factor
+
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(sprite, px - dSize/2, py - dSize/2, dSize, dSize);
 
         /* Bright core glow on innermost particles */
         if (r < 80 && size > 1.5) {
-          ctx.beginPath();
-          ctx.arc(px, py, size * 2, 0, TWO_PI);
-          ctx.fillStyle = `hsla(${hue},${sat}%,95%,0.08)`;
-          ctx.fill();
+          ctx.globalAlpha = 0.08;
+          ctx.drawImage(whiteSprite, px - dSize, py - dSize, dSize * 2, dSize * 2);
         }
       }
+      
+      // Restore alpha context setting
+      ctx.globalAlpha = 1.0;
 
       // Slight center glow (reduced in LITE mode to avoid extra work)
       if (!LITE) {
