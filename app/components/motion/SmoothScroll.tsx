@@ -26,7 +26,17 @@ export function SmoothScroll() {
     });
 
     window.__lenis = lenis;
-    lenis.on("scroll", ScrollTrigger.update);
+    const dispMap = document.getElementById("liquid-displacement-map");
+    const setDispScale = dispMap ? gsap.quickTo(dispMap, "scale", { duration: 0.4, ease: "power2.out" }) : null;
+
+    lenis.on("scroll", (e: any) => {
+      ScrollTrigger.update();
+      if (setDispScale) {
+        const vel = Math.abs(e.velocity || 0);
+        const dispScale = gsap.utils.clamp(0, 18, vel * 0.12);
+        setDispScale(dispScale);
+      }
+    });
 
     tickerFnRef.current = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tickerFnRef.current);

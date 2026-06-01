@@ -99,6 +99,7 @@ export function ProjectPreviewFollower({
   return (
     <div
       ref={containerRef}
+      id="project-preview-follower"
       className="fixed top-0 left-0 z-[30] pointer-events-none will-change-transform flex items-center justify-center"
       style={{
         width: "280px",
@@ -111,7 +112,7 @@ export function ProjectPreviewFollower({
     >
       <div
         ref={innerRef}
-        className="w-full h-full rounded-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.4)] border border-white/20 relative"
+        className="w-full h-full rounded-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.4)] border border-white/20 relative liquid-distort-scroll"
         style={{
           backgroundColor: activeProject?.color || "#000",
         }}

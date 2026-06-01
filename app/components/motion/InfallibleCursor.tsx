@@ -126,12 +126,43 @@ export function InfallibleCursor() {
         return;
       }
 
-      cx.current += (mx.current - cx.current) * 0.15;
-      cy.current += (my.current - cy.current) * 0.15;
+      let targetX = mx.current;
+      let targetY = my.current;
+      let skewXVal = 0;
+      let skewYVal = 0;
+
+      // Find hovered interactive elements for magnetic snapping
+      const hoveredEl = document.querySelector("a:hover, button:hover, [data-h]:hover, input:hover, select:hover, [data-cursor-plus]:hover, [data-cursor-minus]:hover");
+      if (hoveredEl && window.matchMedia("(pointer:fine)").matches) {
+        const rect = hoveredEl.getBoundingClientRect();
+        const bx = rect.left + rect.width / 2;
+        const by = rect.top + rect.height / 2;
+
+        // Snapping factor: interpolate closer to the center of the button, while still following mouse offset slightly
+        targetX = bx + (mx.current - bx) * 0.35;
+        targetY = by + (my.current - by) * 0.35;
+
+        // Apply elastic skew based on physical tension (distance between mouse pointer and target center)
+        const distX = mx.current - bx;
+        const distY = my.current - by;
+        skewXVal = Math.max(-15, Math.min(15, distX * 0.08));
+        skewYVal = Math.max(-15, Math.min(15, distY * 0.08));
+
+        cx.current += (targetX - cx.current) * 0.22;
+        cy.current += (targetY - cy.current) * 0.22;
+      } else {
+        cx.current += (mx.current - cx.current) * 0.15;
+        cy.current += (my.current - cy.current) * 0.15;
+      }
+
       scale.current += (targetScale.current - scale.current) * 0.18;
 
       if (el) {
-        el.style.transform = `translate3d(${cx.current - 10}px, ${cy.current - 10}px, 0) scale(${scale.current})`;
+        let transformStr = `translate3d(${cx.current - 10}px, ${cy.current - 10}px, 0) scale(${scale.current})`;
+        if (skewXVal !== 0 || skewYVal !== 0) {
+          transformStr += ` skew(${skewXVal}deg, ${skewYVal}deg)`;
+        }
+        el.style.transform = transformStr;
         el.style.opacity = String(opacity.current);
       }
       rafRef.current = requestAnimationFrame(animate);

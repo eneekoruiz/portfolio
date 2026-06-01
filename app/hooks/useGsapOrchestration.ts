@@ -89,27 +89,27 @@ export function useGsapOrchestration(
 
       if (hasNel || hasHln || hasHfd || hasMemoji) {
         if (hasNel) {
-          tl.to(".n-el", { opacity: 1, y: 0, duration: 0.12, stagger: 0.015 });
+          tl.to(".n-el", { opacity: 1, y: 0, duration: 0.28, ease: "back.out(1.15)", stagger: 0.025 });
         }
         if (hasHln) {
           tl.to(
             ".h-ln",
-            { yPercent: 0, duration: 0.25, stagger: 0.02 },
-            hasNel ? "-=0.1" : undefined,
+            { yPercent: 0, duration: 0.45, ease: "back.out(1.2)", stagger: 0.035 },
+            hasNel ? "-=0.22" : undefined,
           );
         }
         if (hasHfd) {
           tl.to(
             ".h-fd",
-            { opacity: 1, y: 0, duration: 0.18, stagger: 0.02 },
-            hasNel || hasHln ? "-=0.15" : undefined,
+            { opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.15)", stagger: 0.03 },
+            hasNel || hasHln ? "-=0.32" : undefined,
           );
         }
         if (hasMemoji) {
           tl.to(
             ".memoji",
-            { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" },
-            hasNel || hasHln || hasHfd ? "-=0.25" : undefined,
+            { opacity: 1, x: 0, duration: 0.55, ease: "back.out(1.2)" },
+            hasNel || hasHln || hasHfd ? "-=0.4" : undefined,
           );
         }
       }

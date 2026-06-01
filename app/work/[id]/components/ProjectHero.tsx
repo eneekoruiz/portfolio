@@ -587,19 +587,55 @@ export function ProjectHero({
       }
 
       if (!disableStudio && screenRef.current && overlayRef.current) {
+        let fromProps: gsap.TweenVars = {
+          scale: 0.05,
+          opacity: 0,
+          z: -1500,
+          filter: "blur(30px)",
+          borderRadius: "50rem",
+        };
+
+        const flipData = sessionStorage.getItem("flip_rect");
+        if (flipData) {
+          sessionStorage.removeItem("flip_rect");
+          try {
+            const first = JSON.parse(flipData);
+            const lastWidth = window.innerWidth * 0.94;
+            const lastHeight = window.innerHeight * 0.65;
+            
+            const scaleX = first.width / (window.innerWidth < 768 ? lastWidth : Math.min(1400, window.innerWidth * 0.94));
+            const scaleY = first.height / (window.innerWidth < 768 ? lastHeight : window.innerHeight * 0.82);
+            
+            const firstCenterX = first.left + first.width / 2;
+            const firstCenterY = first.top + first.height / 2;
+            const deltaX = firstCenterX - window.innerWidth / 2;
+            const deltaY = firstCenterY - window.innerHeight / 2;
+
+            fromProps = {
+              scaleX: scaleX,
+              scaleY: scaleY,
+              x: deltaX,
+              y: deltaY,
+              opacity: 0.8,
+              z: 0,
+              filter: "blur(5px)",
+              borderRadius: "1rem",
+              transformOrigin: "center center",
+            };
+          } catch (_) {}
+        }
+
         tl
           // Phase 2: Screen reveals with a "Window" effect
           .fromTo(
             screenRef.current,
-            {
-              scale: 0.05,
-              opacity: 0,
-              z: -1500,
-              filter: "blur(30px)",
-              borderRadius: "50rem",
-            },
+            fromProps,
             {
               scale: 1,
+              scaleX: 1,
+              scaleY: 1,
+              x: 0,
+              y: 0,
               opacity: 1,
               z: 0,
               filter: "blur(0px)",

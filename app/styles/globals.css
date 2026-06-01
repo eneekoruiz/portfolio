@@ -839,3 +839,9 @@ html {
   left: 0;
   transform: rotateY(180deg);
 }
+
+/* ── 24. AWWWARDS LIQUID SCROLL DISTORTION ── */
+.liquid-distort-scroll {
+  filter: url(#liquid-distort-filter);
+  will-change: filter, transform;
+}

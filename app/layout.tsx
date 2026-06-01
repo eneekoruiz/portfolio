@@ -95,6 +95,27 @@ export default async function RootLayout({
           id="scroll-progress"
           className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0"
         />
+        {/* Hidden global SVG filter for velocity-based liquid distortion */}
+        <svg className="hidden" aria-hidden="true" style={{ position: "absolute", width: 0, height: 0 }}>
+          <defs>
+            <filter id="liquid-distort-filter">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.02 0.08"
+                numOctaves="1"
+                result="noise"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="noise"
+                scale="0"
+                xChannelSelector="R"
+                yChannelSelector="G"
+                id="liquid-displacement-map"
+              />
+            </filter>
+          </defs>
+        </svg>
         <ClientThemeProvider
           attribute="class"
           defaultTheme="system"

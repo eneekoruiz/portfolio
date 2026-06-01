@@ -134,6 +134,31 @@ export function PremiumWorkRow({
     return () => mm.revert();
   }, [isExpanded, skipAnimation, motionEnabled]);
 
+  useEffect(() => {
+    if (!motionEnabled || !rowRef.current) return;
+    const el = rowRef.current;
+    const setSkew = gsap.quickTo(el, "skewY", { duration: 0.6, ease: "power3.out" });
+
+    const handleScroll = (e: any) => {
+      const vel = e.velocity || 0;
+      const skew = gsap.utils.clamp(-3, 3, vel * 0.02);
+      setSkew(skew);
+    };
+
+    const registerScroll = () => {
+      if (window.__lenis) {
+        window.__lenis.on("scroll", handleScroll);
+      } else {
+        setTimeout(registerScroll, 100);
+      }
+    };
+    registerScroll();
+
+    return () => {
+      window.__lenis?.off("scroll", handleScroll);
+    };
+  }, [motionEnabled]);
+
   const onMouseMove = useCallback((e: React.MouseEvent) => {
     const el = rowRef.current;
     if (!el) return;
@@ -151,6 +176,18 @@ export function PremiumWorkRow({
     setIsNavigating(true);
 
     saveNavState({ openIdx: idx, scrollY: window.scrollY });
+
+    // Capture preview follower position for FLIP transition
+    const follower = document.getElementById("project-preview-follower");
+    if (follower) {
+      const rect = follower.getBoundingClientRect();
+      sessionStorage.setItem("flip_rect", JSON.stringify({
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      }));
+    }
 
     const targetRoute = `/work/${safeId}`;
     const svg = createLiquidCurtain({
@@ -181,7 +218,7 @@ export function PremiumWorkRow({
     <div
       ref={rowRef}
       onMouseMove={onMouseMove}
-      className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08] transition-all duration-700"
+      className="group/row relative border-b border-black/[0.08] dark:border-white/[0.08]"
       style={{
         background: isExpanded ? theme.gradient : undefined,
         backdropFilter: isExpanded ? "blur(20px) saturate(1.4)" : "none",
@@ -189,6 +226,11 @@ export function PremiumWorkRow({
         boxShadow: isExpanded
           ? `inset 0 1px 0 0 rgba(255,255,255,${isDark ? "0.05" : "0.1"}), inset 0 -1px 0 0 rgba(0,0,0,${isDark ? "0.1" : "0.05"})`
           : "none",
+        transitionProperty: "background, border-color, box-shadow, backdrop-filter, opacity",
+        transitionDuration: "700ms",
+        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+        willChange: "transform",
+        transformStyle: "preserve-3d",
       }}
     >
       {/* ── Vertical Accent Theme-Colored Bar on Hover ── */}
