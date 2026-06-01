@@ -576,7 +576,7 @@ export default function ProjectPage() {
       {/* ── HEADER ── */}
       {/* ── HEADER ── */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-3rem)] max-w-[1200px] transition-all duration-500 ease-expo [[class*='studio-active']_&]:opacity-0 [[class*='studio-active']_&]:pointer-events-none [[class*='studio-active']_&]:-translate-y-10">
-        <div className="flex items-center justify-between px-6 py-3.5 rounded-2xl bg-white/90 dark:bg-black/60 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-glass">
+        <div className="flex items-center justify-between px-6 py-3.5 rounded-full glass-hud">
           <button
             ref={backMagRef}
             onClick={handleReturn}

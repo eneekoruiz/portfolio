@@ -80,13 +80,15 @@ export function useSectionObserver(
             const r = link.getBoundingClientRect();
             const nr = navInnerRef.current.getBoundingClientRect();
             if (indRef.current) {
+              gsap.killTweensOf(indRef.current);
               gsap.to(indRef.current, {
                 x: r.left - nr.left,
                 width: r.width,
                 height: r.height,
+                scaleX: 1,
                 opacity: 0.65,
-                duration: 0.3,
-                ease: "power3.out",
+                duration: 0.52,
+                ease: "elastic.out(1.1, 0.75)",
                 overwrite: "auto",
               });
             }

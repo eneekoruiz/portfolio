@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import gsap from "gsap";
 
 export function useNavbarInteractions(
@@ -8,6 +8,8 @@ export function useNavbarInteractions(
   indRef: React.RefObject<HTMLDivElement | null>,
   activeLinkRef: React.RefObject<HTMLAnchorElement | null>,
 ) {
+  const activeAnimRef = useRef<gsap.core.Tween | gsap.core.Timeline | null>(null);
+
   const onNavEnter = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       const el = e.currentTarget;
@@ -17,25 +19,34 @@ export function useNavbarInteractions(
       const targetX = r.left - nr.left;
       const currentX = gsap.getProperty(indRef.current, "x") as number;
       const distance = Math.abs(targetX - currentX);
-      const stretch = Math.min(1.4, 1 + distance / 200);
+      const stretch = Math.min(1.4, 1 + distance / 220);
 
+      // Kill previous animations instantly to support mid-way interruption
+      if (activeAnimRef.current) {
+        activeAnimRef.current.kill();
+      }
+      gsap.killTweensOf(indRef.current);
+
+      // Spring-based elastic timeline with physical stretch-and-recoil
       const tl = gsap.timeline();
+      activeAnimRef.current = tl;
+
       tl.to(indRef.current, {
         x: targetX,
         width: r.width,
         scaleX: stretch,
         height: r.height,
         opacity: 1,
-        duration: 0.35,
+        duration: 0.3,
         ease: "power3.out",
       }).to(
         indRef.current,
         {
           scaleX: 1,
-          duration: 0.45,
-          ease: "elastic.out(1, 0.5)",
+          duration: 0.48,
+          ease: "elastic.out(1.1, 0.6)",
         },
-        "-=0.15",
+        "-=0.12",
       );
     },
     [navInnerRef, indRef],
@@ -44,18 +55,30 @@ export function useNavbarInteractions(
   const onNavContainerLeave = useCallback(() => {
     const active = activeLinkRef.current;
     const nr = navInnerRef.current?.getBoundingClientRect();
+
+    if (activeAnimRef.current) {
+      activeAnimRef.current.kill();
+    }
+    gsap.killTweensOf(indRef.current);
+
     if (active && nr && indRef.current) {
       const r = active.getBoundingClientRect();
-      gsap.to(indRef.current, {
+      activeAnimRef.current = gsap.to(indRef.current, {
         x: r.left - nr.left,
         width: r.width,
         height: r.height,
+        scaleX: 1,
         opacity: 0.65,
-        duration: 0.24,
-        ease: "power3.out",
+        duration: 0.45,
+        ease: "elastic.out(1.1, 0.75)",
       });
     } else if (indRef.current) {
-      gsap.to(indRef.current, { opacity: 0, duration: 0.12 });
+      activeAnimRef.current = gsap.to(indRef.current, {
+        opacity: 0,
+        scaleX: 1,
+        duration: 0.15,
+        ease: "power2.out",
+      });
     }
   }, [navInnerRef, indRef, activeLinkRef]);
 

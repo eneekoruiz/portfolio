@@ -37,7 +37,7 @@ export function Navbar({
       className="fixed top-3 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-2rem)] max-w-[940px]"
       data-noprint
     >
-      <div className="flex items-center justify-between gap-2 md:gap-4 px-3 md:px-5 py-[.62rem] rounded-full bg-white/82 dark:bg-[#0a0a0a]/82 backdrop-blur-3xl border border-white/80 dark:border-white/10 shadow-glass">
+      <div className="flex items-center justify-between gap-2 md:gap-4 px-3 md:px-5 py-[.62rem] rounded-full glass-hud">
         <a
           ref={logoRef}
           href="#hero"
@@ -55,7 +55,7 @@ export function Navbar({
         >
           <div
             ref={indRef}
-            className="nav-ind absolute top-0 left-0 h-9 bg-black/5 dark:bg-white/10 rounded-xl opacity-0"
+            className="nav-ind absolute top-0 left-0 h-9 bg-black/5 dark:bg-white/10 rounded-full opacity-0"
             aria-hidden="true"
           />
           {t.menu.map((link: string, i: number) => (
