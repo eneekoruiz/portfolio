@@ -9,7 +9,10 @@ type CursorMode = "default" | "plus" | "arrow" | "text" | "minus";
 export function InfallibleCursor() {
   const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<CursorMode>("default");
-  const cursorRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const dotRef = useRef<HTMLDivElement>(null);
+  const followerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const motionEnabled = useMotionEnabled();
 
@@ -35,8 +38,8 @@ export function InfallibleCursor() {
     if (!mounted || !motionEnabled) return;
     if (!window.matchMedia("(pointer:fine)").matches) return;
 
-    const el = cursorRef.current;
-    if (!el) return;
+    const followerEl = followerRef.current;
+    if (!followerEl) return;
 
     let disposed = false;
 
@@ -51,11 +54,11 @@ export function InfallibleCursor() {
       const speed = Math.abs(e.movementX) + Math.abs(e.movementY);
       if (speed > 90 && !isHover.current) {
         targetScale.current = 1.6;
-        el.classList.add("cursor-shake-pulse");
+        followerEl.classList.add("cursor-shake-pulse");
         clearTimeout(shakeTO.current);
         shakeTO.current = setTimeout(() => {
           targetScale.current = 1;
-          el.classList.remove("cursor-shake-pulse");
+          followerEl.classList.remove("cursor-shake-pulse");
         }, 500);
       }
     };
@@ -78,10 +81,12 @@ export function InfallibleCursor() {
         }
       } else if (e.data.type === "portfolio-cursor-hover") {
         isHover.current = true;
-        targetScale.current = 4;
+        setIsHovered(true);
+        targetScale.current = 1.8;
         setMode(e.data.mode || "default");
       } else if (e.data.type === "portfolio-cursor-leave") {
         isHover.current = false;
+        setIsHovered(false);
         targetScale.current = 1;
         setMode("default");
       }
@@ -94,7 +99,8 @@ export function InfallibleCursor() {
       if (!target) return;
 
       isHover.current = true;
-      targetScale.current = 4;
+      setIsHovered(true);
+      targetScale.current = 1.8;
 
       if (target.hasAttribute("data-cursor-plus")) setMode("plus");
       else if (target.hasAttribute("data-cursor-minus")) setMode("minus");
@@ -114,7 +120,8 @@ export function InfallibleCursor() {
       ) as HTMLElement;
       if (!target) return;
       isHover.current = false;
-      if (!el.classList.contains("cursor-shake-pulse")) targetScale.current = 1;
+      setIsHovered(false);
+      if (!followerEl.classList.contains("cursor-shake-pulse")) targetScale.current = 1;
       setMode("default");
     };
 
@@ -157,14 +164,27 @@ export function InfallibleCursor() {
 
       scale.current += (targetScale.current - scale.current) * 0.18;
 
-      if (el) {
-        let transformStr = `translate3d(${cx.current - 10}px, ${cy.current - 10}px, 0) scale(${scale.current})`;
+      // Update inner dot (1:1 zero latency position)
+      if (dotRef.current) {
+        const dotScale = isHover.current ? 0 : 1;
+        dotRef.current.style.transform = `translate3d(${mx.current - 3}px, ${my.current - 3}px, 0) scale(${dotScale})`;
+        dotRef.current.style.opacity = String(opacity.current);
+      }
+
+      // Update outer follower (smoothly lags behind with LERP)
+      if (followerRef.current) {
+        let transformStr = `translate3d(${cx.current - 11}px, ${cy.current - 11}px, 0) scale(${scale.current})`;
         if (skewXVal !== 0 || skewYVal !== 0) {
           transformStr += ` skew(${skewXVal}deg, ${skewYVal}deg)`;
         }
-        el.style.transform = transformStr;
-        el.style.opacity = String(opacity.current);
+        followerRef.current.style.transform = transformStr;
+        followerRef.current.style.opacity = String(opacity.current);
+
+        // Morph style dynamically to avoid React re-renders on every animation frame
+        followerRef.current.style.backgroundColor = isHover.current ? "white" : "transparent";
+        followerRef.current.style.borderColor = isHover.current ? "white" : "rgba(255, 255, 255, 0.45)";
       }
+
       rafRef.current = requestAnimationFrame(animate);
     };
 
@@ -196,41 +216,63 @@ export function InfallibleCursor() {
   if (!mounted || !motionEnabled) return null;
 
   return (
-    <div
-      ref={cursorRef}
-      aria-hidden="true"
-      data-noprint
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        zIndex: 9999999,
-        pointerEvents: "none",
-        width: "20px",
-        height: "20px",
-        borderRadius: "9999px",
-        backgroundColor: "white",
-        border: "1px solid rgba(128,128,128,0.2)",
-        mixBlendMode: "difference",
-        opacity: 0,
-        willChange: "transform, scale",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "opacity 0.3s ease, background-color 0.4s ease",
-      }}
-    >
+    <div style={{ position: "fixed", top: 0, left: 0, zIndex: 9999999, pointerEvents: "none" }} data-noprint>
+      {/* Inner Dot: Zero Latency */}
       <div
-        className="transition-all duration-300 flex items-center justify-center"
+        ref={dotRef}
+        aria-hidden="true"
         style={{
-          transform: `scale(${isHover.current ? 0.3 : 0})`,
-          color: "black",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "6px",
+          height: "6px",
+          borderRadius: "50%",
+          backgroundColor: "white",
+          mixBlendMode: "difference",
+          opacity: 0,
+          willChange: "transform",
+          pointerEvents: "none",
+          transition: "opacity 0.3s ease",
+        }}
+      />
+      {/* Outer Follower: Smooth lag with Lerp */}
+      <div
+        ref={followerRef}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "22px",
+          height: "22px",
+          borderRadius: "50%",
+          border: "1px solid rgba(255, 255, 255, 0.45)",
+          backgroundColor: "transparent",
+          mixBlendMode: "difference",
+          opacity: 0,
+          willChange: "transform, background-color, border-color",
+          pointerEvents: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease",
         }}
       >
-        {mode === "plus" && <Plus size={16} strokeWidth={4} />}
-        {mode === "minus" && <Minus size={16} strokeWidth={4} />}
-        {mode === "arrow" && <ArrowUpRight size={16} strokeWidth={4} />}
-        {mode === "text" && <div className="w-[2px] h-4 bg-black" />}
+        <div
+          className="flex items-center justify-center"
+          style={{
+            transform: `scale(${isHovered ? 0.95 : 0})`,
+            color: "black",
+            opacity: isHovered ? 1 : 0,
+            transition: "transform 0.25s ease, opacity 0.2s ease",
+          }}
+        >
+          {mode === "plus" && <Plus size={12} strokeWidth={3.5} />}
+          {mode === "minus" && <Minus size={12} strokeWidth={3.5} />}
+          {mode === "arrow" && <ArrowUpRight size={12} strokeWidth={3.5} />}
+          {mode === "text" && <div className="w-[1.5px] h-3 bg-black" />}
+        </div>
       </div>
     </div>
   );
