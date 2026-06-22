@@ -9,16 +9,16 @@ export const baseMetadata: Metadata = {
     template: "%s · Eneko Ruiz",
   },
   description:
-    "Ingeniero Informático & Full Stack Developer. Especializado en arquitecturas escalables, Next.js, Python y performance web. Resolviendo problemas complejos con diseño premium.",
+    "Portfolio de Eneko Ruiz, ingeniero informático y desarrollador full stack.",
   keywords: [
     "Eneko Ruiz",
     "Software Engineer",
     "Full Stack Developer",
-    "Next.js Expert",
+    "Next.js",
     "React Developer",
     "Python Engineer",
     "Java Backend",
-    "UI/UX Performance",
+    "Web Development",
     "Donostia Software",
     "San Sebastian Developer",
     "TypeScript",
@@ -34,8 +34,7 @@ export const baseMetadata: Metadata = {
     url: DOMAIN,
     siteName: "Eneko Ruiz Portfolio",
     title: "Eneko Ruiz — Full Stack Developer & Software Engineer",
-    description:
-      "Ingeniero Informático desde Donostia. Me obsesiono con los detalles que nadie nota pero todo el mundo siente.",
+    description: "Proyectos seleccionados, experiencia y formas de contacto.",
     images: [
       {
         url: `${DOMAIN}/og.png`,
@@ -83,7 +82,7 @@ export const jsonLd = {
       email: "eneekoruiz@gmail.com",
       jobTitle: "Ingeniero Informático · Full Stack Developer",
       description:
-        "Ingeniero Informático especializado en desarrollo Full Stack, arquitecturas reactivas y experiencias web de alto rendimiento.",
+        "Ingeniero informático y desarrollador full stack con experiencia en aplicaciones web.",
       image: `${DOMAIN}/og.png`,
       address: {
         "@type": "PostalAddress",
@@ -108,8 +107,7 @@ export const jsonLd = {
         "CI/CD",
         "GSAP",
         "Framer Motion",
-        "Cloud Architecture",
-        "Performance Optimization",
+
         "Responsive Design",
       ],
     },
@@ -118,8 +116,7 @@ export const jsonLd = {
       "@id": `${DOMAIN}/#website`,
       url: DOMAIN,
       name: "Eneko Ruiz — Portfolio Personal",
-      description:
-        "Explora los proyectos y la filosofía de desarrollo de Eneko Ruiz, Ingeniero Informático.",
+      description: "Proyectos seleccionados y experiencia de Eneko Ruiz.",
       author: { "@id": `${DOMAIN}/#person` },
       inLanguage: ["es", "en", "eu"],
     },
