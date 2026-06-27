@@ -34,7 +34,7 @@ export function proxy(request: NextRequest) {
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https://avatars.githubusercontent.com https://raw.githubusercontent.com https://eneko-ruiz.vercel.app;
     font-src 'self' https://fonts.gstatic.com;
-    connect-src 'self' https://api.github.com https://raw.githack.com https://eneko-ruiz-curriculum.vercel.app https://vercel.live https://*.vercel.live https://va.vercel-scripts.com https://vitals.vercel-insights.com;
+    connect-src 'self' https://api.github.com https://raw.githack.com https://raw.githubusercontent.com https://eneko-ruiz-curriculum.vercel.app https://vercel.live https://*.vercel.live https://va.vercel-scripts.com https://vitals.vercel-insights.com;
     frame-src 'self' https://eneko-ruiz-curriculum.vercel.app https://vercel.live https://agpeluqueria.vercel.app https://who-are-ya-backend.onrender.com https://pke-web.vercel.app;
     media-src 'self';
     object-src 'none';
