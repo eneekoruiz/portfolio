@@ -21,8 +21,6 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const instancedNodesA = useRef<THREE.InstancedMesh>(null);
   const instancedNodesB = useRef<THREE.InstancedMesh>(null);
   const rungsRef = useRef<THREE.LineSegments>(null);
-  const strandARef = useRef<THREE.Line>(null);
-  const strandBRef = useRef<THREE.Line>(null);
 
   const numPairs = 120;
   const radius = 2;
@@ -194,8 +192,8 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         args={[sphereGeo, materialB, numPairs]}
       />
       <lineSegments ref={rungsRef} geometry={rungsGeo} material={lineMat} />
-      <line ref={strandARef} geometry={strandAGeo} material={strandMatA} />
-      <line ref={strandBRef} geometry={strandBGeo} material={strandMatB} />
+      <primitive object={new THREE.Line(strandAGeo, strandMatA)} />
+      <primitive object={new THREE.Line(strandBGeo, strandMatB)} />
     </group>
   );
 };
