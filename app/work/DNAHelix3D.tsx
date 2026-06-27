@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useMemo, useState } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 interface DNAHelix3DProps {
@@ -20,12 +20,14 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const groupRef = useRef<THREE.Group>(null);
   const instancedNodesA = useRef<THREE.InstancedMesh>(null);
   const instancedNodesB = useRef<THREE.InstancedMesh>(null);
-  const linesRef = useRef<THREE.LineSegments>(null);
+  const rungsRef = useRef<THREE.LineSegments>(null);
+  const strandARef = useRef<THREE.Line>(null);
+  const strandBRef = useRef<THREE.Line>(null);
 
-  const { viewport } = useThree();
-  const numPairs = 60;
+  const numPairs = 120;
   const radius = 2;
-  const height = 15;
+  const height = 18;
+  const turns = 4;
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
@@ -33,12 +35,12 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const [secondaryColor] = useState(() => new THREE.Color(secondary));
 
   // Geometry for nodes
-  const sphereGeo = useMemo(() => new THREE.SphereGeometry(0.12, 16, 16), []);
+  const sphereGeo = useMemo(() => new THREE.SphereGeometry(0.15, 16, 16), []);
   const materialA = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       color: accentColor,
       emissive: accentColor,
-      emissiveIntensity: darkMode ? 2.5 : 0.5,
+      emissiveIntensity: darkMode ? 2.0 : 0.5,
       toneMapped: false,
     });
   }, [accentColor, darkMode]);
@@ -52,98 +54,134 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     });
   }, [secondaryColor, darkMode]);
 
-  // Line segments geometry
-  const lineGeoRef = useRef<THREE.BufferGeometry | null>(null);
-  if (!lineGeoRef.current) {
+  // Rungs geometry (line segments)
+  const rungsGeo = useMemo(() => {
     const geo = new THREE.BufferGeometry();
-    const positions = new Float32Array(numPairs * 6); // 2 points per pair, 3 coords
+    const positions = new Float32Array(numPairs * 6);
     geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    lineGeoRef.current = geo;
-  }
-  const lineGeo = lineGeoRef.current;
+    return geo;
+  }, [numPairs]);
+
+  // Strands geometry (continuous lines)
+  const strandAGeo = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(numPairs * 3);
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    return geo;
+  }, [numPairs]);
+
+  const strandBGeo = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(numPairs * 3);
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    return geo;
+  }, [numPairs]);
 
   const lineMat = useMemo(() => {
     return new THREE.LineBasicMaterial({
       color: darkMode ? 0xffffff : 0x888888,
       transparent: true,
-      opacity: darkMode ? 0.3 : 0.1,
+      opacity: darkMode ? 0.4 : 0.2,
     });
   }, [darkMode]);
+  
+  const strandMatA = useMemo(() => {
+    return new THREE.LineBasicMaterial({
+      color: accentColor,
+      transparent: true,
+      opacity: darkMode ? 0.6 : 0.4,
+    });
+  }, [accentColor, darkMode]);
+
+  const strandMatB = useMemo(() => {
+    return new THREE.LineBasicMaterial({
+      color: secondaryColor,
+      transparent: true,
+      opacity: darkMode ? 0.6 : 0.4,
+    });
+  }, [secondaryColor, darkMode]);
 
   useFrame((state, delta) => {
     if (paused) return;
 
-    const time = state.clock.getElapsedTime();
+    // Use elapsedTime to avoid THREE.Clock deprecation warning
+    const time = state.clock.elapsedTime;
     const rotationSpeed = time * 0.5;
 
     if (groupRef.current) {
-      // Gentle floating
       groupRef.current.position.y = Math.sin(time * 0.5) * 0.5;
       groupRef.current.rotation.y = rotationSpeed * 0.5;
     }
 
-    const positions = lineGeo.attributes.position.array as Float32Array;
+    const rungsPos = rungsGeo.attributes.position.array as Float32Array;
+    const strandAPos = strandAGeo.attributes.position.array as Float32Array;
+    const strandBPos = strandBGeo.attributes.position.array as Float32Array;
 
     for (let i = 0; i < numPairs; i++) {
-      const progress = i / numPairs;
+      const progress = i / (numPairs - 1);
       const y = (progress - 0.5) * height;
-      const angle = progress * Math.PI * 4 + rotationSpeed;
+      const angle = progress * Math.PI * 2 * turns + rotationSpeed;
 
-      // A subtle wave adds organic life without destroying the structural shape
-      const wave = Math.sin(progress * Math.PI * 4 + time * 1.5) * 0.15;
+      const xA = Math.cos(angle) * radius;
+      const zA = Math.sin(angle) * radius;
 
-      const xA = Math.cos(angle) * (radius + wave);
-      const zA = Math.sin(angle) * (radius + wave);
+      const xB = Math.cos(angle + Math.PI) * radius;
+      const zB = Math.sin(angle + Math.PI) * radius;
 
-      const xB = Math.cos(angle + Math.PI) * (radius + wave);
-      const zB = Math.sin(angle + Math.PI) * (radius + wave);
-
-      // Update Node A
+      // Node A
       dummy.position.set(xA, y, zA);
-      dummy.scale.setScalar(1 + Math.sin(time * 2 + i * 0.1) * 0.2);
+      dummy.scale.setScalar(1 + Math.sin(time * 2 + i * 0.1) * 0.1);
       dummy.updateMatrix();
       if (instancedNodesA.current) {
         instancedNodesA.current.setMatrixAt(i, dummy.matrix);
       }
 
-      // Update Node B
+      // Node B
       dummy.position.set(xB, y, zB);
+      dummy.scale.setScalar(1 + Math.sin(time * 2 + i * 0.1) * 0.1);
       dummy.updateMatrix();
       if (instancedNodesB.current) {
         instancedNodesB.current.setMatrixAt(i, dummy.matrix);
       }
 
-      // Draw horizontal rungs for EVERY node, creating a dense, clear helix ladder
-      positions[i * 6] = xA;
-      positions[i * 6 + 1] = y;
-      positions[i * 6 + 2] = zA;
+      // Rungs (horizontal lines)
+      rungsPos[i * 6] = xA;
+      rungsPos[i * 6 + 1] = y;
+      rungsPos[i * 6 + 2] = zA;
 
-      positions[i * 6 + 3] = xB;
-      positions[i * 6 + 4] = y;
-      positions[i * 6 + 5] = zB;
+      rungsPos[i * 6 + 3] = xB;
+      rungsPos[i * 6 + 4] = y;
+      rungsPos[i * 6 + 5] = zB;
+
+      // Strands (continuous lines)
+      strandAPos[i * 3] = xA;
+      strandAPos[i * 3 + 1] = y;
+      strandAPos[i * 3 + 2] = zA;
+
+      strandBPos[i * 3] = xB;
+      strandBPos[i * 3 + 1] = y;
+      strandBPos[i * 3 + 2] = zB;
     }
 
-    if (instancedNodesA.current) {
-      instancedNodesA.current.instanceMatrix.needsUpdate = true;
-    }
-    if (instancedNodesB.current) {
-      instancedNodesB.current.instanceMatrix.needsUpdate = true;
-    }
-    if (lineGeo) {
-      lineGeo.attributes.position.needsUpdate = true;
-    }
+    if (instancedNodesA.current) instancedNodesA.current.instanceMatrix.needsUpdate = true;
+    if (instancedNodesB.current) instancedNodesB.current.instanceMatrix.needsUpdate = true;
+    
+    rungsGeo.attributes.position.needsUpdate = true;
+    strandAGeo.attributes.position.needsUpdate = true;
+    strandBGeo.attributes.position.needsUpdate = true;
   });
 
-  // Update colors when props change
   React.useEffect(() => {
     accentColor.set(accent);
     materialA.color.set(accentColor);
     materialA.emissive.set(accentColor);
+    strandMatA.color.set(accentColor);
 
     secondaryColor.set(secondary);
     materialB.color.set(secondaryColor);
     materialB.emissive.set(secondaryColor);
-  }, [accent, secondary, accentColor, secondaryColor, materialA, materialB]);
+    strandMatB.color.set(secondaryColor);
+  }, [accent, secondary, accentColor, secondaryColor, materialA, materialB, strandMatA, strandMatB]);
 
   return (
     <group ref={groupRef} rotation={[0, 0, THREE.MathUtils.degToRad(-15)]}>
@@ -155,7 +193,9 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         ref={instancedNodesB}
         args={[sphereGeo, materialB, numPairs]}
       />
-      <lineSegments ref={linesRef} geometry={lineGeo} material={lineMat} />
+      <lineSegments ref={rungsRef} geometry={rungsGeo} material={lineMat} />
+      <line ref={strandARef} geometry={strandAGeo} material={strandMatA} />
+      <line ref={strandBRef} geometry={strandBGeo} material={strandMatB} />
     </group>
   );
 };
