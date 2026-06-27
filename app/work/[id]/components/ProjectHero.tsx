@@ -592,7 +592,7 @@ export function ProjectHero({
               // RESPONSIVE DIMENSIONS - Use relative units for better mobile behavior
               width: "94vw",
               maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
-              height: window.innerWidth < 768 ? "65dvh" : "82dvh",
+              height: "82dvh",
               force3D: true,
               ease: "expo.inOut",
               duration: 2.2,
@@ -937,9 +937,9 @@ export function ProjectHero({
           >
             {canInteract && !isInteracting && (
               <div
-                className={
+                className={`flex flex-col items-center justify-center ${
                   motionEnabled ? "animate-in fade-in duration-700" : ""
-                }
+                }`}
               >
                 {/* Desktop/Tablet CTA (md+) */}
                 <div className="hidden md:flex flex-col items-center gap-6">
@@ -1007,11 +1007,11 @@ export function ProjectHero({
                     </svg>
                     {/* Ripple / tactile ping */}
                     <span
-                      className="absolute -bottom-2 w-10 h-10 rounded-full bg-white/8 opacity-60"
+                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white/8 opacity-60"
                       aria-hidden
                     />
                     <span
-                      className="absolute -bottom-2 w-10 h-10 rounded-full border border-white/10"
+                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full border border-white/10"
                       aria-hidden
                     />
                     {/* Sheen layer (animated with GSAP) */}
@@ -1286,45 +1286,47 @@ export function ProjectHero({
         {!disableStudio && motionEnabled && (
           <div
             ref={scrollProgressRef}
-            className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-300 px-4 py-3 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+            className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-500 w-[250px] max-w-[88vw] px-5 py-3 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
             style={{
               opacity: 1,
-              width: "min(88vw, 340px)",
               bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)",
             }}
           >
             {/* Layout 1: Default hint before scroll */}
             <div
               ref={scrollHintDefaultRef}
-              className="flex flex-col items-center gap-3"
+              className="flex flex-col items-center gap-2.5"
             >
-              <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/50">
+              {/* Elegant scroll wheel animation pill */}
+              <div className="w-5 h-8 rounded-full border border-white/20 flex justify-center pt-1.5 relative overflow-hidden bg-white/[0.02]">
+                <div className="w-1 h-1.5 rounded-full bg-white/70 animate-scroll-dot" />
+              </div>
+              <p className="font-mono text-[8px] uppercase tracking-[0.4em] text-white/50 text-center leading-relaxed">
                 {s.deepScroll}
               </p>
-              <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent animate-pulse" />
             </div>
 
             {/* Layout 2: Progress telemetry during scroll */}
             <div
               ref={scrollHintProgressRef}
-              className="hidden md:flex flex-col items-center gap-2 w-full"
+              className="hidden flex-col items-center gap-2.5 w-full"
             >
               <div
-                className="flex items-center justify-between w-full font-mono text-[9px] uppercase tracking-widest text-white/70"
+                className="flex items-center justify-between w-full font-mono text-[8px] uppercase tracking-[0.3em] text-white/60 font-black"
                 role="status"
                 aria-live="polite"
               >
                 <span>{s.initializing}</span>
-                <span ref={scrollTextRef}>0%</span>
+                <span ref={scrollTextRef} className="text-white">0%</span>
               </div>
-              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/5 shadow-inner">
+              <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden relative">
                 <div
                   ref={scrollBarRef}
-                  className="h-full transition-all duration-75 ease-out rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                  style={{ width: "0%", backgroundColor: accent }}
+                  className="h-full transition-all duration-100 ease-linear rounded-full"
+                  style={{ width: "0%", backgroundColor: accent, boxShadow: `0 0 6px ${accent}` }}
                 />
               </div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">
+              <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">
                 <span
                   className="truncate"
                   style={{ textShadow: `0 6px 30px ${accent}40` }}

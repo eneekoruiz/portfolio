@@ -28,12 +28,16 @@ export function RepoRow({
   const isActive = activeRepo === idx;
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const descRef = useRef<HTMLDivElement | null>(null);
   const enterTimer = useRef<number | null>(null);
   const animRef = useRef<Animation | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      setIsTouch(window.matchMedia("(hover: none)").matches);
+    }
   }, []);
 
   useEffect(() => {
@@ -140,10 +144,10 @@ export function RepoRow({
     >
       <div
         className="py-[18px] md:py-5 cursor-pointer relative z-10"
-        onMouseEnter={() => !isMobile && setActiveRepo(idx)}
-        onMouseLeave={() => !isMobile && setActiveRepo(null)}
+        onMouseEnter={() => !isTouch && setActiveRepo(idx)}
+        onMouseLeave={() => !isTouch && setActiveRepo(null)}
         onClick={() => {
-          if (isMobile) {
+          if (isTouch) {
             setActiveRepo(isActive ? null : idx);
           } else {
             window.open(r.html_url, "_blank", "noopener,noreferrer");
@@ -194,32 +198,40 @@ export function RepoRow({
               </div>
             </div>
             <div
-              ref={descRef}
-              // Keep layout consistent: the element remains in the flow
-              className="overflow-hidden mt-3"
-              aria-hidden={!isActive}
+              className="grid transition-[grid-template-rows] duration-200 ease-out"
+              style={{
+                gridTemplateRows: isActive ? "1fr" : "0fr",
+              }}
             >
-              {r.description && (
-                <p className="text-[11px] text-lead/80 leading-[1.7] mb-3 pr-4">
-                  {r.description}
-                </p>
-              )}
-              <a
-                href={r.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex md:hidden items-center gap-2 px-4 py-2 rounded-full text-white text-[9px] font-black uppercase tracking-[0.22em] hover:scale-105 transition-all shadow-lg border backdrop-blur-md"
-                style={{
-                  background: isDark
-                    ? `linear-gradient(145deg, ${LANG_COLORS[r.langs?.[0]] || "#666666"}80 0%, transparent 100%)`
-                    : `linear-gradient(145deg, ${LANG_COLORS[r.langs?.[0]] || "#24292F"} 0%, ${LANG_COLORS[r.langs?.[0]] || "#24292F"}ee 100%)`,
-                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "transparent",
-                  boxShadow: `0 8px 20px rgba(0,0,0,0.15)`,
-                }}
+              <div
+                ref={descRef}
+                className="overflow-hidden"
+                aria-hidden={!isActive}
               >
-                Visitar Repo <ArrowUpRight size={12} />
-              </a>
+                <div className="pt-3">
+                  {r.description && (
+                    <p className="text-[11px] text-lead/80 leading-[1.7] mb-3 pr-4">
+                      {r.description}
+                    </p>
+                  )}
+                  <a
+                    href={r.html_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex md:hidden items-center gap-2 px-4 py-2 rounded-full text-white text-[9px] font-black uppercase tracking-[0.22em] hover:scale-105 transition-all shadow-lg border backdrop-blur-md"
+                    style={{
+                      background: isDark
+                        ? `linear-gradient(145deg, ${LANG_COLORS[r.langs?.[0]] || "#666666"}80 0%, transparent 100%)`
+                        : `linear-gradient(145deg, ${LANG_COLORS[r.langs?.[0]] || "#24292F"} 0%, ${LANG_COLORS[r.langs?.[0]] || "#24292F"}ee 100%)`,
+                      borderColor: isDark ? "rgba(255,255,255,0.1)" : "transparent",
+                      boxShadow: `0 8px 20px rgba(0,0,0,0.15)`,
+                    }}
+                  >
+                    Visitar Repo <ArrowUpRight size={12} />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
           <div className="hidden md:flex items-center gap-4 shrink-0">

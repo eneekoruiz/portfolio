@@ -66,6 +66,14 @@ export function InfallibleCursor() {
       }
     };
 
+    const onMouseDown = () => {
+      targetScale.current = isHover.current ? 1.35 : 0.72;
+    };
+
+    const onMouseUp = () => {
+      targetScale.current = isHover.current ? 1.8 : 1.0;
+    };
+
     const onMessage = (e: MessageEvent) => {
       if (!e.data) return;
       if (e.data.type === "portfolio-cursor-move") {
@@ -209,6 +217,8 @@ export function InfallibleCursor() {
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mousedown", onMouseDown, { passive: true });
+    window.addEventListener("mouseup", onMouseUp, { passive: true });
     window.addEventListener("message", onMessage);
     window.addEventListener("mouseenter", onEnter, true);
     window.addEventListener("mouseleave", onLeave, true);
@@ -219,6 +229,8 @@ export function InfallibleCursor() {
       disposed = true;
       document.documentElement.classList.remove("has-custom-cursor");
       window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mouseup", onMouseUp);
       window.removeEventListener("message", onMessage);
       window.removeEventListener("mouseenter", onEnter, true);
       window.removeEventListener("mouseleave", onLeave, true);

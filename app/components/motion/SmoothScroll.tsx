@@ -28,7 +28,14 @@ export function SmoothScroll() {
     window.__lenis = lenis;
     const dispMap = document.getElementById("liquid-displacement-map");
     const setDispScale = dispMap
-      ? gsap.quickTo(dispMap, "scale", { duration: 0.4, ease: "power2.out" })
+      ? (val: number) => {
+          gsap.to(dispMap, {
+            attr: { scale: val },
+            duration: 0.4,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        }
       : null;
 
     lenis.on("scroll", (e: any) => {

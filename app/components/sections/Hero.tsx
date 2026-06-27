@@ -10,6 +10,22 @@ import { LiveStatus } from "../ui/LiveStatus";
 import { WorkScrollBtn, BinaryStreamBtn } from "../ui/Buttons";
 import type { Tx } from "../../types";
 
+const TextReveal = ({ text }: { text: string }) => {
+  return (
+    <span className="inline-block overflow-hidden pb-4 -mb-4">
+      {text.split("").map((char, i) => (
+        <span
+          key={i}
+          className="inline-block char-reveal"
+          style={{ transform: "translateY(110%) rotateX(45deg)", opacity: 0, transformOrigin: "bottom" }}
+        >
+          {char}
+        </span>
+      ))}
+    </span>
+  );
+};
+
 interface HeroProps {
   t: Tx;
   greeting: string;
@@ -237,34 +253,42 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       setupTouchFallback();
     }
 
-    // ── Animación inicial: barrido de la linterna ───────────────────
-    if (
-      phase === "ready" &&
-      textContainerRef.current &&
-      !isMobile &&
-      !reduced
-    ) {
-      const target = textContainerRef.current;
-      const tl = gsap.timeline({
-        onComplete: () => {
-          // Asegurarse de que el hover tome el control total después de la animación
-          if (target) gsap.set(target, { clearProps: "all" });
-        },
+    // ── Animación inicial: barrido de la linterna y texto ───────────────────
+    if (phase === "ready" && !reduced) {
+      // Reveal Text
+      gsap.to(".char-reveal", {
+        y: "0%",
+        rotateX: 0,
+        opacity: 1,
+        stagger: 0.04,
+        duration: 1.2,
+        ease: "power4.out",
+        delay: 0.2,
       });
 
-      tl.fromTo(
-        target,
-        { "--mx": "-500px", "--my": "100px", rotateX: 5, rotateY: -10 },
-        {
-          "--mx": "1200px",
-          "--my": "150px",
-          rotateX: 0,
-          rotateY: 0,
-          duration: 1.2,
-          ease: "power3.out",
-          delay: 0,
-        },
-      );
+      if (textContainerRef.current && !isMobile) {
+        const target = textContainerRef.current;
+        const tl = gsap.timeline({
+          onComplete: () => {
+            // Asegurarse de que el hover tome el control total después de la animación
+            if (target) gsap.set(target, { clearProps: "all" });
+          },
+        });
+
+        tl.fromTo(
+          target,
+          { "--mx": "-500px", "--my": "100px", rotateX: 5, rotateY: -10 },
+          {
+            "--mx": "1200px",
+            "--my": "150px",
+            rotateX: 0,
+            rotateY: 0,
+            duration: 1.2,
+            ease: "power3.out",
+            delay: 0.5,
+          },
+        );
+      }
     }
 
     // ── MODO MÓVIL: Animación Autónoma ───────────────────────────
@@ -383,10 +407,9 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                   color: isDark ? "#a1a1a6" : "#6e6e73", // Sleek Apple silver for dark mode
                 }}
               >
-                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">
-                  <span>Eneko</span>
-                  <br />
-                  <span>Ruiz.</span>
+                <h1 className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] flex flex-col">
+                  <TextReveal text="Eneko" />
+                  <TextReveal text="Ruiz." />
                 </h1>
               </div>
 
@@ -404,10 +427,9 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
                   backfaceVisibility: "hidden",
                 }}
               >
-                <div className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px]">
-                  <span>Eneko</span>
-                  <br />
-                  <span>Ruiz.</span>
+                <div className="font-black text-[clamp(4rem,11vw,11rem)] leading-[.87] tracking-[-4px] flex flex-col">
+                  <TextReveal text="Eneko" />
+                  <TextReveal text="Ruiz." />
                 </div>
               </div>
             </div>

@@ -127,27 +127,30 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         ? localStorage.getItem("portfolio-motion-enabled") !== "false"
         : true;
 
-    // Run a faster counter if motion is disabled to not block the user too long
-    const duration = isMotionActuallyEnabled ? 1500 : 800;
+    // Run a slower, more progressive counter if motion is enabled
+    const duration = isMotionActuallyEnabled ? 2200 : 800;
     const counter = { value: 0 };
 
-    counterTweenRef.current = gsap.to(counter, {
-      value: 100,
-      duration: duration / 1000,
-      ease: "power2.out",
-      onUpdate: () => {
-        setN(Math.round(counter.value));
-      },
-      onComplete: () => {
-        setN(100);
-        exitDelayRef.current = window.setTimeout(() => {
-          exitDelayRef.current = null;
-          playExit();
-        }, 150);
-      },
-    });
+    const timer = setTimeout(() => {
+      counterTweenRef.current = gsap.to(counter, {
+        value: 100,
+        duration: duration / 1000,
+        ease: "power2.inOut",
+        onUpdate: () => {
+          setN(Math.round(counter.value));
+        },
+        onComplete: () => {
+          setN(100);
+          exitDelayRef.current = window.setTimeout(() => {
+            exitDelayRef.current = null;
+            playExit();
+          }, 150);
+        },
+      });
+    }, 300);
 
     return () => {
+      clearTimeout(timer);
       counterTweenRef.current?.kill();
       counterTweenRef.current = null;
       if (exitDelayRef.current !== null) {
@@ -238,7 +241,6 @@ export function Preloader({ onDone }: { onDone: () => void }) {
               className="absolute inset-0 bg-ink origin-left"
               style={{
                 transform: `scaleX(${n / 100})`,
-                transition: "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)",
               }}
             />
           </div>

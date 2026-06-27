@@ -116,6 +116,7 @@ function EmailCard({ c }: { c: (typeof CONTACTS)[0] }) {
           display: "block",
           width: "100%",
           cursor: "default",
+          transformStyle: "preserve-3d",
         }}
       >
         <div className="flip-inner min-h-[180px]">
@@ -222,6 +223,7 @@ function SocialCard({ c }: { c: (typeof CONTACTS)[0] }) {
         aria-label={c.label}
         data-h
         className="block h-full no-underline"
+        style={{ transformStyle: "preserve-3d" }}
       >
         <div className="flip-inner min-h-[180px]">
           <div

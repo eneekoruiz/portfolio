@@ -7,7 +7,9 @@ export function useIntroPhase(mounted: boolean) {
   const { phase, setPhase, markSeen } = useIntro();
 
   const hasSeen =
-    typeof window !== "undefined" && window.__hasSeenIntro === true;
+    typeof window !== "undefined" &&
+    (window.__hasSeenIntro === true ||
+      sessionStorage.getItem("hasSeenIntro") === "true");
 
   if (hasSeen && phase !== "ready") {
     setPhase("ready");

@@ -90,7 +90,10 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
     // Determine the initial phase on the client after hydration
     const checkSeen = () => {
       if (typeof window === "undefined") return false;
-      return window.__hasSeenIntro === true;
+      return (
+        window.__hasSeenIntro === true ||
+        sessionStorage.getItem("hasSeenIntro") === "true"
+      );
     };
 
     if (checkSeen()) {
@@ -103,6 +106,9 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
   const markSeen = useCallback(() => {
     if (typeof window !== "undefined") {
       window.__hasSeenIntro = true;
+      try {
+        sessionStorage.setItem("hasSeenIntro", "true");
+      } catch (e) {}
     }
     setPhase("ready");
   }, []);

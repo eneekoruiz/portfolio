@@ -931,3 +931,26 @@ html {
   filter: url(#liquid-distort-filter);
   will-change: filter, transform;
 }
+
+/* ── 25. PREMIUM SCROLL HINT ANIMATION ── */
+@keyframes scroll-dot {
+  0% {
+    transform: translateY(-2px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+.animate-scroll-dot {
+  animation: scroll-dot 1.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+

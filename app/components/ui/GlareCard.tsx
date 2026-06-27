@@ -64,7 +64,7 @@ export function GlareCard({
       ref={cardRef}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className={`relative overflow-hidden rounded-[28px] border transition-all duration-300 group ${className}`}
+      className={`relative overflow-hidden rounded-[28px] border transition-[border-color,background-color,box-shadow,opacity] duration-300 group ${className}`}
       style={{
         borderColor: `${accent}25`,
         perspective: "1000px",

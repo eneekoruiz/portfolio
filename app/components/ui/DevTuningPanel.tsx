@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 export function DevTuningPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [config, setConfig] = useState({
-    density: 0.0012,
-    maxLinks: 1,
+    density: 0.0018,
+    maxLinks: 5,
     glowStrength: 1,
-    maxDist: 120,
+    maxDist: 150,
     parallax: 0.045,
     followerDuration: 0.12,
     followerScale: 0.88,
@@ -20,10 +20,10 @@ export function DevTuningPanel() {
     // Initialize global config if not present
     const win = window as any;
     win.__PARTICLE_CONFIG = win.__PARTICLE_CONFIG || {
-      density: 0.0012,
-      maxLinks: 1,
+      density: 0.0018,
+      maxLinks: 5,
       glowStrength: 1,
-      maxDist: 120,
+      maxDist: 150,
       parallax: 0.045,
       followerDuration: 0.12,
       followerScale: 0.88,
@@ -145,7 +145,7 @@ export function DevTuningPanel() {
             <input
               type="range"
               min="0"
-              max="5"
+              max="10"
               step="1"
               value={config.maxLinks}
               onChange={(e) =>

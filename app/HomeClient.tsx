@@ -71,12 +71,12 @@ const MemoFooter = dynamic(
 );
 
 // ── Dynamic Visualizers ──
-const DNAHelix = dynamic<{
+const CanvasScene = dynamic<{
   accent: string;
   secondary: string;
   darkMode: boolean;
   paused?: boolean;
-}>(() => import("./work/visualizers").then((m) => m.DNAHelix), { ssr: false });
+}>(() => import("./work/CanvasScene").then((m) => m.CanvasScene), { ssr: false });
 
 // Registrar plugins GSAP
 if (typeof window !== "undefined") {
@@ -236,7 +236,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {!ready &&
+      {mounted && !ready &&
         (phase === "loading" || phase === "splash" || phase === "checking") && (
           <>
             <IdentitySplash
@@ -273,7 +273,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
               }
             }}
           >
-            <DNAHelix
+            <CanvasScene
               accent={dnaColors.accent}
               secondary={dnaColors.secondary}
               darkMode={isDark}

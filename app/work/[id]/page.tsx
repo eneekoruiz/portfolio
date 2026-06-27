@@ -215,7 +215,7 @@ function GlareCard({
       ref={cardRef}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className={`relative overflow-hidden rounded-3xl border border-black/5 dark:border-white/5 bg-white/90 dark:bg-white/[0.02] backdrop-blur-2xl transition-all duration-500 hover:border-black/15 dark:hover:border-white/15 hover:shadow-2xl group ${className}`}
+      className={`relative overflow-hidden rounded-3xl border border-black/5 dark:border-white/5 bg-white/90 dark:bg-white/[0.02] backdrop-blur-2xl transition-[border-color,background-color,box-shadow,opacity] duration-500 hover:border-black/15 dark:hover:border-white/15 hover:shadow-2xl group ${className}`}
       style={{
         ...style,
         perspective: "1000px",
@@ -463,6 +463,9 @@ export default function ProjectPage() {
     const navigate = () => {
       if (typeof window !== "undefined") {
         window.__hasSeenIntro = true;
+        try {
+          sessionStorage.setItem("hasSeenIntro", "true");
+        } catch (e) {}
       }
       window.__lenis?.start?.(); // Start before navigating
       router.replace("/", { scroll: false });
@@ -472,7 +475,7 @@ export default function ProjectPage() {
         if (window.location.pathname !== "/") {
           window.location.href = "/";
         }
-      }, 700);
+      }, 2500);
     };
 
     // 🌊 Punto 8 — SVG Liquid Curtain
