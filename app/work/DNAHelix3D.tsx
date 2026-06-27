@@ -89,8 +89,8 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       const y = (progress - 0.5) * height;
       const angle = progress * Math.PI * 4 + rotationSpeed;
 
-      // Add a slight wave effect
-      const wave = Math.sin(progress * Math.PI * 2 + time) * 0.5;
+      // A subtle wave adds organic life without destroying the structural shape
+      const wave = Math.sin(progress * Math.PI * 4 + time * 1.5) * 0.15;
 
       const xA = Math.cos(angle) * (radius + wave);
       const zA = Math.sin(angle) * (radius + wave);
@@ -113,25 +113,14 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         instancedNodesB.current.setMatrixAt(i, dummy.matrix);
       }
 
-      // Update lines
-      if (i % 2 === 0) {
-        positions[i * 6] = xA;
-        positions[i * 6 + 1] = y;
-        positions[i * 6 + 2] = zA;
+      // Draw horizontal rungs for EVERY node, creating a dense, clear helix ladder
+      positions[i * 6] = xA;
+      positions[i * 6 + 1] = y;
+      positions[i * 6 + 2] = zA;
 
-        positions[i * 6 + 3] = xB;
-        positions[i * 6 + 4] = y;
-        positions[i * 6 + 5] = zB;
-      } else {
-        // zero out to not draw lines between every single node if not wanted,
-        // but let's just make it same for now or 0
-        positions[i * 6] = 0;
-        positions[i * 6 + 1] = 0;
-        positions[i * 6 + 2] = 0;
-        positions[i * 6 + 3] = 0;
-        positions[i * 6 + 4] = 0;
-        positions[i * 6 + 5] = 0;
-      }
+      positions[i * 6 + 3] = xB;
+      positions[i * 6 + 4] = y;
+      positions[i * 6 + 5] = zB;
     }
 
     if (instancedNodesA.current) {
