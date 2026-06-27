@@ -585,10 +585,7 @@ export function ProjectHero({
               z: 0,
               filter: "blur(0px)",
               borderRadius: "2.5rem",
-              xPercent: -50,
-              yPercent: -50,
-              left: "50%",
-              top: "50%",
+              // Centered by inset-0 m-auto in CSS
               // RESPONSIVE DIMENSIONS - Use relative units for better mobile behavior
               width: "94vw",
               maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
@@ -1252,7 +1249,7 @@ export function ProjectHero({
             className={
               isInteracting
                 ? "fixed inset-0 z-[2000] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
-                : "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
+                : "absolute inset-0 m-auto z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
             }
             style={
               isInteracting

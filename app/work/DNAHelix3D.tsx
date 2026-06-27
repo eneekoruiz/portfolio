@@ -20,10 +20,10 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const groupRef = useRef<THREE.Group>(null);
   const rungsRef = useRef<THREE.LineSegments>(null);
   
-  const numPairs = 120;
-  const radius = 2;
-  const height = 18;
-  const turns = 4;
+  const numPairs = 70;
+  const radius = 2.5;
+  const height = 24;
+  const turns = 5.5;
 
   const [accentColor] = useState(() => new THREE.Color(accent));
   const [secondaryColor] = useState(() => new THREE.Color(secondary));
