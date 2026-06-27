@@ -102,12 +102,16 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       dummy.position.set(xA, y, zA);
       dummy.scale.setScalar(1 + Math.sin(time * 2 + i * 0.1) * 0.2);
       dummy.updateMatrix();
-      instancedNodesA.current?.setMatrixAt(i, dummy.matrix);
+      if (instancedNodesA.current) {
+        instancedNodesA.current.setMatrixAt(i, dummy.matrix);
+      }
 
       // Update Node B
       dummy.position.set(xB, y, zB);
       dummy.updateMatrix();
-      instancedNodesB.current?.setMatrixAt(i, dummy.matrix);
+      if (instancedNodesB.current) {
+        instancedNodesB.current.setMatrixAt(i, dummy.matrix);
+      }
 
       // Update lines
       if (i % 2 === 0) {
@@ -130,9 +134,15 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       }
     }
 
-    instancedNodesA.current!.instanceMatrix.needsUpdate = true;
-    instancedNodesB.current!.instanceMatrix.needsUpdate = true;
-    lineGeo.attributes.position.needsUpdate = true;
+    if (instancedNodesA.current) {
+      instancedNodesA.current.instanceMatrix.needsUpdate = true;
+    }
+    if (instancedNodesB.current) {
+      instancedNodesB.current.instanceMatrix.needsUpdate = true;
+    }
+    if (lineGeo) {
+      lineGeo.attributes.position.needsUpdate = true;
+    }
   });
 
   // Update colors when props change
