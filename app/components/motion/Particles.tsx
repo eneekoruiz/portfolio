@@ -97,7 +97,7 @@ export function NetworkParticles() {
       const baseCount = Math.round(area * cfg.density);
       const count = Math.max(
         40,
-        Math.min(800, Math.round(baseCount * performanceScale)),
+        Math.min(180, Math.round(baseCount * performanceScale)),
       );
       createStars(count);
     };
@@ -208,7 +208,7 @@ export function NetworkParticles() {
           const baseCount = Math.round(area * cfg.density);
           const newCount = Math.max(
             40,
-            Math.min(800, Math.round(baseCount * performanceScale)),
+            Math.min(180, Math.round(baseCount * performanceScale)),
           );
 
           stars = stars.slice(0, newCount);

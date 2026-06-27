@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 
 export function useMotionEnabled(): boolean {
-  const [enabled, setEnabled] = useState(() => {
-    if (typeof window === "undefined") return true; // Default to true during SSR
-    return localStorage.getItem("portfolio-motion-enabled") !== "false";
-  });
+  const [enabled, setEnabled] = useState(true); // Always true on first render to match SSR
 
   useEffect(() => {
     if (typeof window === "undefined") return;
