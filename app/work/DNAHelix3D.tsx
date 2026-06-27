@@ -28,7 +28,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const height = 15;
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  
+
   const [accentColor] = useState(() => new THREE.Color(accent));
   const [secondaryColor] = useState(() => new THREE.Color(secondary));
 
@@ -53,12 +53,14 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   }, [secondaryColor, darkMode]);
 
   // Line segments geometry
-  const lineGeo = useMemo(() => {
+  const lineGeoRef = useRef<THREE.BufferGeometry | null>(null);
+  if (!lineGeoRef.current) {
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(numPairs * 6); // 2 points per pair, 3 coords
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    return geo;
-  }, [numPairs]);
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    lineGeoRef.current = geo;
+  }
+  const lineGeo = lineGeoRef.current;
 
   const lineMat = useMemo(() => {
     return new THREE.LineBasicMaterial({
@@ -117,8 +119,8 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         positions[i * 6 + 4] = y;
         positions[i * 6 + 5] = zB;
       } else {
-         // zero out to not draw lines between every single node if not wanted, 
-         // but let's just make it same for now or 0
+        // zero out to not draw lines between every single node if not wanted,
+        // but let's just make it same for now or 0
         positions[i * 6] = 0;
         positions[i * 6 + 1] = 0;
         positions[i * 6 + 2] = 0;
@@ -138,7 +140,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     accentColor.set(accent);
     materialA.color.set(accentColor);
     materialA.emissive.set(accentColor);
-    
+
     secondaryColor.set(secondary);
     materialB.color.set(secondaryColor);
     materialB.emissive.set(secondaryColor);
@@ -146,8 +148,14 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
 
   return (
     <group ref={groupRef} rotation={[0, 0, THREE.MathUtils.degToRad(-15)]}>
-      <instancedMesh ref={instancedNodesA} args={[sphereGeo, materialA, numPairs]} />
-      <instancedMesh ref={instancedNodesB} args={[sphereGeo, materialB, numPairs]} />
+      <instancedMesh
+        ref={instancedNodesA}
+        args={[sphereGeo, materialA, numPairs]}
+      />
+      <instancedMesh
+        ref={instancedNodesB}
+        args={[sphereGeo, materialB, numPairs]}
+      />
       <lineSegments ref={linesRef} geometry={lineGeo} material={lineMat} />
     </group>
   );

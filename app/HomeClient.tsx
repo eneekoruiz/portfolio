@@ -76,7 +76,9 @@ const CanvasScene = dynamic<{
   secondary: string;
   darkMode: boolean;
   paused?: boolean;
-}>(() => import("./work/CanvasScene").then((m) => m.CanvasScene), { ssr: false });
+}>(() => import("./work/CanvasScene").then((m) => m.CanvasScene), {
+  ssr: false,
+});
 
 // Registrar plugins GSAP
 if (typeof window !== "undefined") {
@@ -236,7 +238,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {mounted && !ready &&
+      {mounted &&
+        !ready &&
         (phase === "loading" || phase === "splash" || phase === "checking") && (
           <>
             <IdentitySplash

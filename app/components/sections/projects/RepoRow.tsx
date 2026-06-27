@@ -133,7 +133,7 @@ export function RepoRow({
         enterTimer.current = null;
       }
     };
-  }, [isActive]);
+  }, [isActive, menu]);
 
   const isDark = mounted && resolvedTheme === "dark";
 
@@ -224,7 +224,9 @@ export function RepoRow({
                       background: isDark
                         ? `linear-gradient(145deg, ${LANG_COLORS[r.langs?.[0]] || "#666666"}80 0%, transparent 100%)`
                         : `linear-gradient(145deg, ${LANG_COLORS[r.langs?.[0]] || "#24292F"} 0%, ${LANG_COLORS[r.langs?.[0]] || "#24292F"}ee 100%)`,
-                      borderColor: isDark ? "rgba(255,255,255,0.1)" : "transparent",
+                      borderColor: isDark
+                        ? "rgba(255,255,255,0.1)"
+                        : "transparent",
                       boxShadow: `0 8px 20px rgba(0,0,0,0.15)`,
                     }}
                   >

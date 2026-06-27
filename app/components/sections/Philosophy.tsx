@@ -108,7 +108,7 @@ function BentoCard({
       el.removeEventListener("mouseenter", onEnter);
       el.removeEventListener("mouseleave", onLeave);
     };
-  }, [index]);
+  }, [index, motionEnabled]);
 
   return (
     <div

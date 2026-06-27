@@ -197,7 +197,12 @@ export function NetworkParticles() {
 
         // If average frame rate falls below 48 FPS, degrade particle count gracefully
         // Only run after the initialization period to avoid page-load spikes triggering reduction
-        if (now - startTime > fpsGuardDelay && fps < 48 && stars.length > 50 && performanceScale > 0.3) {
+        if (
+          now - startTime > fpsGuardDelay &&
+          fps < 48 &&
+          stars.length > 50 &&
+          performanceScale > 0.3
+        ) {
           performanceScale = Math.max(0.25, performanceScale * 0.8);
           const area = Math.max(1, W * H);
           const baseCount = Math.round(area * cfg.density);
@@ -244,15 +249,15 @@ export function NetworkParticles() {
           if (distSq < mouseDistSq) {
             const dist = Math.sqrt(distSq);
             if (dist > 4) {
-              const strength = (1 - dist / mouseDist);
-              
+              const strength = 1 - dist / mouseDist;
+
               // Attraction force towards mouse
               const pullForce = strength * 0.35;
               p.vx += (dx / dist) * pullForce;
               p.vy += (dy / dist) * pullForce;
 
               // Swirl force around mouse for organic motion
-              const swirlForce = strength * 0.20;
+              const swirlForce = strength * 0.2;
               p.vx += (-dy / dist) * swirlForce;
               p.vy += (dx / dist) * swirlForce;
             }
@@ -279,7 +284,9 @@ export function NetworkParticles() {
       // Reset connection counters
       const connCounts = new Uint8Array(stars.length);
 
-      const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+      const isDark =
+        typeof document !== "undefined" &&
+        document.documentElement.classList.contains("dark");
 
       // Draw lines (constellations) with ultra-thin strokes
       ctx.lineWidth = isDark ? 0.55 : 0.75; // Thicker in light mode for better visibility
@@ -339,7 +346,7 @@ export function NetworkParticles() {
               ctx.lineTo(mouse.x, mouse.y);
               ctx.strokeStyle = isDark
                 ? `rgba(147, 197, 253, ${alpha})` // bright blue
-                : `rgba(79, 70, 229, ${alpha})`;  // rich indigo
+                : `rgba(79, 70, 229, ${alpha})`; // rich indigo
               ctx.stroke();
             }
           }

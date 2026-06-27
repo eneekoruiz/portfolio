@@ -1317,13 +1317,19 @@ export function ProjectHero({
                 aria-live="polite"
               >
                 <span>{s.initializing}</span>
-                <span ref={scrollTextRef} className="text-white">0%</span>
+                <span ref={scrollTextRef} className="text-white">
+                  0%
+                </span>
               </div>
               <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden relative">
                 <div
                   ref={scrollBarRef}
                   className="h-full transition-all duration-100 ease-linear rounded-full"
-                  style={{ width: "0%", backgroundColor: accent, boxShadow: `0 0 6px ${accent}` }}
+                  style={{
+                    width: "0%",
+                    backgroundColor: accent,
+                    boxShadow: `0 0 6px ${accent}`,
+                  }}
                 />
               </div>
               <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">

@@ -54,7 +54,9 @@ export const HeroScrollHUD = forwardRef<HTMLDivElement, HeroScrollHUDProps>(
         >
           <div className="flex items-center justify-between w-full font-mono text-[8px] uppercase tracking-[0.3em] text-white/60 font-black">
             <span>{s.initializing}</span>
-            <span ref={scrollTextRef} className="text-white">0%</span>
+            <span ref={scrollTextRef} className="text-white">
+              0%
+            </span>
           </div>
           <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden relative">
             <div

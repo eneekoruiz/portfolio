@@ -17,7 +17,11 @@ const TextReveal = ({ text }: { text: string }) => {
         <span
           key={i}
           className="inline-block char-reveal"
-          style={{ transform: "translateY(110%) rotateX(45deg)", opacity: 0, transformOrigin: "bottom" }}
+          style={{
+            transform: "translateY(110%) rotateX(45deg)",
+            opacity: 0,
+            transformOrigin: "bottom",
+          }}
         >
           {char}
         </span>
