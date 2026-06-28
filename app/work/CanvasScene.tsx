@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
 import { DNAHelix3D } from "./DNAHelix3D";
 
 interface CanvasSceneProps {
@@ -24,15 +23,15 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true }}
     >
-      <ambientLight intensity={darkMode ? 0.2 : 0.8} />
-      <pointLight position={[10, 10, 10]} intensity={darkMode ? 1 : 2} />
+      <ambientLight intensity={darkMode ? 0.5 : 1} />
+      <directionalLight position={[10, 10, 10]} intensity={darkMode ? 1.5 : 2.5} />
+      <directionalLight position={[-10, -10, -10]} intensity={darkMode ? 0.5 : 1} />
       <DNAHelix3D
         accent={accent}
         secondary={secondary}
         darkMode={darkMode}
         paused={paused}
       />
-      <Environment preset="city" />
     </Canvas>
   );
 };

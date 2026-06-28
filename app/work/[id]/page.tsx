@@ -48,10 +48,14 @@ type TerrainMeshProps = { accent: string; darkMode: boolean };
 type FloatingArtifactProps = { accent: string; idx: number };
 type AccentProps = { accent: string };
 
-const DNAHelix = dynamic<DNAHelixProps>(
-  () => import("../visualizers").then((m) => m.DNAHelix),
-  { ssr: false },
-);
+const CanvasScene = dynamic<{
+  accent: string;
+  secondary: string;
+  darkMode: boolean;
+  paused?: boolean;
+}>(() => import("../CanvasScene").then((m) => m.CanvasScene), {
+  ssr: false,
+});
 const TerrainMesh = dynamic<TerrainMeshProps>(
   () => import("../visualizers").then((m) => m.TerrainMesh),
   { ssr: false },
@@ -557,7 +561,7 @@ export default function ProjectPage() {
                   transformStyle: "preserve-3d",
                 }}
               >
-                <DNAHelix
+                <CanvasScene
                   accent={theme.helixA}
                   secondary={theme.helixB}
                   darkMode={darkMode}

@@ -130,6 +130,10 @@ function AboutContent({ t }: { t: Tx }) {
       id="about"
       aria-label="Sobre mí"
       className="relative py-24 md:py-40 overflow-hidden z-[20] bg-page"
+      style={{
+        maskImage: "linear-gradient(to bottom, transparent, black 15%, black)",
+        WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black)",
+      }}
     >
       <NetworkParticles />
       <div className="px-6 md:px-8 max-w-[1200px] mx-auto relative z-10">
