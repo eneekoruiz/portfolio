@@ -45,6 +45,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const memojiRef = useRef<HTMLDivElement>(null);
+  const bgGlowRef = useRef<HTMLDivElement>(null);
 
   const [isMobile, setIsMobile] = useState(false);
   const tilt = useDeviceTilt();
@@ -74,9 +75,27 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
     const hero = document.getElementById("hero");
     if (!btn || !hero) return;
 
+    const glow = bgGlowRef.current;
+    const setGlowX = glow
+      ? gsap.quickTo(glow, "x", { duration: 0.45, ease: "power3.out" })
+      : null;
+    const setGlowY = glow
+      ? gsap.quickTo(glow, "y", { duration: 0.45, ease: "power3.out" })
+      : null;
+    const setGlowOpacity = glow
+      ? gsap.quickTo(glow, "opacity", { duration: 0.35, ease: "power2.out" })
+      : null;
+
     // ── MODO DESKTOP: Mouse ────────────────────────────────────────────
     const onMove = (e: MouseEvent) => {
       if (isMobile || reduced) return;
+
+      const heroRect = hero.getBoundingClientRect();
+      setGlowX?.(e.clientX - heroRect.left - 260);
+      setGlowY?.(e.clientY - heroRect.top - 260);
+      setGlowOpacity?.(
+        document.documentElement.classList.contains("dark") ? 0.52 : 0.34,
+      );
 
       const rect = btn.getBoundingClientRect();
       const currentX = (gsap.getProperty(btn, "x") as number) || 0;
@@ -217,6 +236,10 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
 
     const onLeave = () => {
       if (isMobile) return;
+      setGlowX?.(-900);
+      setGlowY?.(-900);
+      setGlowOpacity?.(0);
+
       if (btn)
         gsap.to(btn, {
           x: 0,
@@ -326,6 +349,7 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
         hero.removeEventListener("mouseleave", onLeave);
       }
       mobileAnim?.kill();
+      if (glow) gsap.killTweensOf(glow);
       touchCleanup();
     };
   }, [reduced, motionEnabled, isMobile, phase]);
@@ -369,6 +393,17 @@ export function Hero({ t, greeting, reduced, setMag, phase }: HeroProps) {
       aria-label="Hero"
       className="min-h-[100svh] flex flex-col overflow-hidden pt-[80px] relative snap-start"
     >
+      <div
+        ref={bgGlowRef}
+        className="pointer-events-none absolute left-0 top-0 z-0 h-[520px] w-[520px] rounded-full opacity-0 blur-3xl will-change-transform"
+        style={{
+          transform: "translate3d(-900px, -900px, 0)",
+          background:
+            "radial-gradient(circle, rgba(0,102,255,0.42) 0%, rgba(0,102,255,0.18) 34%, transparent 70%)",
+        }}
+        aria-hidden="true"
+      />
+
       {/* Memoji + Pill */}
       <div
         ref={memojiRef}

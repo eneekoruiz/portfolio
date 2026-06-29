@@ -48,6 +48,9 @@ export function RepoRow({
         className="py-[18px] md:py-5 cursor-pointer relative z-10"
         onMouseEnter={() => !isTouch && setActiveRepo(idx)}
         onMouseLeave={() => !isTouch && setActiveRepo(null)}
+        onFocus={() => !isTouch && setActiveRepo(idx)}
+        onBlur={() => !isTouch && setActiveRepo(null)}
+        tabIndex={0}
         onClick={() => {
           if (isTouch) {
             setActiveRepo(isActive ? null : idx);
@@ -100,7 +103,7 @@ export function RepoRow({
               </div>
             </div>
             <div
-              className="grid transition-[grid-template-rows] duration-300 ease-out"
+              className="repo-description-panel grid transition-[grid-template-rows] duration-300 ease-out"
               style={{
                 gridTemplateRows: isActive && !menu ? "1fr" : "0fr",
               }}

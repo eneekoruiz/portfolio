@@ -21,6 +21,7 @@ export function NetworkParticles() {
       H = 0,
       raf = 0;
     let paused = false;
+    let inViewport = false;
 
     type Star = {
       x: number;
@@ -134,7 +135,7 @@ export function NetworkParticles() {
     container.addEventListener("touchcancel", ml);
 
     const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
+      if (document.visibilityState === "visible" && inViewport) {
         paused = false;
         if (!raf && motionEnabled) raf = requestAnimationFrame(loop);
       } else {
@@ -144,6 +145,26 @@ export function NetworkParticles() {
       }
     };
     document.addEventListener("visibilitychange", handleVisibility);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry.isIntersecting;
+        paused = !inViewport;
+        if (
+          inViewport &&
+          document.visibilityState === "visible" &&
+          motionEnabled &&
+          !raf
+        ) {
+          raf = requestAnimationFrame(loop);
+        } else if (!inViewport && raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      },
+      { rootMargin: "120px", threshold: 0.01 },
+    );
+    observer.observe(cv);
 
     const handleConfigUpdate = () => {
       cfg = getConfig();
@@ -161,6 +182,7 @@ export function NetworkParticles() {
           handleConfigUpdate,
         );
         document.removeEventListener("visibilitychange", handleVisibility);
+        observer.disconnect();
         container.removeEventListener("mousemove", mm as EventListener);
         container.removeEventListener("mouseleave", ml);
         container.removeEventListener("touchstart", touch as EventListener);
@@ -383,13 +405,14 @@ export function NetworkParticles() {
       raf = requestAnimationFrame(loop);
     };
 
-    loop();
+    if (inViewport) loop();
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       window.removeEventListener("portfolio-config-update", handleConfigUpdate);
       document.removeEventListener("visibilitychange", handleVisibility);
+      observer.disconnect();
       container.removeEventListener("mousemove", mm as EventListener);
       container.removeEventListener("mouseleave", ml);
       container.removeEventListener("touchstart", touch as EventListener);

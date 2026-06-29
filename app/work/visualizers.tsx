@@ -624,9 +624,15 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
-    let raf: number;
+    let raf = 0;
+    let active = false;
 
     const draw = () => {
+      if (!active || document.visibilityState !== "visible") {
+        raf = 0;
+        return;
+      }
+
       ctx.clearRect(0, 0, 300, 200);
 
       const nodes = nodesRef.current;
@@ -665,10 +671,29 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
       raf = requestAnimationFrame(draw);
     };
 
-    raf = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(raf);
-  }, [accent]);
+    const start = () => {
+      if (!raf) raf = requestAnimationFrame(draw);
+    };
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        active = entry.isIntersecting;
+        if (active) start();
+        else if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      },
+      { rootMargin: "80px", threshold: 0.01 },
+    );
+
+    observer.observe(canvas);
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
+  }, [accent]);
   return (
     <div className="relative h-44 flex items-center justify-center overflow-hidden">
       <canvas
