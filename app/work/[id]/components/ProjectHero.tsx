@@ -421,6 +421,7 @@ export function ProjectHero({
   const [mobilePressed, setMobilePressed] = useState(false);
 
   const [isInteracting, setIsInteracting] = useState(false);
+  const scrollLockYRef = useRef(0);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [canInteract, setCanInteract] = useState(false);
   const interRef = useRef(false);
@@ -707,7 +708,14 @@ export function ProjectHero({
   useEffect(() => {
     if (isInteracting) {
       // 1. Strict Scroll Lock & UI Cleanups
+      scrollLockYRef.current = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollLockYRef.current}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
       document.body.classList.add("studio-active");
       window.__lenis?.stop();
 
@@ -766,9 +774,17 @@ export function ProjectHero({
       window.addEventListener("keydown", handleEsc);
 
       return () => {
+        const lockedY = scrollLockYRef.current;
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        document.body.style.width = "";
         document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
         document.body.classList.remove("studio-active");
         window.__lenis?.start();
+        window.scrollTo(0, lockedY);
         window.removeEventListener("wheel", preventScrollAndZoom);
         window.removeEventListener("touchmove", preventScrollAndZoom);
         window.removeEventListener("keydown", preventZoomKeys);
@@ -846,7 +862,7 @@ export function ProjectHero({
       <>
         {/* Studio HUD - Top Control Bar */}
         {isInteracting && (
-          <header className="w-full bg-[#121212] border-b border-white/10 px-6 pb-4 pt-[calc(env(safe-area-inset-top,0px)+2rem)] md:py-4 flex items-center justify-between shrink-0 z-[2010]">
+          <header className="w-full bg-[#121212] border-b border-white/10 px-6 pb-4 pt-[calc(env(safe-area-inset-top,0px)+1rem)] md:py-4 flex items-center justify-between shrink-0 z-[10000]">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 pr-6 border-r border-white/10">
                 <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
@@ -908,7 +924,7 @@ export function ProjectHero({
               {/* Close Session */}
               <button
                 onClick={() => setIsInteracting(false)}
-                className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group shrink-0"
               >
                 <X size={16} className="font-bold" />
                 <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">
@@ -1140,7 +1156,7 @@ export function ProjectHero({
 
         {/* Studio HUD - Bottom Status Bar */}
         {isInteracting && (
-          <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[2010]">
+          <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[10000]">
             <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
               Auth: <span className="text-brand">Developer_Privileges</span>{" "}
               {" // "} Root_Access: <span className="text-green-400">True</span>
@@ -1248,7 +1264,7 @@ export function ProjectHero({
             ref={screenRef}
             className={
               isInteracting
-                ? "fixed inset-0 z-[2000] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+? "fixed inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : "absolute inset-0 m-auto z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
             }
             style={
@@ -1263,7 +1279,7 @@ export function ProjectHero({
                     maxHeight: "100dvh",
                     transform: "none",
                     borderRadius: 0,
-                    zIndex: 2000,
+                    zIndex: 9999,
                     display: "flex",
                     flexDirection: "column",
                     backgroundColor: "#0d0d0d",
@@ -1356,7 +1372,7 @@ export function ProjectHero({
             ref={screenRef}
             className={
               isInteracting
-                ? "fixed inset-0 z-[2000] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                ? "fixed inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : "relative z-30 pointer-events-auto overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 mx-auto w-[min(94vw,1400px)] h-[65dvh] md:h-[72dvh] rounded-[2.5rem]"
             }
             style={
@@ -1371,7 +1387,7 @@ export function ProjectHero({
                     maxHeight: "100dvh",
                     transform: "none",
                     borderRadius: 0,
-                    zIndex: 2000,
+                    zIndex: 9999,
                     display: "flex",
                     flexDirection: "column",
                     backgroundColor: "#0d0d0d",

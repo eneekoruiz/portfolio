@@ -1,4 +1,3 @@
-import { Inter } from "next/font/google";
 import { ClientThemeProvider } from "./components/ui/ClientThemeProvider";
 import { headers } from "next/headers";
 import { SkipLink } from "./components/ui/SkipLink";
@@ -9,12 +8,6 @@ import { SmoothScroll } from "./components/motion/SmoothScroll";
 import { InfallibleCursor } from "./components/motion/InfallibleCursor";
 import { baseMetadata, jsonLd } from "./lib/metadata";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
-});
 
 export const metadata = baseMetadata;
 
@@ -26,7 +19,7 @@ export default async function RootLayout({
   const nonce = (await headers()).get("x-nonce") || "";
 
   return (
-    <html lang="es" className={`${inter.variable}`} suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#f5f5f7" />
         <meta name="color-scheme" content="light dark" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo, useState, useEffect } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -11,6 +11,11 @@ interface DNAHelix3DProps {
   paused?: boolean;
 }
 
+const PAIRS = 76;
+const RADIUS = 2.45;
+const HEIGHT = 24;
+const TURNS = 5.75;
+
 export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   accent,
   secondary,
@@ -18,162 +23,167 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   paused = false,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const rungsRef = useRef<THREE.LineSegments>(null);
-  
-  const numPairs = 70;
-  const radius = 2.5;
-  const height = 24;
-  const turns = 5.5;
+  const nodesARef = useRef<THREE.InstancedMesh>(null);
+  const nodesBRef = useRef<THREE.InstancedMesh>(null);
+  const rungsRef = useRef<THREE.InstancedMesh>(null);
 
-  const [accentColor] = useState(() => new THREE.Color(accent));
-  const [secondaryColor] = useState(() => new THREE.Color(secondary));
+  const accentColor = useMemo(() => new THREE.Color(accent), [accent]);
+  const secondaryColor = useMemo(() => new THREE.Color(secondary), [secondary]);
 
-  // Pre-calculate positions once to avoid massive CPU overhead in useFrame
-  const { positionsA, positionsB, rungsPositions, strandAPositions, strandBPositions } = useMemo(() => {
+  const helixData = useMemo(() => {
     const dummy = new THREE.Object3D();
     const matricesA: THREE.Matrix4[] = [];
     const matricesB: THREE.Matrix4[] = [];
-    const rungs = new Float32Array(numPairs * 6);
-    const strandA = new Float32Array(numPairs * 3);
-    const strandB = new Float32Array(numPairs * 3);
+    const rungMatrices: THREE.Matrix4[] = [];
+    const pointsA: THREE.Vector3[] = [];
+    const pointsB: THREE.Vector3[] = [];
+    const up = new THREE.Vector3(0, 1, 0);
 
-    for (let i = 0; i < numPairs; i++) {
-      const progress = i / (numPairs - 1);
-      const y = (progress - 0.5) * height;
-      const angle = progress * Math.PI * 2 * turns;
+    for (let i = 0; i < PAIRS; i++) {
+      const progress = i / (PAIRS - 1);
+      const y = (progress - 0.5) * HEIGHT;
+      const t = progress * Math.PI * 2 * TURNS;
 
-      const xA = Math.cos(angle) * radius;
-      const zA = Math.sin(angle) * radius;
-      const xB = Math.cos(angle + Math.PI) * radius;
-      const zB = Math.sin(angle + Math.PI) * radius;
+      const a = new THREE.Vector3(
+        RADIUS * Math.cos(t),
+        y,
+        RADIUS * Math.sin(t),
+      );
+      const b = new THREE.Vector3(
+        RADIUS * Math.cos(t + Math.PI),
+        y,
+        RADIUS * Math.sin(t + Math.PI),
+      );
 
-      // Node A
-      dummy.position.set(xA, y, zA);
-      dummy.scale.setScalar(1); // Perfect rigid shape, no pulsing
+      pointsA.push(a);
+      pointsB.push(b);
+
+      const nodeScale = 0.11 + (i % 3) * 0.006;
+      dummy.position.copy(a);
+      dummy.quaternion.identity();
+      dummy.scale.setScalar(nodeScale);
       dummy.updateMatrix();
       matricesA.push(dummy.matrix.clone());
 
-      // Node B
-      dummy.position.set(xB, y, zB);
-      dummy.scale.setScalar(1);
+      dummy.position.copy(b);
+      dummy.quaternion.identity();
+      dummy.scale.setScalar(nodeScale);
       dummy.updateMatrix();
       matricesB.push(dummy.matrix.clone());
 
-      // Rungs
-      rungs[i * 6] = xA;
-      rungs[i * 6 + 1] = y;
-      rungs[i * 6 + 2] = zA;
-      rungs[i * 6 + 3] = xB;
-      rungs[i * 6 + 4] = y;
-      rungs[i * 6 + 5] = zB;
-
-      // Strands
-      strandA[i * 3] = xA;
-      strandA[i * 3 + 1] = y;
-      strandA[i * 3 + 2] = zA;
-      strandB[i * 3] = xB;
-      strandB[i * 3 + 1] = y;
-      strandB[i * 3 + 2] = zB;
+      const mid = a.clone().lerp(b, 0.5);
+      const dir = b.clone().sub(a);
+      const length = dir.length();
+      dummy.position.copy(mid);
+      dummy.quaternion.setFromUnitVectors(up, dir.normalize());
+      dummy.scale.set(1, length, 1);
+      dummy.updateMatrix();
+      rungMatrices.push(dummy.matrix.clone());
     }
 
-    return { positionsA: matricesA, positionsB: matricesB, rungsPositions: rungs, strandAPositions: strandA, strandBPositions: strandB };
-  }, [numPairs, radius, height, turns]);
+    return {
+      matricesA,
+      matricesB,
+      rungMatrices,
+      curveA: new THREE.CatmullRomCurve3(pointsA),
+      curveB: new THREE.CatmullRomCurve3(pointsB),
+    };
+  }, []);
 
-  // Geometry for nodes
-  const sphereGeo = useMemo(() => new THREE.SphereGeometry(0.15, 16, 16), []);
-  const materialA = useMemo(() => new THREE.MeshStandardMaterial({
-    color: accentColor,
-    emissive: accentColor,
-    emissiveIntensity: darkMode ? 2.0 : 0.5,
-    toneMapped: false,
-  }), [accentColor, darkMode]);
+  const sphereGeo = useMemo(() => new THREE.SphereGeometry(1, 16, 12), []);
+  const rungGeo = useMemo(() => new THREE.CylinderGeometry(0.018, 0.018, 1, 8), []);
+  const strandAGeo = useMemo(
+    () => new THREE.TubeGeometry(helixData.curveA, 180, 0.024, 8, false),
+    [helixData.curveA],
+  );
+  const strandBGeo = useMemo(
+    () => new THREE.TubeGeometry(helixData.curveB, 180, 0.024, 8, false),
+    [helixData.curveB],
+  );
 
-  const materialB = useMemo(() => new THREE.MeshStandardMaterial({
-    color: secondaryColor,
-    emissive: secondaryColor,
-    emissiveIntensity: darkMode ? 1.5 : 0.3,
-    toneMapped: false,
-  }), [secondaryColor, darkMode]);
+  const materialA = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: accentColor,
+        emissive: accentColor,
+        emissiveIntensity: darkMode ? 1.4 : 0.25,
+        roughness: 0.34,
+        metalness: 0.22,
+        toneMapped: false,
+      }),
+    [accentColor, darkMode],
+  );
 
-  // Geometries for lines
-  const rungsGeo = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(rungsPositions, 3));
-    return geo;
-  }, [rungsPositions]);
+  const materialB = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: secondaryColor,
+        emissive: secondaryColor,
+        emissiveIntensity: darkMode ? 1.1 : 0.18,
+        roughness: 0.36,
+        metalness: 0.18,
+        toneMapped: false,
+      }),
+    [secondaryColor, darkMode],
+  );
 
-  const strandAGeo = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(strandAPositions, 3));
-    return geo;
-  }, [strandAPositions]);
-
-  const strandBGeo = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(strandBPositions, 3));
-    return geo;
-  }, [strandBPositions]);
-
-  const lineMat = useMemo(() => new THREE.LineBasicMaterial({
-    color: darkMode ? 0xffffff : 0x888888,
-    transparent: true,
-    opacity: darkMode ? 0.4 : 0.2,
-  }), [darkMode]);
-  
-  const strandMatA = useMemo(() => new THREE.LineBasicMaterial({
-    color: accentColor,
-    transparent: true,
-    opacity: darkMode ? 0.6 : 0.4,
-  }), [accentColor, darkMode]);
-
-  const strandMatB = useMemo(() => new THREE.LineBasicMaterial({
-    color: secondaryColor,
-    transparent: true,
-    opacity: darkMode ? 0.6 : 0.4,
-  }), [secondaryColor, darkMode]);
-
-  const instancedNodesA = useRef<THREE.InstancedMesh>(null);
-  const instancedNodesB = useRef<THREE.InstancedMesh>(null);
+  const rungMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: darkMode ? 0xdde7ff : 0x6f7480,
+        emissive: darkMode ? 0x172b58 : 0x000000,
+        emissiveIntensity: darkMode ? 0.32 : 0,
+        transparent: true,
+        opacity: darkMode ? 0.58 : 0.42,
+        roughness: 0.48,
+        metalness: 0.28,
+      }),
+    [darkMode],
+  );
 
   useEffect(() => {
-    if (instancedNodesA.current && instancedNodesB.current) {
-      for (let i = 0; i < numPairs; i++) {
-        instancedNodesA.current.setMatrixAt(i, positionsA[i]);
-        instancedNodesB.current.setMatrixAt(i, positionsB[i]);
-      }
-      instancedNodesA.current.instanceMatrix.needsUpdate = true;
-      instancedNodesB.current.instanceMatrix.needsUpdate = true;
+    const nodesA = nodesARef.current;
+    const nodesB = nodesBRef.current;
+    const rungs = rungsRef.current;
+    if (!nodesA || !nodesB || !rungs) return;
+
+    for (let i = 0; i < PAIRS; i++) {
+      nodesA.setMatrixAt(i, helixData.matricesA[i]);
+      nodesB.setMatrixAt(i, helixData.matricesB[i]);
+      rungs.setMatrixAt(i, helixData.rungMatrices[i]);
     }
-  }, [positionsA, positionsB, numPairs]);
+
+    nodesA.instanceMatrix.needsUpdate = true;
+    nodesB.instanceMatrix.needsUpdate = true;
+    rungs.instanceMatrix.needsUpdate = true;
+  }, [helixData]);
 
   useFrame((state, delta) => {
     if (paused || !groupRef.current) return;
     const time = state.clock.elapsedTime;
-    
-    // Only animate the parent group rotation/position for massive performance boost
-    groupRef.current.position.y = Math.sin(time * 0.5) * 0.5;
-    groupRef.current.rotation.y += delta * 0.5;
+    groupRef.current.position.y = Math.sin(time * 0.45) * 0.42;
+    groupRef.current.rotation.y += delta * 0.42;
   });
 
   useEffect(() => {
-    accentColor.set(accent);
-    materialA.color.set(accentColor);
-    materialA.emissive.set(accentColor);
-    strandMatA.color.set(accentColor);
-
-    secondaryColor.set(secondary);
-    materialB.color.set(secondaryColor);
-    materialB.emissive.set(secondaryColor);
-    strandMatB.color.set(secondaryColor);
-  }, [accent, secondary, accentColor, secondaryColor, materialA, materialB, strandMatA, strandMatB]);
+    return () => {
+      sphereGeo.dispose();
+      rungGeo.dispose();
+      strandAGeo.dispose();
+      strandBGeo.dispose();
+      materialA.dispose();
+      materialB.dispose();
+      rungMat.dispose();
+    };
+  }, [materialA, materialB, rungGeo, rungMat, sphereGeo, strandAGeo, strandBGeo]);
 
   return (
     <group ref={groupRef} rotation={[0, 0, THREE.MathUtils.degToRad(-15)]}>
-      <instancedMesh ref={instancedNodesA} args={[sphereGeo, materialA, numPairs]} />
-      <instancedMesh ref={instancedNodesB} args={[sphereGeo, materialB, numPairs]} />
-      <lineSegments ref={rungsRef} geometry={rungsGeo} material={lineMat} />
-      <primitive object={new THREE.Line(strandAGeo, strandMatA)} />
-      <primitive object={new THREE.Line(strandBGeo, strandMatB)} />
+      <mesh geometry={strandAGeo} material={materialA} />
+      <mesh geometry={strandBGeo} material={materialB} />
+      <instancedMesh ref={rungsRef} args={[rungGeo, rungMat, PAIRS]} />
+      <instancedMesh ref={nodesARef} args={[sphereGeo, materialA, PAIRS]} />
+      <instancedMesh ref={nodesBRef} args={[sphereGeo, materialB, PAIRS]} />
     </group>
   );
 };
