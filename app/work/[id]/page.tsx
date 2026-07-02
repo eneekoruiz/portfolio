@@ -547,15 +547,13 @@ export default function ProjectPage() {
       {isReadyToAnimate && motionEnabled && (
         <>
           <div
-            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden"
+            className="fixed inset-0 pointer-events-none z-0"
             style={{ perspective: "900px" }}
           >
             {!isA11y && !isSpot && (
               <div
-                className="helix-group will-change-transform"
+                className="helix-group will-change-transform absolute inset-0"
                 style={{
-                  width: "clamp(140px, 40vw, 420px)",
-                  height: "210vh",
                   opacity: darkMode ? 0.55 : 0.3,
                   filter: `drop-shadow(0 0 25px ${theme.helixA}60)`,
                   transformStyle: "preserve-3d",
