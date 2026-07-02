@@ -25,8 +25,9 @@ const getDeviceProfile = () => {
   const lite = (window as Window).__LITE === true;
   const lowPower =
     lite || isMobile || cores <= 4 || memory <= 4 || window.devicePixelRatio > 1.75;
+  const maxDpr = Math.min(window.devicePixelRatio || 1, 2);
 
-  return { isMobile, lowPower };
+  return { isMobile, lowPower, maxDpr };
 };
 
 export const CanvasScene: React.FC<CanvasSceneProps> = ({
@@ -38,7 +39,7 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
   const hostRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
-  const { isMobile, lowPower } = useMemo(() => getDeviceProfile(), []);
+  const { isMobile, lowPower, maxDpr } = useMemo(() => getDeviceProfile(), []);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -78,11 +79,11 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
     <div ref={hostRef} className="h-full w-full">
       <Canvas
         camera={camera}
-        dpr={isMobile ? [0.65, 0.9] : lowPower ? [0.75, 1] : [1, 1.35]}
+        dpr={(isMobile ? [1, 1.5] : lowPower ? [1, 1.5] : [1, maxDpr]) as [number, number]}
         frameloop={active ? "always" : "demand"}
-        performance={{ min: lowPower ? 0.3 : 0.5 }}
+        performance={{ min: lowPower ? 0.4 : 0.6 }}
         gl={{
-          antialias: !lowPower,
+          antialias: true,
           alpha: true,
           powerPreference: "high-performance",
         }}
