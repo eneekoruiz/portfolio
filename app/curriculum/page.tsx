@@ -16,6 +16,8 @@ import { useGSAP } from "@gsap/react";
 import { ChevronLeft, ExternalLink, Download } from "lucide-react";
 import { useTranslations } from "../hooks/useTranslations";
 
+const CV_ORIGIN = "https://eneko-ruiz-curriculum.vercel.app";
+
 export default function CurriculumPage() {
   const { t } = useTranslations();
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function CurriculumPage() {
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
+  const [pdfDownloading, setPdfDownloading] = useState(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,13 +34,28 @@ export default function CurriculumPage() {
 
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
+      if (e.origin !== CV_ORIGIN || !e.data?.type) return;
+
       if (e.data.type === "trigger-cv-print") {
-        const iframe = iframeRef.current;
-        if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
+        iframeRef.current?.contentWindow?.postMessage({ type: "print-cv" }, CV_ORIGIN);
+        setPdfDownloading(true);
+      }
+
+      if (e.data.type === "cv-download-pdf" || e.data.type === "cv-download-pdf-start") {
+        setPdfDownloading(true);
+      }
+
+      if (e.data.type === "cv-download-pdf-ready") {
+        setPdfDownloading(false);
+      }
+
+      if (e.data.type === "cv-download-pdf-fallback") {
+        setPdfDownloading(false);
+        if (typeof e.data.url === "string") {
+          window.open(e.data.url, "_blank", "noopener,noreferrer");
         }
       }
+
       if (e.data.type === "set-cv-height") {
         setIframeHeight(`${e.data.height}px`);
         setLoading(false);
@@ -48,6 +66,12 @@ export default function CurriculumPage() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
+
+  useEffect(() => {
+    if (!pdfDownloading) return;
+    const timer = window.setTimeout(() => setPdfDownloading(false), 35000);
+    return () => window.clearTimeout(timer);
+  }, [pdfDownloading]);
 
   useEffect(() => {
     document.title = "Currículum | Eneko Ruiz";
@@ -109,6 +133,17 @@ export default function CurriculumPage() {
     }
   }, [loading]);
 
+  const handleDownloadPdf = () => {
+    setPdfDownloading(true);
+    const iframe = iframeRef.current;
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage({ type: "print-cv" }, CV_ORIGIN);
+    } else {
+      window.open(`${CV_ORIGIN}/Eneko_Ruiz_CV_ES.pdf`, "_blank", "noopener,noreferrer");
+      setPdfDownloading(false);
+    }
+  };
+
   const handleReturn = () => {
     if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage({ type: "leaving" }, "*");
@@ -167,8 +202,22 @@ export default function CurriculumPage() {
         </h1>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={pdfDownloading}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-ink/10 dark:border-white/10 text-ink text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/5 disabled:opacity-60 disabled:pointer-events-none transition-all"
+            aria-busy={pdfDownloading}
+          >
+            {pdfDownloading ? (
+              <span className="w-3.5 h-3.5 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
+            ) : (
+              <Download size={14} />
+            )}
+            <span className="hidden sm:inline">PDF</span>
+          </button>
           <a
-            href="https://eneko-ruiz-curriculum.vercel.app"
+            href={CV_ORIGIN}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-page text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
@@ -181,6 +230,15 @@ export default function CurriculumPage() {
 
       {/* ── CONTENT AREA ── */}
       <main className="flex-1 relative bg-page overflow-y-auto overflow-x-hidden scroll-smooth">
+        {pdfDownloading && (
+          <div className="absolute inset-x-4 top-4 z-20 flex justify-center pointer-events-none">
+            <div className="flex items-center gap-3 rounded-full border border-ink/10 bg-page/95 px-5 py-3 text-[11px] font-bold uppercase tracking-[0.16em] text-ink shadow-2xl backdrop-blur-xl dark:border-white/10">
+              <span className="w-4 h-4 border-2 border-ink/20 border-t-ink rounded-full animate-spin" />
+              <span>Preparando PDF</span>
+            </div>
+          </div>
+        )}
+
         {loading && (
           <div className="absolute inset-0 z-10 bg-page flex items-center justify-center p-8">
             <div className="w-full max-w-5xl h-full flex gap-8 animate-pulse">
@@ -208,7 +266,7 @@ export default function CurriculumPage() {
         <div className="curriculum-content w-full h-full">
           <iframe
             ref={iframeRef}
-            src="https://eneko-ruiz-curriculum.vercel.app"
+            src={CV_ORIGIN}
             title="Eneko Ruiz Curriculum"
             style={{ height: iframeHeight }}
             className={`w-full border-none transition-all duration-1000 ${loading ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
@@ -245,7 +303,7 @@ export default function CurriculumPage() {
             </p>
             <div className="pointer-events-auto">
               <a
-                href="https://eneko-ruiz-curriculum.vercel.app"
+                href={CV_ORIGIN}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(0,102,255,0.2)]"
