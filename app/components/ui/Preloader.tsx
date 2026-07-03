@@ -21,6 +21,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   const [n, setN] = useState(0);
   const motionEnabled = useMotionEnabled();
   const containerRef = useRef<HTMLDivElement>(null);
+  const fieldRef = useRef<HTMLCanvasElement>(null);
   const numRef = useRef<HTMLDivElement>(null);
   const barContainerRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,114 @@ export function Preloader({ onDone }: { onDone: () => void }) {
   // Stable ref to onDone
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
+  const progressRef = useRef(n);
+  progressRef.current = n;
+
+  // Procedural signal field: shader-like visual richness without adding bundle weight.
+  useEffect(() => {
+    const canvas = fieldRef.current;
+    if (!canvas || !motionEnabled) return;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    let raf = 0;
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    const nodes = Array.from({ length: 34 }, (_, i) => ({
+      seed: i * 13.37,
+      x: Math.random(),
+      y: Math.random(),
+      r: 0.6 + Math.random() * 1.8,
+      speed: 0.24 + Math.random() * 0.68,
+    }));
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      width = Math.max(1, Math.floor(rect.width));
+      height = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const draw = (time: number) => {
+      const progress = progressRef.current / 100;
+      ctx.clearRect(0, 0, width, height);
+
+      const grd = ctx.createRadialGradient(
+        width * (0.35 + progress * 0.3),
+        height * 0.48,
+        10,
+        width * 0.5,
+        height * 0.5,
+        Math.max(width, height) * 0.8,
+      );
+      grd.addColorStop(0, `rgba(0, 102, 255, ${0.16 + progress * 0.1})`);
+      grd.addColorStop(0.45, "rgba(120, 180, 255, 0.045)");
+      grd.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      ctx.lineWidth = 0.7;
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        const ax =
+          ((a.x * width + Math.sin(time * 0.00018 * a.speed + a.seed) * 90) %
+            (width + 120)) -
+          60;
+        const ay =
+          ((a.y * height + Math.cos(time * 0.00016 * a.speed + a.seed) * 70) %
+            (height + 120)) -
+          60;
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(185, 215, 255, ${0.08 + progress * 0.15})`;
+        ctx.arc(ax, ay, a.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const bx =
+            ((b.x * width + Math.sin(time * 0.00018 * b.speed + b.seed) * 90) %
+              (width + 120)) -
+            60;
+          const by =
+            ((b.y * height + Math.cos(time * 0.00016 * b.speed + b.seed) * 70) %
+              (height + 120)) -
+            60;
+          const dx = ax - bx;
+          const dy = ay - by;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 210) continue;
+          ctx.strokeStyle = `rgba(0, 102, 255, ${(1 - dist / 210) * (0.045 + progress * 0.095)})`;
+          ctx.beginPath();
+          ctx.moveTo(ax, ay);
+          ctx.lineTo(bx, by);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+
+      const scanY = (height * (progress + ((time * 0.00006) % 0.12))) % height;
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      ctx.fillRect(0, scanY, width, 1);
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    raf = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, [motionEnabled]);
 
   // ── Exit Animation (Cinematic & Premium Zoom) ──────────────────────────────
   const playExit = useCallback(() => {
@@ -181,6 +290,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         aria-hidden="true"
       />
 
+      <canvas
+        ref={fieldRef}
+        className="absolute inset-0 h-full w-full opacity-80 mix-blend-screen dark:opacity-100"
+        aria-hidden="true"
+      />
+
+      <div className="preloader-signal-mask" aria-hidden="true" />
+
       {/* ── Ambient Light (Follows progress) ── */}
       <div
         ref={lightRef}
@@ -220,6 +337,10 @@ export function Preloader({ onDone }: { onDone: () => void }) {
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
             transformOrigin: "center center",
+            textShadow:
+              n > 92
+                ? "0 0 44px rgba(var(--brand-rgb), 0.42)"
+                : "0 0 18px rgba(var(--brand-rgb), 0.18)",
           }}
           aria-label={`${n} percent loaded`}
         >

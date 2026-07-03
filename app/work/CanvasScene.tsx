@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { DNAHelix3D } from "./DNAHelix3D";
 
 interface CanvasSceneProps {
@@ -19,15 +19,74 @@ const getDeviceProfile = () => {
   const nav = navigator as Navigator & { deviceMemory?: number };
   const cores = nav.hardwareConcurrency || 4;
   const memory = nav.deviceMemory || 4;
-  const isMobile =
-    window.matchMedia("(max-width: 768px), (hover: none), (pointer: coarse)")
-      .matches;
+  const isMobile = window.matchMedia(
+    "(max-width: 768px), (hover: none), (pointer: coarse)",
+  ).matches;
   const lite = (window as Window).__LITE === true;
   const lowPower =
-    lite || isMobile || cores <= 4 || memory <= 4 || window.devicePixelRatio > 1.75;
+    lite ||
+    isMobile ||
+    cores <= 4 ||
+    memory <= 4 ||
+    window.devicePixelRatio > 1.75;
 
   return { isMobile, lowPower };
 };
+
+function AdaptiveDprGovernor({
+  active,
+  lowPower,
+  isMobile,
+}: {
+  active: boolean;
+  lowPower: boolean;
+  isMobile: boolean;
+}) {
+  const { setDpr } = useThree();
+  const frameCount = useRef(0);
+  const lastCheck = useRef(0);
+  const currentDpr = useRef(isMobile ? 0.82 : lowPower ? 0.95 : 1.2);
+  const bounds = isMobile
+    ? { min: 0.6, max: 0.95 }
+    : lowPower
+      ? { min: 0.72, max: 1.08 }
+      : { min: 0.9, max: 1.35 };
+
+  useEffect(() => {
+    currentDpr.current = Math.min(
+      bounds.max,
+      Math.max(bounds.min, currentDpr.current),
+    );
+    setDpr(currentDpr.current);
+  }, [bounds.max, bounds.min, setDpr]);
+
+  useFrame((state) => {
+    if (!active) return;
+    frameCount.current += 1;
+    const now = state.clock.elapsedTime;
+    if (lastCheck.current === 0) {
+      lastCheck.current = now;
+      return;
+    }
+
+    const elapsed = now - lastCheck.current;
+    if (elapsed < 2) return;
+
+    const fps = frameCount.current / elapsed;
+    frameCount.current = 0;
+    lastCheck.current = now;
+
+    if (fps < 48 && currentDpr.current > bounds.min) {
+      currentDpr.current = Math.max(bounds.min, currentDpr.current - 0.12);
+      setDpr(currentDpr.current);
+    } else if (fps > 58 && currentDpr.current < bounds.max) {
+      currentDpr.current = Math.min(bounds.max, currentDpr.current + 0.06);
+      setDpr(currentDpr.current);
+    }
+  });
+
+  return null;
+}
 
 export const CanvasScene: React.FC<CanvasSceneProps> = ({
   accent,
@@ -85,8 +144,15 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
           antialias: !lowPower,
           alpha: true,
           powerPreference: "high-performance",
+          stencil: false,
+          depth: true,
         }}
       >
+        <AdaptiveDprGovernor
+          active={active}
+          lowPower={lowPower}
+          isMobile={isMobile}
+        />
         <ambientLight intensity={darkMode ? 0.68 : 1.08} />
         <directionalLight
           position={[7, 9, 8]}

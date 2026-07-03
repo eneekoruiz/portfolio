@@ -13,6 +13,120 @@ interface DNAHelix3DProps {
   isMobile?: boolean;
 }
 
+function createAtmosphereMaterial(
+  accent: string,
+  secondary: string,
+  darkMode: boolean,
+) {
+  return new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: {
+      uTime: { value: 0 },
+      uAccent: { value: new THREE.Color(accent) },
+      uSecondary: { value: new THREE.Color(secondary) },
+      uDark: { value: darkMode ? 1 : 0 },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv;
+      uniform float uTime;
+      uniform vec3 uAccent;
+      uniform vec3 uSecondary;
+      uniform float uDark;
+
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+      }
+
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(
+          mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+          mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+          u.y
+        );
+      }
+
+      void main() {
+        vec2 uv = vUv - 0.5;
+        float radial = 1.0 - smoothstep(0.04, 0.72, length(uv * vec2(0.62, 1.0)));
+        float ribbons = sin((uv.y + noise(uv * 4.0 + uTime * 0.06) * 0.12) * 34.0 + uTime * 0.85);
+        float strands = smoothstep(0.7, 1.0, ribbons) * radial;
+        float mist = noise(uv * 7.0 + vec2(uTime * 0.035, -uTime * 0.025)) * radial;
+        vec3 color = mix(uSecondary, uAccent, 0.55 + 0.45 * sin(uv.y * 8.0 + uTime * 0.4));
+        float alpha = (strands * 0.16 + mist * 0.08) * (0.48 + uDark * 0.52);
+        gl_FragColor = vec4(color, alpha);
+      }
+    `,
+  });
+}
+
+function HelixAtmosphere({
+  accent,
+  secondary,
+  darkMode,
+  paused,
+}: {
+  accent: string;
+  secondary: string;
+  darkMode: boolean;
+  paused: boolean;
+}) {
+  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+  if (!materialRef.current) {
+    materialRef.current = createAtmosphereMaterial(accent, secondary, darkMode);
+  }
+
+  const planeGeometry = useMemo(
+    () => new THREE.PlaneGeometry(8.5, 25, 1, 1),
+    [],
+  );
+
+  useEffect(() => {
+    const uniforms = materialRef.current?.uniforms;
+    if (!uniforms) return;
+    uniforms.uAccent.value.set(accent);
+    uniforms.uSecondary.value.set(secondary);
+    uniforms.uDark.value = darkMode ? 1 : 0;
+  }, [accent, darkMode, secondary]);
+
+  useFrame((state) => {
+    const uniforms = materialRef.current?.uniforms;
+    if (paused || !uniforms) return;
+    // Three uniforms are mutable GPU state updated outside React rendering.
+    // eslint-disable-next-line react-hooks/immutability
+    uniforms.uTime.value = state.clock.elapsedTime;
+  });
+
+  useEffect(() => {
+    const material = materialRef.current;
+    return () => {
+      material?.dispose();
+      planeGeometry.dispose();
+    };
+  }, [planeGeometry]);
+
+  return (
+    <mesh
+      geometry={planeGeometry}
+      material={materialRef.current}
+      position={[0, 0, -3.2]}
+      scale={[1.08, 1, 1]}
+    />
+  );
+}
 export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   accent,
   secondary,
@@ -150,7 +264,12 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         config.radialSegments,
         false,
       ),
-    [config.radialSegments, config.strandRadius, config.tubeSegments, helixData.curveA],
+    [
+      config.radialSegments,
+      config.strandRadius,
+      config.tubeSegments,
+      helixData.curveA,
+    ],
   );
   const strandBGeo = useMemo(
     () =>
@@ -161,7 +280,12 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         config.radialSegments,
         false,
       ),
-    [config.radialSegments, config.strandRadius, config.tubeSegments, helixData.curveB],
+    [
+      config.radialSegments,
+      config.strandRadius,
+      config.tubeSegments,
+      helixData.curveB,
+    ],
   );
 
   const materialA = useMemo(
@@ -238,19 +362,47 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       materialB.dispose();
       rungMat.dispose();
     };
-  }, [materialA, materialB, rungGeo, rungMat, sphereGeo, strandAGeo, strandBGeo]);
+  }, [
+    materialA,
+    materialB,
+    rungGeo,
+    rungMat,
+    sphereGeo,
+    strandAGeo,
+    strandBGeo,
+  ]);
 
   return (
     <group
       ref={groupRef}
-      rotation={config.rotation.map(THREE.MathUtils.degToRad) as [number, number, number]}
+      rotation={
+        config.rotation.map(THREE.MathUtils.degToRad) as [
+          number,
+          number,
+          number,
+        ]
+      }
       scale={config.scale}
     >
+      {!lowPower && !isMobile && (
+        <HelixAtmosphere
+          accent={accent}
+          secondary={secondary}
+          darkMode={darkMode}
+          paused={paused}
+        />
+      )}
       <mesh geometry={strandAGeo} material={materialA} />
       <mesh geometry={strandBGeo} material={materialB} />
       <instancedMesh ref={rungsRef} args={[rungGeo, rungMat, config.pairs]} />
-      <instancedMesh ref={nodesARef} args={[sphereGeo, materialA, config.pairs]} />
-      <instancedMesh ref={nodesBRef} args={[sphereGeo, materialB, config.pairs]} />
+      <instancedMesh
+        ref={nodesARef}
+        args={[sphereGeo, materialA, config.pairs]}
+      />
+      <instancedMesh
+        ref={nodesBRef}
+        args={[sphereGeo, materialB, config.pairs]}
+      />
     </group>
   );
 };

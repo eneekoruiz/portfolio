@@ -155,8 +155,9 @@ export function BinaryStreamBtn({
   const toRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const bitId = useRef(0);
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (state !== "idle") return;
+    const portalOrigin = { x: event.clientX, y: event.clientY };
     setState("animating");
     setProgress(0);
 
@@ -185,7 +186,7 @@ export function BinaryStreamBtn({
 
         // Navigate using the cinematic portal
         toRef.current = setTimeout(() => {
-          triggerPortal(href);
+          triggerPortal(href, portalOrigin);
         }, 150);
       } else {
         setProgress(p);
@@ -450,11 +451,12 @@ export function PortalWarpBtn({ className }: { className?: string }) {
   const [state, setState] = useState<BtnState>("idle");
   const toRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (state !== "idle") return;
+    const portalOrigin = { x: event.clientX, y: event.clientY };
     setState("animating");
     toRef.current = setTimeout(() => {
-      triggerPortal("/lab");
+      triggerPortal("/lab", portalOrigin);
     }, 820);
   };
 
