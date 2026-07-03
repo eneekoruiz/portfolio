@@ -13,7 +13,7 @@ interface CanvasSceneProps {
 
 const getDeviceProfile = () => {
   if (typeof window === "undefined") {
-    return { isMobile: false, lowPower: false };
+    return { isMobile: false, lowPower: false, maxDpr: 1 };
   }
 
   const nav = navigator as Navigator & { deviceMemory?: number };
@@ -29,28 +29,33 @@ const getDeviceProfile = () => {
     cores <= 4 ||
     memory <= 4 ||
     window.devicePixelRatio > 1.75;
+  const maxDpr = Math.min(window.devicePixelRatio || 1, 2);
 
-  return { isMobile, lowPower };
+  return { isMobile, lowPower, maxDpr };
 };
 
 function AdaptiveDprGovernor({
   active,
   lowPower,
   isMobile,
+  maxDpr,
 }: {
   active: boolean;
   lowPower: boolean;
   isMobile: boolean;
+  maxDpr: number;
 }) {
   const { setDpr } = useThree();
   const frameCount = useRef(0);
   const lastCheck = useRef(0);
-  const currentDpr = useRef(isMobile ? 0.82 : lowPower ? 0.95 : 1.2);
+  const currentDpr = useRef(
+    isMobile ? 0.86 : lowPower ? 1 : Math.min(maxDpr, 1.35),
+  );
   const bounds = isMobile
-    ? { min: 0.6, max: 0.95 }
+    ? { min: 0.65, max: 1 }
     : lowPower
-      ? { min: 0.72, max: 1.08 }
-      : { min: 0.9, max: 1.35 };
+      ? { min: 0.75, max: 1.15 }
+      : { min: 0.9, max: Math.min(maxDpr, 1.5) };
 
   useEffect(() => {
     currentDpr.current = Math.min(
@@ -97,7 +102,7 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
   const hostRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
-  const { isMobile, lowPower } = useMemo(() => getDeviceProfile(), []);
+  const { isMobile, lowPower, maxDpr } = useMemo(() => getDeviceProfile(), []);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -137,9 +142,15 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
     <div ref={hostRef} className="h-full w-full">
       <Canvas
         camera={camera}
-        dpr={isMobile ? [0.65, 0.9] : lowPower ? [0.75, 1] : [1, 1.35]}
+        dpr={
+          (isMobile
+            ? [0.75, 1]
+            : lowPower
+              ? [0.85, 1.15]
+              : [1, Math.min(maxDpr, 1.5)]) as [number, number]
+        }
         frameloop={active ? "always" : "demand"}
-        performance={{ min: lowPower ? 0.3 : 0.5 }}
+        performance={{ min: lowPower ? 0.4 : 0.6 }}
         gl={{
           antialias: !lowPower,
           alpha: true,
@@ -152,6 +163,7 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
           active={active}
           lowPower={lowPower}
           isMobile={isMobile}
+          maxDpr={maxDpr}
         />
         <ambientLight intensity={darkMode ? 0.68 : 1.08} />
         <directionalLight

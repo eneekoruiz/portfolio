@@ -480,7 +480,7 @@ export function ProjectHero({
           trigger: heroRef.current,
           start: "top top",
           end: disableStudio ? "+=120%" : "+=250%", // More space for a grander transition
-          scrub: 1.2,
+          scrub: 0.8,
           pin: true,
           anticipatePin: 1,
           onUpdate: (self: ScrollTrigger) => {
@@ -579,6 +579,11 @@ export function ProjectHero({
               z: -1500,
               filter: "blur(30px)",
               borderRadius: "50rem",
+              // Explicitly center the start state so it appears in the center, not corner
+              xPercent: -50,
+              yPercent: -50,
+              left: "50%",
+              top: "50%",
             },
             {
               scale: 1,
@@ -586,8 +591,10 @@ export function ProjectHero({
               z: 0,
               filter: "blur(0px)",
               borderRadius: "2.5rem",
-              // Centered by inset-0 m-auto in CSS
-              // RESPONSIVE DIMENSIONS - Use relative units for better mobile behavior
+              xPercent: -50,
+              yPercent: -50,
+              left: "50%",
+              top: "50%",
               width: "94vw",
               maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
               height: "82dvh",
@@ -695,27 +702,31 @@ export function ProjectHero({
     if (!screenRef.current || !motionEnabled) return;
 
     if (isInteracting) {
+      // Clear all GSAP-set transforms so position:fixed works correctly
+      gsap.set(screenRef.current, {
+        clearProps: "transform,left,top,xPercent,yPercent,width,height,borderRadius,filter,scale,opacity,z",
+      });
       const tl = gsap.timeline();
       tl.fromTo(
         ".studio-bar",
         { y: 50, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6, ease: "back.out(1.7)" },
       );
+    } else {
+      // On exit, ScrollTrigger refresh will re-apply the animated state
+      ScrollTrigger.refresh();
     }
   }, [isInteracting, motionEnabled]);
 
   // ── 🚀 STUDIO MODE SIDE EFFECTS (Scroll Lock & ESC Key) ────────────────
   useEffect(() => {
     if (isInteracting) {
-      // 1. Strict Scroll Lock & UI Cleanups
+      // 1. Strict Scroll Lock & UI Cleanups (avoid position: fixed which breaks GSAP ScrollTrigger)
       scrollLockYRef.current = window.scrollY;
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollLockYRef.current}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
       document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.touchAction = "none";
       document.body.classList.add("studio-active");
       window.__lenis?.stop();
 
@@ -775,13 +786,10 @@ export function ProjectHero({
 
       return () => {
         const lockedY = scrollLockYRef.current;
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        document.body.style.width = "";
         document.body.style.overflow = "";
+        document.body.style.touchAction = "";
         document.documentElement.style.overflow = "";
+        document.documentElement.style.touchAction = "";
         document.body.classList.remove("studio-active");
         window.__lenis?.start();
         window.scrollTo(0, lockedY);
@@ -1264,13 +1272,13 @@ export function ProjectHero({
             ref={screenRef}
             className={
               isInteracting
-? "fixed inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
-                : "absolute inset-0 m-auto z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
+? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                : "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
             }
             style={
               isInteracting
                 ? {
-                    position: "fixed",
+                    position: "absolute",
                     left: 0,
                     top: 0,
                     width: "100%",
