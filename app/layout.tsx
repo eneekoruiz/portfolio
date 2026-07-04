@@ -6,6 +6,7 @@ import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";
 import { InfallibleCursor } from "./components/motion/InfallibleCursor";
+import { CursorTrail } from "./components/motion/CursorTrail";
 import { baseMetadata, jsonLd } from "./lib/metadata";
 
 
@@ -122,6 +123,7 @@ export default async function RootLayout({
           <SmoothScroll />
           <EasterEgg />
           <InfallibleCursor />
+          <CursorTrail />
           <IntroProvider>{children}</IntroProvider>
         </ClientThemeProvider>
       </body>

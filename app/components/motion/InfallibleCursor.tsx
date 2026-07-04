@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { Plus, ArrowUpRight, Minus } from "lucide-react";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
-type CursorMode = "default" | "plus" | "arrow" | "text" | "minus";
+type CursorMode = "default" | "plus" | "arrow" | "text" | "minus" | "view";
 
 export function InfallibleCursor() {
   const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<CursorMode>("default");
   const [isHovered, setIsHovered] = useState(false);
+  const spinRef = useRef<HTMLDivElement>(null);
 
   const dotRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
@@ -103,9 +104,9 @@ export function InfallibleCursor() {
       }
     };
 
-    const onEnter = (e: MouseEvent) => {
+      const onEnter = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest(
-        "a,button,[data-h],input,select,[data-cursor-plus],[data-cursor-minus]",
+        "a,button,[data-h],input,select,[data-cursor-plus],[data-cursor-minus],[data-cursor-view]",
       ) as HTMLElement;
       if (!target) return;
 
@@ -115,6 +116,7 @@ export function InfallibleCursor() {
 
       if (target.hasAttribute("data-cursor-plus")) setMode("plus");
       else if (target.hasAttribute("data-cursor-minus")) setMode("minus");
+      else if (target.hasAttribute("data-cursor-view")) setMode("view");
       else if (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
         setMode("text");
       else if (
@@ -127,7 +129,7 @@ export function InfallibleCursor() {
 
     const onLeave = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest(
-        "a,button,[data-h],input,select,[data-cursor-plus],[data-cursor-minus]",
+        "a,button,[data-h],input,select,[data-cursor-plus],[data-cursor-minus],[data-cursor-view]",
       ) as HTMLElement;
       if (!target) return;
       isHover.current = false;
@@ -187,6 +189,15 @@ export function InfallibleCursor() {
 
       // Update outer follower (smoothly lags behind with LERP)
       if (followerRef.current) {
+        const isViewMode = mode === "view";
+        const viewScale = isViewMode ? 4.5 : isHover.current ? 1.8 : 1;
+        const currentScaleTarget = isViewMode ? 4.5 : targetScale.current;
+        if (!isViewMode) {
+          scale.current += (currentScaleTarget - scale.current) * 0.18;
+        } else {
+          scale.current += (4.5 - scale.current) * 0.12;
+        }
+
         let transformStr = `translate3d(${cx.current - 11}px, ${cy.current - 11}px, 0) scale(${scale.current})`;
         if (skewXVal !== 0 || skewYVal !== 0) {
           transformStr += ` skew(${skewXVal}deg, ${skewYVal}deg)`;
@@ -196,11 +207,17 @@ export function InfallibleCursor() {
 
         // Morph style dynamically to avoid React re-renders on every animation frame
         followerRef.current.style.backgroundColor = isHover.current
-          ? "white"
+          ? isViewMode ? "rgba(255,255,255,0)" : "white"
           : "transparent";
         followerRef.current.style.borderColor = isHover.current
-          ? "white"
+          ? isViewMode ? "rgba(255,255,255,0.6)" : "white"
           : "rgba(255, 255, 255, 0.45)";
+      }
+
+      // Spin the view-project ring
+      if (spinRef.current && mode === "view") {
+        const elapsed = performance.now() / 1000;
+        spinRef.current.style.transform = `rotate(${elapsed * 30}deg)`;
       }
 
       rafRef.current = requestAnimationFrame(animate);
@@ -285,7 +302,7 @@ export function InfallibleCursor() {
           borderRadius: "50%",
           border: "1px solid rgba(255, 255, 255, 0.45)",
           backgroundColor: "transparent",
-          mixBlendMode: "difference",
+          mixBlendMode: mode === "view" ? "normal" : "difference",
           opacity: 0,
           willChange: "transform, background-color, border-color",
           pointerEvents: "none",
@@ -294,14 +311,16 @@ export function InfallibleCursor() {
           justifyContent: "center",
           transition:
             "opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease",
+          overflow: "visible",
         }}
       >
+        {/* Standard mode icons */}
         <div
           className="flex items-center justify-center"
           style={{
-            transform: `scale(${isHovered ? 0.95 : 0})`,
+            transform: `scale(${isHovered && mode !== "view" ? 0.95 : 0})`,
             color: "black",
-            opacity: isHovered ? 1 : 0,
+            opacity: isHovered && mode !== "view" ? 1 : 0,
             transition: "transform 0.25s ease, opacity 0.2s ease",
           }}
         >
@@ -310,6 +329,47 @@ export function InfallibleCursor() {
           {mode === "arrow" && <ArrowUpRight size={12} strokeWidth={3.5} />}
           {mode === "text" && <div className="w-[1.5px] h-3 bg-black" />}
         </div>
+
+        {/* VIEW PROJECT circular text — only in view mode */}
+        {mode === "view" && (
+          <div
+            ref={spinRef}
+            style={{
+              position: "absolute",
+              width: "88px",
+              height: "88px",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              willChange: "transform",
+            }}
+          >
+            <svg
+              viewBox="0 0 100 100"
+              width="88"
+              height="88"
+              aria-hidden="true"
+            >
+              <defs>
+                <path
+                  id="cursor-circle"
+                  d="M 50,50 m -35,0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0"
+                />
+              </defs>
+              <text
+                fontSize="10.5"
+                fill="white"
+                fontFamily="monospace"
+                fontWeight="700"
+                letterSpacing="2"
+              >
+                <textPath href="#cursor-circle">
+                  VIEW PROJECT · VIEW PROJECT ·{" "}
+                </textPath>
+              </text>
+            </svg>
+          </div>
+        )}
       </div>
     </div>
   );

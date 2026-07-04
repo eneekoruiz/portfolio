@@ -30,6 +30,7 @@ import { useMobileMenu } from "./hooks/useMobileMenu";
 import { useIntroPhase } from "./hooks/useIntroPhase";
 import { useDnaColors } from "./hooks/useDnaColors";
 import { useNavbarInteractions } from "./hooks/useNavbarInteractions";
+import { useScrollVelocitySkew } from "./hooks/useScrollVelocitySkew";
 
 // ── UI & Navigation ────────────────────────────────────────────────────────
 import { Preloader } from "./components/ui/Preloader";
@@ -220,6 +221,13 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     };
   }, [reduced, motionEnabled]);
 
+  // ── Scroll Velocity Skew (Awwwards-grade rubbery scroll) ──
+  const skewRef = useScrollVelocitySkew<HTMLDivElement>({
+    maxSkew: 4,
+    ease: 0.08,
+    enabled: motionEnabled && !reduced,
+  });
+
   // ── Nav Handlers ──
   const { onNavEnter, onNavContainerLeave } = useNavbarInteractions(
     navInner,
@@ -288,12 +296,16 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
-        ref={main}
+        ref={(el) => {
+          (main as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          (skewRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+        }}
         id="main-content"
         className="relative z-[10]"
         style={{
           visibility: ready ? "visible" : "hidden",
           opacity: ready ? 1 : 0,
+          transformOrigin: "center top",
         }}
       >
         <Navbar
@@ -354,6 +366,9 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         t={t}
         menuRefs={menuRefs}
       />
+
+      {/* 🎞️ Premium Film Grain — SVG feTurbulence, always visible */}
+      <div className="film-grain" aria-hidden="true" />
 
       {/* 🛠️ Masterclass Utilities */}
       <div className="hud-scanline" aria-hidden="true" />

@@ -276,53 +276,47 @@ html.reveal-cursor .cur-ring {
     transform: none !important;
   }
 }
-@keyframes grain {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  10% {
-    transform: translate(-2%, -2%);
-  }
-  30% {
-    transform: translate(2%, 2%);
-  }
-  50% {
-    transform: translate(-2%, 1%);
-  }
-  70% {
-    transform: translate(1%, -2%);
-  }
-  90% {
-    transform: translate(-1%, 2%);
-  }
+/* ── PREMIUM FILM GRAIN — SVG feTurbulence animated seed ── */
+/* Much higher quality than the static noise approach */
+@keyframes grain-shift {
+  0%   { transform: translate(0,    0)    rotate(0deg); }
+  10%  { transform: translate(-2%, -3%)   rotate(0.5deg); }
+  20%  { transform: translate(3%,  1%)    rotate(-0.5deg); }
+  30%  { transform: translate(-1%, 2%)    rotate(0.3deg); }
+  40%  { transform: translate(2%,  -2%)   rotate(-0.3deg); }
+  50%  { transform: translate(-3%, 1%)    rotate(0.4deg); }
+  60%  { transform: translate(1%,  3%)    rotate(-0.4deg); }
+  70%  { transform: translate(-2%, -1%)   rotate(0.2deg); }
+  80%  { transform: translate(3%,  2%)    rotate(-0.2deg); }
+  90%  { transform: translate(-1%, -3%)   rotate(0.3deg); }
+  100% { transform: translate(0,    0)    rotate(0deg); }
 }
 
-body::after {
-  content: "";
+.film-grain {
   position: fixed;
-  inset: -50%;
-  width: 200%;
-  height: 200%;
-  z-index: 9990;
+  inset: -30%;
+  width: 160%;
+  height: 160%;
+  z-index: 9991;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.048;
   mix-blend-mode: overlay;
-  animation: grain 4s steps(10) infinite;
+  animation: grain-shift 0.55s steps(1) infinite;
+  will-change: transform;
 }
 
-/* FIX #10: Disable grain on mobile for performance */
+/* Lighter on light mode, slightly stronger in dark */
+:root .film-grain { opacity: 0.038; }
+.dark .film-grain { opacity: 0.055; }
+
+/* Disable grain on mobile for performance */
 @media (max-width: 768px) {
-  body::after {
-    display: none;
-  }
+  .film-grain { display: none; }
 }
 
 /* Disable heavy visuals when lite mode is active */
-html[data-lite="1"] body::after {
-  display: none !important;
-}
+html[data-lite="1"] .film-grain { display: none !important; }
 html[data-lite="1"] .cur-dot,
 html[data-lite="1"] .cur-ring {
   display: none !important;
@@ -376,6 +370,26 @@ html {
   transition:
     opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── LINE MASK REVEAL — Awwwards text reveal technique ── */
+/* Wrap text in .reveal-line > .reveal-line-inner for horizontal clip */
+.reveal-line {
+  overflow: hidden;
+  display: inline-block;
+}
+.reveal-line-inner {
+  display: inline-block;
+  transform: translateY(105%);
+  will-change: transform;
+}
+.reveal-line.in .reveal-line-inner {
+  transform: translateY(0);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* Stagger delay utilities */
+.reveal-line-inner[style*='--delay'] {
+  transition-delay: var(--delay, 0ms);
 }
 
 /* ── 7. BUTTON STATES — GPU-accelerated ── */

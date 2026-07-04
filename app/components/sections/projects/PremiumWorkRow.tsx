@@ -314,8 +314,7 @@ export function PremiumWorkRow({
           }
         }}
         className="relative z-10 w-full text-left py-[16px] md:py-[22px] px-5 md:px-6 flex items-center justify-between gap-4 cursor-pointer group/btn"
-        data-cursor-plus={isExpanded ? undefined : "true"}
-        data-cursor-minus={isExpanded ? "true" : undefined}
+        data-cursor-view="true"
       >
         {/* Order Number with Theme Color Shift */}
         <span
