@@ -987,3 +987,101 @@ html {
     opacity: 1;
   }
 }
+
+/* ── 26. SIGNAL PRELOADER + ECLIPSE PORTAL ── */
+.preloader-signal-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(var(--brand-rgb), 0.08),
+      transparent 18%,
+      transparent 74%,
+      rgba(var(--brand-rgb), 0.1)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.035) 0,
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+}
+
+.portal-eclipse-overlay {
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(var(--brand-rgb), 0.16),
+      transparent 42%
+    ),
+    var(--page);
+}
+
+.portal-scan-field {
+  background:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(var(--brand-rgb), 0.1) 46%,
+      rgba(255, 255, 255, 0.22) 50%,
+      rgba(var(--brand-rgb), 0.1) 54%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.055) 0,
+      rgba(255, 255, 255, 0.055) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  mix-blend-mode: screen;
+}
+
+.portal-eclipse-lens {
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(var(--brand-rgb), 0.48) 28%,
+      rgba(var(--brand-rgb), 0.18) 52%,
+      transparent 72%
+    ),
+    conic-gradient(
+      from 90deg,
+      rgba(var(--brand-rgb), 0),
+      rgba(var(--brand-rgb), 0.55),
+      rgba(255, 255, 255, 0.35),
+      rgba(var(--brand-rgb), 0)
+    );
+  box-shadow:
+    0 0 44px rgba(var(--brand-rgb), 0.42),
+    inset 0 0 28px rgba(255, 255, 255, 0.25);
+  filter: saturate(1.35) blur(0.2px);
+  will-change: transform, opacity;
+}
+
+.portal-eclipse-ring {
+  border: 1px solid rgba(var(--brand-rgb), 0.62);
+  box-shadow:
+    inset 0 0 36px rgba(var(--brand-rgb), 0.28),
+    0 0 70px rgba(var(--brand-rgb), 0.36);
+  background: radial-gradient(
+    circle,
+    transparent 52%,
+    rgba(var(--brand-rgb), 0.18) 72%,
+    transparent 78%
+  );
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-scan-field,
+  .preloader-signal-mask {
+    opacity: 0.12 !important;
+  }
+}
