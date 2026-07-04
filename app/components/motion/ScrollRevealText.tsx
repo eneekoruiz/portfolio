@@ -35,7 +35,7 @@ export function ScrollRevealText({
   delay = 0,
   threshold = 0.15,
 }: ScrollRevealTextProps) {
-  const containerRef = useRef<any>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
   const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
@@ -79,8 +79,8 @@ export function ScrollRevealText({
 
   return (
     // @ts-ignore — dynamic tag
-    <Tag ref={containerRef} className={className}>
-      {lines.map((line, i) => (
+    <Tag ref={containerRef as any} className={className}>
+      {lines.map((line: React.ReactNode, i: number) => (
         <span key={i} className="reveal-line block">
           <span className="reveal-line-inner">{line}</span>
         </span>

@@ -297,8 +297,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
         ref={(el) => {
-          (main as React.MutableRefObject<HTMLDivElement | null>).current = el;
-          (skewRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          (main as React.MutableRefObject<HTMLDivElement | null>).current = el as HTMLDivElement | null;
+          (skewRef as React.MutableRefObject<HTMLDivElement | null>).current = el as HTMLDivElement | null;
         }}
         id="main-content"
         className="relative z-[10]"
