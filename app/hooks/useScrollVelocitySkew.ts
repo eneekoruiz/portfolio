@@ -25,10 +25,10 @@ interface SkewOptions {
 }
 
 export function useScrollVelocitySkew<T extends HTMLElement>(
+  ref: React.RefObject<T | null> | React.MutableRefObject<T | null>,
   options: SkewOptions = {},
 ) {
   const { maxSkew = 5, ease = 0.1, enabled = true } = options;
-  const ref = useRef<T>(null);
   const currentSkew = useRef(0);
   const rafRef = useRef<number>(0);
   const velocityRef = useRef(0);
@@ -94,7 +94,5 @@ export function useScrollVelocitySkew<T extends HTMLElement>(
       window.__lenis?.off?.("scroll", onScroll);
       if (el) gsap.set(el, { skewY: 0 });
     };
-  }, [maxSkew, ease, enabled]);
-
-  return ref;
+  }, [maxSkew, ease, enabled, ref]);
 }

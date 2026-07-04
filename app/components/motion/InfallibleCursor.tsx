@@ -255,6 +255,7 @@ export function InfallibleCursor() {
       cancelAnimationFrame(rafRef.current);
       clearTimeout(shakeTO.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, motionEnabled]);
 
   if (!mounted || !motionEnabled) return null;

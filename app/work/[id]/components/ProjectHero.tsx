@@ -1272,13 +1272,13 @@ export function ProjectHero({
             ref={screenRef}
             className={
               isInteracting
-? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                ? "fixed inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
             }
             style={
               isInteracting
                 ? {
-                    position: "absolute",
+                    position: "fixed",
                     left: 0,
                     top: 0,
                     width: "100%",

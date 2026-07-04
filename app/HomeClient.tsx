@@ -222,7 +222,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   }, [reduced, motionEnabled]);
 
   // ── Scroll Velocity Skew (Awwwards-grade rubbery scroll) ──
-  const skewRef = useScrollVelocitySkew<HTMLDivElement>({
+  useScrollVelocitySkew<HTMLDivElement>(main, {
     maxSkew: 4,
     ease: 0.08,
     enabled: motionEnabled && !reduced,
@@ -296,10 +296,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
-        ref={(el) => {
-          (main as React.MutableRefObject<HTMLDivElement | null>).current = el as HTMLDivElement | null;
-          (skewRef as React.MutableRefObject<HTMLDivElement | null>).current = el as HTMLDivElement | null;
-        }}
+        ref={main}
         id="main-content"
         className="relative z-[10]"
         style={{

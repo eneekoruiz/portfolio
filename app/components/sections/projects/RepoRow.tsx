@@ -28,13 +28,9 @@ export function RepoRow({
   const isActive = activeRepo === idx;
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined") {
-      setIsTouch(window.matchMedia("(hover: none)").matches);
-    }
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
@@ -46,13 +42,13 @@ export function RepoRow({
     >
       <div
         className="py-[18px] md:py-5 cursor-pointer relative z-10"
-        onMouseEnter={() => !isTouch && setActiveRepo(idx)}
-        onMouseLeave={() => !isTouch && setActiveRepo(null)}
-        onFocus={() => !isTouch && setActiveRepo(idx)}
-        onBlur={() => !isTouch && setActiveRepo(null)}
+        onMouseEnter={() => !isMobile && setActiveRepo(idx)}
+        onMouseLeave={() => !isMobile && setActiveRepo(null)}
+        onFocus={() => !isMobile && setActiveRepo(idx)}
+        onBlur={() => !isMobile && setActiveRepo(null)}
         tabIndex={0}
         onClick={() => {
-          if (isTouch) {
+          if (isMobile) {
             setActiveRepo(isActive ? null : idx);
           } else {
             window.open(r.html_url, "_blank", "noopener,noreferrer");
