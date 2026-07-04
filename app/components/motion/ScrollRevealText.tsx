@@ -35,7 +35,7 @@ export function ScrollRevealText({
   delay = 0,
   threshold = 0.15,
 }: ScrollRevealTextProps) {
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<any>(null);
   const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
