@@ -32,6 +32,8 @@ La configuración usa Chromium de Playwright, escritorio 1440 × 1000 e iPhone 1
 
 El informe final completo se incluye en `audit/final-full-report`, con sus capturas en `audit/final-full-captures`. La batería anterior se conserva en `audit/full-suite-report`. No se afirma un objetivo de FPS en un móvil real ni compatibilidad validada con Safari.
 
+Una comprobación adicional posterior agotó el límite de 90 segundos al cerrar el contexto de Chromium en móvil, después de completar sus aserciones. Se conserva en `audit/additional-timeout-report`. Al repetir de forma aislada el modo oscuro y la primera visita móvil con `--timeout=180000`, ambos casos pasaron; el informe está en `audit/final-regression-report`. El tiempo de espera de las aserciones funcionales siguió siendo de 20 segundos.
+
 ## Entrega y publicación
 
 El paquete contiene el código completo, el parche o parches desde la base, la lista de archivos cambiados, un manifiesto con hashes y las instrucciones de publicación. El commit local permite reconocer exactamente esta intervención. No contiene `node_modules`, `.next`, credenciales ni archivos de entorno locales.
