@@ -32,14 +32,21 @@ export function ThemeToggle() {
     document.documentElement.style.setProperty("--y", `${y}px`);
     document.documentElement.setAttribute("data-transition", "eclipse");
 
-    const transition = document.startViewTransition(() => {
+    try {
+      const transition = document.startViewTransition(() => {
+        setTheme(theme === "dark" ? "light" : "dark");
+      });
+      transition.ready?.catch(() => {});
+      transition.updateCallbackDone?.catch(() => {});
+      transition.finished.finally(() => {
+        setIsAnimating(false);
+        document.documentElement.removeAttribute("data-transition");
+      });
+    } catch {
       setTheme(theme === "dark" ? "light" : "dark");
-    });
-
-    transition.finished.then(() => {
       setIsAnimating(false);
       document.documentElement.removeAttribute("data-transition");
-    });
+    }
   };
 
   if (!mounted) {

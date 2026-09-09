@@ -34,8 +34,8 @@ export function useDnaColors(
 
     // Natural color fallback
     return {
-      accent: isDarkLocal ? "#ffffff" : "#1a1a1a",
-      secondary: isDarkLocal ? "#666666" : "#b3b3b3",
+      accent: isDarkLocal ? "#729bff" : "#0066ff",
+      secondary: isDarkLocal ? "#d1dfff" : "#8aa8dc",
     };
   }, [activeSection, expandedIdx, top3, theme, resolvedTheme]);
 }

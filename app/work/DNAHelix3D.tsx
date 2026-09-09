@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { materia } from "../lib/materia";
 
 interface DNAHelix3DProps {
   accent: string;
@@ -178,6 +179,10 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
 
   const accentColor = useMemo(() => new THREE.Color(accent), [accent]);
   const secondaryColor = useMemo(() => new THREE.Color(secondary), [secondary]);
+  const liveColors = useMemo(
+    () => ({ accent: new THREE.Color(), secondary: new THREE.Color() }),
+    [],
+  );
 
   const helixData = useMemo(() => {
     const dummy = new THREE.Object3D();
@@ -328,7 +333,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     [darkMode],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const nodesA = nodesARef.current;
     const nodesB = nodesBRef.current;
     const rungs = rungsRef.current;
@@ -343,13 +348,26 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     nodesA.instanceMatrix.needsUpdate = true;
     nodesB.instanceMatrix.needsUpdate = true;
     rungs.instanceMatrix.needsUpdate = true;
-  }, [config.pairs, helixData]);
+  }, [config.pairs, helixData, materialA, materialB, rungMat]);
 
   useFrame((state, delta) => {
     if (paused || !groupRef.current) return;
     const time = state.clock.elapsedTime;
     groupRef.current.position.y = Math.sin(time * 0.32) * 0.26;
-    groupRef.current.rotation.y += delta * config.rotationSpeed;
+    groupRef.current.position.x = isMobile
+      ? 0
+      : materia.composition.value * 2.4;
+    groupRef.current.rotation.y +=
+      Math.min(delta, 0.05) *
+      config.rotationSpeed *
+      (1 + materia.warp.value * 14);
+    liveColors.accent.set(materia.accent);
+    liveColors.secondary.set(materia.secondary);
+    const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 4);
+    materialA.color.lerp(liveColors.accent, blend);
+    materialA.emissive.copy(materialA.color);
+    materialB.color.lerp(liveColors.secondary, blend);
+    materialB.emissive.copy(materialB.color);
   });
 
   useEffect(() => {
@@ -358,19 +376,16 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       rungGeo.dispose();
       strandAGeo.dispose();
       strandBGeo.dispose();
+    };
+  }, [sphereGeo, rungGeo, strandAGeo, strandBGeo]);
+
+  useEffect(() => {
+    return () => {
       materialA.dispose();
       materialB.dispose();
       rungMat.dispose();
     };
-  }, [
-    materialA,
-    materialB,
-    rungGeo,
-    rungMat,
-    sphereGeo,
-    strandAGeo,
-    strandBGeo,
-  ]);
+  }, [materialA, materialB, rungMat]);
 
   return (
     <group

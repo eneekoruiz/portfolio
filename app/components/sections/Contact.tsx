@@ -1,400 +1,139 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef, useState } from "react";
 import {
-  Mail,
-  GithubIcon,
-  LinkedinIcon,
   ArrowUpRight,
   Check,
+  Copy,
+  Github,
+  Linkedin,
+  Mail,
 } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useMagnetic } from "../../hooks/useMagnetic";
+import type { Lang, Tx } from "../../types";
+import { SectionFrame } from "./SectionFrame";
+import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
-import { BinaryStreamBtn } from "../ui/Buttons";
-import type { Tx } from "../../types";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 
 const EMAIL = "eneekoruiz@gmail.com";
 
-const CONTACTS = [
-  {
-    href: `mailto:${EMAIL}`,
-    icon: Mail,
-    label: "Gmail",
-    val: EMAIL,
-    bg: "#EA4335",
-    rgb: "234, 67, 53",
-    glow: "rgba(234,67,53,.4)",
-    bd: "border-[rgba(234,67,53,.5)]",
-    isEmail: true,
-  },
-  {
-    href: "https://github.com/eneekoruiz",
-    icon: GithubIcon,
-    label: "GitHub",
-    val: "github.com/eneekoruiz",
-    bg: "#24292F",
-    rgb: "36, 41, 47",
-    glow: "rgba(120,120,120,.3)",
-    bd: "border-[rgba(120,120,120,.45)]",
-    isEmail: false,
-  },
-  {
-    href: "https://linkedin.com/in/eneekoruiz",
-    icon: LinkedinIcon,
-    label: "LinkedIn",
-    val: "linkedin.com/in/eneekoruiz",
-    bg: "#0077B5",
-    rgb: "0, 119, 181",
-    glow: "rgba(0,119,181,.4)",
-    bd: "border-[rgba(0,119,181,.5)]",
-    isEmail: false,
-  },
-];
+export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
+  const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const alive = useRef(true);
+  const motion = useMotionEnabled();
+  const cardRef = useRef<HTMLDivElement>(null);
+  useMateriaSurface(cardRef, "#0066ff", motion, 28);
+  const mailRef = useSpringHover<HTMLAnchorElement>(motion);
+  const copyRef = useSpringHover<HTMLButtonElement>(motion);
+  const es = lang === "es";
 
-/* ── Email copy card with clipboard UX ── */
-function EmailCard({ c }: { c: (typeof CONTACTS)[0] }) {
-  const [copied, setCopied] = useState(false);
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const isDark = mounted && (theme === "dark" || resolvedTheme === "dark");
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
 
-  const cardRef = useMagnetic<HTMLDivElement>({
-    strength: 0.015,
-    innerStrength: 0.04,
-  });
-  const iconRef = useRef<HTMLDivElement>(null);
-
-  const handleClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (copied) return;
+  const copy = async () => {
     try {
       await navigator.clipboard.writeText(EMAIL);
-      setCopied(true);
-      // Ripple burst on the card
-      const el = cardRef.current;
-      if (el) {
-        gsap.fromTo(
-          el,
-          { scale: 1 },
-          {
-            scale: 1.03,
-            duration: 0.15,
-            ease: "power2.out",
-            onComplete: () => {
-              gsap.to(el, {
-                scale: 1,
-                duration: 0.4,
-                ease: "elastic.out(1, 0.4)",
-              });
-            },
-          },
-        );
-      }
-      setTimeout(() => setCopied(false), 2500);
+      if (!alive.current) return;
+      setStatus("copied");
     } catch {
-      window.location.href = c.href;
+      if (alive.current) setStatus("failed");
     }
+    if (!alive.current) return;
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setStatus("idle"), 4000);
   };
 
   return (
-    <div ref={cardRef} className="flip-wrap contact-card">
-      <button
-        onClick={handleClick}
-        aria-label={copied ? "Copiado!" : `Copiar email: ${EMAIL}`}
-        data-h
-        className="block h-full w-full text-left no-underline"
-        style={{
-          all: "unset",
-          display: "block",
-          width: "100%",
-          cursor: "default",
-          transformStyle: "preserve-3d",
-        }}
+    <SectionFrame id="contact" index="05" label={t.coLb} title={t.coH}>
+      <div
+        ref={cardRef}
+        data-section-reveal
+        className="materia-surface relative overflow-hidden rounded-[28px] border border-ink/15 p-6 md:p-10 transition-colors duration-300"
       >
-        <div className="flip-inner min-h-[180px]">
-          <div
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border transition-all duration-300 backdrop-blur-xl rounded-[32px] overflow-hidden`}
-            style={
-              {
-                background: isDark
-                  ? `linear-gradient(145deg, rgba(${c.rgb}, 0.06) 0%, rgba(${c.rgb}, 0.02) 100%)`
-                  : `linear-gradient(145deg, rgba(${c.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
-                borderColor: isDark
-                  ? `rgba(${c.rgb}, 0.35)`
-                  : `rgba(${c.rgb}, 0.4)`,
-                boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? "0.12" : "0.15"})`,
-              } as React.CSSProperties
-            }
-          >
-            <div ref={iconRef} className="transition-all duration-200">
-              {copied ? (
-                <Check
-                  size={28}
-                  className="text-[#34c759]"
-                  aria-hidden="true"
-                />
-              ) : (
-                <c.icon
-                  size={28}
-                  style={{
-                    color: isDark && c.label === "GitHub" ? "#fff" : c.bg,
-                  }}
-                  aria-hidden="true"
-                />
-              )}
-            </div>
-            <div>
-              <p className="font-black text-[1.1rem] tracking-[-0.4px] text-ink mb-1">
-                {c.label}
-              </p>
-              <p
-                className={`font-mono text-[12px] transition-colors duration-300 ${copied ? "text-[#34c759]" : "text-lead"}`}
-              >
-                {copied ? "¡Copiado al portapapeles!" : c.val}
-              </p>
-            </div>
-            <div
-              className="mt-auto flex items-center gap-1.5 text-[12px] font-bold"
-              style={{
-                color: copied
-                  ? "#34c759"
-                  : isDark && c.label === "GitHub"
-                    ? "#fff"
-                    : c.bg,
-              }}
-            >
-              {copied ? "Pegalo donde quieras" : "Copiar email"}{" "}
-              <ArrowUpRight size={13} />
-            </div>
-          </div>
-          <div
-            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden"
-            style={
-              {
-                background: isDark
-                  ? `linear-gradient(145deg, rgba(${c.rgb}, 0.1) 0%, rgba(${c.rgb}, 0.03) 100%)`
-                  : `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)`,
-                borderColor: isDark
-                  ? `rgba(${c.rgb}, 0.45)`
-                  : `rgba(${c.rgb}, 0.5)`,
-                boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? "0.15" : "0.2"})`,
-              } as React.CSSProperties
-            }
-          >
-            <c.icon
-              size={42}
-              style={{ color: isDark && c.label === "GitHub" ? "#fff" : c.bg }}
-              aria-hidden="true"
-            />
-            <span className="text-ink font-bold text-[14px]">Copiar email</span>
-          </div>
-        </div>
-      </button>
-    </div>
-  );
-}
-
-/* ── Standard social card with magnetic icon ── */
-function SocialCard({ c }: { c: (typeof CONTACTS)[0] }) {
-  const cardRef = useMagnetic<HTMLDivElement>({
-    strength: 0.015,
-    innerStrength: 0.04,
-  });
-  const iconRef = useRef<HTMLDivElement>(null);
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const isDark = mounted && (theme === "dark" || resolvedTheme === "dark");
-
-  return (
-    <div ref={cardRef} className="flip-wrap contact-card">
-      <a
-        href={c.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={c.label}
-        data-h
-        className="block h-full no-underline"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        <div className="flip-inner min-h-[180px]">
-          <div
-            className={`flip-front bento-glow border-beam h-full flex flex-col gap-3 p-[1.85rem] shadow-rest border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden`}
-            style={
-              {
-                background: isDark
-                  ? `linear-gradient(145deg, rgba(${c.rgb}, 0.06) 0%, rgba(${c.rgb}, 0.02) 100%)`
-                  : `linear-gradient(145deg, rgba(${c.rgb}, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%)`,
-                borderColor: isDark
-                  ? `rgba(${c.rgb}, 0.35)`
-                  : `rgba(${c.rgb}, 0.4)`,
-                boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? "0.12" : "0.15"})`,
-              } as React.CSSProperties
-            }
-          >
-            <div ref={iconRef}>
-              <c.icon
-                size={28}
-                style={{
-                  color: isDark && c.label === "GitHub" ? "#fff" : c.bg,
-                }}
-                aria-hidden="true"
-              />
-            </div>
-            <div>
-              <p className="font-black text-[1.1rem] tracking-[-0.4px] text-ink mb-1">
-                {c.label}
-              </p>
-              <p className="font-mono text-[12px] text-lead">{c.val}</p>
-            </div>
-            <div
-              className="mt-auto flex items-center gap-1.5 text-[12px] font-bold"
-              style={{ color: isDark && c.label === "GitHub" ? "#fff" : c.bg }}
-            >
-              Contactar <ArrowUpRight size={13} />
-            </div>
-          </div>
-          <div
-            className="flip-back flex flex-col items-center justify-center gap-3 border backdrop-blur-xl transition-all duration-300 rounded-[32px] overflow-hidden"
-            style={
-              {
-                background: isDark
-                  ? `linear-gradient(145deg, rgba(${c.rgb}, 0.1) 0%, rgba(${c.rgb}, 0.03) 100%)`
-                  : `linear-gradient(145deg, rgba(${c.rgb}, 0.35) 0%, rgba(${c.rgb}, 0.05) 100%)`,
-                borderColor: isDark
-                  ? `rgba(${c.rgb}, 0.45)`
-                  : `rgba(${c.rgb}, 0.5)`,
-                boxShadow: `0 20px 50px rgba(${c.rgb}, ${isDark ? "0.15" : "0.2"})`,
-              } as React.CSSProperties
-            }
-          >
-            <c.icon
-              size={42}
-              style={{ color: isDark && c.label === "GitHub" ? "#fff" : c.bg }}
-              aria-hidden="true"
-            />
-            <span className="text-ink font-bold text-[14px]">Escribir</span>
-          </div>
-        </div>
-      </a>
-    </div>
-  );
-}
-
-export function Contact({ t }: { t: Tx }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const motionEnabled = useMotionEnabled();
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      if (!motionEnabled) {
-        // Instantly reveal everything
-        gsap.set(".title-char, .contact-card, .sec-h", {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          scale: 1,
-        });
-        return;
-      }
-
-      const titleChars = containerRef.current?.querySelectorAll(".title-char");
-      if (titleChars && titleChars.length > 0) {
-        gsap.fromTo(
-          titleChars,
-          { y: "100%", rotateX: -90, opacity: 0 },
-          {
-            y: 0,
-            rotateX: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.015,
-            ease: "expo.out",
-            scrollTrigger: { trigger: containerRef.current, start: "top 99%" },
-          },
-        );
-      }
-
-      const cards =
-        containerRef.current?.querySelectorAll<HTMLElement>(".contact-card");
-      if (cards && cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            stagger: 0.05,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: "top 99%",
-              once: true,
-            },
-          },
-        );
-      }
-    });
-    return () => ctx.revert();
-  }, [motionEnabled]);
-
-  return (
-    <section
-      ref={containerRef}
-      id="contact"
-      data-section="contact"
-      aria-label="Contacto"
-      className="border-t border-black/7 dark:border-white/10 py-24 relative bg-transparent z-[20]"
-    >
-      <div className="px-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-12">
-        <div className="max-w-[700px]">
-          <p className="sec-h text-[10px] font-bold tracking-[.22em] uppercase text-lead/60 mb-5">
-            {t.coLb}
-          </p>
-          <h2 className="sec-h font-black text-[clamp(2.4rem,5vw,4.8rem)] tracking-[-2.5px] leading-[.91] text-ink mb-3 perspective-1000">
-            {t.coH.split(" ").map((word, wIdx, wordsArray) => (
-              <span key={wIdx} className="inline-block whitespace-nowrap">
-                {word.split("").map((c, cIdx) => (
-                  <span key={cIdx} className="title-char inline-block">
-                    {c}
-                  </span>
-                ))}
-                {wIdx < wordsArray.length - 1 && (
-                  <span className="title-char inline-block">&nbsp;</span>
-                )}
-              </span>
-            ))}
-          </h2>
-          <p className="sec-h text-[15px] md:text-[18px] text-lead max-w-[500px] leading-relaxed">
+        <div className="grid gap-8 border-b border-ink/15 pb-9 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+          <p className="max-w-xl text-lg leading-relaxed tracking-tight text-lead md:text-2xl">
             {t.coP}
           </p>
+          <span className="flex items-center gap-2 text-xs font-medium text-lead md:justify-end">
+            <span
+              className="h-2 w-2 rounded-full bg-emerald-600"
+              aria-hidden="true"
+            />
+            {t.status}
+          </span>
         </div>
-
-        <div className="sec-h flex flex-col items-start md:items-end gap-5">
-          <BinaryStreamBtn label={t.ctaCv} />
-          <div className="flex items-center gap-6 px-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#34c759] animate-pulse shadow-[0_0_10px_#34c759]" />
-            <span className="text-[11px] font-bold tracking-widest uppercase text-lead/50">
-              {t.status}
-            </span>
-          </div>
+        <a
+          href={`mailto:${EMAIL}`}
+          className="my-9 block w-fit break-all text-[clamp(1.4rem,4.4vw,4.7rem)] font-bold leading-tight tracking-[-0.06em] text-ink underline decoration-brand/40 decoration-1 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+        >
+          {EMAIL}
+        </a>
+        <div className="flex flex-wrap items-center gap-3">
+          <a
+            ref={mailRef}
+            href={`mailto:${EMAIL}`}
+            className="materia-button bg-ink text-page"
+          >
+            <Mail size={16} aria-hidden="true" />
+            {es ? "Escríbeme" : "Email me"}
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </a>
+          <button
+            ref={copyRef}
+            type="button"
+            onClick={copy}
+            className="materia-button border border-ink/20 text-ink"
+          >
+            {status === "copied" ? (
+              <Check size={16} aria-hidden="true" />
+            ) : (
+              <Copy size={16} aria-hidden="true" />
+            )}
+            {es ? "Copiar correo" : "Copy email"}
+          </button>
+          <a
+            href="https://github.com/eneekoruiz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="materia-button text-ink"
+          >
+            <Github size={16} aria-hidden="true" />
+            GitHub
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
+          <a
+            href="https://linkedin.com/in/eneekoruiz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="materia-button text-ink"
+          >
+            <Linkedin size={16} aria-hidden="true" />
+            LinkedIn
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
         </div>
+        <p
+          role="status"
+          aria-live="polite"
+          className="mt-4 min-h-6 text-sm text-lead"
+        >
+          {status === "copied"
+            ? es
+              ? "Correo copiado."
+              : "Email copied."
+            : status === "failed"
+              ? es
+                ? "No se pudo copiar. Puedes seleccionar el correo o usar Escríbeme."
+                : "Could not copy. Select the address or use Email me."
+              : ""}
+        </p>
       </div>
-
-      <div className="px-8 max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative z-10">
-        <EmailCard c={CONTACTS[0]} />
-        <SocialCard c={CONTACTS[1]} />
-        <SocialCard c={CONTACTS[2]} />
-      </div>
-    </section>
+    </SectionFrame>
   );
 }

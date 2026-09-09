@@ -3,6 +3,9 @@ import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 
 export default defineConfig([
   {
+    ignores: [".next/**", "node_modules/**", "dist/**", "out/**"],
+  },
+  {
     extends: [...nextCoreWebVitals],
     rules: {
       "react-hooks/set-state-in-effect": "off",

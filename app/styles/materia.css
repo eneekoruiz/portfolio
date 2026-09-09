@@ -1,0 +1,134 @@
+@font-face {
+  font-family: "Materia Sans";
+  src: url("/fonts/roboto-flex-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 1000;
+  font-stretch: 25% 151%;
+  font-display: swap;
+}
+
+.kinetic-type {
+  font-family: "Materia Sans", var(--font-sans);
+  font-variation-settings:
+    "wdth" var(--type-width, 100),
+    "wght" var(--type-weight, 850);
+  perspective: 1100px;
+  transform-style: preserve-3d;
+  text-wrap: nowrap;
+}
+.kinetic-type [data-kinetic-char] {
+  backface-visibility: hidden;
+}
+.materia-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border-radius: 999px;
+  padding: 14px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  outline-offset: 5px;
+}
+.materia-button:focus-visible {
+  outline: 2px solid var(--brand);
+}
+.materia-surface {
+  --surface-color: #0066ff;
+  --surface-x: 50%;
+  --surface-y: 50%;
+  --surface-energy: 0;
+  isolation: isolate;
+  background: color-mix(in srgb, var(--page) 24%, transparent);
+}
+.materia-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  opacity: var(--surface-energy);
+  background: radial-gradient(
+    ellipse at var(--surface-x) var(--surface-y),
+    color-mix(in srgb, var(--surface-color) 11%, transparent),
+    transparent 65%
+  );
+}
+.work-surface {
+  background: color-mix(in srgb, var(--page) 58%, transparent);
+}
+.work-surface-header {
+  -webkit-tap-highlight-color: transparent;
+}
+.work-expand-icon {
+  transform: rotate(calc(var(--accordion-progress, 0) * 135deg));
+}
+.hero-prism {
+  margin-left: -5%;
+}
+.umbral-surface {
+  will-change: transform;
+}
+.umbral-surface[hidden] {
+  display: none;
+}
+[data-umbral-clone] {
+  border: 0;
+  border-radius: 0;
+}
+[data-umbral-clone] [data-project-title] {
+  z-index: 10;
+}
+html[data-umbral]::view-transition-group(*) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-umbral]::view-transition-old(root),
+html[data-umbral]::view-transition-new(root) {
+  animation: none;
+}
+html[data-umbral]::view-transition-old(project-surface) {
+  animation-duration: 200ms;
+}
+html[data-umbral]::view-transition-new(project-surface) {
+  animation-duration: 300ms;
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .materia-canvas > div {
+    opacity: 0.16;
+  }
+  .materia-surface {
+    background: color-mix(in srgb, var(--page) 94%, transparent);
+  }
+  .materia-surface::before {
+    display: none;
+  }
+  .kinetic-type,
+  .kinetic-type [data-kinetic-char] {
+    transform: none !important;
+    opacity: 1 !important;
+    will-change: auto !important;
+  }
+  .materia-button {
+    transform: none !important;
+  }
+}
+html[data-lite="1"] .materia-surface {
+  background: var(--page);
+}
+@media print {
+  .materia-canvas,
+  .umbral-surface,
+  .hero-prism {
+    display: none !important;
+  }
+  .kinetic-type,
+  .kinetic-type [data-kinetic-char] {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
