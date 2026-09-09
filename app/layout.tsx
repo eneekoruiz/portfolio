@@ -12,6 +12,7 @@ import { UmbralProvider } from "./components/motion/UmbralProvider";
 import { baseMetadata, jsonLd } from "./lib/metadata";
 
 export const metadata = baseMetadata;
+export const dynamic = "force-dynamic";
 
 export default async function RootLayout({
   children,

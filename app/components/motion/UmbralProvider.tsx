@@ -129,7 +129,12 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
           content.inert = false;
         }
         gsap.killTweensOf(clone.querySelectorAll("[data-project-body]"));
-        transition?.skipTransition();
+        if (transition) {
+          try {
+            transition.skipTransition();
+          } catch {}
+          transition = undefined;
+        }
         shell.hidden = true;
         shell.replaceChildren();
         shell.removeAttribute("style");
@@ -166,15 +171,22 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         if (document.startViewTransition && !document.hidden) {
           shell.style.viewTransitionName = "project-surface";
           if (heading) heading.style.viewTransitionName = "project-title";
-          transition = document.startViewTransition(() => {
-            shell.hidden = true;
-            if (content) content.style.opacity = "1";
-            if (destination)
-              destination.style.viewTransitionName = "project-surface";
-            if (destinationTitle)
-              destinationTitle.style.viewTransitionName = "project-title";
-          });
-          transition.finished.then(finishFocus, finishFocus);
+          try {
+            const vt = document.startViewTransition(() => {
+              shell.hidden = true;
+              if (content) content.style.opacity = "1";
+              if (destination)
+                destination.style.viewTransitionName = "project-surface";
+              if (destinationTitle)
+                destinationTitle.style.viewTransitionName = "project-title";
+            });
+            transition = vt;
+            vt.ready.catch(() => {});
+            vt.updateCallbackDone.catch(() => {});
+            vt.finished.then(finishFocus, finishFocus);
+          } catch {
+            finishFocus();
+          }
         } else {
           if (content) content.style.opacity = "1";
           gsap.to(shell, {

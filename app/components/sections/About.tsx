@@ -1,178 +1,73 @@
 "use client";
-import { useRef, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { NetworkParticles } from "../motion/Particles";
-import { useMagnetic } from "../../hooks/useMagnetic";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+
+import { useRef } from "react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import type { Tx } from "../../types";
-
-if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
-
-export function About({ t }: { t: Tx }) {
-  return <AboutContent t={t} />;
-}
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMateriaSurface } from "../../hooks/useMateriaSurface";
+import { useSpringHover } from "../../hooks/useSpringHover";
+import { SectionFrame } from "./SectionFrame";
 
 interface MetricCardProps {
-  v: string;
-  l: string;
-  key?: string | number;
+  value: string;
+  label: string;
+  motion: boolean;
 }
 
-function MetricCard({ v, l }: MetricCardProps) {
-  const ref = useMagnetic<HTMLDivElement>({
-    strength: 0.02,
-    innerStrength: 0.05,
-  });
+function MetricCard({ value, label, motion }: MetricCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  useMateriaSurface(ref, "#0066ff", motion, 20);
+
   return (
     <div
       ref={ref}
-      className="p-8 md:p-10 rounded-3xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-white/[0.03] backdrop-blur-xl block will-change-transform border-beam"
+      className="materia-surface relative overflow-hidden rounded-[20px] border border-ink/15 p-6 transition-colors duration-300"
     >
-      <div className="font-black text-5xl md:text-6xl tracking-tighter text-ink dark:text-white mb-1">
-        {v}
-      </div>
-      <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">
-        {l}
-      </p>
+      <dt className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-lead">
+        {label}
+      </dt>
+      <dd className="text-5xl font-black leading-none tracking-[-0.07em] text-ink">
+        {value}
+      </dd>
     </div>
   );
 }
 
-function AboutContent({ t }: { t: Tx }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const textContainerRef = useRef<HTMLDivElement>(null);
-  const motionEnabled = useMotionEnabled();
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      if (!motionEnabled) {
-        // Instantly reveal everything
-        gsap.set(".title-char, .about-reveal, .word-inner", {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          scale: 1,
-        });
-        return;
-      }
-
-      // 1. Título con animación de caracteres
-      const titleChars = sectionRef.current?.querySelectorAll(".title-char");
-      if (titleChars && titleChars.length > 0) {
-        gsap.fromTo(
-          titleChars,
-          { y: "100%", rotateX: -90, opacity: 0 },
-          {
-            y: 0,
-            rotateX: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.015,
-            ease: "expo.out",
-            scrollTrigger: { trigger: sectionRef.current, start: "top 99%" },
-          },
-        );
-      }
-
-      // 2. Entrada de métricas
-      if (document.querySelector(".about-reveal")) {
-        gsap.from(".about-reveal", {
-          y: 20,
-          opacity: 0,
-          stagger: 0.04,
-          duration: 0.35,
-          ease: "power3.out",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 99%" },
-        });
-      }
-
-      // 3. EFECTO TELÓN (MASKED REVEAL)
-      if (textContainerRef.current && document.querySelector(".word-inner")) {
-        gsap.fromTo(
-          ".word-inner",
-          { y: "110%", opacity: 0 },
-          {
-            y: "0%",
-            opacity: 1,
-            duration: 0.32,
-            stagger: 0.01,
-            ease: "expo.out",
-            scrollTrigger: {
-              trigger: textContainerRef.current,
-              start: "top 99%",
-              toggleActions: "play none none reverse",
-            },
-          },
-        );
-      }
-    }, sectionRef);
-    return () => ctx.revert();
-  }, [t.mf, motionEnabled]);
-
-  // Función para crear la "máscara" palabra por palabra
-  const renderMaskedWords = (text: string) => {
-    return text.split(" ").map((word, i) => (
-      <span
-        key={i}
-        className="inline-block overflow-hidden align-bottom mr-[0.25em] pb-[0.1em]"
-      >
-        <span className="word-inner inline-block will-change-transform">
-          {word}
-        </span>
-      </span>
-    ));
-  };
+export function About({ t }: { t: Tx }) {
+  const motion = useMotionEnabled();
+  const linkRef = useSpringHover<HTMLAnchorElement>(motion);
 
   return (
-    <section
-      ref={sectionRef}
-      id="about"
-      aria-label="Sobre mí"
-      className="relative py-24 md:py-40 overflow-hidden z-[20] bg-page"
-      style={{
-        maskImage: "linear-gradient(to bottom, transparent, black 15%, black)",
-        WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black)",
-      }}
-    >
-      <NetworkParticles />
-      <div className="px-6 md:px-8 max-w-[1200px] mx-auto relative z-10">
-        <div className="relative z-10">
-          <div>
-            <p className="about-reveal text-[11px] font-bold tracking-[0.2em] uppercase text-brand mb-4">
-              {t.abLb}
-            </p>
-            <h2 className="font-black text-[clamp(2.5rem,6vw,4.5rem)] tracking-tight leading-none mb-8 md:mb-12 text-ink perspective-1000">
-              {t.abH.split(" ").map((word, wIdx, wordsArray) => (
-                <span key={wIdx} className="inline-block whitespace-nowrap">
-                  {word.split("").map((c, cIdx) => (
-                    <span key={cIdx} className="title-char inline-block">
-                      {c}
-                    </span>
-                  ))}
-                  {wIdx < wordsArray.length - 1 && (
-                    <span className="title-char inline-block">&nbsp;</span>
-                  )}
-                </span>
-              ))}
-            </h2>
-          </div>
-
-          <hr className="about-reveal hidden md:block border-none h-px bg-black/10 dark:bg-white/10 mb-12 max-w-3xl" />
-
-          <div ref={textContainerRef} className="max-w-4xl mb-0 md:mb-24">
-            <p className="font-medium text-[clamp(1.2rem,2.5vw,1.8rem)] leading-[1.4] text-slate-800 dark:text-slate-200">
-              {renderMaskedWords(t.mf)}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 about-reveal">
-            {t.metrics.map(([v, l]) => (
-              <MetricCard key={l} v={v} l={l} />
-            ))}
-          </div>
+    <SectionFrame id="about" index="02" label={t.abLb} title={t.abH}>
+      <div className="grid gap-10 lg:grid-cols-[1.4fr_0.6fr] lg:gap-16">
+        <div data-section-reveal>
+          <p className="max-w-3xl text-pretty text-[clamp(1.15rem,2.3vw,2rem)] font-medium leading-[1.5] tracking-[-0.025em] text-ink">
+            {t.mf}
+          </p>
+          <Link
+            ref={linkRef}
+            href="/curriculum"
+            className="materia-button mt-8 border border-ink/20 bg-page/90 text-ink"
+          >
+            {t.ctaCv}
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
         </div>
+        <dl
+          data-section-reveal
+          className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1"
+        >
+          {t.metrics.map(([value, label]) => (
+            <MetricCard
+              key={label}
+              value={value}
+              label={label}
+              motion={motion}
+            />
+          ))}
+        </dl>
       </div>
-    </section>
+    </SectionFrame>
   );
 }

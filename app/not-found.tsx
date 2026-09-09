@@ -1,38 +1,10 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { Home } from "lucide-react";
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
 import Link from "next/link";
+import { Home } from "lucide-react";
 
 export default function NotFound() {
-  const btn = useRef<HTMLAnchorElement>(null);
-  const router = useRouter();
-  useEffect(() => {
-    const el = btn.current;
-    if (!el) return;
-    const mv = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      gsap.to(el, {
-        x: (e.clientX - (r.left + r.width / 2)) * 0.3,
-        y: (e.clientY - (r.top + r.height / 2)) * 0.3,
-        duration: 0.32,
-        ease: "power3.out",
-      });
-    };
-    const lv = () =>
-      gsap.to(el, { x: 0, y: 0, duration: 0.55, ease: "elastic.out(1,.4)" });
-    el.addEventListener("mousemove", mv);
-    el.addEventListener("mouseleave", lv);
-    return () => {
-      el.removeEventListener("mousemove", mv);
-      el.removeEventListener("mouseleave", lv);
-    };
-  }, []);
-
   return (
     <main
-      className="min-h-screen flex items-center justify-center p-8 bg-page"
+      className="min-h-screen flex items-center justify-center p-8 bg-page text-ink"
       style={{ cursor: "auto" }}
     >
       <div className="max-w-[420px] w-full text-center">
@@ -47,12 +19,7 @@ export default function NotFound() {
             O simplemente te has perdido. Volvamos al código limpio.
           </p>
           <Link
-            ref={btn}
             href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              router.push("/");
-            }}
             aria-label="Volver al inicio"
             className="inline-flex items-center gap-2.5 px-8 py-[.9rem] rounded-full bg-ink text-page font-bold text-[14px] no-underline shadow-[0_8px_25px_rgba(0,0,0,.2)] hover:scale-105 active:scale-95 transition-transform"
           >
