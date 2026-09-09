@@ -2,12 +2,14 @@ import { ClientThemeProvider } from "./components/ui/ClientThemeProvider";
 import { headers } from "next/headers";
 import { SkipLink } from "./components/ui/SkipLink";
 import "./styles/globals.css";
+import "./styles/materia.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";
 import { InfallibleCursor } from "./components/motion/InfallibleCursor";
+import { MateriaLayer } from "./components/motion/MateriaLayer";
+import { UmbralProvider } from "./components/motion/UmbralProvider";
 import { baseMetadata, jsonLd } from "./lib/metadata";
-
 
 export const metadata = baseMetadata;
 
@@ -122,7 +124,10 @@ export default async function RootLayout({
           <SmoothScroll />
           <EasterEgg />
           <InfallibleCursor />
-          <IntroProvider>{children}</IntroProvider>
+          <IntroProvider>
+            <MateriaLayer />
+            <UmbralProvider>{children}</UmbralProvider>
+          </IntroProvider>
         </ClientThemeProvider>
       </body>
     </html>

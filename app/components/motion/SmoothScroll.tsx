@@ -4,15 +4,20 @@ import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { materia } from "../../lib/materia";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 
 export function SmoothScroll() {
   const tickerFnRef = useRef<((time: number) => void) | null>(null);
+  const enabled = useMotionEnabled();
+  const reduced = usePreferredMotion();
 
   useEffect(() => {
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    if (reducedMotion) return;
+    if (reducedMotion || reduced || !enabled) return;
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -26,25 +31,10 @@ export function SmoothScroll() {
     });
 
     window.__lenis = lenis;
-    const dispMap = document.getElementById("liquid-displacement-map");
-    const setDispScale = dispMap
-      ? (val: number) => {
-          gsap.to(dispMap, {
-            attr: { scale: val },
-            duration: 0.4,
-            ease: "power2.out",
-            overwrite: "auto",
-          });
-        }
-      : null;
-
-    lenis.on("scroll", (e: any) => {
+    lenis.on("scroll", (e: Lenis) => {
       ScrollTrigger.update();
-      if (setDispScale) {
-        const vel = Math.abs(e.velocity || 0);
-        const dispScale = gsap.utils.clamp(0, 18, vel * 0.12);
-        setDispScale(dispScale);
-      }
+      materia.velocity = e.velocity;
+      materia.scrollTime = performance.now();
     });
 
     tickerFnRef.current = (time: number) => lenis.raf(time * 1000);
@@ -73,8 +63,9 @@ export function SmoothScroll() {
       }
       lenis.destroy();
       delete window.__lenis;
+      materia.velocity = 0;
     };
-  }, []);
+  }, [enabled, reduced]);
 
   return null;
 }

@@ -400,6 +400,20 @@ export function ProjectHero({
   const s = STUDIO_TX[lang] ?? STUDIO_TX["en"];
   const motionEnabled = useMotionEnabled();
   const staticStudioLayout = !motionEnabled;
+  const [embeddingOrigin, setEmbeddingOrigin] = useState<string | null>(null);
+  useEffect(() => setEmbeddingOrigin(window.location.origin), []);
+  // The live salon site permits framing only from its published portfolio hosts.
+  // Local and preview deployments use a real external link instead of a blocked iframe.
+  const embeddingAllowed =
+    embeddingOrigin !== null &&
+    (projectId !== "ana-peluquera" ||
+      [
+        "https://eneko-ruiz.vercel.app",
+        "https://eneekoruiz.vercel.app",
+        "https://ana-peluqueria.vercel.app",
+        "https://ana-peluquera.vercel.app",
+        "https://agpeluqueria.vercel.app",
+      ].includes(embeddingOrigin));
   const heroRef = useRef<HTMLDivElement>(null);
   const bgImageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -454,12 +468,12 @@ export function ProjectHero({
 
   // Iframe loading safety fallback
   useEffect(() => {
-    if (!liveUrl || iframeLoaded || !shouldLoad) return;
+    if (!liveUrl || iframeLoaded || !shouldLoad || !embeddingAllowed) return;
     const timer = setTimeout(() => {
       setIframeLoaded(true);
     }, 6000); // 6s fallback for heavy sites
     return () => clearTimeout(timer);
-  }, [liveUrl, iframeLoaded, shouldLoad]);
+  }, [liveUrl, iframeLoaded, shouldLoad, embeddingAllowed]);
 
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
   useGSAP(
@@ -577,7 +591,6 @@ export function ProjectHero({
               scale: 0.05,
               opacity: 0,
               z: -1500,
-              filter: "blur(30px)",
               borderRadius: "50rem",
               // Explicitly center the start state so it appears in the center, not corner
               xPercent: -50,
@@ -589,7 +602,6 @@ export function ProjectHero({
               scale: 1,
               opacity: 1,
               z: 0,
-              filter: "blur(0px)",
               borderRadius: "2.5rem",
               xPercent: -50,
               yPercent: -50,
@@ -704,7 +716,8 @@ export function ProjectHero({
     if (isInteracting) {
       // Clear all GSAP-set transforms so position:fixed works correctly
       gsap.set(screenRef.current, {
-        clearProps: "transform,left,top,xPercent,yPercent,width,height,borderRadius,filter,scale,opacity,z",
+        clearProps:
+          "transform,left,top,xPercent,yPercent,width,height,borderRadius,filter,scale,opacity,z",
       });
       const tl = gsap.timeline();
       tl.fromTo(
@@ -949,6 +962,7 @@ export function ProjectHero({
           <div
             className="absolute inset-0 z-[100] flex flex-col items-center justify-center transition-all duration-700 group/shield cursor-pointer"
             style={{
+              display: liveUrl && !embeddingAllowed ? "none" : undefined,
               opacity: isInteracting ? 0 : 1,
               pointerEvents: isInteracting ? "none" : "all",
               backgroundColor: canInteract ? "rgba(0,0,0,0.6)" : "transparent",
@@ -1065,7 +1079,27 @@ export function ProjectHero({
             <div className="absolute inset-0 z-[105] pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,210,0.06))] bg-[length:100%_2px,3px_100%] select-none" />
           )}
 
-          {shouldLoad && liveUrl ? (
+          {liveUrl && !embeddingAllowed ? (
+            <div className="relative z-[110] flex h-full w-full flex-col items-center justify-center gap-6 bg-neutral-950 px-8 py-12 text-center text-white">
+              <p className="text-2xl font-semibold tracking-tight">{title}</p>
+              <p className="max-w-md text-sm leading-relaxed text-white/70">
+                {lang === "es"
+                  ? "Explora la experiencia completa en su sitio web."
+                  : "Explore the full experience on its website."}
+              </p>
+              <a
+                href={liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="materia-button bg-white text-black focus-visible:outline-white"
+              >
+                {lang === "es"
+                  ? "Ver proyecto en directo"
+                  : "Visit live project"}
+                <ExternalLink size={16} aria-hidden="true" />
+              </a>
+            </div>
+          ) : shouldLoad && liveUrl ? (
             <>
               {!iframeLoaded && (
                 <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black gap-6">
@@ -1193,6 +1227,7 @@ export function ProjectHero({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div
         ref={heroRef}
+        data-umbral-destination={projectId}
         className="relative h-[100dvh] w-full overflow-hidden flex flex-col items-center justify-center bg-transparent"
         style={{
           perspective: isInteracting || !motionEnabled ? "none" : "2000px",
@@ -1227,7 +1262,7 @@ export function ProjectHero({
               className="relative flex flex-col items-center justify-center will-change-transform pointer-events-none"
             >
               <span
-                className="font-mono text-[clamp(0.9rem,1.5vw,1.2rem)] opacity-40 mb-3 tracking-[0.4em]"
+                className="font-mono text-[clamp(0.9rem,1.5vw,1.2rem)] opacity-85 mb-3 tracking-[0.4em]"
                 style={{ color: accent }}
               >
                 PROJECT // {index.toString().padStart(2, "0")}
@@ -1247,13 +1282,13 @@ export function ProjectHero({
           </div>
 
           <p
-            className="text-xl md:text-2xl font-light tracking-tight max-w-2xl mb-12 opacity-50"
+            className="text-xl md:text-2xl font-normal tracking-tight max-w-2xl mb-12 opacity-80"
             style={{ color: darkMode ? "#fff" : "#000" }}
           >
             {subtitle}
           </p>
 
-          <div className="flex items-center gap-6 flex-wrap justify-center opacity-40">
+          <div className="flex items-center gap-6 flex-wrap justify-center">
             {langs.slice(0, 3).map((lang) => (
               <div
                 key={lang}
@@ -1272,7 +1307,7 @@ export function ProjectHero({
             ref={screenRef}
             className={
               isInteracting
-? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
+                ? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
                 : "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-auto transition-shadow duration-500 overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/10 opacity-0"
             }
             style={

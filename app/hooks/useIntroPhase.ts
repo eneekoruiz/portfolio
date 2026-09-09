@@ -3,19 +3,12 @@
 import { useCallback } from "react";
 import { useIntro } from "../components/IntroProvider";
 
-export function useIntroPhase(mounted: boolean) {
+export function useIntroPhase(_mounted: boolean) {
   const { phase, setPhase, markSeen } = useIntro();
 
-  const hasSeen =
-    typeof window !== "undefined" &&
-    (window.__hasSeenIntro === true ||
-      sessionStorage.getItem("hasSeenIntro") === "true");
-
-  if (hasSeen && phase !== "ready") {
-    setPhase("ready");
-  }
-
-  const ready = phase === "ready" || hasSeen;
+  // Keep the first client render identical to SSR. IntroProvider reads storage
+  // after hydration; reading it here leaves server visibility attributes stale.
+  const ready = phase === "ready";
 
   const onPreloaderDone = useCallback(() => {
     setPhase("splash");
@@ -27,7 +20,7 @@ export function useIntroPhase(mounted: boolean) {
   }, [setPhase, markSeen]);
 
   return {
-    phase: hasSeen ? "ready" : phase,
+    phase,
     ready,
     onPreloaderDone,
     onSplashComplete,
