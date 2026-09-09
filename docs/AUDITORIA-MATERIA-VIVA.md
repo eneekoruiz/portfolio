@@ -13,13 +13,13 @@ Los cambios de Materia, Tensión y Umbral están implementados y la compilación
 | Auditoría de dependencias npm | 0 vulnerabilidades conocidas |
 | Primera batería completa de Playwright | 16 aprobadas, 2 omitidas porque requieren ratón en móvil |
 | Revisión visual posterior | Portada, tarjetas, detalle y tema oscuro inspeccionados; defectos corregidos |
-| Última batería de 20 casos, sobre la compilación final | Interrumpida al reanudar la sesión; se confirmaron los primeros 3 casos de escritorio. Falta completar esta repetición |
+| Batería final de 20 casos, sobre la compilación final | 18 aprobadas, 2 omitidas en móvil; 0 fallos y 0 casos inestables |
 
 La batería completa anterior verificó lectura y desbordamientos, acordeones reversibles, ES/EN, conservación del documento y canvas, regreso con Atrás, movimiento reducido, alternativa sin View Transitions, Escape y desactivación de animaciones. Los refinamientos posteriores modificaron el contraste, el avatar y las instancias de la hélice al cambiar de tema.
 
-La repetición posterior confirmó la corrección visual del modo oscuro, pero detectó que el sitio externo de AG Beauty Salon bloquea su iframe en localhost. Se corrigió mostrando un enlace real al proyecto en los orígenes no autorizados. Esta corrección **compila y pasa ESLint**, pero la última batería quedó interrumpida antes de verificar todos sus escenarios. También se añadió una prueba de primera visita con movimiento reducido que todavía necesita completarse.
+La revisión posterior confirmó la corrección visual del modo oscuro y detectó que el sitio externo de AG Beauty Salon bloquea su iframe en localhost. Se corrigió mostrando un enlace real al proyecto en los orígenes no autorizados. La batería final verificó esta corrección y las primeras visitas sin datos guardados con movimiento reducido. Aunque la sesión dejó de mostrar la salida del proceso, se recuperó el informe HTML completo y se verificaron sus datos internos: 20 casos, 18 aprobados, 2 omitidos, sin fallos ni casos inestables.
 
-## Para terminar la auditoría
+## Para reproducir la auditoría
 
 ```sh
 npm ci
@@ -28,9 +28,9 @@ npm run build
 npm run test:e2e
 ```
 
-La configuración usa Chromium de Playwright, escritorio 1440 × 1000 e iPhone 13 emulado, un único trabajador y SwiftShader. En este equipo una batería completa tardó unos diez minutos. Si hay un servidor antiguo en el puerto 3100, cerrarlo o sustituirlo por la compilación actual antes de ejecutar las pruebas. No marcar el trabajo como completamente auditado hasta completar la batería final y revisar las capturas nuevas.
+La configuración usa Chromium de Playwright, escritorio 1440 × 1000 e iPhone 13 emulado, un único trabajador y SwiftShader. La batería final duró aproximadamente 7 minutos y 39 segundos. Si hay un servidor antiguo en el puerto 3100, cerrarlo o sustituirlo por la compilación actual antes de ejecutar las pruebas.
 
-Los informes de la batería completa anterior se incluyen en `audit/full-suite-report`. Las capturas disponibles de la última ejecución se incluyen en el paquete, identificadas como parciales cuando no hay resultado completo. No se afirma un objetivo de FPS en un móvil real ni compatibilidad validada con Safari.
+El informe final completo se incluye en `audit/final-full-report`, con sus capturas en `audit/final-full-captures`. La batería anterior se conserva en `audit/full-suite-report`. No se afirma un objetivo de FPS en un móvil real ni compatibilidad validada con Safari.
 
 ## Entrega y publicación
 
