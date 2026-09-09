@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { DNAHelix3D } from "./DNAHelix3D";
+import { OpticalCompositor } from "./OpticalCompositor";
 
 interface CanvasSceneProps {
   accent: string;
@@ -23,12 +23,7 @@ const getDeviceProfile = () => {
     "(max-width: 768px), (hover: none), (pointer: coarse)",
   ).matches;
   const lite = (window as Window).__LITE === true;
-  const lowPower =
-    lite ||
-    isMobile ||
-    cores <= 4 ||
-    memory <= 4 ||
-    window.devicePixelRatio > 1.75;
+  const lowPower = lite || isMobile || cores <= 4 || memory <= 4;
   const maxDpr = Math.min(window.devicePixelRatio || 1, 2);
 
   return { isMobile, lowPower, maxDpr };
@@ -165,20 +160,11 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
           isMobile={isMobile}
           maxDpr={maxDpr}
         />
-        <ambientLight intensity={darkMode ? 0.68 : 1.08} />
-        <directionalLight
-          position={[7, 9, 8]}
-          intensity={darkMode ? 1.35 : 2.1}
-        />
-        <directionalLight
-          position={[-6, -4, -7]}
-          intensity={darkMode ? 0.35 : 0.75}
-        />
-        <DNAHelix3D
+        <OpticalCompositor
           accent={accent}
           secondary={secondary}
           darkMode={darkMode}
-          paused={!active}
+          active={active}
           lowPower={lowPower}
           isMobile={isMobile}
         />

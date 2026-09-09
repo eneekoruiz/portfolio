@@ -36,6 +36,9 @@ import { useMagnetic } from "../../hooks/useMagnetic";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { useTextScramble } from "../../hooks/useTextScramble";
 import { ProjectHero } from "./components/ProjectHero";
+import { materia } from "../../lib/materia";
+import { umbral } from "../../components/motion/UmbralProvider";
+import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 import {
   createLiquidCurtain,
   animateLiquidCurtainIn,
@@ -48,22 +51,6 @@ type TerrainMeshProps = { accent: string; darkMode: boolean };
 type FloatingArtifactProps = { accent: string; idx: number };
 type AccentProps = { accent: string };
 
-const CanvasScene = dynamic<{
-  accent: string;
-  secondary: string;
-  darkMode: boolean;
-  paused?: boolean;
-}>(() => import("../CanvasScene").then((m) => m.CanvasScene), {
-  ssr: false,
-});
-const TerrainMesh = dynamic<TerrainMeshProps>(
-  () => import("../visualizers").then((m) => m.TerrainMesh),
-  { ssr: false },
-);
-const FloatingArtifact = dynamic<FloatingArtifactProps>(
-  () => import("../visualizers").then((m) => m.FloatingArtifact),
-  { ssr: false },
-);
 const SandwichDiagram = dynamic<AccentProps>(
   () => import("../visualizers").then((m) => m.SandwichDiagram),
   { ssr: false },
@@ -276,7 +263,9 @@ export default function ProjectPage() {
 
   const [lang, setLang] = useState<Lang>("es");
   const [darkMode, setDarkMode] = useState(false);
-  const motionEnabled = useMotionEnabled();
+  const userMotionEnabled = useMotionEnabled();
+  const reducedMotion = usePreferredMotion();
+  const motionEnabled = userMotionEnabled && !reducedMotion;
 
   // Sync language from localStorage on mount
   useEffect(() => {
@@ -316,6 +305,11 @@ export default function ProjectPage() {
 
   const safeId = id as string;
   const theme = THEMES[safeId] ?? DEFAULT_THEME;
+  useEffect(() => {
+    materia.accent = theme.helixA;
+    materia.secondary = theme.helixB;
+    materia.composition.target = 0;
+  }, [theme]);
   const summary = PROJECT_SUMMARIES[safeId];
 
   const isBackend = safeId === "who-are-ya-backend";
@@ -366,7 +360,9 @@ export default function ProjectPage() {
     iterations: 2,
     delay: 50,
   });
-  const scrambledTitle = motionEnabled ? scrambledText : titleText;
+  const enteredThroughUmbral = useRef(umbral.active);
+  const scrambledTitle =
+    motionEnabled && !enteredThroughUmbral.current ? scrambledText : titleText;
 
   // Detect dark mode
   useEffect(() => {
@@ -473,13 +469,6 @@ export default function ProjectPage() {
       }
       window.__lenis?.start?.(); // Start before navigating
       router.replace("/", { scroll: false });
-
-      // Safety fallback
-      setTimeout(() => {
-        if (window.location.pathname !== "/") {
-          window.location.href = "/";
-        }
-      }, 2500);
     };
 
     // 🌊 Punto 8 — SVG Liquid Curtain
@@ -541,43 +530,8 @@ export default function ProjectPage() {
   return (
     <div
       ref={main}
-      className={`relative overflow-x-hidden selection:bg-brand/20 bg-page text-ink transition-colors duration-300 ${motionEnabled ? "min-h-[350vh]" : "min-h-screen"}`}
+      className={`relative z-10 overflow-x-hidden selection:bg-brand/20 text-ink transition-colors duration-300 ${motionEnabled ? "min-h-[350vh]" : "min-h-screen"}`}
     >
-      {/* ── 3D BACKGROUND (DEFERRED LOADING) ── */}
-      {isReadyToAnimate && motionEnabled && (
-        <>
-          <div
-            className="fixed inset-0 pointer-events-none z-0"
-            style={{ perspective: "900px" }}
-          >
-            {!isA11y && !isSpot && (
-              <div
-                className="helix-group will-change-transform absolute inset-0"
-                style={{
-                  opacity: darkMode ? 0.55 : 0.3,
-                  filter: `drop-shadow(0 0 25px ${theme.helixA}60)`,
-                  transformStyle: "preserve-3d",
-                }}
-              >
-                <CanvasScene
-                  accent={theme.helixA}
-                  secondary={theme.helixB}
-                  darkMode={darkMode}
-                />
-              </div>
-            )}
-          </div>
-          <div className="fixed inset-0 pointer-events-none z-0 opacity-60">
-            <TerrainMesh accent={theme.helixA} darkMode={darkMode} />
-          </div>
-          <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <FloatingArtifact key={i} accent={theme.accent} idx={i} />
-            ))}
-          </div>
-        </>
-      )}
-
       {/* ── HEADER ── */}
       {/* ── HEADER ── */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-3rem)] max-w-[1200px] transition-all duration-500 ease-expo [[class*='studio-active']_&]:opacity-0 [[class*='studio-active']_&]:pointer-events-none [[class*='studio-active']_&]:-translate-y-10">

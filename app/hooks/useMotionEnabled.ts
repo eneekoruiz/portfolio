@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePreferredMotion } from "./usePreferredMotion";
 
 export function useMotionEnabled(): boolean {
+  const reduced = usePreferredMotion();
   const [enabled, setEnabled] = useState(true); // Always true on first render to match SSR
 
   useEffect(() => {
@@ -36,5 +38,5 @@ export function useMotionEnabled(): boolean {
     };
   }, []);
 
-  return enabled;
+  return enabled && !reduced;
 }

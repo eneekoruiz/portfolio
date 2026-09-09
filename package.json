@@ -12,6 +12,8 @@
     "start": "next start",
     "lint": "eslint app",
     "typecheck": "tsc --noEmit",
+    "test:motion": "node scripts/check-materia.mjs",
+    "test:e2e": "playwright test",
     "check-i18n": "npx tsx scripts/check-i18n.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -31,6 +33,7 @@
     "three": "^0.185.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -45,7 +48,7 @@
   "overrides": {
     "@babel/core": "7.29.6",
     "next": {
-      "postcss": "8.5.15"
+      "postcss": "8.5.28"
     }
   }
 }

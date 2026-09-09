@@ -11,7 +11,9 @@ import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
-import type { ProjectCard, RepoFull, Tx } from "../../types";
+import type { ProjectCard, RepoFull, Tx, Lang } from "../../types";
+import { KineticText } from "../motion/KineticText";
+import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 
 // Custom Hooks & Utilities
 import { useMobile } from "../../hooks/useMobile";
@@ -31,6 +33,7 @@ if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 interface ProjectsProps {
   t: Tx;
+  lang: Lang;
   top3: ProjectCard[];
   repos: RepoFull[];
   load: boolean;
@@ -46,6 +49,7 @@ interface ProjectsProps {
 
 export function Projects({
   t,
+  lang,
   top3,
   repos,
   load,
@@ -64,6 +68,7 @@ export function Projects({
 
   // 1. Mobile view detection
   const isMobile = useMobile();
+  const reduced = usePreferredMotion();
 
   // 2. Navigation persistence handling on mount / return
   const isReturning = useRef(false);
@@ -102,8 +107,8 @@ export function Projects({
       <section
         ref={sectionRef}
         id="work"
-        aria-label="Proyectos"
-        className="py-16 md:py-28 px-5 md:px-8 max-w-[1300px] mx-auto relative z-[60]"
+        aria-label={t.woLb}
+        className="py-20 md:py-32 px-5 md:px-10 max-w-[1440px] mx-auto relative z-[60]"
       >
         <div className="projects-header mb-10 md:mb-16">
           <div className="flex items-center gap-4 mb-4">
@@ -114,38 +119,20 @@ export function Projects({
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
             <h2
-              className="font-black text-[clamp(2.2rem,7vw,5.5rem)] tracking-tight leading-[0.95] text-ink uppercase italic perspective-1000"
-              aria-label="Selected Works"
+              className="font-black text-[clamp(2.2rem,7vw,7rem)] tracking-tight leading-[0.95] text-ink uppercase perspective-1000"
+              aria-label={t.woH}
             >
-              <span className="overflow-hidden inline-block py-2 pl-4 pr-12 -my-2 -ml-4 -mr-12">
-                {"Selected".split("").map((c, i) => (
-                  <span
-                    key={i}
-                    className="title-char inline-block will-change-transform pr-[0.1em]"
-                  >
-                    {c}
-                  </span>
-                ))}
-              </span>
-              <br />
-              <span className="overflow-hidden inline-block py-2 pl-4 pr-12 -my-2 -ml-4 -mr-12">
-                {"Works.".split("").map((c, i) => (
-                  <span
-                    key={i}
-                    className="title-char inline-block will-change-transform pr-[0.1em]"
-                  >
-                    {c}
-                  </span>
-                ))}
-              </span>
+              <KineticText text={t.woH} enabled={motionEnabled && !reduced} />
             </h2>
             <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.22em] text-lead/30 mb-1">
-              Click to expand ↓
+              {lang === "es"
+                ? "Selecciona para explorar ↓"
+                : "Select to explore ↓"}
             </span>
           </div>
         </div>
 
-        <div className="projects-list border-t border-black/10 dark:border-white/10">
+        <div className="projects-list space-y-4 md:space-y-5">
           {top3.length === 0
             ? [0, 1, 2, 3, 4].map((i) => (
                 <div key={i} className="work-row-anim">
@@ -155,6 +142,7 @@ export function Projects({
             : top3.map((p, i) => (
                 <div key={p.n} className="work-row-anim">
                   <PremiumWorkRow
+                    lang={lang}
                     proj={p}
                     idx={i}
                     isExpanded={expandedIdx === i}

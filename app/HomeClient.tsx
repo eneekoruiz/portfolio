@@ -13,7 +13,6 @@ import type { RepoFull, ProjectCard } from "./types";
 import { usePreferredMotion } from "./hooks/usePreferredMotion";
 import { useMotionEnabled } from "./hooks/useMotionEnabled";
 import { useGreeting } from "./hooks/useGreeting";
-import { useDeviceTilt } from "./hooks/useDeviceTilt";
 import { useTheme } from "next-themes";
 import { useTranslations } from "./hooks/useTranslations";
 import { useScrollReveal } from "./hooks/useScrollReveal";
@@ -30,6 +29,7 @@ import { useMobileMenu } from "./hooks/useMobileMenu";
 import { useIntroPhase } from "./hooks/useIntroPhase";
 import { useDnaColors } from "./hooks/useDnaColors";
 import { useNavbarInteractions } from "./hooks/useNavbarInteractions";
+import { materia } from "./lib/materia";
 
 // ── UI & Navigation ────────────────────────────────────────────────────────
 import { Preloader } from "./components/ui/Preloader";
@@ -70,16 +70,6 @@ const MemoFooter = dynamic(
   { ssr: false },
 );
 
-// ── Dynamic Visualizers ──
-const CanvasScene = dynamic<{
-  accent: string;
-  secondary: string;
-  darkMode: boolean;
-  paused?: boolean;
-}>(() => import("./work/CanvasScene").then((m) => m.CanvasScene), {
-  ssr: false,
-});
-
 // Registrar plugins GSAP
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -106,7 +96,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   // ── Estado ──────────────────────────────────────────────────────────────
   const { theme, resolvedTheme } = useTheme();
   const { lang, setLang, t } = useTranslations();
-  const tilt = useDeviceTilt();
   const [hoveredProject, setHoveredProject] = useState<{
     name: string;
     color: string;
@@ -119,10 +108,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   // ── Extracted Hooks Integration ──
   const mounted = useProjectNavigation(t);
-
-  const isDark = mounted && theme === "dark";
-  const isLite =
-    mounted && typeof window !== "undefined" && (window as Window).__LITE;
 
   useEffect(() => {
     if (!mounted) return;
@@ -235,6 +220,15 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     expandedIdx,
     top3,
   );
+  useEffect(() => {
+    materia.accent = dnaColors.accent;
+    materia.secondary = dnaColors.secondary;
+    materia.paused = menu;
+    materia.composition.target = activeSection === "hero" ? 1 : 0;
+    return () => {
+      materia.paused = false;
+    };
+  }, [dnaColors, menu, activeSection]);
 
   return (
     <>
@@ -253,38 +247,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
             )}
           </>
         )}
-
-      {/* 🧬 DNA Background — Deepest Layer */}
-      {ready && !isLite && !reduced && motionEnabled && (
-        <div className="fixed inset-0 pointer-events-none z-[1]">
-          <div
-            className="helix-group will-change-transform"
-            style={{
-              width: "100vw",
-              height: "240vh",
-              opacity: expandedIdx !== null ? 1.0 : isDark ? 0.9 : 0.8,
-              transformStyle: "preserve-3d",
-              willChange: "transform",
-            }}
-            ref={(el) => {
-              if (el) {
-                if (expandedIdx !== null) {
-                  el.style.transform = "rotateY(0deg) rotateX(0deg)";
-                } else {
-                  el.style.transform = `rotateY(${tilt.x * 12}deg) rotateX(${-tilt.y * 12}deg)`;
-                }
-              }
-            }}
-          >
-            <CanvasScene
-              accent={dnaColors.accent}
-              secondary={dnaColors.secondary}
-              darkMode={isDark}
-              paused={menu}
-            />
-          </div>
-        </div>
-      )}
 
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
@@ -308,17 +270,12 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           onNavContainerLeave={onNavContainerLeave}
         />
 
-        <MemoHero
-          t={t}
-          greeting={greeting}
-          reduced={reduced}
-          setMag={() => {}}
-          phase={phase}
-        />
+        <MemoHero t={t} greeting={greeting} reduced={reduced} phase={phase} />
         <MemoSkills t={t} />
         <MemoAbout t={t} />
         <MemoProjects
           t={t}
+          lang={lang}
           top3={top3}
           repos={repos}
           load={load}
