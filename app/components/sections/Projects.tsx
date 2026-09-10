@@ -113,7 +113,7 @@ export function Projects({
         <div className="projects-header mb-10 md:mb-16">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 md:w-10 bg-ink opacity-12" />
-            <p className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.32em] uppercase text-lead/50">
+            <p className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-lead">
               {t.woLb || "PORTFOLIO DE INGENIERÍA"}
             </p>
           </div>
@@ -124,7 +124,7 @@ export function Projects({
             >
               <KineticText text={t.woH} enabled={motionEnabled && !reduced} />
             </h2>
-            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.22em] text-lead/30 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-lead mb-1">
               {lang === "es"
                 ? "Selecciona para explorar ↓"
                 : "Select to explore ↓"}

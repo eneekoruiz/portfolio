@@ -14,8 +14,11 @@ export function NetworkParticles() {
   const motionEnabled = useMotionEnabled();
 
   useEffect(() => {
-    const cv = cvRef.current!;
-    const ctx = cv.getContext("2d", { alpha: true })!;
+    const cv = cvRef.current;
+    const ctx = cv?.getContext("2d", { alpha: true });
+    if (!cv || !ctx) return;
+    const lowPower = matchMedia("(pointer: coarse)").matches || window.__LITE;
+    const particleLimit = lowPower ? 48 : 110;
 
     let W = 0,
       H = 0,
@@ -85,20 +88,18 @@ export function NetworkParticles() {
     };
 
     const resize = () => {
-      const ratio = getAdaptivePixelRatio();
+      const ratio = lowPower ? 1 : getAdaptivePixelRatio();
       W = Math.floor(cv.offsetWidth);
       H = Math.floor(cv.offsetHeight);
       cv.width = Math.floor(cv.offsetWidth * ratio);
       cv.height = Math.floor(cv.offsetHeight * ratio);
-      cv.style.width = `${cv.offsetWidth}px`;
-      cv.style.height = `${cv.offsetHeight}px`;
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
       const area = Math.max(1, W * H);
       const baseCount = Math.round(area * cfg.density);
       const count = Math.max(
         40,
-        Math.min(180, Math.round(baseCount * performanceScale)),
+        Math.min(particleLimit, Math.round(baseCount * performanceScale)),
       );
       createStars(count);
     };
@@ -230,7 +231,7 @@ export function NetworkParticles() {
           const baseCount = Math.round(area * cfg.density);
           const newCount = Math.max(
             40,
-            Math.min(180, Math.round(baseCount * performanceScale)),
+            Math.min(particleLimit, Math.round(baseCount * performanceScale)),
           );
 
           stars = stars.slice(0, newCount);
@@ -425,7 +426,8 @@ export function NetworkParticles() {
   return (
     <canvas
       ref={cvRef}
-      className="absolute inset-0 w-full h-full pointer-events-auto z-0 print:hidden"
+      data-network-particles
+      className="absolute inset-0 w-full h-full pointer-events-none z-0 print:hidden"
       aria-hidden="true"
     />
   );

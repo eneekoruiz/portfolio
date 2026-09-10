@@ -491,6 +491,7 @@ export function ProjectHero({
       // 1. Cinematic Scroll Sequence — INCREASED END for better pacing
       const tl = gsap.timeline({
         scrollTrigger: {
+          id: `studio-${projectId}`,
           trigger: heroRef.current,
           start: "top top",
           end: disableStudio ? "+=120%" : "+=250%", // More space for a grander transition
@@ -591,7 +592,8 @@ export function ProjectHero({
               scale: 0.05,
               opacity: 0,
               z: -1500,
-              borderRadius: "50rem",
+              rotateX: 18,
+              rotateY: -22,
               // Explicitly center the start state so it appears in the center, not corner
               xPercent: -50,
               yPercent: -50,
@@ -602,14 +604,12 @@ export function ProjectHero({
               scale: 1,
               opacity: 1,
               z: 0,
-              borderRadius: "2.5rem",
+              rotateX: 0,
+              rotateY: 0,
               xPercent: -50,
               yPercent: -50,
               left: "50%",
               top: "50%",
-              width: "94vw",
-              maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
-              height: "82dvh",
               force3D: true,
               ease: "expo.inOut",
               duration: 2.2,
@@ -706,7 +706,11 @@ export function ProjectHero({
       window.addEventListener("mousemove", onMove);
       return () => window.removeEventListener("mousemove", onMove);
     },
-    { scope: heroRef, dependencies: [isReady, motionEnabled] },
+    {
+      scope: heroRef,
+      dependencies: [isReady, motionEnabled, projectId],
+      revertOnUpdate: true,
+    },
   );
 
   // ── 🚀 STUDIO MODE TRANSITION (Fullscreen Takeover) ────────────────
@@ -977,7 +981,11 @@ export function ProjectHero({
                 }`}
               >
                 {/* Desktop/Tablet CTA (md+) */}
-                <div className="hidden md:flex flex-col items-center gap-6">
+                <button
+                  type="button"
+                  onClick={() => canInteract && setIsInteracting(true)}
+                  className="hidden md:flex flex-col items-center gap-6 rounded-2xl p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                >
                   <div
                     className={`w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.12)] ${motionEnabled ? "group-hover/shield:scale-110 transition-transform studio-pulse" : ""}`}
                   >
@@ -994,7 +1002,7 @@ export function ProjectHero({
                       {s.clickToInteract}
                     </span>
                   </div>
-                </div>
+                </button>
 
                 {/* Mobile tactile CTA (sm) — more artistic and realistic */}
                 <div className="md:hidden flex flex-col items-center gap-4">
@@ -1081,6 +1089,9 @@ export function ProjectHero({
 
           {liveUrl && !embeddingAllowed ? (
             <div className="relative z-[110] flex h-full w-full flex-col items-center justify-center gap-6 bg-neutral-950 px-8 py-12 text-center text-white">
+              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/70">
+                {s.enterStudio}
+              </span>
               <p className="text-2xl font-semibold tracking-tight">{title}</p>
               <p className="max-w-md text-sm leading-relaxed text-white/70">
                 {lang === "es"
@@ -1127,10 +1138,11 @@ export function ProjectHero({
                 className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? "opacity-100" : "opacity-0"} ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
                 style={{
                   background: "#000",
-                  filter:
-                    canInteract && !isInteracting
-                      ? "blur(15px) brightness(0.4) saturate(0.5)"
-                      : "none",
+                  opacity: iframeLoaded
+                    ? canInteract && !isInteracting
+                      ? 0.4
+                      : 1
+                    : 0,
                 }}
               />
             </>
@@ -1144,10 +1156,7 @@ export function ProjectHero({
                 playsInline
                 className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
                 style={{
-                  filter:
-                    canInteract && !isInteracting
-                      ? "blur(15px) brightness(0.4) saturate(0.5)"
-                      : "none",
+                  opacity: canInteract && !isInteracting ? 0.4 : 1,
                 }}
               />
               {/* HUD Overlay for Video */}
@@ -1305,6 +1314,7 @@ export function ProjectHero({
         {!disableStudio && !staticStudioLayout && (
           <div
             ref={screenRef}
+            data-studio-screen="cinematic"
             className={
               isInteracting
                 ? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
@@ -1329,7 +1339,10 @@ export function ProjectHero({
                   }
                 : {
                     transformStyle: "preserve-3d",
-                    willChange: "transform, width, height, border-radius",
+                    willChange: "transform, opacity",
+                    width: "min(94vw, 1400px)",
+                    height: "82dvh",
+                    borderRadius: "2.5rem",
                     borderColor: "rgba(255,255,255,0.1)",
                   }
             }
@@ -1413,6 +1426,7 @@ export function ProjectHero({
         <div className="relative py-20 bg-[#0a0a0a] flex flex-col items-center justify-center border-t border-white/10 w-full min-h-[85dvh]">
           <div
             ref={screenRef}
+            data-studio-screen="static"
             className={
               isInteracting
                 ? "fixed inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"

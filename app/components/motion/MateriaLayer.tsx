@@ -9,10 +9,11 @@ import { useIntro } from "../IntroProvider";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { materia, tickMateria } from "../../lib/materia";
+import { StaticDNA } from "./StaticDNA";
 
 const CanvasScene = dynamic(
   () => import("../../work/CanvasScene").then((m) => m.CanvasScene),
-  { ssr: false },
+  { ssr: false, loading: () => <StaticDNA /> },
 );
 
 class GraphicsBoundary extends Component<
@@ -24,7 +25,7 @@ class GraphicsBoundary extends Component<
     return { failed: true };
   }
   render() {
-    return this.state.failed ? null : this.props.children;
+    return this.state.failed ? <StaticDNA /> : this.props.children;
   }
 }
 
@@ -48,8 +49,7 @@ export function MateriaLayer() {
   }, [enabled, reduced]);
   const routeHasScene = pathname === "/" || pathname.startsWith("/work/");
   const ready = pathname !== "/" || phase === "ready";
-  if (!mounted || !enabled || reduced || window.__LITE || !routeHasScene)
-    return null;
+  if (!mounted || !routeHasScene) return null;
   return (
     <div
       className="materia-canvas fixed inset-0 z-0 pointer-events-none"
@@ -57,12 +57,16 @@ export function MateriaLayer() {
       style={{ opacity: ready ? 1 : 0 }}
     >
       <GraphicsBoundary>
-        <CanvasScene
-          accent="#0066ff"
-          secondary="#8aa8dc"
-          darkMode={resolvedTheme === "dark"}
-          paused={!ready}
-        />
+        {!enabled || reduced ? (
+          <StaticDNA />
+        ) : (
+          <CanvasScene
+            accent="#0066ff"
+            secondary="#8aa8dc"
+            darkMode={resolvedTheme === "dark"}
+            paused={!ready}
+          />
+        )}
       </GraphicsBoundary>
     </div>
   );

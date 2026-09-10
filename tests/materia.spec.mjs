@@ -154,12 +154,12 @@ test("reduced motion renders readable text and immediate project navigation", as
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await home(page);
-  await expect(page.locator(".materia-canvas")).toHaveCount(0);
+  await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   const row = await openFirstProject(page);
   await row.getByRole("link", { name: "Explorar proyecto" }).click();
   await expect(page).toHaveURL(/\/work\/ana-peluquera$/);
   await expect(page.locator(".umbral-surface")).toBeHidden();
-  await expect(page.locator(".materia-canvas")).toHaveCount(0);
+  await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   await expect(
     page.locator('iframe[src="https://agpeluqueria.vercel.app"]'),
   ).toHaveCount(0);
@@ -235,7 +235,7 @@ test("dark theme and animation preference keep content readable", async ({
   await page
     .getByRole("button", { name: "Pausar animación de fondo", exact: true })
     .click();
-  await expect(page.locator(".materia-canvas")).toHaveCount(0);
+  await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   await expect(page.locator("#main-content")).toBeVisible();
   const row = await openFirstProject(page);
   await row.getByRole("link", { name: "Explorar proyecto" }).click();
@@ -261,7 +261,7 @@ test("first visit with reduced motion reaches readable content", async ({
     await page.goto("http://localhost:3100/");
     await expect(page.locator("#main-content")).toBeVisible();
     await expect(page.locator("#hero h1")).toHaveText("EnekoEnekoRuiz.Ruiz.");
-    await expect(page.locator(".materia-canvas")).toHaveCount(0);
+    await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
     expect(errors).toEqual([]);
   } finally {
     await context.close();

@@ -354,6 +354,10 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     if (paused || !groupRef.current) return;
     const time = state.clock.elapsedTime;
     groupRef.current.position.y = Math.sin(time * 0.32) * 0.26;
+    groupRef.current.rotation.x =
+      THREE.MathUtils.degToRad(config.rotation[0]) + materia.tiltX.value;
+    groupRef.current.rotation.z =
+      THREE.MathUtils.degToRad(config.rotation[2]) + materia.tiltY.value;
     groupRef.current.position.x = isMobile
       ? 0
       : materia.composition.value * 2.4;

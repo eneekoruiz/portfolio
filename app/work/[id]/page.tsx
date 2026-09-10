@@ -51,6 +51,15 @@ type TerrainMeshProps = { accent: string; darkMode: boolean };
 type FloatingArtifactProps = { accent: string; idx: number };
 type AccentProps = { accent: string };
 
+const TerrainMesh = dynamic<TerrainMeshProps>(
+  () => import("../visualizers").then((m) => m.TerrainMesh),
+  { ssr: false },
+);
+const FloatingArtifact = dynamic<FloatingArtifactProps>(
+  () => import("../visualizers").then((m) => m.FloatingArtifact),
+  { ssr: false },
+);
+
 const SandwichDiagram = dynamic<AccentProps>(
   () => import("../visualizers").then((m) => m.SandwichDiagram),
   { ssr: false },
@@ -533,6 +542,18 @@ export default function ProjectPage() {
       className={`relative z-10 overflow-x-hidden selection:bg-brand/20 text-ink transition-colors duration-300 ${motionEnabled ? "min-h-[350vh]" : "min-h-screen"}`}
     >
       {/* ── HEADER ── */}
+      {isReadyToAnimate && motionEnabled && (
+        <div
+          data-project-atmosphere
+          className="fixed inset-0 pointer-events-none z-0"
+          aria-hidden="true"
+        >
+          <TerrainMesh accent={theme.helixA} darkMode={darkMode} />
+          {[1, 2, 3, 4, 5].map((index) => (
+            <FloatingArtifact key={index} accent={theme.accent} idx={index} />
+          ))}
+        </div>
+      )}
       {/* ── HEADER ── */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-3rem)] max-w-[1200px] transition-all duration-500 ease-expo [[class*='studio-active']_&]:opacity-0 [[class*='studio-active']_&]:pointer-events-none [[class*='studio-active']_&]:-translate-y-10">
         <div className="flex items-center justify-between px-6 py-3.5 rounded-full glass-hud">

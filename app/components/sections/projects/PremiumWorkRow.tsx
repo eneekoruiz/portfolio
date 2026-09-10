@@ -147,9 +147,14 @@ export function PremiumWorkRow({
       ref={rowRef}
       data-materia-surface={safeId}
       data-expanded={isExpanded}
-      className="materia-surface work-surface relative rounded-[20px] border border-ink/15 text-ink"
+      className="materia-surface work-surface group/work relative rounded-[20px] border border-ink/15 text-ink"
       style={{ "--surface-color": theme.color } as CSSProperties}
     >
+      <div className="work-orbit-mark" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
       <button
         id={`btn-${safeId}`}
         onClick={onToggle}
@@ -171,7 +176,7 @@ export function PremiumWorkRow({
           </div>
           <h3
             data-project-title
-            className="text-balance break-words text-[clamp(1.65rem,4vw,4.2rem)] font-bold capitalize leading-[1.04] tracking-[-0.055em]"
+            className="work-project-title text-balance break-words text-[clamp(1.65rem,4vw,4.2rem)] font-bold capitalize leading-[1.04] tracking-[-0.055em]"
           >
             {summary?.title ?? proj.name.replace(/[-_]/g, " ")}
           </h3>
@@ -197,21 +202,21 @@ export function PremiumWorkRow({
       >
         <div
           ref={contentRef}
-          className="grid gap-8 px-5 pb-7 pt-2 md:grid-cols-[1fr_1.5fr] md:gap-12 md:px-8 md:pb-10"
+          className="grid gap-4 px-4 pb-5 pt-2 md:grid-cols-[1fr_1.5fr] md:px-6 md:pb-6"
         >
-          <div className="flex flex-col justify-between gap-6">
+          <div className="work-lifecycle flex flex-col justify-between gap-7 rounded-2xl border p-5 md:p-7">
             <div>
               <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.14em] text-lead">
                 {copy.lifecycle}
               </p>
-              <ol className="grid grid-cols-2 gap-x-4 gap-y-4">
+              <ol className="work-lifecycle-track flex flex-col gap-5">
                 {copy.stages.map((stage, i) => (
                   <li
                     key={stage}
-                    className="flex items-start gap-2 text-xs leading-relaxed"
+                    className="relative flex items-start gap-4 text-xs leading-relaxed"
                   >
                     <span
-                      className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full"
+                      className="relative z-10 mt-1 h-2 w-2 shrink-0 rounded-full"
                       style={{
                         background:
                           i < theme.progress ? theme.color : "var(--lead)",
@@ -237,10 +242,16 @@ export function PremiumWorkRow({
               }
               onClick={theme.hasAudit ? handleNavigate : undefined}
               onFocus={prefetch}
-              onPointerEnter={prefetch}
+              onPointerEnter={(event) => {
+                prefetch();
+                if (enabled && event.pointerType !== "touch")
+                  onHoverProject({ name: proj.name, color: theme.color });
+              }}
+              onPointerLeave={() => onHoverProject(null)}
+              onPointerCancel={() => onHoverProject(null)}
               target={theme.hasAudit ? undefined : "_blank"}
               rel={theme.hasAudit ? undefined : "noopener noreferrer"}
-              className="materia-button w-fit bg-ink text-page"
+              className="materia-button work-project-action w-fit bg-ink text-page"
             >
               {theme.hasAudit ? copy.open : copy.source}
               {theme.hasAudit ? (
@@ -250,7 +261,7 @@ export function PremiumWorkRow({
               )}
             </a>
           </div>
-          <div className="flex flex-col justify-between gap-7 border-t border-ink/10 pt-5 md:border-l md:border-t-0 md:pl-8 md:pt-0">
+          <div className="flex flex-col justify-between gap-7 rounded-2xl border border-ink/10 bg-page/80 p-5 md:p-7">
             <p className="max-w-xl text-sm leading-relaxed text-lead md:text-base">
               {summary?.[lang === "es" ? "es" : "en"] ?? proj.desc}
             </p>
@@ -276,6 +287,10 @@ export function PremiumWorkRow({
                     <span
                       key={language}
                       className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1 text-[11px] font-medium"
+                      style={{
+                        background: `${getTechColor(language)}15`,
+                        borderColor: `${getTechColor(language)}55`,
+                      }}
                     >
                       <span
                         className="h-1 w-1 rounded-full"
@@ -287,6 +302,17 @@ export function PremiumWorkRow({
                 </dd>
               </div>
             </dl>
+            {theme.hasAudit && (
+              <a
+                href={`https://github.com/eneekoruiz/${proj.name}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-11 w-fit items-center gap-3 text-xs font-semibold text-ink underline decoration-ink/25 underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+              >
+                {copy.source}
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            )}
           </div>
         </div>
       </div>

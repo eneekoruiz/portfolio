@@ -22,12 +22,16 @@ export const materia = {
   paused: false,
   warp: new SpringValue(0, 110, 20),
   composition: new SpringValue(1, 90, 20),
+  tiltX: new SpringValue(0, 100, 20),
+  tiltY: new SpringValue(0, 100, 20),
 };
 
 export function tickMateria(deltaMs: number) {
   const dt = Math.min(deltaMs / 1000, 2);
   materia.warp.step(dt);
   materia.composition.step(dt);
+  materia.tiltX.step(dt);
+  materia.tiltY.step(dt);
   if (performance.now() - materia.scrollTime > 100) {
     materia.velocity *= Math.exp(-dt * 16);
     if (Math.abs(materia.velocity) < 0.01) materia.velocity = 0;
