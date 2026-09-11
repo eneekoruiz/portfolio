@@ -77,20 +77,20 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       ref={heroRef}
       id="hero"
       aria-label="Eneko Ruiz"
-      className="materia-hero relative flex min-h-[100svh] flex-col overflow-hidden px-5 pt-28 md:px-10 md:pt-32"
+      className="materia-hero relative flex min-h-[100svh] lg:h-[100svh] lg:max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
       <div className="hero-light" aria-hidden="true" />
-      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-5">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
           {greeting}
         </p>
         <LiveStatus label={t.status} />
       </div>
-      <div className="relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-8 py-12 lg:grid-cols-[1.4fr_0.6fr] lg:gap-0 lg:py-16">
+      <div className="relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-6 py-4 md:py-6 lg:grid-cols-[1.4fr_0.6fr] lg:gap-0 lg:py-4">
         <div className="relative z-10 min-w-0">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(5.3rem,16.5vw,16rem)] font-black uppercase leading-[0.78] tracking-[-0.07em] text-ink"
+            className="m-0 text-[clamp(4rem,min(13.5vw,14vh),11.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] text-ink"
           >
             <KineticText
               text="Eneko"
@@ -106,16 +106,16 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               className="mt-[0.13em] text-brand"
             />
           </h1>
-          <div className="mt-10 flex max-w-xl items-start gap-5 md:mt-14">
+          <div className="mt-6 flex max-w-xl items-start gap-4 md:mt-8 md:gap-5">
             <span
-              className="mt-2 h-px w-10 shrink-0 bg-brand"
+              className="mt-2 h-px w-8 md:w-10 shrink-0 bg-brand"
               aria-hidden="true"
             />
             <div>
               <p className="text-base font-semibold text-ink md:text-xl">
                 {t.role}
               </p>
-              <p className="mt-3 max-w-sm text-sm leading-relaxed text-lead">
+              <p className="mt-2 md:mt-3 max-w-sm text-sm leading-relaxed text-lead">
                 {t.tagline}
               </p>
             </div>
@@ -123,14 +123,14 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </div>
         <div
           ref={prismRef}
-          className="materia-surface hero-prism relative hidden min-h-[390px] self-stretch rounded-[26px] border border-ink/15 lg:block"
+          className="materia-surface hero-prism relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 lg:block"
           data-materia-surface="hero"
         >
           <div className="absolute inset-x-5 top-5 flex items-center justify-between text-[10px] font-mono tracking-[0.18em] text-lead">
             <span>ER — 01</span>
             <span aria-hidden="true">↗</span>
           </div>
-          <div className="hero-portrait-frame absolute inset-x-4 bottom-20 mx-auto">
+          <div className="hero-portrait-frame absolute inset-x-4 bottom-16 md:bottom-20 mx-auto">
             <video
               ref={portraitRef}
               src="/memoji.webm"
@@ -150,8 +150,8 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           </div>
         </div>
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-6 border-t border-ink/15 py-6">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 md:gap-6 border-t border-ink/15 py-3 md:py-4 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <SignatureLink
             label={t.ctaWork}
             kind="work"
