@@ -38,7 +38,7 @@ test("all 20 languages reach project descriptions, technology labels, contact an
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
-  await row.locator("button").click();
+  await row.locator("button[aria-expanded]").click();
   for (const lang of Object.keys(LANG_LABELS)) {
     await language(page, lang);
     await expect(page.locator('a[href="#main-content"]')).toHaveText(
@@ -137,6 +137,32 @@ test("language search understands translated names and supports keyboard selecti
   await expect(page.locator("[data-language-picker]")).toHaveCount(0);
   await expect(page.locator("[data-language-trigger]")).toBeFocused();
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+});
+
+test("project decision lens reveals the brief, system and impact without leaving the row", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const row = page.locator('[data-materia-surface="ana-peluquera"]');
+  await row.locator("button[aria-expanded]").click();
+  const lens = row.locator("[data-decision-lens]");
+  await expect(lens).toBeVisible();
+  await expect(lens.getByRole("tab")).toHaveCount(3);
+  await expect(lens.locator("[data-lens-panel]")).toContainText(
+    PROJECTS_CONTENT["ana-peluquera"].es.objective,
+  );
+  await lens.getByRole("tab").nth(1).click();
+  await expect(lens.getByRole("tab").nth(1)).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(lens.locator("[data-lens-panel]")).toContainText(
+    PROJECTS_CONTENT["ana-peluquera"].es.algorithmH,
+  );
+  await lens.getByRole("tab").nth(2).press("Enter");
+  await expect(lens.locator("[data-lens-panel]")).toContainText(
+    PROJECTS_CONTENT["ana-peluquera"].es.outcomeH,
+  );
 });
 
 test("Arabic and Hindi keep connected words and Japanese headings fit narrow viewports", async ({

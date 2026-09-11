@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, type CSSProperties } from "react";
+import { useRef, useEffect, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { UI_COPY } from "../../../data/interface-translations";
 import { TX } from "../../../data/translations";
@@ -49,11 +49,29 @@ export function PremiumWorkRow({
   const bodyRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const prefetched = useRef(false);
+  const [lensStep, setLensStep] = useState(0);
   const safeId = proj.name.toLowerCase().replace(/[\s_]+/g, "-");
   const panelId = `panel-${safeId}`;
   const theme = PROJ_THEMES[safeId] ?? DEFAULT_THEME;
   const copy = UI_COPY[lang];
   const content = PROJECTS_CONTENT[safeId]?.[lang];
+  const lens = [
+    {
+      label: copy.stages[0],
+      title: content?.title ?? proj.name,
+      body: content?.objective ?? proj.desc,
+    },
+    {
+      label: copy.stages[1],
+      title: content?.algorithmH ?? copy.stages[1],
+      body: content?.algorithmP ?? proj.desc,
+    },
+    {
+      label: copy.stages[2],
+      title: content?.outcomeH ?? copy.stages[2],
+      body: content?.outcomeP ?? proj.desc,
+    },
+  ];
   const actionRef = useSpringHover<HTMLAnchorElement>(enabled);
   useMateriaSurface(rowRef, theme.color, enabled);
   useProjectTension(rowRef, enabled, isExpanded, idx);
@@ -232,9 +250,86 @@ export function PremiumWorkRow({
             data-work-panel
             className="flex flex-col justify-between gap-7 rounded-2xl border border-ink/10 bg-page/80 p-5 md:p-7"
           >
-            <p className="max-w-xl text-sm leading-relaxed text-lead md:text-base">
-              {content?.objective ?? proj.desc}
-            </p>
+            <div
+              data-decision-lens
+              className="rounded-xl border border-ink/10 bg-page/60 p-4 md:p-5"
+            >
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-lead">
+                  {copy.lifecycle}
+                </p>
+                <span
+                  className="font-mono text-[10px] tabular-nums text-lead"
+                  aria-live="polite"
+                >
+                  {String(lensStep + 1).padStart(2, "0")} / 03
+                </span>
+              </div>
+              <div
+                role="tablist"
+                aria-label={copy.lifecycle}
+                className="relative grid grid-cols-3 border-b border-ink/10"
+              >
+                {lens.map((item, i) => (
+                  <button
+                    key={item.label}
+                    id={`${panelId}-lens-tab-${i}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={lensStep === i}
+                    aria-controls={`${panelId}-lens-panel`}
+                    tabIndex={lensStep === i ? 0 : -1}
+                    onClick={() => setLensStep(i)}
+                    onKeyDown={(event) => {
+                      const next =
+                        event.key === "ArrowRight"
+                          ? (i + 1) % lens.length
+                          : event.key === "ArrowLeft"
+                            ? (i - 1 + lens.length) % lens.length
+                            : event.key === "Home"
+                              ? 0
+                              : event.key === "End"
+                                ? lens.length - 1
+                                : null;
+                      if (next === null) return;
+                      event.preventDefault();
+                      setLensStep(next);
+                      requestAnimationFrame(() =>
+                        document
+                          .getElementById(`${panelId}-lens-tab-${next}`)
+                          ?.focus(),
+                      );
+                    }}
+                    className="relative min-h-11 px-1 text-start font-mono text-[9px] uppercase tracking-[0.08em] text-lead transition-colors duration-300 hover:text-ink focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand md:px-2 md:text-[10px]"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute bottom-[-1px] left-0 h-px w-1/3 transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)]"
+                  style={{
+                    background: theme.color,
+                    transform: `translate3d(${lensStep * 100}%, 0, 0)`,
+                  }}
+                />
+              </div>
+              <div
+                key={`${safeId}-${lang}-${lensStep}`}
+                id={`${panelId}-lens-panel`}
+                role="tabpanel"
+                aria-labelledby={`${panelId}-lens-tab-${lensStep}`}
+                data-lens-panel
+                className="work-lens-panel pt-5"
+              >
+                <h4 className="mb-2 text-balance text-lg font-semibold tracking-[-0.03em] md:text-xl">
+                  {lens[lensStep].title}
+                </h4>
+                <p className="max-w-xl text-sm leading-relaxed text-lead md:text-base">
+                  {lens[lensStep].body}
+                </p>
+              </div>
+            </div>
             <dl className="grid grid-cols-[1fr_1fr] gap-5">
               <div>
                 <dt className="mb-1 font-mono text-[10px] uppercase tracking-wider text-lead">

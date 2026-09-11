@@ -1,6 +1,6 @@
 # Refinamiento editorial y óptico
 
-Fecha: 11 de septiembre de 2026. Trabajo posterior al commit `02e64d7`, en `codex/materia-viva`.
+Fecha: 11 de septiembre de 2026. Trabajo posterior al commit `7150f42`, en `codex/materia-viva`.
 
 ## Implementado
 
@@ -18,6 +18,7 @@ Fecha: 11 de septiembre de 2026. Trabajo posterior al commit `02e64d7`, en `code
 - Mapa de lectura móvil con enlaces anterior/siguiente; retorno y contacto siguen siendo accesibles.
 - Seguimiento de secciones por identidad y posición real; las secciones que se montan tarde ya no desplazan la correspondencia de los enlaces.
 - Se aceptan interrupciones rápidas de los controles de animación y tema. El tema respeta correctamente la selección inicial del sistema.
+- Lente de decisiones en cada caso de Selected Works: tres paradas navegables (arquitectura, desarrollo e impacto) que convierten el proyecto en una lectura rápida de criterio, sistema y resultado, sin abandonar la tarjeta.
 
 ## Comprobaciones
 
@@ -26,6 +27,7 @@ Fecha: 11 de septiembre de 2026. Trabajo posterior al commit `02e64d7`, en `code
 - Muelles: aprobadas las comprobaciones de reversión, frecuencia de refresco y fotogramas largos (`scratch/editorial-springs-final.log`).
 - Auditoría de navegador final: los 6 escenarios móviles de localización, captura, PKE, persistencia y mapa de lectura pasan en `scratch/editorial-mobile-final-v2.log` y `scratch/editorial-reading-final-v3.log`; el escenario de navegación adaptativa es de escritorio y pasa en `scratch/editorial-release-localization.log`. La órbita de escritorio pasa aislada en `scratch/editorial-orbit-isolated.log`. Las capturas están en `scratch/editorial-desktop-audit-captures`.
 - La ronda completa de 52 casos se detuvo después de 35 por la presión de memoria/tiempo del entorno; registró un timeout de estabilidad durante la primera prueba de órbitas que no se reproduce aislada. No se presenta esa ronda interrumpida como certificación de todos los casos.
+- La lente de decisiones pasa en escritorio y móvil en `scratch/materia-lens-playwright.log` y `scratch/materia-lens-playwright-mobile.log`; la compilación posterior a la integración pasa en `scratch/materia-lens-build.log`.
 
 ## Alcance de las garantías
 
