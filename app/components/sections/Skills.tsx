@@ -46,6 +46,10 @@ function SkillOrbit({
       startX = 0,
       startAngle = 0,
       elapsed = 0;
+    let lastX = 0,
+      lastTime = 0,
+      releaseVelocity = 0;
+    const pitch = new SpringValue(0, 100, 18);
     let radius = 115;
     const resize = new ResizeObserver(([entry]) => {
       radius = Math.min(178, Math.max(90, entry.contentRect.width * 0.31));
@@ -56,23 +60,30 @@ function SkillOrbit({
         const theta = (i * Math.PI * 2) / items.length + angle.value;
         const depth = (Math.cos(theta) + 1) / 2;
         const x = Math.sin(theta) * radius;
-        const y = Math.sin(theta * 2 + elapsed * 0.7) * 12;
+        const y =
+          Math.sin(theta * 2 + elapsed * 0.7) * 12 +
+          Math.cos(theta) * pitch.value * 18;
         items[i].style.transform =
-          `translate(-50%,-50%) translate3d(${x}px,${y}px,${depth * 45}px) scale(${0.64 + depth * 0.36})`;
+          `translate(-50%,-50%) translate3d(${x}px,${y}px,${(depth - 0.5) * 100}px) rotateY(${Math.sin(theta) * -12}deg) scale(${0.64 + depth * 0.36})`;
         items[i].style.opacity = String(0.38 + depth * 0.62);
         items[i].style.zIndex = String(Math.round(depth * 100));
       }
     };
     const tick = (_time: number, delta: number) => {
-      const dt = Math.min(delta / 1000, 0.08);
+      const dt = delta / 1000;
       const rotating = !pausedRef.current && !focused && !hovering && !dragging;
       if (rotating) {
-        angle.target += dt * 0.24;
-        elapsed += dt;
+        const advance = Math.min(dt, 0.08);
+        angle.target += advance * 0.24;
+        elapsed += advance;
       }
+      // Autonomous drift stays bounded after a missed frame. The analytic
+      // springs use real elapsed time so pausing never becomes slow motion.
       angle.step(dt);
+      pitch.target = Math.max(-1, Math.min(1, angle.velocity * 0.15));
+      pitch.step(dt);
       draw();
-      if (!rotating && angle.settled) gsap.ticker.remove(tick);
+      if (!rotating && angle.settled && pitch.settled) gsap.ticker.remove(tick);
     };
     function wake() {
       if (visible && document.visibilityState === "visible")
@@ -105,17 +116,58 @@ function SkillOrbit({
       pointerId = event.pointerId;
       startX = event.clientX;
       startAngle = angle.target;
+      lastX = startX;
+      lastTime = event.timeStamp;
+      releaseVelocity = 0;
       orbit.setPointerCapture(pointerId);
       wake();
     };
     const move = (event: PointerEvent) => {
       if (!dragging || event.pointerId !== pointerId) return;
       angle.target = startAngle + (event.clientX - startX) * 0.012;
+      const dt = (event.timeStamp - lastTime) / 1000;
+      if (dt > 0)
+        releaseVelocity = Math.max(
+          -5,
+          Math.min(5, ((event.clientX - lastX) * 0.012) / dt),
+        );
+      lastX = event.clientX;
+      lastTime = event.timeStamp;
       wake();
     };
-    const release = () => {
+    const release = (event: PointerEvent) => {
+      if (!dragging) return;
+      // A cancelled touch scroll must not fling the cylinder. Momentum decays
+      // from the last actual movement, so holding before release never kicks it.
+      if (event.type === "pointerup")
+        angle.target +=
+          releaseVelocity *
+          Math.exp(-Math.max(0, event.timeStamp - lastTime) / 90) *
+          0.2;
       dragging = false;
       pointerId = -1;
+      wake();
+    };
+    const wheel = (event: WheelEvent) => {
+      if (event.ctrlKey || dragging) return;
+      const unit =
+        event.deltaMode === 1
+          ? 16
+          : event.deltaMode === 2
+            ? orbit.clientHeight
+            : 1;
+      const delta =
+        Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.deltaY;
+      angle.target += Math.max(-240, Math.min(240, delta * unit)) * 0.0015;
+      wake();
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      angle.target +=
+        ((event.key === "ArrowRight" ? 1 : -1) * Math.PI * 2) / items.length;
       wake();
     };
     orbit.dataset.orbitActive = "true";
@@ -124,6 +176,8 @@ function SkillOrbit({
     orbit.addEventListener("pointerenter", enter);
     orbit.addEventListener("pointerleave", leave);
     orbit.addEventListener("pointerdown", down);
+    orbit.addEventListener("wheel", wheel, { passive: true });
+    orbit.addEventListener("keydown", key);
     orbit.addEventListener("pointermove", move);
     orbit.addEventListener("pointerup", release);
     orbit.addEventListener("pointercancel", release);
@@ -142,6 +196,8 @@ function SkillOrbit({
       orbit.removeEventListener("pointerenter", enter);
       orbit.removeEventListener("pointerleave", leave);
       orbit.removeEventListener("pointerdown", down);
+      orbit.removeEventListener("wheel", wheel);
+      orbit.removeEventListener("keydown", key);
       orbit.removeEventListener("pointermove", move);
       orbit.removeEventListener("pointerup", release);
       orbit.removeEventListener("pointercancel", release);
@@ -185,8 +241,10 @@ function SkillOrbit({
       </header>
       <ul
         ref={orbitRef}
+        tabIndex={motion ? 0 : undefined}
         aria-label={label}
-        className="skill-orbit mt-7 flex min-h-36 flex-wrap content-center justify-center gap-2"
+        aria-describedby={`orbit-help-${category.g.replace(/\W/g, "")}`}
+        className="skill-orbit mt-7 flex min-h-36 flex-wrap content-center justify-center gap-2 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
       >
         {category.techs.map((tech) => (
           <li
@@ -202,11 +260,14 @@ function SkillOrbit({
           </li>
         ))}
       </ul>
-      <p className="relative mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-lead">
+      <p
+        id={`orbit-help-${category.g.replace(/\W/g, "")}`}
+        className="relative mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-lead"
+      >
         {motion
           ? lang === "es"
-            ? "Arrastra para explorar"
-            : "Drag to explore"
+            ? "Arrastra para explorar · rueda o flechas ← →"
+            : "Drag to explore · wheel or arrows ← →"
           : category.techs.length +
             (lang === "es" ? " tecnologías" : " technologies")}
       </p>

@@ -37,6 +37,7 @@ export function KineticText({
     const tiltX = new SpringValue(0, 130, 20);
     const tiltY = new SpringValue(0, 130, 20);
     const tension = new SpringValue(0, 150, 22);
+    const light = new SpringValue(0, 150, 22);
     const release = gsap.parseEase("expo.out");
     let visible = false;
     let enteredAt = -1;
@@ -61,6 +62,18 @@ export function KineticText({
       const value = tension.step(delta / 1000);
       const rx = tiltX.step(delta / 1000);
       const ry = tiltY.step(delta / 1000);
+      if (!light.settled) {
+        element.style.setProperty(
+          "--type-light",
+          String(light.step(delta / 1000)),
+        );
+        if (light.settled && light.value === 0) {
+          for (const char of characters) {
+            char.style.removeProperty("--glyph-light-x");
+            char.style.removeProperty("--glyph-light-y");
+          }
+        }
+      }
       const changing =
         !tension.settled ||
         !tiltX.settled ||
@@ -103,6 +116,18 @@ export function KineticText({
       const y = (event.clientY - bounds.top) / Math.max(1, bounds.height);
       tiltX.target = (0.5 - y) * 7;
       tiltY.target = (x - 0.5) * 9;
+      light.target = 1;
+      const rectangles = characters.map((char) => char.getBoundingClientRect());
+      characters.forEach((char, i) => {
+        char.style.setProperty(
+          "--glyph-light-x",
+          `${event.clientX - rectangles[i].left}px`,
+        );
+        char.style.setProperty(
+          "--glyph-light-y",
+          `${event.clientY - rectangles[i].top}px`,
+        );
+      });
       for (let i = 0; i < waves.length; i++) {
         const distance = x - (i + 0.5) / waves.length;
         waves[i].target = Math.exp(-distance * distance * 32);
@@ -110,6 +135,7 @@ export function KineticText({
     };
     const leave = () => {
       tiltX.target = tiltY.target = 0;
+      light.target = 0;
       for (const wave of waves) wave.target = 0;
     };
     element.addEventListener("pointermove", move);
@@ -141,6 +167,7 @@ export function KineticText({
       element.style.transform = element.style.willChange = "";
       element.style.removeProperty("--type-width");
       element.style.removeProperty("--type-weight");
+      element.style.removeProperty("--type-light");
       for (const char of characters) char.removeAttribute("style");
     };
   }, [text, enabled, interactive, delay]);
@@ -173,6 +200,7 @@ export function KineticText({
             <span
               key={`${char}-${i}`}
               data-kinetic-char
+              data-glyph={interactive ? char : undefined}
               className="inline-block origin-bottom"
               aria-hidden="true"
             >

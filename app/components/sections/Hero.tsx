@@ -52,7 +52,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   );
   const prismRef = useRef<HTMLDivElement>(null);
   useMateriaSurface(prismRef, "#0066ff", enabled, 26);
-  const contactRef = useSpringHover<HTMLAnchorElement>(enabled);
+  const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 36, heroRef);
   const scrollTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
@@ -121,17 +121,19 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
             <span>ER — 01</span>
             <span aria-hidden="true">↗</span>
           </div>
-          <video
-            ref={portraitRef}
-            src="/memoji.webm"
-            autoPlay={enabled}
-            loop={enabled}
-            muted
-            playsInline
-            preload="metadata"
-            aria-hidden="true"
-            className="hero-portrait absolute inset-x-4 bottom-20 mx-auto h-[65%] w-[calc(100%-2rem)] rounded-[24px] object-contain"
-          />
+          <div className="hero-portrait-frame absolute inset-x-4 bottom-20 mx-auto">
+            <video
+              ref={portraitRef}
+              src="/memoji.webm"
+              autoPlay={enabled}
+              loop={enabled}
+              muted
+              playsInline
+              preload="metadata"
+              aria-hidden="true"
+              className="hero-portrait block h-full w-full object-cover"
+            />
+          </div>
           <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between border-t border-ink/15 pt-4">
             <span className="font-mono text-[10px] tracking-[0.14em] text-lead">
               SOFTWARE / SYSTEMS
@@ -148,6 +150,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           />
           <a
             ref={contactRef}
+            data-magnetic-contact
             href="#contact"
             onClick={(e) => scrollTo(e, "contact")}
             className="materia-button border border-ink/20 text-ink"

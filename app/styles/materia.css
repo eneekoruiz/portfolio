@@ -19,6 +19,27 @@
 .kinetic-type [data-kinetic-char] {
   backface-visibility: hidden;
 }
+.kinetic-type [data-glyph] {
+  position: relative;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .kinetic-type [data-glyph]::after {
+    content: attr(data-glyph);
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--type-light, 0);
+    color: transparent;
+    background: radial-gradient(
+      160px circle at var(--glyph-light-x, 50%) var(--glyph-light-y, 50%),
+      #e1f9ff 0%,
+      #35b8ff 32%,
+      transparent 72%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
+}
 .kinetic-wrap {
   text-wrap: balance;
 }
@@ -93,6 +114,7 @@
   );
 }
 .work-project-title {
+  transform-origin: left center;
   transition: color 180ms;
 }
 .work-surface:focus-within .work-project-title,
@@ -122,7 +144,8 @@
   width: 150px;
   height: 130px;
   pointer-events: none;
-  opacity: 0.13;
+  opacity: calc(0.13 + var(--work-energy, 0) * 0.17);
+  transform: rotate(var(--work-turn, 0deg));
   overflow: hidden;
 }
 .work-orbit-mark span {
@@ -163,18 +186,24 @@
     transparent 75%
   );
 }
-.hero-portrait {
+.hero-portrait-frame {
   width: min(calc(100% - 2rem), 300px);
   height: auto;
   aspect-ratio: 1;
   border-radius: 50%;
-  object-fit: cover;
   background: #000;
   border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
   box-shadow: 0 24px 48px -24px
     color-mix(in srgb, var(--brand) 28%, transparent);
   transform: perspective(900px) rotateX(var(--hero-tilt-x, 0deg))
     rotateY(var(--hero-tilt-y, 0deg));
+}
+.hero-portrait {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  /* Explicit video clipping prevents decoded frames bleeding outside the circle.
+     The outer frame keeps the original shadow and spring-driven tilt. */
+  clip-path: circle(50%);
 }
 .hero-sensor {
   display: none;
@@ -312,9 +341,17 @@ html[data-umbral]::view-transition-new(project-surface) {
 }
 .skill-orbit-pill {
   border-color: color-mix(in srgb, var(--surface-color) 55%, transparent);
-  background: color-mix(in srgb, var(--surface-color) 13%, var(--page));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--surface-color) 20%, var(--page)),
+    color-mix(in srgb, var(--surface-color) 7%, var(--page))
+  );
   box-shadow: 0 8px 24px -15px var(--surface-color);
   white-space: nowrap;
+}
+.philosophy-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
 }
 .skill-orbit[data-orbit-active] .skill-orbit-pill {
   position: absolute;

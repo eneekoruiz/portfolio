@@ -24,6 +24,7 @@ function BentoCard({ item, index, motion }: BentoCardProps) {
   return (
     <article
       ref={ref}
+      tabIndex={0}
       data-section-reveal
       className={`materia-surface philosophy-card relative flex min-h-60 flex-col overflow-hidden rounded-[24px] border border-ink/15 p-6 md:p-8 ${[0, 3, 4].includes(index) ? "md:col-span-2" : ""} ${index === 0 || index === 4 ? "bg-brand/5" : "bg-page/75"}`}
     >

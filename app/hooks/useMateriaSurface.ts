@@ -75,6 +75,7 @@ export function useMateriaSurface(
     observer.observe(element);
     element.addEventListener("pointermove", move, { passive: true });
     element.addEventListener("pointerleave", leave);
+    element.addEventListener("pointercancel", leave);
     element.addEventListener("focusin", focus);
     element.addEventListener("focusout", blur);
     return () => {
@@ -82,6 +83,7 @@ export function useMateriaSurface(
       materia.surfaces.delete(surface);
       element.removeEventListener("pointermove", move);
       element.removeEventListener("pointerleave", leave);
+      element.removeEventListener("pointercancel", leave);
       element.removeEventListener("focusin", focus);
       element.removeEventListener("focusout", blur);
       element.style.removeProperty("--surface-energy");

@@ -369,7 +369,9 @@ export const TerrainMesh = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let previousTime = 0;
 
     const resize = () => {
       const ratio = getAdaptivePixelRatio();
@@ -378,7 +380,7 @@ export const TerrainMesh = ({
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     };
 
-    const draw = () => {
+    const draw = (time: number) => {
       if (!activeRef.current || document.visibilityState !== "visible") {
         animRef.current = 0;
         return;
@@ -387,7 +389,11 @@ export const TerrainMesh = ({
       const W = canvas.offsetWidth,
         H = canvas.offsetHeight;
       ctx.clearRect(0, 0, W, H);
-      tRef.current += 0.0035;
+      const dt = previousTime
+        ? Math.min((time - previousTime) / 1000, 0.05)
+        : 0;
+      previousTime = time;
+      tRef.current += dt * 0.21;
 
       const rows = 12;
       const cols = 20;
@@ -442,12 +448,17 @@ export const TerrainMesh = ({
       animRef.current = requestAnimationFrame(draw);
     };
 
+    const resume = () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      animRef.current = 0;
+      previousTime = 0;
+      if (activeRef.current && document.visibilityState === "visible")
+        animRef.current = requestAnimationFrame(draw);
+    };
     const observer = new IntersectionObserver(
       ([entry]) => {
         activeRef.current = entry.isIntersecting;
-        if (entry.isIntersecting && !animRef.current) {
-          animRef.current = requestAnimationFrame(draw);
-        }
+        resume();
       },
       { threshold: 0.01 },
     );
@@ -455,12 +466,13 @@ export const TerrainMesh = ({
     resize();
     observer.observe(canvas);
     window.addEventListener("resize", resize);
-    animRef.current = requestAnimationFrame(draw);
+    document.addEventListener("visibilitychange", resume);
 
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
       observer.disconnect();
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", resume);
     };
   }, [accent, darkMode]);
 

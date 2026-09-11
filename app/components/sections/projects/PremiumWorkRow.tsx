@@ -11,6 +11,7 @@ import { useMateriaSurface } from "../../../hooks/useMateriaSurface";
 import { useSpringAccordion } from "../../../hooks/useSpringAccordion";
 import { useSpringHover } from "../../../hooks/useSpringHover";
 import { usePreferredMotion } from "../../../hooks/usePreferredMotion";
+import { useProjectTension } from "../../../hooks/useProjectTension";
 import { useUmbral } from "../../motion/UmbralProvider";
 
 interface WorkRowProps {
@@ -101,6 +102,7 @@ export function PremiumWorkRow({
   const summary = SUMMARIES[safeId];
   const actionRef = useSpringHover<HTMLAnchorElement>(enabled);
   useMateriaSurface(rowRef, theme.color, enabled);
+  useProjectTension(rowRef, enabled, isExpanded, idx);
   useSpringAccordion(bodyRef, contentRef, isExpanded, enabled, skipAnimation);
   const prefetch = () => {
     if (theme.hasAudit && !prefetched.current) {
@@ -204,7 +206,10 @@ export function PremiumWorkRow({
           ref={contentRef}
           className="grid gap-4 px-4 pb-5 pt-2 md:grid-cols-[1fr_1.5fr] md:px-6 md:pb-6"
         >
-          <div className="work-lifecycle flex flex-col justify-between gap-7 rounded-2xl border p-5 md:p-7">
+          <div
+            data-work-panel
+            className="work-lifecycle flex flex-col justify-between gap-7 rounded-2xl border p-5 md:p-7"
+          >
             <div>
               <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.14em] text-lead">
                 {copy.lifecycle}
@@ -261,7 +266,10 @@ export function PremiumWorkRow({
               )}
             </a>
           </div>
-          <div className="flex flex-col justify-between gap-7 rounded-2xl border border-ink/10 bg-page/80 p-5 md:p-7">
+          <div
+            data-work-panel
+            className="flex flex-col justify-between gap-7 rounded-2xl border border-ink/10 bg-page/80 p-5 md:p-7"
+          >
             <p className="max-w-xl text-sm leading-relaxed text-lead md:text-base">
               {summary?.[lang === "es" ? "es" : "en"] ?? proj.desc}
             </p>

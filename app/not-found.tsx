@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Home } from "lucide-react";
+import { HomeReturnLink } from "./components/ui/HomeReturnLink";
 
 export default function NotFound() {
   return (
@@ -18,13 +17,7 @@ export default function NotFound() {
           <p className="text-[13px] text-lead leading-[1.6] max-w-[300px]">
             O simplemente te has perdido. Volvamos al código limpio.
           </p>
-          <Link
-            href="/"
-            aria-label="Volver al inicio"
-            className="inline-flex items-center gap-2.5 px-8 py-[.9rem] rounded-full bg-ink text-page font-bold text-[14px] no-underline shadow-[0_8px_25px_rgba(0,0,0,.2)] hover:scale-105 active:scale-95 transition-transform"
-          >
-            <Home size={16} /> Volver al inicio
-          </Link>
+          <HomeReturnLink />
           <code className="text-[10px] text-lead/50 font-mono">
             git checkout main
           </code>
