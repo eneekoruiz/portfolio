@@ -14,7 +14,7 @@
     "wght" var(--type-weight, 850);
   perspective: 1100px;
   transform-style: preserve-3d;
-  text-wrap: nowrap;
+  text-wrap: balance;
 }
 .kinetic-type [data-kinetic-char] {
   backface-visibility: hidden;
@@ -114,7 +114,7 @@
   );
 }
 .work-project-title {
-  transform-origin: left center;
+  transform-origin: center;
   transition: color 180ms;
 }
 .work-surface:focus-within .work-project-title,
@@ -128,7 +128,7 @@
 .work-lifecycle-track li:not(:last-child)::before {
   content: "";
   position: absolute;
-  left: 3px;
+  inset-inline-start: 3px;
   top: 12px;
   height: calc(100% + 14px);
   width: 1px;
@@ -348,6 +348,19 @@ html[data-umbral]::view-transition-new(project-surface) {
   );
   box-shadow: 0 8px 24px -15px var(--surface-color);
   white-space: nowrap;
+  position: relative;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.skill-orbit-pill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--surface-color);
+  background: linear-gradient(130deg, #ffffff70, transparent 60%);
+  opacity: calc(var(--pill-light, 0) * 0.65);
+  pointer-events: none;
 }
 .philosophy-card:focus-visible {
   outline: 2px solid var(--brand);
@@ -371,5 +384,222 @@ html[data-lite="1"] .materia-surface {
   .kinetic-type [data-kinetic-char] {
     transform: none !important;
     opacity: 1 !important;
+  }
+}
+
+/* A shared object for the selected work, pointer preview and project entrance. */
+.project-visual {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1.7;
+  color: var(--ink);
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  isolation: isolate;
+}
+.project-visual-frame {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid
+    color-mix(in srgb, var(--surface-color, var(--brand)) 35%, var(--page));
+  border-radius: 14px;
+  background: var(--page);
+  box-shadow: 0 24px 44px -24px
+    color-mix(in srgb, var(--surface-color, var(--brand)) 38%, transparent);
+  transform: translateZ(var(--preview-depth, 0px));
+}
+.project-visual-chrome {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  font:
+    9px ui-monospace,
+    monospace;
+  color: var(--lead);
+}
+.project-visual-chrome i {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+}
+.project-visual-content {
+  position: relative;
+  height: calc(100% - 28px);
+  overflow: hidden;
+}
+.preview-source {
+  height: 100%;
+  margin: 0;
+  padding: 20px 18px;
+  overflow: hidden;
+  background: #0b1220;
+  color: #b8d7ef;
+  font:
+    11px/1.8 ui-monospace,
+    monospace;
+  text-align: left;
+  mask-image: linear-gradient(black 78%, transparent);
+}
+.preview-pending-orbit {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid color-mix(in srgb, var(--surface-color) 50%, transparent);
+  border-radius: 50%;
+  color: var(--surface-color);
+}
+.project-visual-glint {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  opacity: calc(var(--work-energy, 0) * 0.55);
+  background: linear-gradient(
+    120deg,
+    #ffffff50,
+    transparent 35%,
+    transparent 70%,
+    #ffffff15
+  );
+  transform: translateZ(calc(var(--preview-depth, 0px) + 1px));
+}
+.project-hero-art {
+  transform: perspective(1600px) rotateY(-14deg) rotateZ(6deg);
+}
+.project-hero-art .project-visual {
+  aspect-ratio: 1.7;
+}
+.project-hero-art .preview-source {
+  font-size: clamp(9px, 1.1vw, 16px);
+}
+.project-follower-visual {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: 0.5;
+}
+.project-follower-visual .project-visual-chrome {
+  display: none;
+}
+.project-follower-visual .project-visual-content {
+  height: 100%;
+}
+.project-follower-visual .project-visual-frame {
+  border: 0;
+  border-radius: 0;
+  mask-image: linear-gradient(black, transparent 95%);
+}
+html[dir="rtl"] .text-left {
+  text-align: start;
+}
+html[dir="rtl"] .kinetic-type {
+  transform-origin: right center;
+}
+html[dir="rtl"] [dir="ltr"] .kinetic-type {
+  transform-origin: left center;
+}
+html:lang(ar) :is(h1, h2, h3, p, button, a, .kinetic-type),
+html:lang(hi) :is(h1, h2, h3, p, button, a, .kinetic-type) {
+  letter-spacing: normal;
+}
+html:lang(ar) .kinetic-type {
+  font-family: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  line-height: 1.35;
+}
+html:lang(hi) .kinetic-type {
+  font-family: "Nirmala UI", "Noto Sans Devanagari", sans-serif;
+  line-height: 1.25;
+}
+html:lang(ja) .kinetic-type {
+  font-family:
+    "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+  line-height: 1.15;
+}
+html:lang(zh) .kinetic-type {
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.15;
+}
+html:lang(ko) .kinetic-type {
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  line-height: 1.15;
+}
+html:is(:lang(ar), :lang(hi), :lang(ja), :lang(zh), :lang(ko))
+  #hero
+  [dir="ltr"]
+  .kinetic-type {
+  font-family: "Materia Sans", var(--font-sans);
+  line-height: inherit;
+}
+#hero .kinetic-type {
+  text-wrap: nowrap;
+}
+html[dir="rtl"] .work-lifecycle-track {
+  text-align: start;
+}
+html[dir="rtl"] .hero-prism {
+  margin-left: 0;
+  margin-inline-start: -5%;
+}
+@media (max-width: 767px) {
+  .work-surface-header .project-visual {
+    max-height: 200px;
+    aspect-ratio: 1.85;
+  }
+  .project-hero-art {
+    top: 18vh;
+    width: 90vw;
+    opacity: 0.12;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-visual,
+  .project-visual-frame {
+    transform: none !important;
+  }
+  .skill-orbit-pill::after {
+    display: none;
+  }
+}
+
+/* Portalled to the document so animated navigation controls cannot become its
+   containing block. Position is measured only when opened or resized. */
+.language-panel {
+  position: fixed;
+  left: 12px;
+  top: 84px;
+  width: calc(100vw - 24px);
+}
+@media (max-width: 767px) {
+  .reading-nav {
+    left: 50dvw;
+    top: calc(100dvh - 5.75rem);
+    bottom: auto;
+  }
+}
+@media (min-width: 768px) {
+  [data-nav-compact="true"] .navbar-links {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    max-width: 100%;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  [data-nav-compact="true"] .navbar-menu-trigger {
+    display: flex;
+  }
+}
+@media (pointer: coarse) {
+  .language-panel {
+    --tw-enter-scale: 1;
   }
 }

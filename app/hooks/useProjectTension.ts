@@ -16,6 +16,7 @@ export function useProjectTension(
     const host = ref.current;
     if (!host || !enabled || matchMedia("(pointer: coarse)").matches) return;
     const title = host.querySelector<HTMLElement>("[data-project-title]");
+    const visual = host.querySelector<HTMLElement>("[data-project-visual]");
     const panels = Array.from(
       host.querySelectorAll<HTMLElement>("[data-work-panel]"),
     );
@@ -42,6 +43,11 @@ export function useProjectTension(
       }
       host.style.setProperty("--work-turn", `${flow * 18 + px * 12}deg`);
       host.style.setProperty("--work-energy", String(glow));
+      if (visual) {
+        visual.style.transform = `perspective(1000px) translate3d(${px * -5}px,${py * -5}px,${glow * 14}px) rotateX(${py * -5 + flow * 2}deg) rotateY(${px * 7}deg)`;
+        visual.style.setProperty("--preview-depth", `${glow * 12}px`);
+        visual.style.willChange = moving ? "transform" : "";
+      }
       let complete = true;
       reveal.forEach((spring, i) => {
         spring.target = host.dataset.expanded === "true" ? 1 : 0;
@@ -115,7 +121,8 @@ export function useProjectTension(
       document.removeEventListener("visibilitychange", wake);
       host.style.removeProperty("--work-turn");
       host.style.removeProperty("--work-energy");
-      for (const element of [title, ...panels]) {
+      visual?.style.removeProperty("--preview-depth");
+      for (const element of [title, visual, ...panels]) {
         if (element) element.style.transform = element.style.willChange = "";
       }
     };

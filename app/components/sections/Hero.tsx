@@ -10,6 +10,7 @@ import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
 import type { Tx, Lang } from "../../types";
+import { UI_COPY } from "../../data/interface-translations";
 
 interface HeroProps {
   t: Tx;
@@ -20,6 +21,7 @@ interface HeroProps {
 }
 
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
+  const ui = UI_COPY[lang];
   const motion = useMotionEnabled();
   const enabled = motion && !reduced && phase === "ready";
   const portraitRef = useRef<HTMLVideoElement>(null);
@@ -61,7 +63,11 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
     event.preventDefault();
     if (enabled && window.__lenis)
       window.__lenis.scrollTo(target, { offset: -90 });
-    else target.scrollIntoView({ behavior: "instant" });
+    else
+      window.scrollTo({
+        top: Math.max(0, target.getBoundingClientRect().top + scrollY - 90),
+        behavior: "instant",
+      });
     history.replaceState(null, "", `#${id}`);
     target.setAttribute("tabindex", "-1");
     target.focus({ preventScroll: true });
@@ -82,7 +88,10 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       </div>
       <div className="relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-8 py-12 lg:grid-cols-[1.4fr_0.6fr] lg:gap-0 lg:py-16">
         <div className="relative z-10 min-w-0">
-          <h1 className="m-0 text-[clamp(5.3rem,16.5vw,16rem)] font-black uppercase leading-[0.78] tracking-[-0.07em] text-ink">
+          <h1
+            dir="ltr"
+            className="m-0 text-[clamp(5.3rem,16.5vw,16rem)] font-black uppercase leading-[0.78] tracking-[-0.07em] text-ink"
+          >
             <KineticText
               text="Eneko"
               enabled={enabled}
@@ -168,16 +177,10 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               }
             >
               {sensor === "enabled"
-                ? lang === "es"
-                  ? "Inclinación activada"
-                  : "Tilt enabled"
+                ? ui.tiltEnabled
                 : sensor === "unavailable"
-                  ? lang === "es"
-                    ? "Usa el gesto táctil"
-                    : "Use touch instead"
-                  : lang === "es"
-                    ? "Activar inclinación"
-                    : "Enable tilt"}
+                  ? ui.tiltTouch
+                  : ui.tiltEnable}
             </button>
           )}
         </div>

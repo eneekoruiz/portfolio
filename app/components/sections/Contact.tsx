@@ -9,6 +9,7 @@ import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { ContactTile } from "./ContactTile";
 import { SignatureLink } from "../ui/SignatureLink";
+import { UI_COPY } from "../../data/interface-translations";
 
 const EMAIL = "eneekoruiz@gmail.com";
 
@@ -20,7 +21,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const cardRef = useRef<HTMLDivElement>(null);
   useMateriaSurface(cardRef, "#0066ff", motion, 28);
   const mailRef = useSpringHover<HTMLAnchorElement>(motion);
-  const es = lang === "es";
+  const ui = UI_COPY[lang];
 
   useEffect(() => {
     alive.current = true;
@@ -75,7 +76,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
             className="materia-button bg-ink text-page"
           >
             <Mail size={16} aria-hidden="true" />
-            {es ? "Escríbeme" : "Email me"}
+            {ui.email}
             <ArrowUpRight size={16} aria-hidden="true" />
           </a>
           <SignatureLink label={t.ctaCv} kind="cv" />
@@ -86,13 +87,9 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
           className="mt-4 min-h-6 text-sm text-lead"
         >
           {status === "copied"
-            ? es
-              ? "Correo copiado."
-              : "Email copied."
+            ? ui.copied
             : status === "failed"
-              ? es
-                ? "No se pudo copiar. Puedes seleccionar el correo o usar Escríbeme."
-                : "Could not copy. Select the address or use Email me."
+              ? ui.copyFailed
               : ""}
         </p>
       </div>
@@ -100,7 +97,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
         <ContactTile
           label="Gmail"
           value={EMAIL}
-          action={es ? "Copiar correo" : "Copy email"}
+          action={ui.copyEmail}
           color="#d83c30"
           icon={status === "copied" ? Check : Mail}
           onClick={copy}
@@ -109,7 +106,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
         <ContactTile
           label="GitHub"
           value="github.com/eneekoruiz"
-          action={es ? "Ver perfil" : "View profile"}
+          action={ui.profile}
           color="#747a88"
           icon={Github}
           href="https://github.com/eneekoruiz"
@@ -118,7 +115,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
         <ContactTile
           label="LinkedIn"
           value="linkedin.com/in/eneekoruiz"
-          action={es ? "Conectar" : "Connect"}
+          action={ui.connect}
           color="#0077b5"
           icon={Linkedin}
           href="https://linkedin.com/in/eneekoruiz"

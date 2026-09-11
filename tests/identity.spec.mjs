@@ -142,7 +142,7 @@ test("project opens into a reversible 3D studio scroll journey", async ({
       .filter({ visible: true }),
   ).toBeVisible();
   await expect(
-    screen.getByRole("link", { name: "Ver proyecto en directo" }),
+    screen.getByRole("link", { name: "Abrir en otra pestaña" }),
   ).toBeVisible();
   await page.screenshot({ path: info.outputPath("studio-depth.png") });
   await page.evaluate(() =>

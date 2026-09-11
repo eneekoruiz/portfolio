@@ -1,6 +1,10 @@
+"use client";
+
 import { HomeReturnLink } from "./components/ui/HomeReturnLink";
+import { useTranslations } from "./hooks/useTranslations";
 
 export default function NotFound() {
+  const { ui } = useTranslations();
   return (
     <main
       className="min-h-screen flex items-center justify-center p-8 bg-page text-ink"
@@ -12,10 +16,10 @@ export default function NotFound() {
             404
           </p>
           <h1 className="font-black text-[1.3rem] tracking-[-0.5px] text-ink">
-            Parece que has roto algo.
+            {ui.missingTitle}
           </h1>
           <p className="text-[13px] text-lead leading-[1.6] max-w-[300px]">
-            O simplemente te has perdido. Volvamos al código limpio.
+            {ui.missingDescription}
           </p>
           <HomeReturnLink />
           <code className="text-[10px] text-lead/50 font-mono">

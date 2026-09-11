@@ -14,6 +14,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { ProjectCard, RepoFull, Tx, Lang } from "../../types";
 import { KineticText } from "../motion/KineticText";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
+import { UI_COPY } from "../../data/interface-translations";
 
 // Custom Hooks & Utilities
 import { useMobile } from "../../hooks/useMobile";
@@ -125,9 +126,7 @@ export function Projects({
               <KineticText text={t.woH} enabled={motionEnabled && !reduced} />
             </h2>
             <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-lead mb-1">
-              {lang === "es"
-                ? "Selecciona para explorar ↓"
-                : "Select to explore ↓"}
+              {UI_COPY[lang].workHint} ↓
             </span>
           </div>
         </div>
@@ -160,7 +159,7 @@ export function Projects({
       <section
         id="github"
         data-section="github"
-        aria-label="Actividad de GitHub"
+        aria-label={t.ghLb}
         className="border-t border-black/7 dark:border-white/10 py-12 md:py-22 px-5 md:px-8 max-w-[1200px] mx-auto relative z-10"
       >
         <div className="flex items-end justify-between pb-4 border-b border-black/7 dark:border-white/10 mb-1">

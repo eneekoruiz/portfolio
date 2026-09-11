@@ -6,6 +6,7 @@
 import { useEffect, useMemo } from "react";
 import { createPortal, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { materia } from "../lib/materia";
 import { DNAHelix3D } from "./DNAHelix3D";
 
@@ -108,6 +109,7 @@ export function OpticalCompositor({
       magFilter: THREE.LinearFilter,
       depthBuffer: true,
       stencilBuffer: false,
+      samples: Math.min(2, gl.capabilities.maxSamples),
     });
     const material = new THREE.ShaderMaterial({
       vertexShader,
@@ -146,7 +148,24 @@ export function OpticalCompositor({
       },
     });
     return { target, material };
-  }, [lowPower]);
+  }, [lowPower, gl]);
+
+  useEffect(() => {
+    if (lowPower) return;
+    // Bake studio reflections once. No remote HDR, cube capture, or extra pass per frame.
+    const room = new RoomEnvironment();
+    const generator = new THREE.PMREMGenerator(gl);
+    const environment = generator.fromScene(room, 0.04, 0.1, 100, {
+      size: 128,
+    });
+    sourceScene.environment = environment.texture;
+    room.dispose();
+    generator.dispose();
+    return () => {
+      sourceScene.environment = null;
+      environment.dispose();
+    };
+  }, [gl, sourceScene, lowPower]);
 
   useEffect(() => {
     if (!resources) return;
@@ -165,6 +184,9 @@ export function OpticalCompositor({
 
   useFrame((state) => {
     if (!active || materia.paused) return;
+    sourceScene.environmentRotation.y =
+      materia.chapter.value * 0.3 + materia.studio.value * 0.6;
+    sourceScene.environmentIntensity = darkMode ? 0.65 : 0.95;
     const previousTarget = gl.getRenderTarget();
     if (!resources) {
       gl.setRenderTarget(null);
@@ -176,6 +198,16 @@ export function OpticalCompositor({
     }
     const { target, material } = resources;
     const dpr = Math.min(gl.getPixelRatio(), 1.5);
+    const samples =
+      dpr < 1.05
+        ? 0
+        : dpr > 1.25
+          ? Math.min(2, gl.capabilities.maxSamples)
+          : target.samples;
+    if (target.samples !== samples) {
+      target.samples = samples;
+      target.dispose();
+    }
     const width = Math.max(1, Math.round(size.width * dpr));
     const height = Math.max(1, Math.round(size.height * dpr));
     if (target.width !== width || target.height !== height)
@@ -213,6 +245,7 @@ export function OpticalCompositor({
     gl.render(state.scene, state.camera);
     if (gl.domElement.dataset.materiaRenderer !== "refraction")
       gl.domElement.dataset.materiaRenderer = "refraction";
+    gl.domElement.dataset.materiaSamples = String(target.samples);
     gl.setRenderTarget(previousTarget);
   }, 1);
 

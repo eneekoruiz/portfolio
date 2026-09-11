@@ -136,7 +136,7 @@ test("project navigation keeps the document and the canvas; browser Back restore
 test("Spanish and English controls update together", async ({ page }) => {
   await home(page);
   await page.getByRole("button", { name: /^Idioma:/ }).click();
-  await page.getByRole("menuitem", { name: "English", exact: true }).click();
+  await page.locator('[role="option"]:has(bdi[lang="en"])').click();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(
     page.locator("#hero").getByRole("link", { name: "See work" }),
@@ -164,7 +164,7 @@ test("reduced motion renders readable text and immediate project navigation", as
     page.locator('iframe[src="https://agpeluqueria.vercel.app"]'),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: "Ver proyecto en directo", exact: true }),
+    page.getByRole("link", { name: "Abrir en otra pestaña", exact: true }),
   ).toHaveAttribute("href", /agpeluqueria\.vercel\.app/);
 });
 
@@ -233,7 +233,7 @@ test("dark theme and animation preference keep content readable", async ({
   );
   await page.screenshot({ path: testInfo.outputPath("hero-dark.png") });
   await page
-    .getByRole("button", { name: "Pausar animación de fondo", exact: true })
+    .getByRole("button", { name: "Pausar animaciones", exact: true })
     .click();
   await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   await expect(page.locator("#main-content")).toBeVisible();

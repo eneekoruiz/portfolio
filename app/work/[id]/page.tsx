@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 
 import { TX } from "../../data/translations";
+import { useTranslations } from "../../hooks/useTranslations";
 import { PROJECTS_CONTENT, CODE_SNIPPETS } from "../../data/projects";
 import { LANG_COLORS, getTechColor } from "../../lib/constants";
 import type { Lang } from "../../types";
@@ -270,19 +271,11 @@ export default function ProjectPage() {
   const router = useRouter();
   const main = useRef<HTMLDivElement>(null);
 
-  const [lang, setLang] = useState<Lang>("es");
+  const { lang } = useTranslations();
   const [darkMode, setDarkMode] = useState(false);
   const userMotionEnabled = useMotionEnabled();
   const reducedMotion = usePreferredMotion();
   const motionEnabled = userMotionEnabled && !reducedMotion;
-
-  // Sync language from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("portfolio_lang") as Lang;
-    if (saved && TX[saved]) {
-      setLang(saved);
-    }
-  }, []);
 
   // Force scroll to top on mount and when motion is toggled (prevents layout snap)
   useEffect(() => {
@@ -318,6 +311,11 @@ export default function ProjectPage() {
     materia.accent = theme.helixA;
     materia.secondary = theme.helixB;
     materia.composition.target = 0;
+    materia.chapter.target = 3;
+    materia.studio.target = 0;
+    return () => {
+      materia.studio.target = 0;
+    };
   }, [theme]);
   const summary = PROJECT_SUMMARIES[safeId];
 
@@ -334,7 +332,7 @@ export default function ProjectPage() {
   const LIVE_URLS: Record<string, string | null> = {
     "ana-peluquera": "https://agpeluqueria.vercel.app",
     "who-are-ya-backend": "https://who-are-ya-backend.onrender.com",
-    "pke-web": "https://pke-web.vercel.app",
+    "pke-web": null,
     rides24ofiziala: null,
     "spotshare-parking": null,
   };

@@ -1,31 +1,20 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import { TX } from "../data/translations";
-import type { Lang } from "../types";
-
-const STORAGE_KEY = "portfolio_lang";
+import { UI_COPY } from "../data/interface-translations";
+import {
+  getLocale,
+  getServerLocale,
+  setLocale,
+  subscribeLocale,
+} from "../lib/locale";
 
 export function useTranslations() {
-  const [lang, setLangState] = useState<Lang>("es");
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as Lang;
-    if (saved && TX[saved]) setLangState(saved);
-  }, []);
-
-  const setLang = (newLang: Lang) => {
-    setLangState(newLang);
-    localStorage.setItem(STORAGE_KEY, newLang);
-  };
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = lang;
-    }
-  }, [lang]);
-
-  const t = useMemo(() => TX[lang], [lang]);
-
-  return { lang, setLang, t };
+  const lang = useSyncExternalStore(
+    subscribeLocale,
+    getLocale,
+    getServerLocale,
+  );
+  return { lang, setLang: setLocale, t: TX[lang], ui: UI_COPY[lang] };
 }

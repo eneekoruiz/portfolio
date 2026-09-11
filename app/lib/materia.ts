@@ -22,6 +22,8 @@ export const materia = {
   paused: false,
   warp: new SpringValue(0, 110, 20),
   composition: new SpringValue(1, 90, 20),
+  chapter: new SpringValue(0, 70, 18),
+  studio: new SpringValue(0, 95, 20),
   tiltX: new SpringValue(0, 100, 20),
   tiltY: new SpringValue(0, 100, 20),
 };
@@ -30,6 +32,8 @@ export function tickMateria(deltaMs: number) {
   const dt = Math.min(deltaMs / 1000, 2);
   materia.warp.step(dt);
   materia.composition.step(dt);
+  materia.chapter.step(dt);
+  materia.studio.step(dt);
   materia.tiltX.step(dt);
   materia.tiltY.step(dt);
   if (performance.now() - materia.scrollTime > 100) {

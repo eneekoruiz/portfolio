@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { SpringValue } from "../../lib/spring";
+import { ProjectVisual } from "./ProjectVisual";
+import { useTranslations } from "../../hooks/useTranslations";
 
 type Preview = { name: string; color: string };
 export function ProjectPreviewFollower({
@@ -11,6 +13,7 @@ export function ProjectPreviewFollower({
   activeProject: Preview | null;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { t } = useTranslations();
   const wakeRef = useRef<() => void>(() => {});
   const [project, setProject] = useState(activeProject);
   const enabled = useMotionEnabled();
@@ -111,12 +114,18 @@ export function ProjectPreviewFollower({
           strokeOpacity="0.5"
         />
       </svg>
+      {project && (
+        <ProjectVisual
+          id={project.name.toLowerCase().replace(/[\s_]+/g, "-")}
+          className="project-follower-visual"
+        />
+      )}
       <div className="relative flex h-full flex-col justify-between">
         <span
           className="font-mono text-[9px] uppercase tracking-widest"
           style={{ color: project?.color }}
         >
-          Eneko Ruiz / Selected work
+          Eneko Ruiz / {t.woLb}
         </span>
         <span className="max-w-44 text-xl font-black capitalize leading-tight">
           {project?.name === "ana-peluquera"

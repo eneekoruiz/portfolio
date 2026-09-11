@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { materia } from "../../lib/materia";
 import { SpringValue } from "../../lib/spring";
+import { kineticGroups } from "../../lib/kinetic-segmentation";
 
 export function KineticText({
   text,
@@ -170,43 +171,37 @@ export function KineticText({
       element.style.removeProperty("--type-light");
       for (const char of characters) char.removeAttribute("style");
     };
-  }, [text, enabled, interactive, delay]);
+  }, [text, enabled, interactive, delay, wrap]);
   return (
     <span
       ref={ref}
       data-kinetic-interactive={interactive || undefined}
       className={`kinetic-type block origin-left ${wrap ? "kinetic-wrap" : ""} ${className}`}
     >
-      {wrap
-        ? text.split(" ").map((word, index) => (
-            <span
-              key={index}
-              className="inline-block whitespace-nowrap"
-              aria-hidden="true"
-            >
-              {Array.from(word).map((char, i) => (
-                <span
-                  key={i}
-                  data-kinetic-char
-                  className="inline-block origin-bottom"
-                >
-                  {char}
-                </span>
-              ))}
-              {index < text.split(" ").length - 1 ? "\u00a0" : ""}
-            </span>
-          ))
-        : Array.from(text).map((char, i) => (
-            <span
-              key={`${char}-${i}`}
-              data-kinetic-char
-              data-glyph={interactive ? char : undefined}
-              className="inline-block origin-bottom"
-              aria-hidden="true"
-            >
-              {char === " " ? "\u00a0" : char}
-            </span>
-          ))}
+      {kineticGroups(text, wrap).map((group, index) =>
+        /^\s+$/u.test(group.join("")) ? (
+          <span key={index} aria-hidden="true">
+            {" "}
+          </span>
+        ) : (
+          <span
+            key={index}
+            className="inline-block max-w-full"
+            aria-hidden="true"
+          >
+            {group.map((unit, i) => (
+              <span
+                key={i}
+                data-kinetic-char
+                data-glyph={interactive ? unit : undefined}
+                className="inline-block origin-bottom"
+              >
+                {unit}
+              </span>
+            ))}
+          </span>
+        ),
+      )}
       <span className="sr-only">{text}</span>
     </span>
   );

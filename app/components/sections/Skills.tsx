@@ -9,6 +9,7 @@ import { SectionFrame } from "./SectionFrame";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { SpringValue } from "../../lib/spring";
+import { UI_COPY } from "../../data/interface-translations";
 
 function SkillOrbit({
   category,
@@ -50,12 +51,21 @@ function SkillOrbit({
       lastTime = 0,
       releaseVelocity = 0;
     const pitch = new SpringValue(0, 100, 18);
+    const displacements = items.map(() => ({
+      x: new SpringValue(0, 190, 19),
+      y: new SpringValue(0, 165, 18),
+      z: new SpringValue(0, 155, 19),
+    }));
+    let pointerX = 0,
+      pointerY = 0,
+      interacting = false;
     let radius = 115;
     const resize = new ResizeObserver(([entry]) => {
       radius = Math.min(178, Math.max(90, entry.contentRect.width * 0.31));
       wake();
     });
-    const draw = () => {
+    const draw = (dt = 0) => {
+      let settled = true;
       for (let i = 0; i < items.length; i++) {
         const theta = (i * Math.PI * 2) / items.length + angle.value;
         const depth = (Math.cos(theta) + 1) / 2;
@@ -63,11 +73,33 @@ function SkillOrbit({
         const y =
           Math.sin(theta * 2 + elapsed * 0.7) * 12 +
           Math.cos(theta) * pitch.value * 18;
+        const dx = x - pointerX,
+          dy = y - pointerY;
+        const distance = Math.sqrt(dx * dx + dy * dy + 400);
+        const influence =
+          interacting && !dragging
+            ? Math.exp(-(dx * dx + dy * dy) / 6200) * depth
+            : 0;
+        const displacement = displacements[i];
+        displacement.x.target = (dx / distance) * influence * 22;
+        displacement.y.target = (dy / distance) * influence * 18;
+        displacement.z.target = influence * 22;
+        const ox = displacement.x.step(dt),
+          oy = displacement.y.step(dt),
+          oz = displacement.z.step(dt);
+        const moving =
+          !displacement.x.settled ||
+          !displacement.y.settled ||
+          !displacement.z.settled;
+        if (moving) settled = false;
         items[i].style.transform =
-          `translate(-50%,-50%) translate3d(${x}px,${y}px,${(depth - 0.5) * 100}px) rotateY(${Math.sin(theta) * -12}deg) scale(${0.64 + depth * 0.36})`;
+          `translate(-50%,-50%) translate3d(${x + ox}px,${y + oy}px,${(depth - 0.5) * 100 + oz}px) rotateY(${Math.sin(theta) * -12 + ox * 0.15}deg) scale(${0.64 + depth * 0.36})`;
+        items[i].style.setProperty("--pill-light", String(oz / 22));
+        items[i].style.willChange = moving ? "transform" : "";
         items[i].style.opacity = String(0.38 + depth * 0.62);
         items[i].style.zIndex = String(Math.round(depth * 100));
       }
+      return settled;
     };
     const tick = (_time: number, delta: number) => {
       const dt = delta / 1000;
@@ -82,8 +114,9 @@ function SkillOrbit({
       angle.step(dt);
       pitch.target = Math.max(-1, Math.min(1, angle.velocity * 0.15));
       pitch.step(dt);
-      draw();
-      if (!rotating && angle.settled && pitch.settled) gsap.ticker.remove(tick);
+      const settled = draw(dt);
+      if (!rotating && angle.settled && pitch.settled && settled)
+        gsap.ticker.remove(tick);
     };
     function wake() {
       if (visible && document.visibilityState === "visible")
@@ -100,6 +133,7 @@ function SkillOrbit({
     };
     const leave = () => {
       hovering = false;
+      interacting = false;
       wake();
     };
     const focus = () => {
@@ -123,6 +157,13 @@ function SkillOrbit({
       wake();
     };
     const move = (event: PointerEvent) => {
+      if (!dragging && event.pointerType !== "touch") {
+        const rect = orbit.getBoundingClientRect();
+        pointerX = event.clientX - rect.left - rect.width / 2;
+        pointerY = event.clientY - rect.top - rect.height / 2;
+        interacting = true;
+        wake();
+      }
       if (!dragging || event.pointerId !== pointerId) return;
       angle.target = startAngle + (event.clientX - startX) * 0.012;
       const dt = (event.timeStamp - lastTime) / 1000;
@@ -136,6 +177,7 @@ function SkillOrbit({
       wake();
     };
     const release = (event: PointerEvent) => {
+      if (event.type !== "pointerup") interacting = false;
       if (!dragging) return;
       // A cancelled touch scroll must not fling the cylinder. Momentum decays
       // from the last actual movement, so holding before release never kicks it.
@@ -145,6 +187,14 @@ function SkillOrbit({
           Math.exp(-Math.max(0, event.timeStamp - lastTime) / 90) *
           0.2;
       dragging = false;
+      pointerId = -1;
+      wake();
+    };
+    const cancel = () => {
+      dragging = hovering = interacting = false;
+      releaseVelocity = 0;
+      if (pointerId >= 0 && orbit.hasPointerCapture(pointerId))
+        orbit.releasePointerCapture(pointerId);
       pointerId = -1;
       wake();
     };
@@ -186,6 +236,7 @@ function SkillOrbit({
     orbit.addEventListener("focusout", blur);
     orbit.addEventListener("orbit-pause", wake);
     document.addEventListener("visibilitychange", wake);
+    window.addEventListener("blur", cancel);
     draw();
     return () => {
       observer.disconnect();
@@ -206,6 +257,7 @@ function SkillOrbit({
       orbit.removeEventListener("focusout", blur);
       orbit.removeEventListener("orbit-pause", wake);
       document.removeEventListener("visibilitychange", wake);
+      window.removeEventListener("blur", cancel);
     };
   }, [motion, category.techs]);
 
@@ -232,7 +284,7 @@ function SkillOrbit({
             type="button"
             onClick={() => setPaused((value) => !value)}
             aria-pressed={paused}
-            aria-label={`${paused ? (lang === "es" ? "Reanudar" : "Resume") : lang === "es" ? "Pausar" : "Pause"} ${label}`}
+            aria-label={`${paused ? UI_COPY[lang].resume : UI_COPY[lang].pause} ${label}`}
             className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ink/15 text-lead focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
           >
             {paused ? <Play size={14} /> : <Pause size={14} />}
@@ -265,11 +317,8 @@ function SkillOrbit({
         className="relative mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-lead"
       >
         {motion
-          ? lang === "es"
-            ? "Arrastra para explorar · rueda o flechas ← →"
-            : "Drag to explore · wheel or arrows ← →"
-          : category.techs.length +
-            (lang === "es" ? " tecnologías" : " technologies")}
+          ? UI_COPY[lang].orbitHelp
+          : `${UI_COPY[lang].technologies}: ${category.techs.length}`}
       </p>
     </article>
   );

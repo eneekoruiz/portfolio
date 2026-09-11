@@ -309,31 +309,35 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const materialA = useMemo(
     () =>
       signal.apply(
-        new THREE.MeshStandardMaterial({
+        new THREE.MeshPhysicalMaterial({
           color: accentColor,
           emissive: accentColor,
-          emissiveIntensity: darkMode ? 1.15 : 0.18,
-          roughness: 0.38,
-          metalness: 0.18,
+          emissiveIntensity: darkMode ? 0.4 : 0.08,
+          roughness: lowPower ? 0.38 : 0.24,
+          metalness: lowPower ? 0.18 : 0.42,
+          clearcoat: lowPower ? 0 : 0.75,
+          clearcoatRoughness: 0.2,
           toneMapped: false,
         }),
       ),
-    [accentColor, darkMode, signal],
+    [accentColor, darkMode, signal, lowPower],
   );
 
   const materialB = useMemo(
     () =>
       signal.apply(
-        new THREE.MeshStandardMaterial({
+        new THREE.MeshPhysicalMaterial({
           color: secondaryColor,
           emissive: secondaryColor,
-          emissiveIntensity: darkMode ? 0.95 : 0.14,
-          roughness: 0.4,
-          metalness: 0.16,
+          emissiveIntensity: darkMode ? 0.3 : 0.06,
+          roughness: lowPower ? 0.4 : 0.27,
+          metalness: lowPower ? 0.16 : 0.48,
+          clearcoat: lowPower ? 0 : 0.6,
+          clearcoatRoughness: 0.23,
           toneMapped: false,
         }),
       ),
-    [secondaryColor, darkMode, signal],
+    [secondaryColor, darkMode, signal, lowPower],
   );
 
   const rungMat = useMemo(
@@ -379,27 +383,37 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     );
     const time = signal.elapsed;
     const flow = signal.tension.value;
+    const chapter = materia.chapter.value;
+    const studio = materia.studio.value;
+    const size = 1 + studio * (isMobile ? 0.06 : 0.14);
     groupRef.current.scale.set(
-      config.scale[0] * signal.breath,
-      config.scale[1] / signal.breath,
-      config.scale[2] * signal.breath,
+      config.scale[0] * signal.breath * size,
+      (config.scale[1] / signal.breath) * size,
+      config.scale[2] * signal.breath * size,
     );
-    groupRef.current.position.y = Math.sin(time * 0.32) * 0.26;
+    groupRef.current.position.y =
+      Math.sin(time * 0.32) * 0.26 +
+      Math.sin(chapter * 0.9) * 0.6 +
+      studio * 1.2;
+    groupRef.current.position.z = Math.sin(chapter * 0.7) * 0.55 - studio * 1.4;
     groupRef.current.rotation.x =
       THREE.MathUtils.degToRad(config.rotation[0]) +
       materia.tiltX.value +
-      flow * (isMobile ? 0.025 : 0.07);
+      flow * (isMobile ? 0.025 : 0.07) +
+      Math.sin(chapter) * 0.08;
     groupRef.current.rotation.z =
       THREE.MathUtils.degToRad(config.rotation[2]) +
       materia.tiltY.value +
-      flow * 0.035;
+      flow * 0.035 +
+      Math.sin(chapter * 1.3) * (isMobile ? 0.035 : 0.15) -
+      studio * 0.24;
     groupRef.current.position.x = isMobile
       ? 0
       : materia.composition.value * 2.4;
     groupRef.current.rotation.y +=
       Math.min(delta, 0.05) *
       config.rotationSpeed *
-      (1 + materia.warp.value * 14);
+      (1 + materia.warp.value * 14 + studio * 0.8);
     liveColors.accent.set(materia.accent);
     liveColors.secondary.set(materia.secondary);
     const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 4);

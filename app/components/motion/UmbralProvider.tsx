@@ -73,6 +73,7 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
       clone.setAttribute("data-umbral-clone", "");
       clone.style.height = "100%";
       const heading = clone.querySelector<HTMLElement>("[data-project-title]");
+      const visual = clone.querySelector<HTMLElement>("[data-project-visual]");
       shell.replaceChildren(clone);
       shell.hidden = false;
       Object.assign(shell.style, {
@@ -113,6 +114,7 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
       let transition: ViewTransition | undefined;
       let destination: HTMLElement | null = null;
       let destinationTitle: HTMLElement | null = null;
+      let destinationVisual: HTMLElement | null = null;
       let animation: gsap.core.Timeline | undefined;
       let timeout: ReturnType<typeof setTimeout>;
       let frame = 0;
@@ -140,6 +142,7 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         shell.removeAttribute("style");
         destination?.style.removeProperty("view-transition-name");
         destinationTitle?.style.removeProperty("view-transition-name");
+        destinationVisual?.style.removeProperty("view-transition-name");
         materia.surfaces.delete(optical);
         materia.warp.target = 0;
         umbral.active = false;
@@ -162,6 +165,9 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         );
         destinationTitle =
           destination?.querySelector<HTMLElement>("h1") ?? null;
+        destinationVisual =
+          destination?.querySelector<HTMLElement>("[data-project-visual]") ??
+          null;
         if (!destination) {
           dispose();
           return;
@@ -171,6 +177,8 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         if (document.startViewTransition && !document.hidden) {
           shell.style.viewTransitionName = "project-surface";
           if (heading) heading.style.viewTransitionName = "project-title";
+          if (visual && destinationVisual)
+            visual.style.viewTransitionName = "project-image";
           try {
             const vt = document.startViewTransition(() => {
               shell.hidden = true;
@@ -179,6 +187,8 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
                 destination.style.viewTransitionName = "project-surface";
               if (destinationTitle)
                 destinationTitle.style.viewTransitionName = "project-title";
+              if (destinationVisual)
+                destinationVisual.style.viewTransitionName = "project-image";
             });
             transition = vt;
             vt.ready.catch(() => {});
@@ -206,7 +216,11 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         dispose,
       };
       journeyRef.current = journey;
-      const state = Flip.getState(heading ? [shell, heading] : [shell]);
+      const state = Flip.getState([
+        shell,
+        ...(heading ? [heading] : []),
+        ...(visual ? [visual] : []),
+      ]);
       Object.assign(shell.style, {
         top: "0px",
         left: "0px",
@@ -214,6 +228,19 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         height: "100dvh",
         borderRadius: "0px",
       });
+      if (visual) {
+        clone.appendChild(visual);
+        Object.assign(visual.style, {
+          position: "absolute",
+          insetInlineEnd: "-2vw",
+          top: "10vh",
+          width: "min(65vw, 900px)",
+          height: "auto",
+          opacity: "0.22",
+          transform: "none",
+          pointerEvents: "none",
+        });
+      }
       if (heading)
         Object.assign(heading.style, {
           position: "absolute",

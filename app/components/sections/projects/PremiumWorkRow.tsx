@@ -2,6 +2,9 @@
 
 import { useRef, useEffect, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
+import { UI_COPY } from "../../../data/interface-translations";
+import { TX } from "../../../data/translations";
+import { PROJECTS_CONTENT } from "../../../data/projects";
 import { ArrowUpRight, ArrowRight, Plus } from "lucide-react";
 import { getTechColor } from "../../../lib/constants";
 import type { ProjectCard, Lang } from "../../../types";
@@ -13,6 +16,7 @@ import { useSpringHover } from "../../../hooks/useSpringHover";
 import { usePreferredMotion } from "../../../hooks/usePreferredMotion";
 import { useProjectTension } from "../../../hooks/useProjectTension";
 import { useUmbral } from "../../motion/UmbralProvider";
+import { ProjectVisual } from "../../motion/ProjectVisual";
 
 interface WorkRowProps {
   proj: ProjectCard;
@@ -25,56 +29,6 @@ interface WorkRowProps {
   motionEnabled: boolean;
   lang: Lang;
 }
-
-const COPY = {
-  es: {
-    lifecycle: "Del concepto a producción",
-    stages: [
-      "Arquitectura",
-      "Desarrollo",
-      "Despliegue",
-      "Seguridad y auditoría",
-    ],
-    open: "Explorar proyecto",
-    source: "Ver código",
-    year: "Año",
-    size: "Tamaño",
-    stack: "Tecnologías",
-  },
-  en: {
-    lifecycle: "From concept to production",
-    stages: ["Architecture", "Development", "Deployment", "Security & audit"],
-    open: "Explore project",
-    source: "View source",
-    year: "Year",
-    size: "Size",
-    stack: "Technologies",
-  },
-};
-
-const SUMMARIES: Record<string, { title?: string; es: string; en: string }> = {
-  "ana-peluquera": {
-    title: "AG Beauty Salon",
-    es: "Plataforma de reservas con disponibilidad inteligente y sincronización entre Firebase y Google Calendar.",
-    en: "Booking platform with smart availability and synchronization between Firebase and Google Calendar.",
-  },
-  "who-are-ya-backend": {
-    es: "Backend para un juego de fútbol con arquitectura MVC y una API escalable.",
-    en: "Backend for a football game with MVC architecture and a scalable API.",
-  },
-  rides24ofiziala: {
-    es: "Sistema distribuido de viajes compartidos con transacciones seguras.",
-    en: "Distributed ride-sharing system with secure transactions.",
-  },
-  "spotshare-parking": {
-    es: "Gestión de aparcamientos en la nube con controles de calidad mediante SonarCloud.",
-    en: "Cloud parking management with quality checks through SonarCloud.",
-  },
-  "pke-web": {
-    es: "Plataforma web semántica con especial atención a la accesibilidad.",
-    en: "Semantic web platform with a focus on accessibility.",
-  },
-};
 
 export function PremiumWorkRow({
   proj,
@@ -98,8 +52,8 @@ export function PremiumWorkRow({
   const safeId = proj.name.toLowerCase().replace(/[\s_]+/g, "-");
   const panelId = `panel-${safeId}`;
   const theme = PROJ_THEMES[safeId] ?? DEFAULT_THEME;
-  const copy = COPY[lang === "es" ? "es" : "en"];
-  const summary = SUMMARIES[safeId];
+  const copy = UI_COPY[lang];
+  const content = PROJECTS_CONTENT[safeId]?.[lang];
   const actionRef = useSpringHover<HTMLAnchorElement>(enabled);
   useMateriaSurface(rowRef, theme.color, enabled);
   useProjectTension(rowRef, enabled, isExpanded, idx);
@@ -164,27 +118,35 @@ export function PremiumWorkRow({
         aria-controls={panelId}
         onPointerEnter={prefetch}
         onFocus={prefetch}
-        className="work-surface-header relative z-10 grid w-full grid-cols-[1.5rem_1fr_2.5rem] items-center gap-3 px-4 py-7 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand rounded-[20px] md:grid-cols-[3rem_1fr_3rem] md:gap-5 md:px-8 md:py-10"
+        className="work-surface-header relative z-10 grid w-full grid-cols-[1.5rem_1fr_2.5rem] items-center gap-3 px-4 py-7 text-start outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand rounded-[20px] md:grid-cols-[2rem_1.1fr_0.9fr_2.5rem] md:gap-5 md:px-8 md:py-10"
         data-cursor-plus={isExpanded ? undefined : "true"}
         data-cursor-minus={isExpanded ? "true" : undefined}
       >
-        <span className="self-start pt-2 font-mono text-[11px] tabular-nums text-lead">
+        <span className="order-1 self-start pt-2 font-mono text-[11px] tabular-nums text-lead">
           {String(idx + 1).padStart(2, "0")}
         </span>
-        <div className="min-w-0">
+        <div className="order-2 min-w-0">
           <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-lead">
-            <span>{proj.tag}</span>
+            <span>{TX[lang].projectTags[idx] ?? proj.tag}</span>
             <span>{proj.year}</span>
           </div>
           <h3
             data-project-title
             className="work-project-title text-balance break-words text-[clamp(1.65rem,4vw,4.2rem)] font-bold capitalize leading-[1.04] tracking-[-0.055em]"
           >
-            {summary?.title ?? proj.name.replace(/[-_]/g, " ")}
+            {safeId === "ana-peluquera"
+              ? "AG Beauty Salon"
+              : proj.name.replace(/[-_]/g, " ")}
           </h3>
         </div>
+        <div
+          className="order-4 col-span-3 mt-3 min-w-0 md:order-3 md:col-span-1 md:mt-0"
+          aria-hidden="true"
+        >
+          <ProjectVisual id={safeId} />
+        </div>
         <span
-          className="work-expand-icon flex h-10 w-10 items-center justify-center rounded-full border border-current"
+          className="work-expand-icon order-3 flex h-10 w-10 items-center justify-center rounded-full border border-current md:order-4"
           style={{ color: theme.color }}
           aria-hidden="true"
         >
@@ -258,7 +220,7 @@ export function PremiumWorkRow({
               rel={theme.hasAudit ? undefined : "noopener noreferrer"}
               className="materia-button work-project-action w-fit bg-ink text-page"
             >
-              {theme.hasAudit ? copy.open : copy.source}
+              {theme.hasAudit ? copy.explore : copy.source}
               {theme.hasAudit ? (
                 <ArrowRight size={16} aria-hidden="true" />
               ) : (
@@ -271,7 +233,7 @@ export function PremiumWorkRow({
             className="flex flex-col justify-between gap-7 rounded-2xl border border-ink/10 bg-page/80 p-5 md:p-7"
           >
             <p className="max-w-xl text-sm leading-relaxed text-lead md:text-base">
-              {summary?.[lang === "es" ? "es" : "en"] ?? proj.desc}
+              {content?.objective ?? proj.desc}
             </p>
             <dl className="grid grid-cols-[1fr_1fr] gap-5">
               <div>
@@ -284,11 +246,13 @@ export function PremiumWorkRow({
                 <dt className="mb-1 font-mono text-[10px] uppercase tracking-wider text-lead">
                   {copy.size}
                 </dt>
-                <dd className="text-sm font-semibold">{proj.size}</dd>
+                <dd dir="ltr" className="text-sm font-semibold">
+                  {proj.size === "Premium" ? "—" : proj.size}
+                </dd>
               </div>
               <div className="col-span-2">
                 <dt className="mb-3 font-mono text-[10px] uppercase tracking-wider text-lead">
-                  {copy.stack}
+                  {copy.technologies}
                 </dt>
                 <dd className="flex flex-wrap gap-2">
                   {proj.langs.map((language) => (

@@ -4,6 +4,7 @@ import React from "react";
 import type { Lang, Tx } from "../../types";
 import { LANG_LABELS } from "../../data/translations";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
+import { UI_COPY } from "../../data/interface-translations";
 
 interface MobileMenuProps {
   menu: boolean;
@@ -43,7 +44,7 @@ export function MobileMenu({
       <button
         onClick={() => setMenu(false)}
         className="absolute top-6 right-6 p-3 text-ink z-[10001] bg-black/5 dark:bg-white/10 rounded-full"
-        aria-label="Cerrar"
+        aria-label={UI_COPY[lang].close}
       >
         <svg
           width="24"
@@ -60,7 +61,10 @@ export function MobileMenu({
         </svg>
       </button>
 
-      <div className="relative z-10 h-full flex flex-col justify-center px-8">
+      <div className="relative z-10 h-full overflow-y-auto flex flex-col px-8 py-24">
+        <h2 id="mobile-menu-title" className="sr-only">
+          {UI_COPY[lang].navigation}
+        </h2>
         <nav className="flex flex-col gap-4">
           {t.menu.map((link: string, i: number) => (
             <a
