@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 
 import { TX } from "../../data/translations";
+import { useTranslations } from "../../hooks/useTranslations";
 import { PROJECTS_CONTENT, CODE_SNIPPETS } from "../../data/projects";
 import { LANG_COLORS, getTechColor } from "../../lib/constants";
 import type { Lang } from "../../types";
@@ -50,6 +51,15 @@ type DNAHelixProps = { accent: string; secondary: string; darkMode: boolean };
 type TerrainMeshProps = { accent: string; darkMode: boolean };
 type FloatingArtifactProps = { accent: string; idx: number };
 type AccentProps = { accent: string };
+
+const TerrainMesh = dynamic<TerrainMeshProps>(
+  () => import("../visualizers").then((m) => m.TerrainMesh),
+  { ssr: false },
+);
+const FloatingArtifact = dynamic<FloatingArtifactProps>(
+  () => import("../visualizers").then((m) => m.FloatingArtifact),
+  { ssr: false },
+);
 
 const SandwichDiagram = dynamic<AccentProps>(
   () => import("../visualizers").then((m) => m.SandwichDiagram),
@@ -261,19 +271,11 @@ export default function ProjectPage() {
   const router = useRouter();
   const main = useRef<HTMLDivElement>(null);
 
-  const [lang, setLang] = useState<Lang>("es");
+  const { lang } = useTranslations();
   const [darkMode, setDarkMode] = useState(false);
   const userMotionEnabled = useMotionEnabled();
   const reducedMotion = usePreferredMotion();
   const motionEnabled = userMotionEnabled && !reducedMotion;
-
-  // Sync language from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("portfolio_lang") as Lang;
-    if (saved && TX[saved]) {
-      setLang(saved);
-    }
-  }, []);
 
   // Force scroll to top on mount and when motion is toggled (prevents layout snap)
   useEffect(() => {
@@ -309,6 +311,11 @@ export default function ProjectPage() {
     materia.accent = theme.helixA;
     materia.secondary = theme.helixB;
     materia.composition.target = 0;
+    materia.chapter.target = 3;
+    materia.studio.target = 0;
+    return () => {
+      materia.studio.target = 0;
+    };
   }, [theme]);
   const summary = PROJECT_SUMMARIES[safeId];
 
@@ -325,7 +332,7 @@ export default function ProjectPage() {
   const LIVE_URLS: Record<string, string | null> = {
     "ana-peluquera": "https://agpeluqueria.vercel.app",
     "who-are-ya-backend": "https://who-are-ya-backend.onrender.com",
-    "pke-web": "https://pke-web.vercel.app",
+    "pke-web": null,
     rides24ofiziala: null,
     "spotshare-parking": null,
   };
@@ -533,6 +540,18 @@ export default function ProjectPage() {
       className={`relative z-10 overflow-x-hidden selection:bg-brand/20 text-ink transition-colors duration-300 ${motionEnabled ? "min-h-[350vh]" : "min-h-screen"}`}
     >
       {/* ── HEADER ── */}
+      {isReadyToAnimate && motionEnabled && (
+        <div
+          data-project-atmosphere
+          className="fixed inset-0 pointer-events-none z-0"
+          aria-hidden="true"
+        >
+          <TerrainMesh accent={theme.helixA} darkMode={darkMode} />
+          {[1, 2, 3, 4, 5].map((index) => (
+            <FloatingArtifact key={index} accent={theme.accent} idx={index} />
+          ))}
+        </div>
+      )}
       {/* ── HEADER ── */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-3rem)] max-w-[1200px] transition-all duration-500 ease-expo [[class*='studio-active']_&]:opacity-0 [[class*='studio-active']_&]:pointer-events-none [[class*='studio-active']_&]:-translate-y-10">
         <div className="flex items-center justify-between px-6 py-3.5 rounded-full glass-hud">

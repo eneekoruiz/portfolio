@@ -1,243 +1,137 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { SpringValue } from "../../lib/spring";
+import { ProjectVisual } from "./ProjectVisual";
+import { useTranslations } from "../../hooks/useTranslations";
 
-interface ProjectPreviewFollowerProps {
-  activeProject: {
-    name: string;
-    color: string;
-  } | null;
-}
-
+type Preview = { name: string; color: string };
 export function ProjectPreviewFollower({
   activeProject,
-}: ProjectPreviewFollowerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const motionEnabled = useMotionEnabled();
-  const mousePos = useRef({ x: 0, y: 0 });
-
+}: {
+  activeProject: Preview | null;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { t } = useTranslations();
+  const wakeRef = useRef<() => void>(() => {});
+  const [project, setProject] = useState(activeProject);
+  const enabled = useMotionEnabled();
+  const poseRef = useRef({
+    x: new SpringValue(0, 160, 22),
+    y: new SpringValue(0, 160, 22),
+    angle: new SpringValue(0, 130, 18),
+    reveal: new SpringValue(0, 190, 23),
+  });
   useEffect(() => {
-    if (!motionEnabled) return;
-
-    const container = containerRef.current;
-    const inner = innerRef.current;
-    if (!container || !inner) return;
-
-    const getConfig = () => {
-      const win = typeof window !== "undefined" ? (window as any) : null;
-      return win?.__PARTICLE_CONFIG || { followerDuration: 0.12 };
-    };
-
-    let cfg = getConfig();
-
-    let moveX = gsap.quickTo(container, "x", {
-      duration: cfg.followerDuration,
-      ease: "power3.out",
-      overwrite: "auto",
-    });
-    let moveY = gsap.quickTo(container, "y", {
-      duration: cfg.followerDuration,
-      ease: "power3.out",
-      overwrite: "auto",
-    });
-    const tiltZ = gsap.quickTo(inner, "rotateZ", {
-      duration: 0.18,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    const skewX = gsap.quickTo(inner, "skewX", {
-      duration: 0.18,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-
-    const onMouseMove = (e: MouseEvent) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
-
-      if (isVisible) {
-        moveX(e.clientX);
-        moveY(e.clientY);
-
-        const dx = e.movementX || 0;
-        tiltZ(dx * 0.28);
-        skewX(dx * 0.12);
+    const pose = poseRef.current;
+    const element = ref.current;
+    if (!element || !enabled || matchMedia("(pointer: coarse)").matches) return;
+    let positioned = false;
+    const tick = (_time: number, delta: number) => {
+      const dt = delta / 1000;
+      const progress = pose.reveal.step(dt);
+      element.style.transform = `translate3d(${pose.x.step(dt)}px,${pose.y.step(dt)}px,0) rotate(${pose.angle.step(dt)}deg) scale(${0.8 + progress * 0.2})`;
+      element.style.opacity = String(Math.max(0, Math.min(1, progress)));
+      element.style.visibility = progress > 0.001 ? "visible" : "hidden";
+      if (
+        pose.x.settled &&
+        pose.y.settled &&
+        pose.angle.settled &&
+        pose.reveal.settled
+      ) {
+        gsap.ticker.remove(tick);
+        element.style.willChange = "";
       }
     };
-
-    const handleConfigUpdate = () => {
-      cfg = getConfig();
-      moveX = gsap.quickTo(container, "x", {
-        duration: cfg.followerDuration,
-        ease: "power3.out",
-        overwrite: "auto",
-      });
-      moveY = gsap.quickTo(container, "y", {
-        duration: cfg.followerDuration,
-        ease: "power3.out",
-        overwrite: "auto",
-      });
+    const wake = () => {
+      element.style.willChange = "transform, opacity";
+      gsap.ticker.add(tick);
     };
-
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
-    window.addEventListener("portfolio-config-update", handleConfigUpdate);
-
+    wakeRef.current = wake;
+    const move = (event: PointerEvent) => {
+      const x = Math.max(12, Math.min(innerWidth - 252, event.clientX - 120));
+      const y = Math.max(85, Math.min(innerHeight - 176, event.clientY - 200));
+      if (!positioned) {
+        pose.x.snap(x);
+        pose.y.snap(y);
+        positioned = true;
+      }
+      pose.x.target = x;
+      pose.y.target = y;
+      pose.angle.target = Math.max(-8, Math.min(8, event.movementX * 0.3));
+      if (pose.reveal.target > 0 || !pose.reveal.settled) wake();
+    };
+    const leave = () => {
+      pose.reveal.target = 0;
+      pose.angle.target = 0;
+      wake();
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    document.documentElement.addEventListener("pointerleave", leave);
+    wake();
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("portfolio-config-update", handleConfigUpdate);
+      gsap.ticker.remove(tick);
+      wakeRef.current = () => {};
+      window.removeEventListener("pointermove", move);
+      document.documentElement.removeEventListener("pointerleave", leave);
+      pose.reveal.snap(0);
+      element.style.opacity = "0";
     };
-  }, [isVisible, motionEnabled]);
-
+  }, [enabled]);
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const getConfig = () => {
-      const win = typeof window !== "undefined" ? (window as any) : null;
-      return win?.__PARTICLE_CONFIG || { followerScale: 0.88 };
-    };
-
-    const cfg = getConfig();
-    const scaleVal = cfg.followerScale;
-    const startScale = scaleVal - 0.16;
-
-    if (activeProject) {
-      setIsVisible(true);
-      container.animate(
-        [
-          { opacity: 0, transform: `scale(${startScale})` },
-          { opacity: 1, transform: `scale(${scaleVal})` },
-        ],
-        {
-          duration: 160,
-          easing: "cubic-bezier(0.2, 0.9, 0.2, 1)",
-          fill: "forwards",
-        },
-      );
-    } else {
-      const animation = container.animate(
-        [
-          { opacity: 1, transform: `scale(${scaleVal})` },
-          { opacity: 0, transform: `scale(${startScale})` },
-        ],
-        {
-          duration: 120,
-          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-          fill: "forwards",
-        },
-      );
-      animation.onfinish = () => setIsVisible(false);
-    }
-  }, [activeProject]);
-
-  if (!motionEnabled) return null;
-  if (!isVisible && !activeProject) return null;
-
+    const pose = poseRef.current;
+    if (activeProject) setProject(activeProject);
+    pose.reveal.target = activeProject && enabled ? 1 : 0;
+    pose.angle.target = 0;
+    wakeRef.current();
+  }, [activeProject, enabled]);
   return (
     <div
-      ref={containerRef}
+      ref={ref}
       id="project-preview-follower"
-      className="fixed top-0 left-0 z-[30] pointer-events-none will-change-transform flex items-center justify-center"
-      style={{
-        width: "240px",
-        height: "150px",
-        marginLeft: "-120px",
-        marginTop: "-180px",
-        opacity: 0,
-        transform: "scale(0.72)",
-      }}
+      aria-hidden="true"
+      className="pointer-events-none fixed left-0 top-0 z-[80] h-40 w-60 overflow-hidden rounded-2xl border border-white/25 bg-neutral-950 p-5 text-white shadow-2xl"
+      style={{ opacity: 0, visibility: "hidden" }}
     >
-      <div
-        ref={innerRef}
-        className="w-full h-full rounded-2xl overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.34)] border border-white/20 relative"
-        style={{
-          backgroundColor: activeProject?.color || "#000",
-        }}
+      <svg
+        viewBox="0 0 240 160"
+        className="absolute inset-0 h-full w-full"
+        fill="none"
+        style={{ color: project?.color }}
       >
-        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_transparent_0%,_black_100%)]" />
-
-        {activeProject && (
-          <video
-            src={`/projects/${activeProject.name}.webm`}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen"
-          />
-        )}
-
-        <div className="absolute inset-0 mix-blend-overlay opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-          <div className="w-10 h-10 rounded-full border border-white/20 mb-3 flex items-center justify-center relative">
-            <div className="absolute inset-0 rounded-full border border-white/40 animate-ping" />
-            <div className="w-1.5 h-1.5 rounded-full bg-white" />
-          </div>
-          <span className="font-mono text-[8px] uppercase tracking-[0.5em] text-white/50 mb-1">
-            ENK_DATA_STREAM
-          </span>
-          <h4 className="font-black text-white text-base uppercase tracking-tighter leading-tight drop-shadow-lg">
-            {activeProject?.name.replace(/-/g, " ")}
-          </h4>
-          <div className="mt-4 flex gap-1.5 items-center">
-            <div
-              className="w-1 h-1 bg-white/40 rounded-full animate-bounce"
-              style={{ animationDelay: "0s" }}
-            />
-            <div
-              className="w-1 h-1 bg-white/40 rounded-full animate-bounce"
-              style={{ animationDelay: "0.1s" }}
-            />
-            <div
-              className="w-1 h-1 bg-white/40 rounded-full animate-bounce"
-              style={{ animationDelay: "0.2s" }}
-            />
-          </div>
-        </div>
-
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
-          <div className="w-8 h-[1px] bg-white/30" />
-          <div className="w-4 h-[1px] bg-white/30" />
-        </div>
-        <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1">
-          <div className="w-4 h-[1px] bg-white/30" />
-          <div className="w-8 h-[1px] bg-white/30" />
-        </div>
-
-        <svg className="absolute inset-0 w-full h-full opacity-20">
-          <line
-            x1="0"
-            y1="0"
-            x2="100%"
-            y2="100%"
-            stroke="white"
-            strokeWidth="0.5"
-            strokeDasharray="4 4"
-          />
-          <line
-            x1="100%"
-            y1="0"
-            x2="0"
-            y2="100%"
-            stroke="white"
-            strokeWidth="0.5"
-            strokeDasharray="4 4"
-          />
-          <circle
-            cx="50%"
-            cy="50%"
-            r="35%"
-            fill="none"
-            stroke="white"
-            strokeWidth="0.5"
-            strokeDasharray="10 5"
-            className="animate-spin-slow"
-          />
-        </svg>
+        <circle
+          cx="180"
+          cy="80"
+          r="64"
+          stroke="currentColor"
+          strokeWidth="0.8"
+        />
+        <ellipse cx="180" cy="80" rx="28" ry="64" stroke="currentColor" />
+        <path
+          d="M116 80h128M126 47h108M126 113h108"
+          stroke="currentColor"
+          strokeOpacity="0.5"
+        />
+      </svg>
+      {project && (
+        <ProjectVisual
+          id={project.name.toLowerCase().replace(/[\s_]+/g, "-")}
+          className="project-follower-visual"
+        />
+      )}
+      <div className="relative flex h-full flex-col justify-between">
+        <span
+          className="font-mono text-[9px] uppercase tracking-widest"
+          style={{ color: project?.color }}
+        >
+          Eneko Ruiz / {t.woLb}
+        </span>
+        <span className="max-w-44 text-xl font-black capitalize leading-tight">
+          {project?.name === "ana-peluquera"
+            ? "AG Beauty Salon"
+            : project?.name.replace(/[-_]/g, " ")}
+        </span>
       </div>
     </div>
   );

@@ -34,333 +34,16 @@ import {
   GithubIcon,
 } from "lucide-react";
 import { useMotionEnabled } from "../../../hooks/useMotionEnabled";
-import type { Lang, StudioTx } from "../../../types";
+import type { Lang } from "../../../types";
+import { STUDIO_TX } from "../../../data/studio-translations";
+import { materia } from "../../../lib/materia";
+import { UI_COPY } from "../../../data/interface-translations";
+import { TX } from "../../../data/translations";
+import { ProjectVisual } from "../../../components/motion/ProjectVisual";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
-
-const STUDIO_TX: Record<Lang, StudioTx> = {
-  es: {
-    sourceCode: "Código Fuente",
-    closeSession: "Cerrar Sesión",
-    enterStudio: "Entrar al Estudio",
-    clickToInteract: "Haz clic para interactuar",
-    initializing: "Inicializando Estudio",
-    mounting: "Montando entorno remoto...",
-    preparing: "Preparando Entorno",
-    demoWorking: "Estamos trabajando en la demo todavía",
-    comingSoon: "Próximamente",
-    scrollDownInit:
-      "Desplaza hacia abajo para inicializar la vista previa del sistema.",
-    auditDesc:
-      "Este proyecto está siendo auditado para su despliegue final en el entorno de pruebas.",
-    deepScroll: "Desplaza para Entrar",
-    keepScrolling: "Sigue desplazándote",
-  },
-  en: {
-    sourceCode: "Source Code",
-    closeSession: "Close Session",
-    enterStudio: "Enter Studio",
-    clickToInteract: "Click to Interact",
-    initializing: "Initializing Studio",
-    mounting: "Mounting remote environment...",
-    preparing: "Preparing Environment",
-    demoWorking: "We are still working on the demo",
-    comingSoon: "Coming Soon",
-    scrollDownInit: "Scroll down to initialize the system preview.",
-    auditDesc:
-      "This project is being audited for final deployment in the test environment.",
-    deepScroll: "Deep Scroll to Enter",
-    keepScrolling: "Keep scrolling",
-  },
-  eu: {
-    sourceCode: "Iturburu Kodea",
-    closeSession: "Saioa Itxi",
-    enterStudio: "Estudioan Sartu",
-    clickToInteract: "Klikatu elkarreragiteko",
-    initializing: "Estudioa Hasieratzen",
-    mounting: "Urruneko ingurunea muntatzen...",
-    preparing: "Ingurunea Prestatzen",
-    demoWorking: "Demolanean ari gara oraindik",
-    comingSoon: "Laster",
-    scrollDownInit: "Mugitu behera sistemaren aurrebista kargatzeko.",
-    auditDesc:
-      "Proiektu hau proba-ingurunean azken hedapenerako ikuskatzen ari da.",
-    deepScroll: "Mugitu Gehiago Sartzeko",
-    keepScrolling: "Jarraitu mugitzen",
-  },
-  fr: {
-    sourceCode: "Code Source",
-    closeSession: "Quitter l'Atelier",
-    enterStudio: "Entrer dans l'Atelier",
-    clickToInteract: "Cliquer pour interagir",
-    initializing: "Initialisation de l'Atelier",
-    mounting: "Montage de l'environnement distant...",
-    preparing: "Préparation de l'Environnement",
-    demoWorking: "Nous travaillons encore sur la démo",
-    comingSoon: "Prochainement",
-    scrollDownInit: "Faites défiler vers le bas pour initialiser l'aperçu.",
-    auditDesc:
-      "Ce projet est en cours d'audit pour déploiement final dans l'environnement de test.",
-    deepScroll: "Défiler pour Entrer",
-    keepScrolling: "Continuez à défiler",
-  },
-  it: {
-    sourceCode: "Codice Sorgente",
-    closeSession: "Chiudi Sessione",
-    enterStudio: "Entra nello Studio",
-    clickToInteract: "Clicca per interagire",
-    initializing: "Inizializzazione Studio",
-    mounting: "Montaggio dell'ambiente remoto...",
-    preparing: "Preparazione Ambiente",
-    demoWorking: "Stiamo ancora lavorando alla demo",
-    comingSoon: "Prossimamente",
-    scrollDownInit: "Scorri verso il basso per inizializzare l'anteprima.",
-    auditDesc:
-      "Questo progetto è in fase di verifica per il rilascio finale nell'ambiente di test.",
-    deepScroll: "Scorri per Entrare",
-    keepScrolling: "Continua a scorrere",
-  },
-  de: {
-    sourceCode: "Quellcode",
-    closeSession: "Sitzung beenden",
-    enterStudio: "Studio betreten",
-    clickToInteract: "Klicken zum Interagieren",
-    initializing: "Studio wird initialisiert",
-    mounting: "Remote-Umgebung wird geladen...",
-    preparing: "Umgebung wird vorbereitet",
-    demoWorking: "Wir arbeiten noch an der Demo",
-    comingSoon: "Demnächst",
-    scrollDownInit: "Nach unten scrollen, um die Systemvorschau zu laden.",
-    auditDesc:
-      "Dieses Projekt wird für die endgültige Bereitstellung in der Testumgebung geprüft.",
-    deepScroll: "Scrollen zum Betreten",
-    keepScrolling: "Weiter scrollen",
-  },
-  pt: {
-    sourceCode: "Código Fonte",
-    closeSession: "Fechar Sessão",
-    enterStudio: "Entrar no Estúdio",
-    clickToInteract: "Clique para interagir",
-    initializing: "Inicializando Estúdio",
-    mounting: "Montando ambiente remoto...",
-    preparing: "Preparando Ambiente",
-    demoWorking: "Ainda estamos trabalhando na demo",
-    comingSoon: "Em breve",
-    scrollDownInit: "Role para baixo para inicializar a pré-visualização.",
-    auditDesc:
-      "Este projeto está sendo auditado para implantação final no ambiente de testes.",
-    deepScroll: "Rolar para Entrar",
-    keepScrolling: "Continue a rolar",
-  },
-  ca: {
-    sourceCode: "Codi Font",
-    closeSession: "Tancar Sessió",
-    enterStudio: "Entrar a l'Estudi",
-    clickToInteract: "Fes clic per interactuar",
-    initializing: "Inicialitzant Estudi",
-    mounting: "Muntant entorn remot...",
-    preparing: "Preparant Entorn",
-    demoWorking: "Encara estem treballant en la demo",
-    comingSoon: "Properament",
-    scrollDownInit: "Desplaça cap avall per inicialitzar la vista prèvia.",
-    auditDesc:
-      "Aquest projecte està sent auditat per al seu desplegament final a l'entorn de proves.",
-    deepScroll: "Desplaça per Entrar",
-    keepScrolling: "Continua desplaçant-te",
-  },
-  gl: {
-    sourceCode: "Código Fonte",
-    closeSession: "Pechar Sesión",
-    enterStudio: "Entrar no Estudio",
-    clickToInteract: "Fai clic para interactuar",
-    initializing: "Inicializando Estudio",
-    mounting: "Montando contorno remoto...",
-    preparing: "Preparando Contorno",
-    demoWorking: "Aínda estamos traballando na demo",
-    comingSoon: "Proximamente",
-    scrollDownInit: "Despraza cara a baixo para inicializar a vista previa.",
-    auditDesc:
-      "Este proxecto está sendo auditado para o seu despregue final no contorno de probas.",
-    deepScroll: "Desprazar para Entrar",
-    keepScrolling: "Continúa desprazándote",
-  },
-  ja: {
-    sourceCode: "ソースコード",
-    closeSession: "セッションを終了",
-    enterStudio: "スタジオに入る",
-    clickToInteract: "クリックして操作",
-    initializing: "スタジオを初期化中",
-    mounting: "リモート環境をマウント中...",
-    preparing: "環境を準備中",
-    demoWorking: "デモ版は現在開発中です",
-    comingSoon: "近日公開",
-    scrollDownInit: "下へスクロールしてシステムプレビューを起動してください。",
-    auditDesc:
-      "このプロジェクトは、テスト環境への最終デプロイに向けて監査中です。",
-    deepScroll: "スクロールして入場",
-    keepScrolling: "スクロールを続けてください",
-  },
-  zh: {
-    sourceCode: "源代码",
-    closeSession: "关闭会话",
-    enterStudio: "进入工作台",
-    clickToInteract: "点击以进行交互",
-    initializing: "正在初始化工作台",
-    mounting: "正在挂载远程环境...",
-    preparing: "正在准备环境",
-    demoWorking: "我们仍在开发演示版",
-    comingSoon: "即将推出",
-    scrollDownInit: "向下滚动以启动系统预览。",
-    auditDesc: "该项目正在进行审计，以进行测试环境의 最终部署。",
-    deepScroll: "向下滚动以进入",
-    keepScrolling: "请继续滚动",
-  },
-  ar: {
-    sourceCode: "كود المصدر",
-    closeSession: "إغلاق الجلسة",
-    enterStudio: "دخول الاستوديو",
-    clickToInteract: "انقر للتفاعل",
-    initializing: "جاري تهيئة الاستوديو",
-    mounting: "جاري تحميل البيئة عن بعد...",
-    preparing: "جاري تحضير البيئة",
-    demoWorking: "ما زلنا نعمل على العرض التجريبي",
-    comingSoon: "قريباً",
-    scrollDownInit: "مرر لأسفل لتهيئة معاينة النظام.",
-    auditDesc: "يتم تدقيق هذا المشروع من أجل النشر النهائي في بيئة الاختبار.",
-    deepScroll: "مرر للدخول",
-    keepScrolling: "استمر في التمرير",
-  },
-  ru: {
-    sourceCode: "Исходный код",
-    closeSession: "Закрыть сессию",
-    enterStudio: "Войти в студию",
-    clickToInteract: "Нажмите для взаимодействия",
-    initializing: "Инициализация студии",
-    mounting: "Монтирование удаленной среды...",
-    preparing: "Подготовка среды",
-    demoWorking: "Мы все еще работаем над демо-версией",
-    comingSoon: "Скоро",
-    scrollDownInit:
-      "Прокрутите вниз для инициализации предварительного просмотра системы.",
-    auditDesc:
-      "Этот проект проходит аудит для окончательного развертывания в тестовой среде.",
-    deepScroll: "Прокрутите для входа",
-    keepScrolling: "Продолжайте прокручивать",
-  },
-  ko: {
-    sourceCode: "소스 코드",
-    closeSession: "세션 종료",
-    enterStudio: "스튜디오 입장",
-    clickToInteract: "상호작용하려면 클릭하세요",
-    initializing: "스튜디오 초기화 중",
-    mounting: "원격 환경 탑재 중...",
-    preparing: "환경 준비 중",
-    demoWorking: "데모 버전 준비 중입니다",
-    comingSoon: "준비 중",
-    scrollDownInit: "시스템 미리보기를 초기화하려면 아래로 스크롤하세요.",
-    auditDesc:
-      "이 프로젝트는 테스트 환경에서의 최종 배포를 위해 감사(audit) 중입니다.",
-    deepScroll: "들어가려면 스크롤하세요",
-    keepScrolling: "계속 스크롤하세요",
-  },
-  hi: {
-    sourceCode: "सोर्स कोड",
-    closeSession: "सत्र समाप्त करें",
-    enterStudio: "स्टूडियो में प्रवेश करें",
-    clickToInteract: "इंटरैक्ट करने के लिए क्लिक करें",
-    initializing: "स्टूडियो प्रारंभ किया जा रहा है",
-    mounting: "रिमोट वातावरण माउंट किया जा रहा है...",
-    preparing: "वातावरण तैयार किया जा रहा है",
-    demoWorking: "हम अभी भी डेमो पर काम कर रहे हैं",
-    comingSoon: "जल्द ही आ रहा है",
-    scrollDownInit: "सिस्टम पूर्वावलोकन शुरू करने के लिए नीचे स्क्रॉल करें।",
-    auditDesc:
-      "परीक्षण वातावरण में अंतिम परिनियोजन के लिए इस परियोजना का ऑडिट किया जा रहा है।",
-    deepScroll: "प्रवेश करने के लिए स्क्रॉल करें",
-    keepScrolling: "स्क्रॉल करते रहें",
-  },
-  tr: {
-    sourceCode: "Kaynak Kodu",
-    closeSession: "Oturumu Kapat",
-    enterStudio: "Stüdyoya Gir",
-    clickToInteract: "Etkileşim için Tıkla",
-    initializing: "Stüdyo Hazırlanıyor",
-    mounting: "Uzak ortam kuruluyor...",
-    preparing: "Ortam Hazırlanıyor",
-    demoWorking: "Hala demo üzerinde çalışıyoruz",
-    comingSoon: "Çok Yakında",
-    scrollDownInit: "Sistem önizlemesini başlatmak için aşağı kaydırın.",
-    auditDesc: "Bu proje, test ortamında nihai dağıtım için denetlenmektedir.",
-    deepScroll: "Girmek için Aşağı Kaydır",
-    keepScrolling: "Kaydırmaya devam et",
-  },
-  nl: {
-    sourceCode: "Broncode",
-    closeSession: "Sessie Sluiten",
-    enterStudio: "Studio Binnengaan",
-    clickToInteract: "Klik om te communiceren",
-    initializing: "Studio Initialiseren",
-    mounting: "Externe omgeving laden...",
-    preparing: "Omgeving Voorbereiden",
-    demoWorking: "We werken nog aan de demo",
-    comingSoon: "Binnenkort Beschikbaar",
-    scrollDownInit:
-      "Scroll naar beneden om de systeemvoorbeeldweergave te initialiseren.",
-    auditDesc:
-      "Dit project wordt geaudit voor uiteindelijke implementatie in de testomgeving.",
-    deepScroll: "Scroll om Binnen te Gaan",
-    keepScrolling: "Blijf scrollen",
-  },
-  sv: {
-    sourceCode: "Källkod",
-    closeSession: "Stäng sessionen",
-    enterStudio: "Gå in i studion",
-    clickToInteract: "Klicka för att interagera",
-    initializing: "Initierar studion",
-    mounting: "Monterar fjärrmiljö...",
-    preparing: "Förbereder miljö",
-    demoWorking: "Vi arbetar fortfarande med demon",
-    comingSoon: "Kommer snart",
-    scrollDownInit: "Scrolla ner for att initiera systemförhandsgranskningen.",
-    auditDesc: "Detta projekt granskas för slutlig driftsättning i testmiljön.",
-    deepScroll: "Scrolla för att gå in",
-    keepScrolling: "Fortsätt scrolla",
-  },
-  pl: {
-    sourceCode: "Kod Źródłowy",
-    closeSession: "Zamknij Sesję",
-    enterStudio: "Wejdź do Studia",
-    clickToInteract: "Kliknij, aby wejść w interakcję",
-    initializing: "Inicjowanie Studia",
-    mounting: "Montowanie zdalnego środowiska...",
-    preparing: "Przygotowywanie Środowiska",
-    demoWorking: "Wciąż pracujemy nad wersją demonstracyjną",
-    comingSoon: "Wkrótce",
-    scrollDownInit: "Przewiń w dół, aby zainicjować podgląd systemu.",
-    auditDesc:
-      "Ten projekt jest poddawany audytowi w celu końcowego wdrożenia w środowisku testowym.",
-    deepScroll: "Przewiń, aby Wejść",
-    keepScrolling: "Przewijaj dalej",
-  },
-  vi: {
-    sourceCode: "Mã nguồn",
-    closeSession: "Đóng phiên",
-    enterStudio: "Vào Studio",
-    clickToInteract: "Nhập để tương tác",
-    initializing: "Đang khởi tạo Studio",
-    mounting: "Đang gắn kết môi trường từ xa...",
-    preparing: "Đang chuẩn bị môi trường",
-    demoWorking: "Chúng tôi vẫn đang phát triển bản demo",
-    comingSoon: "Sắp ra mắt",
-    scrollDownInit: "Cuộn xuống để khởi chạy xem trước hệ thống.",
-    auditDesc:
-      "Dự án này đang được kiểm tra (audit) để triển khai cuối cùng trên môi trường thử nghiệm.",
-    deepScroll: "Cuộn để vào",
-    keepScrolling: "Tiếp tục cuộn",
-  },
-};
 
 interface ProjectHeroProps {
   projectId: string;
@@ -398,6 +81,7 @@ export function ProjectHero({
   lang = "es",
 }: ProjectHeroProps) {
   const s = STUDIO_TX[lang] ?? STUDIO_TX["en"];
+  const ui = UI_COPY[lang];
   const motionEnabled = useMotionEnabled();
   const staticStudioLayout = !motionEnabled;
   const [embeddingOrigin, setEmbeddingOrigin] = useState<string | null>(null);
@@ -491,6 +175,7 @@ export function ProjectHero({
       // 1. Cinematic Scroll Sequence — INCREASED END for better pacing
       const tl = gsap.timeline({
         scrollTrigger: {
+          id: `studio-${projectId}`,
           trigger: heroRef.current,
           start: "top top",
           end: disableStudio ? "+=120%" : "+=250%", // More space for a grander transition
@@ -498,6 +183,7 @@ export function ProjectHero({
           pin: true,
           anticipatePin: 1,
           onUpdate: (self: ScrollTrigger) => {
+            materia.studio.target = self.progress;
             const isLocked = self.progress > 0.88; // Trigger CTA earlier
             if (!disableStudio && canRef.current !== isLocked) {
               canRef.current = isLocked;
@@ -591,7 +277,8 @@ export function ProjectHero({
               scale: 0.05,
               opacity: 0,
               z: -1500,
-              borderRadius: "50rem",
+              rotateX: 18,
+              rotateY: -22,
               // Explicitly center the start state so it appears in the center, not corner
               xPercent: -50,
               yPercent: -50,
@@ -602,14 +289,12 @@ export function ProjectHero({
               scale: 1,
               opacity: 1,
               z: 0,
-              borderRadius: "2.5rem",
+              rotateX: 0,
+              rotateY: 0,
               xPercent: -50,
               yPercent: -50,
               left: "50%",
               top: "50%",
-              width: "94vw",
-              maxWidth: window.innerWidth < 768 ? "100%" : "1400px",
-              height: "82dvh",
               force3D: true,
               ease: "expo.inOut",
               duration: 2.2,
@@ -704,9 +389,16 @@ export function ProjectHero({
       };
 
       window.addEventListener("mousemove", onMove);
-      return () => window.removeEventListener("mousemove", onMove);
+      return () => {
+        window.removeEventListener("mousemove", onMove);
+        materia.studio.target = 0;
+      };
     },
-    { scope: heroRef, dependencies: [isReady, motionEnabled] },
+    {
+      scope: heroRef,
+      dependencies: [isReady, motionEnabled, projectId],
+      revertOnUpdate: true,
+    },
   );
 
   // ── 🚀 STUDIO MODE TRANSITION (Fullscreen Takeover) ────────────────
@@ -977,7 +669,11 @@ export function ProjectHero({
                 }`}
               >
                 {/* Desktop/Tablet CTA (md+) */}
-                <div className="hidden md:flex flex-col items-center gap-6">
+                <button
+                  type="button"
+                  onClick={() => canInteract && setIsInteracting(true)}
+                  className="hidden md:flex flex-col items-center gap-6 rounded-2xl p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                >
                   <div
                     className={`w-20 h-20 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-[0_0_50px_rgba(255,255,255,0.12)] ${motionEnabled ? "group-hover/shield:scale-110 transition-transform studio-pulse" : ""}`}
                   >
@@ -994,7 +690,7 @@ export function ProjectHero({
                       {s.clickToInteract}
                     </span>
                   </div>
-                </div>
+                </button>
 
                 {/* Mobile tactile CTA (sm) — more artistic and realistic */}
                 <div className="md:hidden flex flex-col items-center gap-4">
@@ -1081,11 +777,12 @@ export function ProjectHero({
 
           {liveUrl && !embeddingAllowed ? (
             <div className="relative z-[110] flex h-full w-full flex-col items-center justify-center gap-6 bg-neutral-950 px-8 py-12 text-center text-white">
+              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/70">
+                {s.enterStudio}
+              </span>
               <p className="text-2xl font-semibold tracking-tight">{title}</p>
               <p className="max-w-md text-sm leading-relaxed text-white/70">
-                {lang === "es"
-                  ? "Explora la experiencia completa en su sitio web."
-                  : "Explore the full experience on its website."}
+                {subtitle}
               </p>
               <a
                 href={liveUrl}
@@ -1093,9 +790,7 @@ export function ProjectHero({
                 rel="noopener noreferrer"
                 className="materia-button bg-white text-black focus-visible:outline-white"
               >
-                {lang === "es"
-                  ? "Ver proyecto en directo"
-                  : "Visit live project"}
+                {TX[lang].openDirect}
                 <ExternalLink size={16} aria-hidden="true" />
               </a>
             </div>
@@ -1127,10 +822,11 @@ export function ProjectHero({
                 className={`w-full h-full border-none transition-all duration-1000 ${iframeLoaded ? "opacity-100" : "opacity-0"} ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
                 style={{
                   background: "#000",
-                  filter:
-                    canInteract && !isInteracting
-                      ? "blur(15px) brightness(0.4) saturate(0.5)"
-                      : "none",
+                  opacity: iframeLoaded
+                    ? canInteract && !isInteracting
+                      ? 0.4
+                      : 1
+                    : 0,
                 }}
               />
             </>
@@ -1144,10 +840,7 @@ export function ProjectHero({
                 playsInline
                 className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
                 style={{
-                  filter:
-                    canInteract && !isInteracting
-                      ? "blur(15px) brightness(0.4) saturate(0.5)"
-                      : "none",
+                  opacity: canInteract && !isInteracting ? 0.4 : 1,
                 }}
               />
               {/* HUD Overlay for Video */}
@@ -1172,11 +865,13 @@ export function ProjectHero({
               </div>
               <div className="flex flex-col items-center gap-3">
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
-                  {liveUrl || videoUrl
-                    ? s.preparing
-                    : projectId === "rides24ofiziala"
-                      ? s.demoWorking
-                      : s.comingSoon}
+                  {projectId === "pke-web"
+                    ? ui.previewUnavailable
+                    : liveUrl || videoUrl
+                      ? s.preparing
+                      : projectId === "rides24ofiziala"
+                        ? s.demoWorking
+                        : s.comingSoon}
                 </span>
                 <div className="w-12 h-px bg-white/10" />
                 <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
@@ -1241,7 +936,16 @@ export function ProjectHero({
             background: `linear-gradient(135deg, ${accent}15 0%, ${accent}08 100%)`,
             transformOrigin: "center center",
           }}
-        />
+        >
+          {projectId !== "pke-web" && (
+            <div
+              className="project-hero-art absolute -end-[2vw] top-[10vh] w-[min(65vw,900px)] opacity-[0.22]"
+              aria-hidden="true"
+            >
+              <ProjectVisual id={projectId} priority />
+            </div>
+          )}
+        </div>
 
         <div
           ref={overlayRef}
@@ -1305,6 +1009,7 @@ export function ProjectHero({
         {!disableStudio && !staticStudioLayout && (
           <div
             ref={screenRef}
+            data-studio-screen="cinematic"
             className={
               isInteracting
                 ? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
@@ -1329,7 +1034,10 @@ export function ProjectHero({
                   }
                 : {
                     transformStyle: "preserve-3d",
-                    willChange: "transform, width, height, border-radius",
+                    willChange: "transform, opacity",
+                    width: "min(94vw, 1400px)",
+                    height: "82dvh",
+                    borderRadius: "2.5rem",
                     borderColor: "rgba(255,255,255,0.1)",
                   }
             }
@@ -1413,6 +1121,7 @@ export function ProjectHero({
         <div className="relative py-20 bg-[#0a0a0a] flex flex-col items-center justify-center border-t border-white/10 w-full min-h-[85dvh]">
           <div
             ref={screenRef}
+            data-studio-screen="static"
             className={
               isInteracting
                 ? "fixed inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"

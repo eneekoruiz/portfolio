@@ -136,7 +136,7 @@ test("project navigation keeps the document and the canvas; browser Back restore
 test("Spanish and English controls update together", async ({ page }) => {
   await home(page);
   await page.getByRole("button", { name: /^Idioma:/ }).click();
-  await page.getByRole("menuitem", { name: "English", exact: true }).click();
+  await page.locator('[role="option"]:has(bdi[lang="en"])').click();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(
     page.locator("#hero").getByRole("link", { name: "See work" }),
@@ -154,17 +154,17 @@ test("reduced motion renders readable text and immediate project navigation", as
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await home(page);
-  await expect(page.locator(".materia-canvas")).toHaveCount(0);
+  await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   const row = await openFirstProject(page);
   await row.getByRole("link", { name: "Explorar proyecto" }).click();
   await expect(page).toHaveURL(/\/work\/ana-peluquera$/);
   await expect(page.locator(".umbral-surface")).toBeHidden();
-  await expect(page.locator(".materia-canvas")).toHaveCount(0);
+  await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   await expect(
     page.locator('iframe[src="https://agpeluqueria.vercel.app"]'),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: "Ver proyecto en directo", exact: true }),
+    page.getByRole("link", { name: "Abrir en otra pestaña", exact: true }),
   ).toHaveAttribute("href", /agpeluqueria\.vercel\.app/);
 });
 
@@ -233,9 +233,9 @@ test("dark theme and animation preference keep content readable", async ({
   );
   await page.screenshot({ path: testInfo.outputPath("hero-dark.png") });
   await page
-    .getByRole("button", { name: "Pausar animación de fondo", exact: true })
+    .getByRole("button", { name: "Pausar animaciones", exact: true })
     .click();
-  await expect(page.locator(".materia-canvas")).toHaveCount(0);
+  await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   await expect(page.locator("#main-content")).toBeVisible();
   const row = await openFirstProject(page);
   await row.getByRole("link", { name: "Explorar proyecto" }).click();
@@ -261,7 +261,7 @@ test("first visit with reduced motion reaches readable content", async ({
     await page.goto("http://localhost:3100/");
     await expect(page.locator("#main-content")).toBeVisible();
     await expect(page.locator("#hero h1")).toHaveText("EnekoEnekoRuiz.Ruiz.");
-    await expect(page.locator(".materia-canvas")).toHaveCount(0);
+    await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
     expect(errors).toEqual([]);
   } finally {
     await context.close();

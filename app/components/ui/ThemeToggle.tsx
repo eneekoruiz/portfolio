@@ -1,29 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 import { useSound } from "../../hooks/useSound";
+import { useTranslations } from "../../hooks/useTranslations";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
+  const { ui } = useTranslations();
+  const motion = useMotionEnabled();
+  const active = useRef<ViewTransition | null>(null);
   const { playClick } = useSound();
   const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const isDark = resolvedTheme === "dark";
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      active.current?.skipTransition();
+      document.documentElement.removeAttribute("data-transition");
+    };
+  }, []);
 
   const handleToggle = (e: React.MouseEvent) => {
-    if (isAnimating) return;
-
-    const x = e.clientX;
-    const y = e.clientY;
+    active.current?.skipTransition();
+    const next = resolvedTheme === "dark" ? "light" : "dark";
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.detail ? e.clientX : rect.left + rect.width / 2;
+    const y = e.detail ? e.clientY : rect.top + rect.height / 2;
 
     playClick();
 
-    if (!document.startViewTransition) {
-      setTheme(theme === "dark" ? "light" : "dark");
+    if (!motion || !document.startViewTransition) {
+      setTheme(next);
       return;
     }
 
@@ -34,16 +47,20 @@ export function ThemeToggle() {
 
     try {
       const transition = document.startViewTransition(() => {
-        setTheme(theme === "dark" ? "light" : "dark");
+        flushSync(() => setTheme(next));
       });
+      active.current = transition;
       transition.ready?.catch(() => {});
       transition.updateCallbackDone?.catch(() => {});
-      transition.finished.finally(() => {
+      const finish = () => {
+        if (active.current !== transition) return;
+        active.current = null;
         setIsAnimating(false);
         document.documentElement.removeAttribute("data-transition");
-      });
+      };
+      transition.finished.then(finish, finish);
     } catch {
-      setTheme(theme === "dark" ? "light" : "dark");
+      setTheme(next);
       setIsAnimating(false);
       document.documentElement.removeAttribute("data-transition");
     }
@@ -61,7 +78,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={handleToggle}
-      aria-label="Cambiar tema"
+      aria-label={ui.theme}
       data-h
       className="group relative flex items-center justify-center w-9 h-9 rounded-xl bg-white/60 dark:bg-white/[0.06] border border-black/5 dark:border-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-110 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-brand overflow-hidden"
     >

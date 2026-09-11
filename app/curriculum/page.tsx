@@ -17,7 +17,7 @@ import { ChevronLeft, ExternalLink, Download } from "lucide-react";
 import { useTranslations } from "../hooks/useTranslations";
 
 export default function CurriculumPage() {
-  const { t } = useTranslations();
+  const { t, ui } = useTranslations();
   const router = useRouter();
   const { theme, resolvedTheme } = useTheme();
   const [iframeHeight, setIframeHeight] = useState("100%");
@@ -50,11 +50,11 @@ export default function CurriculumPage() {
   }, []);
 
   useEffect(() => {
-    document.title = "Currículum | Eneko Ruiz";
+    document.title = `${t.ctaCv} | Eneko Ruiz`;
     return () => {
       document.title = "Eneko Ruiz — Portfolio";
     };
-  }, []);
+  }, [t.ctaCv]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -209,7 +209,7 @@ export default function CurriculumPage() {
           <iframe
             ref={iframeRef}
             src="https://eneko-ruiz-curriculum.vercel.app"
-            title="Eneko Ruiz Curriculum"
+            title={`Eneko Ruiz · ${t.ctaCv}`}
             style={{ height: iframeHeight }}
             className={`w-full border-none transition-all duration-1000 ${loading ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
             allow="web-share; clipboard-write"
@@ -234,14 +234,10 @@ export default function CurriculumPage() {
               <ExternalLink size={32} />
             </div>
             <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-4 text-ink">
-              {t.back === "Volver"
-                ? "Contenido Protegido"
-                : "Protected Content"}
+              {ui.cvUnavailable}
             </h2>
             <p className="max-w-md text-lead text-sm leading-relaxed mb-8">
-              {t.back === "Volver"
-                ? "Por motivos de seguridad (X-Frame-Options), algunos navegadores bloquean la visualización incrustada. Pulsa el botón de arriba para ver el currículum a pantalla completa."
-                : "For security reasons (X-Frame-Options), some browsers block embedded viewing. Click the button above to view the resume in full screen."}
+              {ui.cvFallback}
             </p>
             <div className="pointer-events-auto">
               <a
@@ -262,7 +258,7 @@ export default function CurriculumPage() {
         <button
           onClick={handleReturn}
           className="flex items-center justify-center w-12 h-12 rounded-full bg-brand text-white shadow-lg active:scale-95 transition-transform"
-          aria-label="Go back"
+          aria-label={t.back}
         >
           <ChevronLeft size={20} />
         </button>

@@ -1,19 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowUpRight,
-  Check,
-  Copy,
-  Github,
-  Linkedin,
-  Mail,
-} from "lucide-react";
+import { ArrowUpRight, Check, Github, Linkedin, Mail } from "lucide-react";
 import type { Lang, Tx } from "../../types";
 import { SectionFrame } from "./SectionFrame";
 import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
+import { ContactTile } from "./ContactTile";
+import { SignatureLink } from "../ui/SignatureLink";
+import { UI_COPY } from "../../data/interface-translations";
 
 const EMAIL = "eneekoruiz@gmail.com";
 
@@ -25,8 +21,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const cardRef = useRef<HTMLDivElement>(null);
   useMateriaSurface(cardRef, "#0066ff", motion, 28);
   const mailRef = useSpringHover<HTMLAnchorElement>(motion);
-  const copyRef = useSpringHover<HTMLButtonElement>(motion);
-  const es = lang === "es";
+  const ui = UI_COPY[lang];
 
   useEffect(() => {
     alive.current = true;
@@ -81,42 +76,10 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
             className="materia-button bg-ink text-page"
           >
             <Mail size={16} aria-hidden="true" />
-            {es ? "Escríbeme" : "Email me"}
+            {ui.email}
             <ArrowUpRight size={16} aria-hidden="true" />
           </a>
-          <button
-            ref={copyRef}
-            type="button"
-            onClick={copy}
-            className="materia-button border border-ink/20 text-ink"
-          >
-            {status === "copied" ? (
-              <Check size={16} aria-hidden="true" />
-            ) : (
-              <Copy size={16} aria-hidden="true" />
-            )}
-            {es ? "Copiar correo" : "Copy email"}
-          </button>
-          <a
-            href="https://github.com/eneekoruiz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="materia-button text-ink"
-          >
-            <Github size={16} aria-hidden="true" />
-            GitHub
-            <ArrowUpRight size={14} aria-hidden="true" />
-          </a>
-          <a
-            href="https://linkedin.com/in/eneekoruiz"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="materia-button text-ink"
-          >
-            <Linkedin size={16} aria-hidden="true" />
-            LinkedIn
-            <ArrowUpRight size={14} aria-hidden="true" />
-          </a>
+          <SignatureLink label={t.ctaCv} kind="cv" />
         </div>
         <p
           role="status"
@@ -124,15 +87,40 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
           className="mt-4 min-h-6 text-sm text-lead"
         >
           {status === "copied"
-            ? es
-              ? "Correo copiado."
-              : "Email copied."
+            ? ui.copied
             : status === "failed"
-              ? es
-                ? "No se pudo copiar. Puedes seleccionar el correo o usar Escríbeme."
-                : "Could not copy. Select the address or use Email me."
+              ? ui.copyFailed
               : ""}
         </p>
+      </div>
+      <div className="mt-6 grid gap-5 md:grid-cols-3">
+        <ContactTile
+          label="Gmail"
+          value={EMAIL}
+          action={ui.copyEmail}
+          color="#d83c30"
+          icon={status === "copied" ? Check : Mail}
+          onClick={copy}
+          motion={motion}
+        />
+        <ContactTile
+          label="GitHub"
+          value="github.com/eneekoruiz"
+          action={ui.profile}
+          color="#747a88"
+          icon={Github}
+          href="https://github.com/eneekoruiz"
+          motion={motion}
+        />
+        <ContactTile
+          label="LinkedIn"
+          value="linkedin.com/in/eneekoruiz"
+          action={ui.connect}
+          color="#0077b5"
+          icon={Linkedin}
+          href="https://linkedin.com/in/eneekoruiz"
+          motion={motion}
+        />
       </div>
     </SectionFrame>
   );

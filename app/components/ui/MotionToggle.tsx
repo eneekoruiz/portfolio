@@ -1,33 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Play, Pause } from "lucide-react";
 import { useSound } from "../../hooks/useSound";
+import { useTranslations } from "../../hooks/useTranslations";
+import { useSpringHover } from "../../hooks/useSpringHover";
 
 export function MotionToggle() {
+  const { ui } = useTranslations();
+  const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { playClick } = useSound();
   const [mounted, setMounted] = useState(false);
   const [enabled, setEnabled] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
+  const button = useSpringHover<HTMLButtonElement>(enabled, 8);
 
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined") {
-      const initial =
-        localStorage.getItem("portfolio-motion-enabled") !== "false";
-      setEnabled(initial);
+      try {
+        setEnabled(
+          localStorage.getItem("portfolio-motion-enabled") !== "false",
+        );
+      } catch {}
     }
+    return () => {
+      if (pulseTimer.current) clearTimeout(pulseTimer.current);
+    };
   }, []);
 
   const handleToggle = () => {
-    if (isAnimating) return;
-
     const nextState = !enabled;
     setEnabled(nextState);
     playClick();
 
     if (typeof window !== "undefined") {
-      localStorage.setItem("portfolio-motion-enabled", String(nextState));
+      try {
+        localStorage.setItem("portfolio-motion-enabled", String(nextState));
+      } catch {}
       window.dispatchEvent(
         new CustomEvent("portfolio-motion-changed", {
           detail: { enabled: nextState },
@@ -36,7 +46,8 @@ export function MotionToggle() {
     }
 
     setIsAnimating(true);
-    setTimeout(() => {
+    if (pulseTimer.current) clearTimeout(pulseTimer.current);
+    pulseTimer.current = setTimeout(() => {
       setIsAnimating(false);
     }, 400);
   };
@@ -52,11 +63,12 @@ export function MotionToggle() {
 
   return (
     <button
+      ref={button}
+      data-motion-toggle
       onClick={handleToggle}
-      aria-label={
-        enabled ? "Pausar animación de fondo" : "Activar animación de fondo"
-      }
-      title={enabled ? "Pausar animación" : "Activar animación"}
+      aria-pressed={!enabled}
+      aria-label={enabled ? ui.motionPause : ui.motionResume}
+      title={enabled ? ui.motionPause : ui.motionResume}
       className="group relative flex items-center justify-center w-9 h-9 rounded-xl bg-white/60 dark:bg-white/[0.06] border border-black/5 dark:border-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-110 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-brand overflow-hidden"
     >
       {/* ── Background Glow Pulse ── */}

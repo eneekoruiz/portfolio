@@ -14,6 +14,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { ProjectCard, RepoFull, Tx, Lang } from "../../types";
 import { KineticText } from "../motion/KineticText";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
+import { UI_COPY } from "../../data/interface-translations";
 
 // Custom Hooks & Utilities
 import { useMobile } from "../../hooks/useMobile";
@@ -113,7 +114,7 @@ export function Projects({
         <div className="projects-header mb-10 md:mb-16">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 md:w-10 bg-ink opacity-12" />
-            <p className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.32em] uppercase text-lead/50">
+            <p className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-lead">
               {t.woLb || "PORTFOLIO DE INGENIERÍA"}
             </p>
           </div>
@@ -124,10 +125,8 @@ export function Projects({
             >
               <KineticText text={t.woH} enabled={motionEnabled && !reduced} />
             </h2>
-            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.22em] text-lead/30 mb-1">
-              {lang === "es"
-                ? "Selecciona para explorar ↓"
-                : "Select to explore ↓"}
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-lead mb-1">
+              {UI_COPY[lang].workHint} ↓
             </span>
           </div>
         </div>
@@ -160,7 +159,7 @@ export function Projects({
       <section
         id="github"
         data-section="github"
-        aria-label="Actividad de GitHub"
+        aria-label={t.ghLb}
         className="border-t border-black/7 dark:border-white/10 py-12 md:py-22 px-5 md:px-8 max-w-[1200px] mx-auto relative z-10"
       >
         <div className="flex items-end justify-between pb-4 border-b border-black/7 dark:border-white/10 mb-1">

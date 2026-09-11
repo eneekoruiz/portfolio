@@ -13,6 +13,7 @@ import { Search, Check } from "lucide-react";
 import gsap from "gsap";
 import { LANG_LABELS } from "../../lib/constants";
 import type { Lang, Tx } from "../../types";
+import { UI_COPY } from "../../data/interface-translations";
 
 export function CmdModal({
   lang,
@@ -212,7 +213,7 @@ export function CmdModal({
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Buscador"
+      aria-label={UI_COPY[lang].search}
       style={{ animation: "none", opacity: 0 }}
     >
       <div
@@ -240,13 +241,13 @@ export function CmdModal({
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setQ(e.target.value)
             }
-            aria-label="Buscar"
+            aria-label={UI_COPY[lang].search}
           />
           <button
             onClick={handleClose}
             type="button"
             className="font-mono text-[10px] text-lead/50 hover:text-ink px-[7px] py-[2px] border border-black/10 dark:border-white/10 rounded-[5px] shrink-0 hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all"
-            aria-label="Cerrar buscador"
+            aria-label={UI_COPY[lang].close}
           >
             ESC
           </button>

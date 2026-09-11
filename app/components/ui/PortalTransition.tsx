@@ -127,6 +127,18 @@ export function PortalTransition() {
   }, [active, origin.x, origin.y, pendingUrl, router]);
 
   useEffect(() => {
+    if (!active) return;
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActive(false);
+        setPendingUrl(null);
+      }
+    };
+    window.addEventListener("keydown", cancel);
+    return () => window.removeEventListener("keydown", cancel);
+  }, [active]);
+
+  useEffect(() => {
     const handlePortal = (e: Event) => {
       if (!(e instanceof CustomEvent)) return;
 

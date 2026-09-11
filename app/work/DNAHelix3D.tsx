@@ -4,6 +4,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { materia } from "../lib/materia";
+import { HelixSignal } from "./helixSignal";
 
 interface DNAHelix3DProps {
   accent: string;
@@ -67,7 +68,9 @@ function createAtmosphereMaterial(
         float strands = smoothstep(0.7, 1.0, ribbons) * radial;
         float mist = noise(uv * 7.0 + vec2(uTime * 0.035, -uTime * 0.025)) * radial;
         vec3 color = mix(uSecondary, uAccent, 0.55 + 0.45 * sin(uv.y * 8.0 + uTime * 0.4));
-        float alpha = (strands * 0.16 + mist * 0.08) * (0.48 + uDark * 0.52);
+        float edge = smoothstep(0.0, 0.14, vUv.x) * smoothstep(0.0, 0.14, 1.0 - vUv.x)
+          * smoothstep(0.0, 0.1, vUv.y) * smoothstep(0.0, 0.1, 1.0 - vUv.y);
+        float alpha = (strands * 0.16 + mist * 0.08) * (0.48 + uDark * 0.52) * edge;
         gl_FragColor = vec4(color, alpha);
       }
     `,
@@ -86,6 +89,10 @@ function HelixAtmosphere({
   paused: boolean;
 }) {
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+  const palette = useMemo(
+    () => ({ accent: new THREE.Color(), secondary: new THREE.Color() }),
+    [],
+  );
   if (!materialRef.current) {
     materialRef.current = createAtmosphereMaterial(accent, secondary, darkMode);
   }
@@ -103,12 +110,17 @@ function HelixAtmosphere({
     uniforms.uDark.value = darkMode ? 1 : 0;
   }, [accent, darkMode, secondary]);
 
-  useFrame((state) => {
+  useFrame((_state, delta) => {
     const uniforms = materialRef.current?.uniforms;
     if (paused || !uniforms) return;
     // Three uniforms are mutable GPU state updated outside React rendering.
     // eslint-disable-next-line react-hooks/immutability
-    uniforms.uTime.value = state.clock.elapsedTime;
+    uniforms.uTime.value += Math.min(delta, 0.05);
+    palette.accent.set(materia.accent);
+    palette.secondary.set(materia.secondary);
+    const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 4);
+    uniforms.uAccent.value.lerp(palette.accent, blend);
+    uniforms.uSecondary.value.lerp(palette.secondary, blend);
   });
 
   useEffect(() => {
@@ -140,6 +152,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const nodesARef = useRef<THREE.InstancedMesh>(null);
   const nodesBRef = useRef<THREE.InstancedMesh>(null);
   const rungsRef = useRef<THREE.InstancedMesh>(null);
+  const signal = useMemo(() => new HelixSignal(), []);
 
   const config = useMemo(() => {
     if (isMobile) {
@@ -295,42 +308,52 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
 
   const materialA = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
-        color: accentColor,
-        emissive: accentColor,
-        emissiveIntensity: darkMode ? 1.15 : 0.18,
-        roughness: 0.38,
-        metalness: 0.18,
-        toneMapped: false,
-      }),
-    [accentColor, darkMode],
+      signal.apply(
+        new THREE.MeshPhysicalMaterial({
+          color: accentColor,
+          emissive: accentColor,
+          emissiveIntensity: darkMode ? 0.4 : 0.08,
+          roughness: lowPower ? 0.38 : 0.24,
+          metalness: lowPower ? 0.18 : 0.42,
+          clearcoat: lowPower ? 0 : 0.75,
+          clearcoatRoughness: 0.2,
+          toneMapped: false,
+        }),
+      ),
+    [accentColor, darkMode, signal, lowPower],
   );
 
   const materialB = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
-        color: secondaryColor,
-        emissive: secondaryColor,
-        emissiveIntensity: darkMode ? 0.95 : 0.14,
-        roughness: 0.4,
-        metalness: 0.16,
-        toneMapped: false,
-      }),
-    [secondaryColor, darkMode],
+      signal.apply(
+        new THREE.MeshPhysicalMaterial({
+          color: secondaryColor,
+          emissive: secondaryColor,
+          emissiveIntensity: darkMode ? 0.3 : 0.06,
+          roughness: lowPower ? 0.4 : 0.27,
+          metalness: lowPower ? 0.16 : 0.48,
+          clearcoat: lowPower ? 0 : 0.6,
+          clearcoatRoughness: 0.23,
+          toneMapped: false,
+        }),
+      ),
+    [secondaryColor, darkMode, signal, lowPower],
   );
 
   const rungMat = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
-        color: darkMode ? 0xf2f6ff : 0x737a86,
-        emissive: darkMode ? 0x123a7a : 0x000000,
-        emissiveIntensity: darkMode ? 0.34 : 0,
-        transparent: true,
-        opacity: darkMode ? 0.74 : 0.5,
-        roughness: 0.42,
-        metalness: 0.22,
-      }),
-    [darkMode],
+      signal.apply(
+        new THREE.MeshStandardMaterial({
+          color: darkMode ? 0xf2f6ff : 0x737a86,
+          emissive: darkMode ? 0x123a7a : 0x000000,
+          emissiveIntensity: darkMode ? 0.34 : 0,
+          transparent: true,
+          opacity: darkMode ? 0.74 : 0.5,
+          roughness: 0.42,
+          metalness: 0.22,
+        }),
+      ),
+    [darkMode, signal],
   );
 
   useLayoutEffect(() => {
@@ -350,17 +373,47 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     rungs.instanceMatrix.needsUpdate = true;
   }, [config.pairs, helixData, materialA, materialB, rungMat]);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (paused || !groupRef.current) return;
-    const time = state.clock.elapsedTime;
-    groupRef.current.position.y = Math.sin(time * 0.32) * 0.26;
+    signal.update(
+      delta,
+      materia.velocity,
+      materia.warp.value,
+      lowPower || isMobile,
+    );
+    const time = signal.elapsed;
+    const flow = signal.tension.value;
+    const chapter = materia.chapter.value;
+    const studio = materia.studio.value;
+    const size = 1 + studio * (isMobile ? 0.06 : 0.14);
+    groupRef.current.scale.set(
+      config.scale[0] * signal.breath * size,
+      (config.scale[1] / signal.breath) * size,
+      config.scale[2] * signal.breath * size,
+    );
+    groupRef.current.position.y =
+      Math.sin(time * 0.32) * 0.26 +
+      Math.sin(chapter * 0.9) * 0.6 +
+      studio * 1.2;
+    groupRef.current.position.z = Math.sin(chapter * 0.7) * 0.55 - studio * 1.4;
+    groupRef.current.rotation.x =
+      THREE.MathUtils.degToRad(config.rotation[0]) +
+      materia.tiltX.value +
+      flow * (isMobile ? 0.025 : 0.07) +
+      Math.sin(chapter) * 0.08;
+    groupRef.current.rotation.z =
+      THREE.MathUtils.degToRad(config.rotation[2]) +
+      materia.tiltY.value +
+      flow * 0.035 +
+      Math.sin(chapter * 1.3) * (isMobile ? 0.035 : 0.15) -
+      studio * 0.24;
     groupRef.current.position.x = isMobile
       ? 0
       : materia.composition.value * 2.4;
     groupRef.current.rotation.y +=
       Math.min(delta, 0.05) *
       config.rotationSpeed *
-      (1 + materia.warp.value * 14);
+      (1 + materia.warp.value * 14 + studio * 0.8);
     liveColors.accent.set(materia.accent);
     liveColors.secondary.set(materia.secondary);
     const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 4);

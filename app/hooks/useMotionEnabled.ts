@@ -10,9 +10,9 @@ export function useMotionEnabled(): boolean {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const initial =
-      localStorage.getItem("portfolio-motion-enabled") !== "false";
-    setEnabled(initial);
+    try {
+      setEnabled(localStorage.getItem("portfolio-motion-enabled") !== "false");
+    } catch {}
 
     const handleMotionChange = (e: Event) => {
       const customEvent = e as CustomEvent<{ enabled?: boolean }>;

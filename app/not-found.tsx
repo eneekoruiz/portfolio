@@ -1,7 +1,10 @@
-import Link from "next/link";
-import { Home } from "lucide-react";
+"use client";
+
+import { HomeReturnLink } from "./components/ui/HomeReturnLink";
+import { useTranslations } from "./hooks/useTranslations";
 
 export default function NotFound() {
+  const { ui } = useTranslations();
   return (
     <main
       className="min-h-screen flex items-center justify-center p-8 bg-page text-ink"
@@ -13,18 +16,12 @@ export default function NotFound() {
             404
           </p>
           <h1 className="font-black text-[1.3rem] tracking-[-0.5px] text-ink">
-            Parece que has roto algo.
+            {ui.missingTitle}
           </h1>
           <p className="text-[13px] text-lead leading-[1.6] max-w-[300px]">
-            O simplemente te has perdido. Volvamos al código limpio.
+            {ui.missingDescription}
           </p>
-          <Link
-            href="/"
-            aria-label="Volver al inicio"
-            className="inline-flex items-center gap-2.5 px-8 py-[.9rem] rounded-full bg-ink text-page font-bold text-[14px] no-underline shadow-[0_8px_25px_rgba(0,0,0,.2)] hover:scale-105 active:scale-95 transition-transform"
-          >
-            <Home size={16} /> Volver al inicio
-          </Link>
+          <HomeReturnLink />
           <code className="text-[10px] text-lead/50 font-mono">
             git checkout main
           </code>

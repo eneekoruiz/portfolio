@@ -30,6 +30,8 @@ import { useIntroPhase } from "./hooks/useIntroPhase";
 import { useDnaColors } from "./hooks/useDnaColors";
 import { useNavbarInteractions } from "./hooks/useNavbarInteractions";
 import { materia } from "./lib/materia";
+import { useSceneJourney } from "./hooks/useSceneJourney";
+import { ReadingNav } from "./components/navigation/ReadingNav";
 
 // ── UI & Navigation ────────────────────────────────────────────────────────
 import { Preloader } from "./components/ui/Preloader";
@@ -133,6 +135,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   useScrollRestoration(ready);
   useReturnTransition(ready);
   useLenisSetup();
+  useSceneJourney(main, ready && motionEnabled && !reduced);
 
   // Reveal effects
   useScrollReveal(ready);
@@ -224,7 +227,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     materia.accent = dnaColors.accent;
     materia.secondary = dnaColors.secondary;
     materia.paused = menu;
-    materia.composition.target = activeSection === "hero" ? 1 : 0;
     return () => {
       materia.paused = false;
     };
@@ -252,7 +254,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       <main
         ref={main}
         id="main-content"
-        className="relative z-[10]"
+        className="relative z-[10] pb-24 md:pb-0"
         style={{
           visibility: ready ? "visible" : "hidden",
           opacity: ready ? 1 : 0,
@@ -270,8 +272,14 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           onNavContainerLeave={onNavContainerLeave}
         />
 
-        <MemoHero t={t} greeting={greeting} reduced={reduced} phase={phase} />
-        <MemoSkills t={t} />
+        <MemoHero
+          t={t}
+          greeting={greeting}
+          reduced={reduced}
+          phase={phase}
+          lang={lang}
+        />
+        <MemoSkills t={t} lang={lang} />
         <MemoAbout t={t} />
         <MemoProjects
           t={t}
@@ -289,10 +297,13 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           motionEnabled={motionEnabled}
         />
         <MemoPhilosophy t={t} />
-        <MemoContact t={t} />
+        <MemoContact t={t} lang={lang} />
         <MemoFooter t={t} />
         {!isMobile && <ProjectPreviewFollower activeProject={hoveredProject} />}
       </main>
+      {ready && !menu && !cmd && (
+        <ReadingNav active={activeSection} t={t} lang={lang} />
+      )}
 
       {cmd && (
         <CmdModal
