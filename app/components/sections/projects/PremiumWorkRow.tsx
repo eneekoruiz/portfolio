@@ -123,6 +123,16 @@ export function PremiumWorkRow({
       data-expanded={isExpanded}
       className="materia-surface work-surface group/work relative rounded-[20px] border border-ink/15 text-ink"
       style={{ "--surface-color": theme.color } as CSSProperties}
+      onPointerEnter={() => {
+        prefetch();
+        onHoverProject({ name: proj.name, color: theme.color });
+      }}
+      onPointerLeave={() => onHoverProject(null)}
+      onFocus={() => {
+        prefetch();
+        onHoverProject({ name: proj.name, color: theme.color });
+      }}
+      onBlur={() => onHoverProject(null)}
     >
       <div className="work-orbit-mark" aria-hidden="true">
         <span />

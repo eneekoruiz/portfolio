@@ -98,7 +98,7 @@ function HelixAtmosphere({
   }
 
   const planeGeometry = useMemo(
-    () => new THREE.PlaneGeometry(8.5, 25, 1, 1),
+    () => new THREE.PlaneGeometry(12, 32, 1, 1),
     [],
   );
 
@@ -152,40 +152,42 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
   const nodesARef = useRef<THREE.InstancedMesh>(null);
   const nodesBRef = useRef<THREE.InstancedMesh>(null);
   const rungsRef = useRef<THREE.InstancedMesh>(null);
+  const baseRotationRef = useRef(0);
+  const smoothScrollTurnRef = useRef(0);
   const signal = useMemo(() => new HelixSignal(), []);
 
   const config = useMemo(() => {
     if (isMobile) {
       return {
-        pairs: 38,
-        radius: 2.25,
-        height: 16.5,
-        turns: 2.25,
+        pairs: 40,
+        radius: 2.45,
+        height: 18,
+        turns: 2.3,
         tubeSegments: 88,
         radialSegments: 6,
         nodeSegments: 9,
-        strandRadius: 0.042,
-        rungRadius: 0.034,
-        nodeScale: 0.145,
-        rotationSpeed: 0.12,
-        scale: [0.86, 1.06, 0.86] as [number, number, number],
+        strandRadius: 0.045,
+        rungRadius: 0.036,
+        nodeScale: 0.155,
+        rotationSpeed: 0.15,
+        scale: [0.96, 1.08, 0.96] as [number, number, number],
         rotation: [4, 10, -6] as [number, number, number],
       };
     }
 
     return {
-      pairs: lowPower ? 46 : 64,
-      radius: 2.85,
-      height: 22,
-      turns: lowPower ? 3.05 : 3.45,
+      pairs: lowPower ? 50 : 68,
+      radius: lowPower ? 2.95 : 3.35,
+      height: 24,
+      turns: lowPower ? 3.1 : 3.4,
       tubeSegments: lowPower ? 112 : 168,
       radialSegments: lowPower ? 6 : 8,
       nodeSegments: lowPower ? 10 : 14,
-      strandRadius: lowPower ? 0.036 : 0.048,
-      rungRadius: lowPower ? 0.03 : 0.04,
-      nodeScale: lowPower ? 0.135 : 0.155,
-      rotationSpeed: lowPower ? 0.16 : 0.24,
-      scale: [1.05, 1, 1.05] as [number, number, number],
+      strandRadius: lowPower ? 0.042 : 0.054,
+      rungRadius: lowPower ? 0.035 : 0.045,
+      nodeScale: lowPower ? 0.15 : 0.175,
+      rotationSpeed: lowPower ? 0.18 : 0.26,
+      scale: [1.25, 1.08, 1.25] as [number, number, number],
       rotation: [7, 18, -10] as [number, number, number],
     };
   }, [isMobile, lowPower]);
@@ -356,6 +358,11 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     [darkMode, signal],
   );
 
+  const matARef = useRef(materialA);
+  matARef.current = materialA;
+  const matBRef = useRef(materialB);
+  matBRef.current = materialB;
+
   useLayoutEffect(() => {
     const nodesA = nodesARef.current;
     const nodesB = nodesBRef.current;
@@ -371,7 +378,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     nodesA.instanceMatrix.needsUpdate = true;
     nodesB.instanceMatrix.needsUpdate = true;
     rungs.instanceMatrix.needsUpdate = true;
-  }, [config.pairs, helixData, materialA, materialB, rungMat]);
+  }, [config.pairs, helixData]);
 
   useFrame((_state, delta) => {
     if (paused || !groupRef.current) return;
@@ -391,11 +398,31 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       (config.scale[1] / signal.breath) * size,
       config.scale[2] * signal.breath * size,
     );
+    const scrollMax =
+      typeof document !== "undefined"
+        ? Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
+        : 4000;
+    const scrollFraction =
+      typeof window !== "undefined" ? Math.min(1, Math.max(0, window.scrollY / scrollMax)) : 0;
+    const targetScrollTurn =
+      typeof window !== "undefined"
+        ? window.scrollY * 0.0018 + materia.chapter.value * 0.4
+        : 0;
+    smoothScrollTurnRef.current +=
+      (targetScrollTurn - smoothScrollTurnRef.current) *
+      (1 - Math.exp(-Math.min(delta, 0.05) * 6));
+
+    baseRotationRef.current +=
+      Math.min(delta, 0.05) *
+      config.rotationSpeed *
+      (1 + materia.warp.value * 6 + studio * 0.8);
+
     groupRef.current.position.y =
       Math.sin(time * 0.32) * 0.26 +
-      Math.sin(chapter * 0.9) * 0.6 +
+      Math.sin(chapter * 0.9) * 0.7 -
+      scrollFraction * 2.2 +
       studio * 1.2;
-    groupRef.current.position.z = Math.sin(chapter * 0.7) * 0.55 - studio * 1.4;
+    groupRef.current.position.z = Math.sin(chapter * 0.7) * 0.65 - studio * 1.4;
     groupRef.current.rotation.x =
       THREE.MathUtils.degToRad(config.rotation[0]) +
       materia.tiltX.value +
@@ -409,18 +436,24 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       studio * 0.24;
     groupRef.current.position.x = isMobile
       ? 0
-      : materia.composition.value * 2.4;
-    groupRef.current.rotation.y +=
-      Math.min(delta, 0.05) *
-      config.rotationSpeed *
-      (1 + materia.warp.value * 14 + studio * 0.8);
+      : materia.composition.value * 2.5;
+    groupRef.current.rotation.y =
+      baseRotationRef.current + smoothScrollTurnRef.current;
     liveColors.accent.set(materia.accent);
     liveColors.secondary.set(materia.secondary);
-    const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 4);
-    materialA.color.lerp(liveColors.accent, blend);
-    materialA.emissive.copy(materialA.color);
-    materialB.color.lerp(liveColors.secondary, blend);
-    materialB.emissive.copy(materialB.color);
+    const blend = 1 - Math.exp(-Math.min(delta, 0.05) * 5);
+    const matA = matARef.current;
+    const matB = matBRef.current;
+    if (matA && matB) {
+      matA.color.lerp(liveColors.accent, blend);
+      matA.emissive.copy(matA.color);
+      matA.emissiveIntensity =
+        (darkMode ? 0.45 : 0.15) * (1 + materia.warp.value * 1.4);
+      matB.color.lerp(liveColors.secondary, blend);
+      matB.emissive.copy(matB.color);
+      matB.emissiveIntensity =
+        (darkMode ? 0.35 : 0.12) * (1 + materia.warp.value * 1.4);
+    }
   });
 
   useEffect(() => {

@@ -38,13 +38,14 @@ const fragmentShader = `
     vec2 q = abs(p) - size + radius;
     return min(max(q.x,q.y), 0.0) + length(max(q,0.0)) - radius;
   }
-  vec3 sceneAt(vec2 uv) {
-    vec4 s = texture2D(uScene, clamp(uv, 0.001, 0.999));
-    return mix(uPaper, s.rgb, s.a * mix(0.65, 0.82, uDark));
+  vec4 sceneAt(vec2 uv) {
+    return texture2D(uScene, clamp(uv, 0.001, 0.999));
   }
   void main() {
     vec2 pixel = vec2(vUv.x, 1.0-vUv.y) * uResolution;
-    vec3 color = sceneAt(vUv);
+    vec4 s = sceneAt(vUv);
+    vec3 color = s.rgb;
+    float alpha = s.a;
     for (int i=0; i<${MAX_SURFACES}; i++) {
       if (i >= uCount) break;
       vec4 rect = uRects[i];
@@ -65,20 +66,23 @@ const fragmentShader = `
       bend.y *= -1.0;
       vec2 offset = bend / uResolution;
       vec2 dispersion = vec2(tangent.x, -tangent.y) * (0.6 + energy * 2.3) / uResolution;
-      vec3 lens;
-      lens.r = sceneAt(vUv + offset + dispersion).r;
-      lens.g = sceneAt(vUv + offset).g;
-      lens.b = sceneAt(vUv + offset - dispersion).b;
-      lens = mix(lens, uColors[i], 0.025 + energy * 0.035);
+      vec4 sR = sceneAt(vUv + offset + dispersion);
+      vec4 sG = sceneAt(vUv + offset);
+      vec4 sB = sceneAt(vUv + offset - dispersion);
+      vec3 lens = vec3(sR.r, sG.g, sB.b);
+      float lensAlpha = max(sR.a, max(sG.a, sB.a));
+      lens = mix(lens, uColors[i], 0.035 + energy * 0.045);
       color = mix(color, lens, mask);
+      alpha = mix(alpha, max(alpha, lensAlpha), mask);
       // Directional rim + soft optical bloom, computed without a blur pass.
       float glint = pow(max(0.0, dot(normal, normalize(tangent + vec2(0.001)))), 6.0);
       float caustic = exp(-abs(distance) * 0.7) + exp(-abs(distance) * 0.11) * 0.16;
       color += mix(uColors[i], vec3(1.0), 0.45) * caustic * energy * proximity * (0.22 + glint * 0.7);
+      alpha = clamp(alpha + caustic * energy * proximity * 0.3 * mask, 0.0, 1.0);
       float noise = grain(floor(pixel) + floor(uTime * 12.0)) - 0.5;
       color += noise * 0.008 * mask;
     }
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, alpha);
     #include <colorspace_fragment>
   }
 `;
@@ -114,6 +118,7 @@ export function OpticalCompositor({
     const material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
+      transparent: true,
       depthTest: false,
       depthWrite: false,
       toneMapped: false,

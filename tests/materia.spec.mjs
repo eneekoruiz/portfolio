@@ -44,8 +44,11 @@ async function home(page) {
 
 async function openFirstProject(page) {
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
-  await row.locator("button").click();
-  await expect(row.locator("button")).toHaveAttribute("aria-expanded", "true");
+  await row.locator("button[aria-expanded]").click();
+  await expect(row.locator("button[aria-expanded]")).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
   await expect(
     row.getByRole("link", { name: "Explorar proyecto" }),
   ).toBeVisible();
@@ -77,8 +80,12 @@ test("accordion survives repeated reversals and closes its focusable content", a
 }, testInfo) => {
   await home(page);
   const row = await openFirstProject(page);
-  for (let i = 0; i < 5; i++) await row.locator("button").click();
-  await expect(row.locator("button")).toHaveAttribute("aria-expanded", "false");
+  for (let i = 0; i < 5; i++)
+    await row.locator("button[aria-expanded]").click();
+  await expect(row.locator("button[aria-expanded]")).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
   await expect(row.locator("[data-project-body]")).toHaveAttribute("inert", "");
   await expect
     .poll(() =>
@@ -87,7 +94,7 @@ test("accordion survives repeated reversals and closes its focusable content", a
         .evaluate((el) => el.getBoundingClientRect().height),
     )
     .toBe(0);
-  await row.locator("button").click();
+  await row.locator("button[aria-expanded]").click();
   await expect(
     row.getByRole("link", { name: "Explorar proyecto" }),
   ).toBeVisible();
@@ -142,11 +149,13 @@ test("Spanish and English controls update together", async ({ page }) => {
     page.locator("#hero").getByRole("link", { name: "See work" }),
   ).toBeVisible();
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
-  await row.locator("button").click();
+  await row.locator("button[aria-expanded]").click();
   await expect(
     row.getByRole("link", { name: "Explore project" }),
   ).toBeVisible();
-  await expect(row.getByText("From concept to production")).toBeVisible();
+  await expect(
+    row.getByText("From concept to production").first(),
+  ).toBeVisible();
 });
 
 test("reduced motion renders readable text and immediate project navigation", async ({

@@ -109,7 +109,7 @@ test("project opens into a reversible 3D studio scroll journey", async ({
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
-  await row.locator("button").click();
+  await row.locator("button[aria-expanded]").click();
   if (info.project.name === "desktop") {
     await row.getByRole("link", { name: "Explorar proyecto" }).hover();
     await expect(page.locator("#project-preview-follower")).toBeVisible();

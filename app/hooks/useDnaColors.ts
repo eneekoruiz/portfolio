@@ -9,6 +9,7 @@ export function useDnaColors(
   activeSection: string,
   expandedIdx: number | null,
   top3: ProjectCard[],
+  hoveredProject?: { name: string; color: string } | null,
 ) {
   return useMemo(() => {
     const isDarkLocal = theme === "dark" || resolvedTheme === "dark";
@@ -20,6 +21,15 @@ export function useDnaColors(
       "pke-web": "#9b1fff",
     };
 
+    // 1. Immediate priority: Hovered project in Selected Works
+    if (hoveredProject?.color) {
+      return {
+        accent: hoveredProject.color,
+        secondary: isDarkLocal ? "#555555" : "#bbbbbb",
+      };
+    }
+
+    // 2. Expanded project in Selected Works
     if (activeSection === "work") {
       if (expandedIdx !== null && top3[expandedIdx]) {
         const pColor =
@@ -37,5 +47,5 @@ export function useDnaColors(
       accent: isDarkLocal ? "#729bff" : "#0066ff",
       secondary: isDarkLocal ? "#d1dfff" : "#8aa8dc",
     };
-  }, [activeSection, expandedIdx, top3, theme, resolvedTheme]);
+  }, [activeSection, expandedIdx, top3, theme, resolvedTheme, hoveredProject]);
 }
