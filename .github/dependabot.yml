@@ -10,6 +10,12 @@ updates:
         patterns:
           - '*'
     ignore:
+      - dependency-name: 'react'
+        update-types:
+          - version-update:semver-minor
+      - dependency-name: 'react-dom'
+        update-types:
+          - version-update:semver-minor
       - dependency-name: '*vitest*'
         update-types:
           - version-update:semver-major
