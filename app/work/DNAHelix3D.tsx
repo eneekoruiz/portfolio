@@ -398,29 +398,31 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       (config.scale[1] / signal.breath) * size,
       config.scale[2] * signal.breath * size,
     );
+    const currentScrollY =
+      typeof window !== "undefined"
+        ? window.scrollY || document.documentElement.scrollTop || 0
+        : 0;
     const scrollMax =
       typeof document !== "undefined"
         ? Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
         : 4000;
-    const scrollFraction =
-      typeof window !== "undefined" ? Math.min(1, Math.max(0, window.scrollY / scrollMax)) : 0;
+    const scrollFraction = Math.min(1, Math.max(0, currentScrollY / scrollMax));
     const targetScrollTurn =
-      typeof window !== "undefined"
-        ? window.scrollY * 0.0018 + materia.chapter.value * 0.4
-        : 0;
+      currentScrollY * 0.0035 + materia.chapter.value * 0.75;
     smoothScrollTurnRef.current +=
       (targetScrollTurn - smoothScrollTurnRef.current) *
-      (1 - Math.exp(-Math.min(delta, 0.05) * 6));
+      (1 - Math.exp(-Math.min(delta, 0.05) * 8));
 
     baseRotationRef.current +=
       Math.min(delta, 0.05) *
-      config.rotationSpeed *
+      (config.rotationSpeed +
+        Math.min(Math.abs(materia.velocity) * 0.0018, 0.5)) *
       (1 + materia.warp.value * 6 + studio * 0.8);
 
     groupRef.current.position.y =
       Math.sin(time * 0.32) * 0.26 +
       Math.sin(chapter * 0.9) * 0.7 -
-      scrollFraction * 2.2 +
+      scrollFraction * 3.4 +
       studio * 1.2;
     groupRef.current.position.z = Math.sin(chapter * 0.7) * 0.65 - studio * 1.4;
     groupRef.current.rotation.x =

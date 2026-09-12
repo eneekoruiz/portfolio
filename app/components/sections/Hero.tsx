@@ -80,7 +80,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       className="materia-hero relative flex min-h-[100svh] lg:h-[100svh] lg:max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
       <div className="hero-light" aria-hidden="true" />
-      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
+      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
           {greeting}
         </p>
@@ -90,7 +90,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         <div className="relative z-10 min-w-0">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(4rem,min(13.5vw,14vh),11.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] text-ink"
+            className="m-0 text-[clamp(4.8rem,11.5vw,11.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] text-ink"
           >
             <KineticText
               text="Eneko"
@@ -123,14 +123,14 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </div>
         <div
           ref={prismRef}
-          className="materia-surface hero-prism relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 lg:block"
+          className="materia-surface hero-prism relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 lg:block overflow-hidden"
           data-materia-surface="hero"
         >
-          <div className="absolute inset-x-5 top-5 flex items-center justify-between text-[10px] font-mono tracking-[0.18em] text-lead">
+          <div className="absolute inset-x-5 top-5 z-10 flex items-center justify-between text-[10px] font-mono tracking-[0.18em] text-lead">
             <span>ER — 01</span>
             <span aria-hidden="true">↗</span>
           </div>
-          <div className="hero-portrait-frame absolute inset-x-4 bottom-16 md:bottom-20 mx-auto">
+          <div className="hero-portrait-frame absolute inset-x-4 top-1/2 -translate-y-1/2 mx-auto">
             <video
               ref={portraitRef}
               src="/memoji.webm"
@@ -143,7 +143,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               className="hero-portrait block h-full w-full object-cover"
             />
           </div>
-          <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between border-t border-ink/15 pt-4">
+          <div className="absolute bottom-5 left-5 right-5 z-10 flex items-end justify-between border-t border-ink/15 pt-4">
             <span className="font-mono text-[10px] tracking-[0.14em] text-lead">
               SOFTWARE / SYSTEMS
             </span>

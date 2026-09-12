@@ -206,7 +206,8 @@
   );
 }
 .hero-portrait-frame {
-  width: min(calc(100% - 2rem), 300px);
+  width: min(calc(100% - 2.5rem), 250px);
+  max-height: calc(100% - 4.5rem);
   height: auto;
   aspect-ratio: 1;
   border-radius: 50%;
