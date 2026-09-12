@@ -110,7 +110,7 @@ test("contact magnet, letter lighting and project depth recover after interrupti
   expect(await title.evaluate((el) => el.style.transform)).toContain(
     "rotateY(0deg)",
   );
-  await row.locator("button").click();
+  await row.locator("button[aria-expanded]").click();
   await page.screenshot({ path: info.outputPath("selected-work-depth.png") });
 });
 

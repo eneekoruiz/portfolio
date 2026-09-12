@@ -200,7 +200,7 @@ test("a genuine capture reaches the detail and PKE clearly has no preview", asyn
     .poll(() => image.evaluate((img) => img.complete && img.naturalWidth > 0))
     .toBe(true);
   await page.screenshot({ path: info.outputPath("selected-capture.png") });
-  await row.locator("button").click();
+  await row.locator("button[aria-expanded]").click();
   await row
     .getByRole("link", { name: "Explorar proyecto", exact: true })
     .click();
@@ -222,7 +222,7 @@ test("saved language survives case studies and a missing-page return", async ({
   await page.goto("/");
   await language(page, "fr");
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
-  await row.locator("button").click();
+  await row.locator("button[aria-expanded]").click();
   await row
     .getByRole("link", { name: "Découvrir le projet", exact: true })
     .click();

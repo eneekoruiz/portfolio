@@ -222,15 +222,21 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     activeSection,
     expandedIdx,
     top3,
+    hoveredProject,
   );
   useEffect(() => {
     materia.accent = dnaColors.accent;
     materia.secondary = dnaColors.secondary;
     materia.paused = menu;
+    if (hoveredProject) {
+      materia.warp.target = 0.85;
+    } else {
+      materia.warp.target = 0;
+    }
     return () => {
       materia.paused = false;
     };
-  }, [dnaColors, menu, activeSection]);
+  }, [dnaColors, menu, activeSection, hoveredProject]);
 
   return (
     <>

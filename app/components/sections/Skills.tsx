@@ -59,9 +59,9 @@ function SkillOrbit({
     let pointerX = 0,
       pointerY = 0,
       interacting = false;
-    let radius = 115;
+    let radius = 135;
     const resize = new ResizeObserver(([entry]) => {
-      radius = Math.min(178, Math.max(90, entry.contentRect.width * 0.31));
+      radius = Math.min(195, Math.max(105, entry.contentRect.width * 0.34));
       wake();
     });
     const draw = (dt = 0) => {
@@ -70,9 +70,7 @@ function SkillOrbit({
         const theta = (i * Math.PI * 2) / items.length + angle.value;
         const depth = (Math.cos(theta) + 1) / 2;
         const x = Math.sin(theta) * radius;
-        const y =
-          Math.sin(theta * 2 + elapsed * 0.7) * 12 +
-          Math.cos(theta) * pitch.value * 18;
+        const y = Math.sin(theta) * 6 + pitch.value * 12;
         const dx = x - pointerX,
           dy = y - pointerY;
         const distance = Math.sqrt(dx * dx + dy * dy + 400);
@@ -81,9 +79,9 @@ function SkillOrbit({
             ? Math.exp(-(dx * dx + dy * dy) / 6200) * depth
             : 0;
         const displacement = displacements[i];
-        displacement.x.target = (dx / distance) * influence * 22;
-        displacement.y.target = (dy / distance) * influence * 18;
-        displacement.z.target = influence * 22;
+        displacement.x.target = (dx / distance) * influence * 18;
+        displacement.y.target = (dy / distance) * influence * 14;
+        displacement.z.target = influence * 18;
         const ox = displacement.x.step(dt),
           oy = displacement.y.step(dt),
           oz = displacement.z.step(dt);
@@ -92,25 +90,24 @@ function SkillOrbit({
           !displacement.y.settled ||
           !displacement.z.settled;
         if (moving) settled = false;
+        const zPos = (depth - 0.5) * 80 + oz;
         items[i].style.transform =
-          `translate(-50%,-50%) translate3d(${x + ox}px,${y + oy}px,${(depth - 0.5) * 100 + oz}px) rotateY(${Math.sin(theta) * -12 + ox * 0.15}deg) scale(${0.64 + depth * 0.36})`;
-        items[i].style.setProperty("--pill-light", String(oz / 22));
-        items[i].style.willChange = moving ? "transform" : "";
-        items[i].style.opacity = String(0.38 + depth * 0.62);
+          `translate(-50%,-50%) translate3d(${(x + ox).toFixed(1)}px,${(y + oy).toFixed(1)}px,${zPos.toFixed(1)}px) rotateY(${(Math.sin(theta) * -12).toFixed(1)}deg) scale(${(0.68 + depth * 0.36).toFixed(3)})`;
+        items[i].style.setProperty("--pill-light", String(oz / 18));
+        items[i].style.willChange = moving || dragging ? "transform" : "";
+        items[i].style.opacity = String((0.36 + depth * 0.64).toFixed(3));
         items[i].style.zIndex = String(Math.round(depth * 100));
       }
       return settled;
     };
     const tick = (_time: number, delta: number) => {
       const dt = delta / 1000;
-      const rotating = !pausedRef.current && !focused && !hovering && !dragging;
+      const rotating = !pausedRef.current && !focused && !dragging;
       if (rotating) {
         const advance = Math.min(dt, 0.08);
-        angle.target += advance * 0.24;
+        angle.target += advance * 0.28;
         elapsed += advance;
       }
-      // Autonomous drift stays bounded after a missed frame. The analytic
-      // springs use real elapsed time so pausing never becomes slow motion.
       angle.step(dt);
       pitch.target = Math.max(-1, Math.min(1, angle.velocity * 0.15));
       pitch.step(dt);
@@ -165,12 +162,12 @@ function SkillOrbit({
         wake();
       }
       if (!dragging || event.pointerId !== pointerId) return;
-      angle.target = startAngle + (event.clientX - startX) * 0.012;
+      angle.target = startAngle + (event.clientX - startX) * 0.015;
       const dt = (event.timeStamp - lastTime) / 1000;
       if (dt > 0)
         releaseVelocity = Math.max(
-          -5,
-          Math.min(5, ((event.clientX - lastX) * 0.012) / dt),
+          -8,
+          Math.min(8, ((event.clientX - lastX) * 0.015) / dt),
         );
       lastX = event.clientX;
       lastTime = event.timeStamp;
@@ -179,14 +176,17 @@ function SkillOrbit({
     const release = (event: PointerEvent) => {
       if (event.type !== "pointerup") interacting = false;
       if (!dragging) return;
-      // A cancelled touch scroll must not fling the cylinder. Momentum decays
-      // from the last actual movement, so holding before release never kicks it.
       if (event.type === "pointerup")
         angle.target +=
           releaseVelocity *
-          Math.exp(-Math.max(0, event.timeStamp - lastTime) / 90) *
-          0.2;
+          Math.exp(-Math.max(0, event.timeStamp - lastTime) / 100) *
+          0.35;
       dragging = false;
+      if (pointerId >= 0 && orbit.hasPointerCapture(pointerId)) {
+        try {
+          orbit.releasePointerCapture(pointerId);
+        } catch {}
+      }
       pointerId = -1;
       wake();
     };

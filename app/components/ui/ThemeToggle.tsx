@@ -53,12 +53,19 @@ export function ThemeToggle() {
       transition.ready?.catch(() => {});
       transition.updateCallbackDone?.catch(() => {});
       const finish = () => {
-        if (active.current !== transition) return;
-        active.current = null;
-        setIsAnimating(false);
+        if (active.current === transition) {
+          active.current = null;
+          setIsAnimating(false);
+        }
         document.documentElement.removeAttribute("data-transition");
       };
-      transition.finished.then(finish, finish);
+      const fallbackTimer = setTimeout(finish, 750);
+      transition.finished
+        .catch(() => {})
+        .finally(() => {
+          clearTimeout(fallbackTimer);
+          finish();
+        });
     } catch {
       setTheme(next);
       setIsAnimating(false);
