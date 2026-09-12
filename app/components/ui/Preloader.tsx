@@ -229,37 +229,37 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     };
   }, []);
 
-  // ── Counter Logic (High precision) ──────────────────────────────────────
+  // ── Counter Logic (Direct DOM updates + React state for reliability) ──
   useEffect(() => {
-    const isMotionActuallyEnabled =
-      typeof window !== "undefined"
-        ? localStorage.getItem("portfolio-motion-enabled") !== "false"
-        : true;
-
-    // Run a slower, more progressive counter if motion is enabled
-    const duration = isMotionActuallyEnabled ? 2200 : 800;
+    const duration = 1.9; // Smooth 1.9s reveal progression
     const counter = { value: 0 };
 
-    const timer = setTimeout(() => {
-      counterTweenRef.current = gsap.to(counter, {
-        value: 100,
-        duration: duration / 1000,
-        ease: "power2.inOut",
-        onUpdate: () => {
-          setN(Math.round(counter.value));
-        },
-        onComplete: () => {
-          setN(100);
-          exitDelayRef.current = window.setTimeout(() => {
-            exitDelayRef.current = null;
-            playExit();
-          }, 150);
-        },
-      });
-    }, 300);
+    counterTweenRef.current = gsap.to(counter, {
+      value: 100,
+      duration,
+      ease: "power2.out",
+      onUpdate: () => {
+        const val = Math.min(100, Math.round(counter.value));
+        if (numRef.current) {
+          numRef.current.textContent = String(val);
+        }
+        if (barRef.current) {
+          barRef.current.style.transform = `scaleX(${val / 100})`;
+        }
+        setN(val);
+      },
+      onComplete: () => {
+        if (numRef.current) numRef.current.textContent = "100";
+        if (barRef.current) barRef.current.style.transform = "scaleX(1)";
+        setN(100);
+        exitDelayRef.current = window.setTimeout(() => {
+          exitDelayRef.current = null;
+          playExit();
+        }, 220);
+      },
+    });
 
     return () => {
-      clearTimeout(timer);
       counterTweenRef.current?.kill();
       counterTweenRef.current = null;
       if (exitDelayRef.current !== null) {
@@ -267,7 +267,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         exitDelayRef.current = null;
       }
     };
-  }, [motionEnabled, playExit]);
+  }, [playExit]);
 
   return (
     <div

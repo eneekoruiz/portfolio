@@ -5,25 +5,28 @@ import { usePreferredMotion } from "./usePreferredMotion";
 
 export function useMotionEnabled(): boolean {
   const reduced = usePreferredMotion();
-  const [enabled, setEnabled] = useState(true); // Always true on first render to match SSR
+  const [userExplicit, setUserExplicit] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     try {
-      setEnabled(localStorage.getItem("portfolio-motion-enabled") !== "false");
+      const stored = localStorage.getItem("portfolio-motion-enabled");
+      if (stored !== null) {
+        setUserExplicit(stored === "true");
+      }
     } catch {}
 
     const handleMotionChange = (e: Event) => {
       const customEvent = e as CustomEvent<{ enabled?: boolean }>;
       if (typeof customEvent.detail?.enabled === "boolean") {
-        setEnabled(customEvent.detail.enabled);
+        setUserExplicit(customEvent.detail.enabled);
       }
     };
 
     const handleStorage = (e: StorageEvent) => {
       if (e.key !== "portfolio-motion-enabled" || e.newValue === null) return;
-      setEnabled(e.newValue !== "false");
+      setUserExplicit(e.newValue === "true");
     };
 
     window.addEventListener("portfolio-motion-changed", handleMotionChange);
@@ -38,5 +41,8 @@ export function useMotionEnabled(): boolean {
     };
   }, []);
 
-  return enabled && !reduced;
+  if (userExplicit !== null) {
+    return userExplicit;
+  }
+  return !reduced;
 }

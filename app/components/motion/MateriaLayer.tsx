@@ -38,7 +38,7 @@ export function MateriaLayer() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   useEffect(() => {
-    if (!enabled || reduced) return;
+    if (!enabled) return;
     const tick = (_time: number, delta: number) => {
       if (document.visibilityState === "visible") tickMateria(delta);
     };
@@ -46,7 +46,7 @@ export function MateriaLayer() {
     return () => {
       gsap.ticker.remove(tick);
     };
-  }, [enabled, reduced]);
+  }, [enabled]);
   const routeHasScene = pathname === "/" || pathname.startsWith("/work/");
   const ready = pathname !== "/" || phase === "ready";
   if (!mounted || !routeHasScene) return null;
@@ -57,7 +57,7 @@ export function MateriaLayer() {
       style={{ opacity: ready ? 1 : 0 }}
     >
       <GraphicsBoundary>
-        {!enabled || reduced ? (
+        {!enabled ? (
           <StaticDNA />
         ) : (
           <CanvasScene
