@@ -16,6 +16,7 @@ updates:
       - dependency-name: 'react-dom'
         update-types:
           - version-update:semver-minor
+      - dependency-name: 'lucide-react'
       - dependency-name: '*vitest*'
         update-types:
           - version-update:semver-major
