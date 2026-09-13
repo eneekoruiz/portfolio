@@ -47,10 +47,10 @@ function AdaptiveDprGovernor({
     isMobile ? 0.86 : lowPower ? 1 : Math.min(maxDpr, 1.35),
   );
   const bounds = isMobile
-    ? { min: 0.65, max: 1 }
+    ? { min: 0.85, max: 1.25 }
     : lowPower
-      ? { min: 0.75, max: 1.15 }
-      : { min: 0.9, max: Math.min(maxDpr, 1.5) };
+      ? { min: 0.9, max: 1.5 }
+      : { min: 1, max: Math.min(maxDpr, 2) };
 
   useEffect(() => {
     currentDpr.current = Math.min(
@@ -139,15 +139,15 @@ export const CanvasScene: React.FC<CanvasSceneProps> = ({
         camera={camera}
         dpr={
           (isMobile
-            ? [0.75, 1]
+            ? [0.85, 1.25]
             : lowPower
-              ? [0.85, 1.15]
-              : [1, Math.min(maxDpr, 1.5)]) as [number, number]
+              ? [0.9, 1.5]
+              : [1, Math.min(maxDpr, 2)]) as [number, number]
         }
         frameloop={active ? "always" : "demand"}
         performance={{ min: lowPower ? 0.4 : 0.6 }}
         gl={{
-          antialias: !lowPower,
+          antialias: true,
           alpha: true,
           powerPreference: "high-performance",
           stencil: false,

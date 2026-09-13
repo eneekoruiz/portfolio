@@ -49,9 +49,9 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
       <div
         ref={cardRef}
         data-section-reveal
-        className="materia-surface relative overflow-hidden rounded-[28px] border border-ink/15 p-6 md:p-10 transition-colors duration-300"
+        className="materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 p-5 md:p-8 transition-colors duration-300"
       >
-        <div className="grid gap-8 border-b border-ink/15 pb-9 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+        <div className="grid gap-4 border-b border-ink/15 pb-6 md:grid-cols-[1.2fr_0.8fr] md:items-end">
           <p className="max-w-xl text-lg leading-relaxed tracking-tight text-lead md:text-2xl">
             {t.coP}
           </p>
@@ -65,7 +65,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
         </div>
         <a
           href={`mailto:${EMAIL}`}
-          className="my-9 block w-fit break-all text-[clamp(1.4rem,4.4vw,4.7rem)] font-bold leading-tight tracking-[-0.06em] text-ink underline decoration-brand/40 decoration-1 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+          className="my-6 block w-fit break-all text-[clamp(1.4rem,4.4vw,4.7rem)] font-bold leading-tight tracking-[-0.06em] text-ink underline decoration-brand/40 decoration-1 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
         >
           {EMAIL}
         </a>

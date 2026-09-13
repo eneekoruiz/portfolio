@@ -266,17 +266,17 @@ function SkillOrbit({
       ref={cardRef}
       data-section-reveal
       data-skill-card
-      className="materia-surface skill-orbit-card relative overflow-hidden rounded-[32px] border p-6 md:p-8"
+      className="materia-surface skill-orbit-card relative overflow-hidden rounded-[24px] border p-5 md:p-6"
       style={{ "--surface-color": category.c } as CSSProperties}
     >
       <header className="relative z-10 flex items-center gap-4">
         <span
-          className="skill-orbit-icon flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
+          className="skill-orbit-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]"
           aria-hidden="true"
         >
-          <category.I size={26} />
+          <category.I size={22} />
         </span>
-        <h3 className="text-xl font-black uppercase tracking-tight text-ink md:text-2xl">
+        <h3 className="text-lg font-black uppercase tracking-tight text-ink md:text-xl">
           {label}
         </h3>
         {motion && (
@@ -285,7 +285,7 @@ function SkillOrbit({
             onClick={() => setPaused((value) => !value)}
             aria-pressed={paused}
             aria-label={`${paused ? UI_COPY[lang].resume : UI_COPY[lang].pause} ${label}`}
-            className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ink/15 text-lead focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/15 text-lead focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
           >
             {paused ? <Play size={14} /> : <Pause size={14} />}
           </button>
@@ -296,13 +296,13 @@ function SkillOrbit({
         tabIndex={motion ? 0 : undefined}
         aria-label={label}
         aria-describedby={`orbit-help-${category.g.replace(/\W/g, "")}`}
-        className="skill-orbit mt-7 flex min-h-36 flex-wrap content-center justify-center gap-2 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+        className="skill-orbit mt-4 flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
       >
         {category.techs.map((tech) => (
           <li
             key={tech}
             data-orbit-pill
-            className="skill-orbit-pill rounded-2xl border px-4 py-2.5 text-xs font-bold text-ink"
+            className="skill-orbit-pill rounded-2xl border px-3 py-2 text-xs font-bold text-ink"
           >
             <span
               aria-hidden="true"
@@ -314,7 +314,7 @@ function SkillOrbit({
       </ul>
       <p
         id={`orbit-help-${category.g.replace(/\W/g, "")}`}
-        className="relative mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-lead"
+        className="relative mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-lead"
       >
         {motion
           ? UI_COPY[lang].orbitHelp

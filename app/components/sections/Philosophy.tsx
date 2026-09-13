@@ -26,16 +26,16 @@ function BentoCard({ item, index, motion }: BentoCardProps) {
       ref={ref}
       tabIndex={0}
       data-section-reveal
-      className={`materia-surface philosophy-card relative flex min-h-60 flex-col overflow-hidden rounded-[24px] border border-ink/15 p-6 md:p-8 ${[0, 3, 4].includes(index) ? "md:col-span-2" : ""} ${index === 0 || index === 4 ? "bg-brand/5" : "bg-page/75"}`}
+      className={`materia-surface philosophy-card relative flex min-h-40 flex-col overflow-hidden rounded-[24px] border border-ink/15 p-5 md:p-6 ${[0, 3, 4].includes(index) ? "md:col-span-2" : ""} ${index === 0 || index === 4 ? "bg-brand/5" : "bg-page/75"}`}
     >
       <div ref={visualRef} data-bento-visual className="relative z-10">
-        <div className="mb-10 flex items-center justify-between text-brand">
+        <div className="mb-6 flex items-center justify-between text-brand">
           <Icon size={22} strokeWidth={1.5} aria-hidden="true" />
           <span className="font-mono text-[10px] tracking-wider text-lead">
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
-        <h3 className="mb-3 text-2xl font-bold leading-tight tracking-[-0.04em] text-ink">
+        <h3 className="mb-3 text-xl font-bold leading-tight tracking-[-0.04em] text-ink md:text-2xl">
           {title}
         </h3>
         <p className="text-sm leading-relaxed text-lead">{description}</p>

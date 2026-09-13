@@ -49,14 +49,15 @@ export function About({ t }: { t: Tx }) {
     <SectionFrame id="about" index="02" label={t.abLb} title={t.abH}>
       <NetworkParticles />
       <div className="relative z-10 grid gap-10 lg:gap-14">
-        <div data-section-reveal>
-          <p className="max-w-3xl text-pretty text-[clamp(1.15rem,2.3vw,2rem)] font-medium leading-[1.5] tracking-[-0.025em] text-ink">
+        <div data-section-reveal className="relative">
+          <div className="absolute -inset-8 -z-10 bg-page/90 blur-2xl rounded-[3rem]" aria-hidden="true" />
+          <p className="max-w-3xl text-pretty text-[clamp(1.4rem,2.8vw,2.4rem)] font-medium leading-[1.5] tracking-[-0.025em] text-ink relative z-10">
             <MaskedCopy text={t.mf} enabled={motion} />
           </p>
           <Link
             ref={linkRef}
             href="/curriculum"
-            className="materia-button mt-8 border border-ink/20 bg-page/90 text-ink"
+            className="materia-button mt-8 relative z-10 border border-ink/20 bg-page/90 text-ink"
           >
             {t.ctaCv}
             <ArrowUpRight size={16} aria-hidden="true" />
