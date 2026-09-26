@@ -194,17 +194,17 @@ export function PremiumWorkRow({
       >
         <div
           ref={contentRef}
-          className="grid gap-4 px-4 pb-5 pt-2 md:grid-cols-[1fr_1.5fr] md:px-6 md:pb-6"
+          className="grid gap-4 px-4 pb-4 pt-1 md:grid-cols-[1fr_1.5fr] md:px-5 md:pb-5"
         >
           <div
             data-work-panel
-            className="work-lifecycle flex flex-col justify-between gap-7 rounded-2xl border p-5 md:p-7"
+            className="work-lifecycle flex flex-col justify-between gap-5 rounded-2xl border p-4 md:p-5"
           >
             <div>
-              <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.14em] text-lead">
+              <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.14em] text-lead">
                 {copy.lifecycle}
               </p>
-              <ol className="work-lifecycle-track flex flex-col gap-5">
+              <ol className="work-lifecycle-track flex flex-col gap-4">
                 {copy.stages.map((stage, i) => (
                   <li
                     key={stage}
@@ -246,7 +246,7 @@ export function PremiumWorkRow({
               onPointerCancel={() => onHoverProject(null)}
               target={theme.hasAudit ? undefined : "_blank"}
               rel={theme.hasAudit ? undefined : "noopener noreferrer"}
-              className="materia-button work-project-action w-fit bg-ink text-page"
+              className="materia-button work-project-action mt-4 w-fit bg-ink text-page !min-h-[40px] !py-2.5 !px-5"
             >
               {theme.hasAudit ? copy.explore : copy.source}
               {theme.hasAudit ? (
@@ -258,7 +258,7 @@ export function PremiumWorkRow({
           </div>
           <div
             data-work-panel
-            className="flex flex-col justify-between gap-7 rounded-2xl border border-ink/10 bg-page/80 p-5 md:p-7"
+            className="flex flex-col justify-between gap-5 rounded-2xl border border-ink/10 bg-page/80 p-4 md:p-5"
           >
             <div
               data-decision-lens

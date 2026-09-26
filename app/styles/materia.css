@@ -49,7 +49,7 @@
 .materia-surface.philosophy-card,
 #about .materia-surface,
 #contact > .materia-surface {
-  background: color-mix(in srgb, var(--page) 84%, transparent);
+  background: color-mix(in srgb, var(--page) 50%, transparent);
 }
 .materia-button {
   display: inline-flex;
@@ -74,6 +74,8 @@
   --surface-energy: 0;
   isolation: isolate;
   background: color-mix(in srgb, var(--page) 24%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 .materia-surface::before {
   content: "";
@@ -96,7 +98,7 @@
       color-mix(in srgb, var(--surface-color) 9%, transparent),
       transparent 65%
     ),
-    color-mix(in srgb, var(--page) 70%, transparent);
+    color-mix(in srgb, var(--page) 45%, transparent);
   box-shadow: 0 20px 55px -45px var(--surface-color);
 }
 .work-surface::after {
@@ -338,7 +340,7 @@ html[data-umbral]::view-transition-new(project-surface) {
       color-mix(in srgb, var(--surface-color) 15%, transparent),
       transparent 75%
     ),
-    color-mix(in srgb, var(--page) 88%, transparent);
+    color-mix(in srgb, var(--page) 45%, transparent);
   box-shadow: 0 20px 55px -35px
     color-mix(in srgb, var(--surface-color) 60%, transparent);
 }
@@ -393,6 +395,8 @@ html[data-umbral]::view-transition-new(project-surface) {
 }
 html[data-lite="1"] .materia-surface {
   background: var(--page);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 @media print {
   .materia-canvas,

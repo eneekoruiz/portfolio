@@ -37,8 +37,9 @@ export function MaskedCopy({
           return;
         }
         spring.target = 1;
+        const progress = spring.step(delta / 1000);
         words[index].style.transform =
-          `translate3d(0,${(1 - spring.step(delta / 1000)) * 110}%,0)`;
+          `translate3d(0,${(1 - progress) * 110}%,0) skewY(${(1 - progress) * 8}deg)`;
         if (!spring.settled) settled = false;
       });
       if (settled) finish();
