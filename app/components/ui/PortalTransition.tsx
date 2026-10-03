@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
+import { getMotionSnapshot } from "../../lib/motion-store";
 
 type PortalOrigin = { x: number; y: number };
 
@@ -36,9 +37,8 @@ export function PortalTransition() {
   useEffect(() => {
     if (!active || !pendingUrl) return;
 
-    const motionEnabled =
-      localStorage.getItem("portfolio-motion-enabled") !== "false";
-    const duration = motionEnabled ? 0.95 : 0.24;
+    const motionEnabled = getMotionSnapshot().enabled;
+    const duration = motionEnabled ? 0.28 : 0;
     const navigate = () => {
       if (pendingUrl.startsWith("/") && !pendingUrl.startsWith("//")) {
         router.push(pendingUrl);

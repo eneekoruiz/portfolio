@@ -8,7 +8,7 @@ import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useSpringHover } from "../../hooks/useSpringHover";
 import { SectionFrame } from "./SectionFrame";
-import { NetworkParticles } from "../motion/Particles";
+
 import { MaskedCopy } from "../motion/MaskedCopy";
 import { useSpringTilt } from "../../hooks/useSpringTilt";
 
@@ -16,9 +16,10 @@ interface MetricCardProps {
   value: string;
   label: string;
   motion: boolean;
+  className?: string;
 }
 
-function MetricCard({ value, label, motion }: MetricCardProps) {
+function MetricCard({ value, label, motion, className = "" }: MetricCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
   useMateriaSurface(ref, "#0066ff", motion, 20);
@@ -27,13 +28,13 @@ function MetricCard({ value, label, motion }: MetricCardProps) {
   return (
     <div
       ref={ref}
-      className="materia-surface relative overflow-hidden rounded-[20px] border border-ink/15 p-6 transition-colors duration-300"
+      className={`materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 p-6 md:p-8 transition-colors duration-300 flex flex-col justify-end ${className}`}
     >
       <div ref={visualRef} data-metric-visual>
-        <dt className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-lead">
+        <dt className="mb-4 font-mono text-[10px] uppercase tracking-[0.15em] text-lead">
           {label}
         </dt>
-        <dd className="text-5xl font-black leading-none tracking-[-0.07em] text-ink">
+        <dd className="text-4xl md:text-5xl lg:text-6xl font-black leading-none tracking-[-0.07em] text-ink">
           {value}
         </dd>
       </div>
@@ -47,32 +48,41 @@ export function About({ t }: { t: Tx }) {
 
   return (
     <SectionFrame id="about" index="02" label={t.abLb} title={t.abH}>
-      <NetworkParticles />
-      <div className="relative z-10 grid gap-10 lg:gap-14">
-        <div data-section-reveal className="relative">
-          <div className="absolute -inset-8 -z-10 bg-page/90 blur-2xl rounded-[3rem]" aria-hidden="true" />
-          <p className="max-w-3xl text-pretty text-[clamp(1.4rem,2.8vw,2.4rem)] font-medium leading-[1.5] tracking-[-0.025em] text-ink relative z-10">
-            <MaskedCopy text={t.mf} enabled={motion} />
-          </p>
-          <Link
-            ref={linkRef}
-            href="/curriculum"
-            className="materia-button mt-8 relative z-10 border border-ink/20 bg-page/90 text-ink"
-          >
-            {t.ctaCv}
-            <ArrowUpRight size={16} aria-hidden="true" />
-          </Link>
+      <div className="relative z-10">
+        <div data-section-reveal className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-5">
+          <div className="col-span-2 md:col-span-2 row-span-2 materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 p-6 md:p-8 lg:p-10 bg-page/40 flex flex-col justify-between">
+            <p className="text-pretty text-[clamp(1.2rem,2vw,2rem)] font-medium leading-[1.4] tracking-[-0.025em] text-ink relative z-10 mb-10">
+              <MaskedCopy text={t.mf} enabled={motion} />
+            </p>
+            <Link
+              ref={linkRef}
+              href="/curriculum"
+              className="materia-button w-fit relative z-10 border border-ink/20 bg-ink text-page !min-h-[44px] !px-6"
+            >
+              {t.ctaCv}
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          
+          <MetricCard
+            value={t.metrics[0][0]}
+            label={t.metrics[0][1]}
+            motion={motion}
+            className="col-span-2 md:col-span-1 aspect-square md:aspect-auto"
+          />
+          <MetricCard
+            value={t.metrics[1][0]}
+            label={t.metrics[1][1]}
+            motion={motion}
+            className="col-span-2 md:col-span-1 aspect-square md:aspect-auto"
+          />
+          <MetricCard
+            value={t.metrics[2][0]}
+            label={t.metrics[2][1]}
+            motion={motion}
+            className="col-span-2 md:col-span-2"
+          />
         </div>
-        <dl data-section-reveal className="grid gap-4 sm:grid-cols-3">
-          {t.metrics.map(([value, label]) => (
-            <MetricCard
-              key={label}
-              value={value}
-              label={label}
-              motion={motion}
-            />
-          ))}
-        </dl>
       </div>
     </SectionFrame>
   );

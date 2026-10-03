@@ -16,7 +16,7 @@ export function ReadingNav({
   lang: Lang;
 }) {
   const motion = useMotionEnabled();
-  const chapters = [0, 1, 3, 2, 4, 5].map((i) => ({
+  const chapters = [0, 2, 3, 1, 4, 5].map((i) => ({
     href: t.hrefs[i],
     label: t.menu[i],
   }));

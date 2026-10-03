@@ -113,10 +113,10 @@ export function Navbar({
             className="nav-ind absolute top-0 left-0 h-9 bg-black/5 dark:bg-white/10 rounded-full opacity-0"
             aria-hidden="true"
           />
-          {t.menu.map((link: string, i: number) => (
+          {[0, 2, 3, 1, 4, 5].map((i) => (
             <NavItem
-              key={link}
-              link={link}
+              key={t.hrefs[i]}
+              link={t.menu[i]}
               href={t.hrefs[i]}
               onEnter={onNavEnter}
             />

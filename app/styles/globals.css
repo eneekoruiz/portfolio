@@ -1085,3 +1085,8 @@ html {
     opacity: 0.12 !important;
   }
 }
+
+@media (pointer: fine) {
+  body:hover { cursor: none; }
+  a:hover, button:hover { cursor: none; }
+}

@@ -217,8 +217,8 @@
   border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
   box-shadow: 0 24px 48px -24px
     color-mix(in srgb, var(--brand) 28%, transparent);
-  transform: perspective(900px) rotateX(var(--hero-tilt-x, 0deg))
-    rotateY(var(--hero-tilt-y, 0deg));
+  transform: translateY(-50%) perspective(900px)
+    rotateX(var(--hero-tilt-x, 0deg)) rotateY(var(--hero-tilt-y, 0deg));
 }
 .hero-portrait {
   aspect-ratio: 1;
@@ -625,5 +625,85 @@ html[dir="rtl"] .hero-prism {
 @media (pointer: coarse) {
   .language-panel {
     --tw-enter-scale: 1;
+  }
+}
+
+/* Decorative layers are clipped and subordinate to the reading surface. */
+.materia-canvas {
+  contain: strict;
+  opacity: 0.4 !important;
+  transition: opacity 240ms ease;
+}
+.materia-canvas[data-scene-active="false"] {
+  opacity: 0.13 !important;
+}
+.materia-surface {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.work-surface,
+.skill-orbit-card {
+  background-color: color-mix(in srgb, var(--page) 92%, transparent);
+}
+#about .materia-surface,
+#contact > .materia-surface,
+.materia-surface.philosophy-card {
+  background: color-mix(in srgb, var(--page) 94%, transparent);
+}
+.hero-prism {
+  background-color: color-mix(in srgb, var(--page) 70%, transparent);
+}
+.hero-portrait-frame {
+  max-height: calc(100% - 8rem);
+}
+#hero > div:first-of-type + div {
+  flex-wrap: wrap;
+}
+html {
+  overflow-x: clip;
+}
+@media (max-width: 767px) {
+  .materia-canvas {
+    opacity: 0.18 !important;
+  }
+  .glass-hud {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: color-mix(in srgb, var(--page) 97%, transparent);
+  }
+  .skill-orbit-card {
+    padding: 1.25rem;
+  }
+}
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation: none !important;
+  transition-duration: 0s !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body::after {
+  animation: none !important;
+}
+
+@media (max-width: 767px) {
+  .glass-hud,
+  .dark .glass-hud {
+    background: var(--page);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .reading-nav {
+    background: var(--page);
   }
 }

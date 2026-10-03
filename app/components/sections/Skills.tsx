@@ -34,7 +34,7 @@ function SkillOrbit({
 
   useEffect(() => {
     const orbit = orbitRef.current;
-    if (!orbit || !motion) return;
+    if (!orbit || !motion || paused) return;
     const items = Array.from(
       orbit.querySelectorAll<HTMLElement>("[data-orbit-pill]"),
     );
@@ -259,7 +259,7 @@ function SkillOrbit({
       document.removeEventListener("visibilitychange", wake);
       window.removeEventListener("blur", cancel);
     };
-  }, [motion, category.techs]);
+  }, [motion, category.techs, paused]);
 
   return (
     <article
@@ -269,6 +269,9 @@ function SkillOrbit({
       className="materia-surface skill-orbit-card relative overflow-hidden rounded-[24px] border p-5 md:p-6"
       style={{ "--surface-color": category.c } as CSSProperties}
     >
+      <div data-debug style={{position:"absolute", zIndex:999, background:"red", color:"white"}}>
+        motion: {String(motion)}, paused: {String(paused)}
+      </div>
       <header className="relative z-10 flex items-center gap-4">
         <span
           className="skill-orbit-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]"
@@ -293,7 +296,7 @@ function SkillOrbit({
       </header>
       <ul
         ref={orbitRef}
-        tabIndex={motion ? 0 : undefined}
+        tabIndex={motion && !paused ? 0 : undefined}
         aria-label={label}
         aria-describedby={`orbit-help-${category.g.replace(/\W/g, "")}`}
         className="skill-orbit mt-4 flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
@@ -314,9 +317,9 @@ function SkillOrbit({
       </ul>
       <p
         id={`orbit-help-${category.g.replace(/\W/g, "")}`}
-        className="relative mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-lead"
+        className="relative mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-lead"
       >
-        {motion
+        {motion && !paused
           ? UI_COPY[lang].orbitHelp
           : `${UI_COPY[lang].technologies}: ${category.techs.length}`}
       </p>
@@ -327,7 +330,7 @@ function SkillOrbit({
 export function Skills({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const motion = useMotionEnabled();
   return (
-    <SectionFrame id="skills" index="01" label={t.skLb} title={t.skH}>
+    <SectionFrame id="skills" index="03" label={t.skLb} title={t.skH}>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-7">
         {SKILLS.map((category, index) => (
           <div

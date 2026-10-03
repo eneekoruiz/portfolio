@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { Play, Pause } from "lucide-react";
 import { useSound } from "../../hooks/useSound";
 import { useTranslations } from "../../hooks/useTranslations";
@@ -11,19 +12,12 @@ export function MotionToggle() {
   const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { playClick } = useSound();
   const [mounted, setMounted] = useState(false);
-  const [enabled, setEnabled] = useState(true);
+  const enabled = useMotionEnabled();
   const [isAnimating, setIsAnimating] = useState(false);
   const button = useSpringHover<HTMLButtonElement>(enabled, 8);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined") {
-      try {
-        setEnabled(
-          localStorage.getItem("portfolio-motion-enabled") !== "false",
-        );
-      } catch {}
-    }
     return () => {
       if (pulseTimer.current) clearTimeout(pulseTimer.current);
     };
@@ -31,7 +25,7 @@ export function MotionToggle() {
 
   const handleToggle = () => {
     const nextState = !enabled;
-    setEnabled(nextState);
+
     playClick();
 
     if (typeof window !== "undefined") {

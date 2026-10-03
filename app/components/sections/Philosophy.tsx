@@ -6,7 +6,6 @@ import { SectionFrame } from "./SectionFrame";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { useSpringTilt } from "../../hooks/useSpringTilt";
-import { NetworkParticles } from "../motion/Particles";
 
 interface BentoCardProps {
   item: Tx["vals"][number];
@@ -50,7 +49,7 @@ export function Philosophy({ t }: { t: Tx }) {
   return (
     <SectionFrame id="values" index="04" label={t.valLb} title={t.valH}>
       <span id="philosophy" className="absolute top-0" aria-hidden="true" />
-      <NetworkParticles />
+
       <div className="relative z-10 grid gap-4 md:grid-cols-3">
         {t.vals.map((item, index) => (
           <BentoCard key={item.t} item={item} index={index} motion={motion} />

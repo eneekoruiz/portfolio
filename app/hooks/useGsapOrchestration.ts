@@ -16,8 +16,6 @@ export function useGsapOrchestration(
   // Preset entrance properties to avoid layout shifts on first render
   useLayoutEffect(() => {
     if (!ready || motionPaused) return;
-    if (document.querySelectorAll(".n-el").length > 0)
-      gsap.set(".n-el", { opacity: 0, y: -14 });
     if (document.querySelectorAll(".h-ln").length > 0)
       gsap.set(".h-ln", { yPercent: 115 });
     if (document.querySelectorAll(".h-fd").length > 0)
@@ -82,7 +80,7 @@ export function useGsapOrchestration(
 
       // Dynamic intro stagger timeline
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      const hasNel = document.querySelectorAll(".n-el").length > 0;
+      const hasNel = false;
       const hasHln = document.querySelectorAll(".h-ln").length > 0;
       const hasHfd = document.querySelectorAll(".h-fd").length > 0;
       const hasMemoji = document.querySelectorAll(".memoji").length > 0;
@@ -131,6 +129,10 @@ export function useGsapOrchestration(
         }
       }
     },
-    { scope: mainRef, dependencies: [ready, motionPaused] },
+    {
+      scope: mainRef,
+      dependencies: [ready, motionPaused],
+      revertOnUpdate: true,
+    },
   );
 }

@@ -30,6 +30,11 @@ test.beforeEach(async ({ page }) => {
 test("technology cards keep moving pills, pause without jumping and support drag", async ({
   page,
 }, info) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("portfolio-motion-enabled", "true");
+    Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
+    Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
+  });
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();
   await card.scrollIntoViewIfNeeded();
@@ -46,7 +51,9 @@ test("technology cards keep moving pills, pause without jumping and support drag
     .poll(async () => {
       const first = await pill.getAttribute("style");
       await page.waitForTimeout(120);
-      return (await pill.getAttribute("style")) === first;
+      const second = await pill.getAttribute("style");
+      if (first !== second) console.log("MISMATCH:", first, "!==", second);
+      return second === first;
     })
     .toBe(true);
   const paused = await pill.getAttribute("style");
@@ -64,6 +71,9 @@ test("technology cards keep moving pills, pause without jumping and support drag
 test("hero unveils on touch and pointer letters recover after interrupted hover", async ({
   page,
 }, info) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("portfolio-motion-enabled", "true"),
+  );
   await page.goto("/");
   await expect
     .poll(() => page.evaluate(() => window.__kineticMotionSeen))
@@ -82,15 +92,15 @@ test("hero unveils on touch and pointer letters recover after interrupted hover"
   await page.screenshot({ path: info.outputPath("hero-identity.png") });
 });
 
-test("lite mode retains rendered DNA and reduced motion retains a static silhouette", async ({
+test("lite mode and reduced motion retain a static silhouette", async ({
   page,
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/?lite=1");
-  await expect(
-    page.locator('canvas[data-materia-renderer="direct"]'),
-  ).toBeVisible();
+  await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
+  await expect(page.locator("[data-dna-static]")).toBeVisible();
+  await page.goto("/");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
   await expect(page.locator("[data-dna-static]")).toBeVisible();
@@ -107,6 +117,11 @@ test("project opens into a reversible 3D studio scroll journey", async ({
 }, info) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    localStorage.setItem("portfolio-motion-enabled", "true");
+    Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
+    Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
+  });
   await page.goto("/");
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
   await row.locator("button[aria-expanded]").click();
@@ -159,6 +174,9 @@ test("project opens into a reversible 3D studio scroll journey", async ({
 test("restored philosophy navigation, particles and contact card springs", async ({
   page,
 }, info) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("portfolio-motion-enabled", "true"),
+  );
   await page.goto("/");
   await expect(page.locator('a[href="#values"]').first()).toHaveCount(1);
   const values = page.locator("#values");

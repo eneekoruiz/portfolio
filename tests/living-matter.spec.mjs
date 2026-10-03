@@ -23,6 +23,9 @@ test.beforeEach(async ({ page }) => {
 test("wheel and keyboard explore paused technology orbits without trapping page scroll", async ({
   page,
 }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("portfolio-motion-enabled", "true"),
+  );
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();
   await card.scrollIntoViewIfNeeded();
@@ -123,13 +126,26 @@ test("helix signal compiles in both render profiles and motion preferences relea
     if (message.type() === "error") errors.push(message.text());
   });
   await page.goto("/");
-  await expect(page.locator("canvas[data-materia-renderer]")).toBeVisible();
-  await expect
-    .poll(() => page.evaluate(() => window.__helixShaders.length))
-    .toBeGreaterThan(0);
-  expect(await page.evaluate(() => window.__helixShaders.every(Boolean))).toBe(
-    true,
-  );
+  const motionState = await page.evaluate(() => {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const touch = matchMedia(
+      "(hover: none), (pointer: coarse), (max-width: 767px)",
+    ).matches;
+    return { reduced, lightweight: touch };
+  });
+
+  if (!motionState.reduced && !motionState.lightweight) {
+    await expect(page.locator("canvas[data-materia-renderer]")).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => window.__helixShaders.length))
+      .toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.__helixShaders.every(Boolean))).toBe(
+      true,
+    );
+  } else {
+    await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
+    await expect(page.locator("[data-dna-static]")).toBeVisible();
+  }
   await page.screenshot({ path: info.outputPath("living-dna.png") });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);

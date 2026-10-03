@@ -1,174 +1,100 @@
 "use client";
-
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useRef, useState } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OpticalCompositor } from "./OpticalCompositor";
 
-interface CanvasSceneProps {
-  accent: string;
-  secondary: string;
-  darkMode: boolean;
-  paused?: boolean;
-}
-
-const getDeviceProfile = () => {
-  if (typeof window === "undefined") {
-    return { isMobile: false, lowPower: false, maxDpr: 1 };
-  }
-
-  const nav = navigator as Navigator & { deviceMemory?: number };
-  const cores = nav.hardwareConcurrency || 4;
-  const memory = nav.deviceMemory || 4;
-  const isMobile = window.matchMedia(
-    "(max-width: 768px), (hover: none), (pointer: coarse)",
-  ).matches;
-  const lite = (window as Window).__LITE === true;
-  const lowPower = lite || isMobile || cores <= 4 || memory <= 4;
-  const maxDpr = Math.min(window.devicePixelRatio || 1, 2);
-
-  return { isMobile, lowPower, maxDpr };
-};
-
-function AdaptiveDprGovernor({
+/** A decorative scene gets at most 30 frames/s, even on 120/144 Hz screens. */
+function FrameBudget({
   active,
-  lowPower,
-  isMobile,
-  maxDpr,
+  onSlow,
 }: {
   active: boolean;
-  lowPower: boolean;
-  isMobile: boolean;
-  maxDpr: number;
+  onSlow: () => void;
 }) {
-  const { setDpr } = useThree();
-  const frameCount = useRef(0);
-  const lastCheck = useRef(0);
-  const currentDpr = useRef(
-    isMobile ? 0.86 : lowPower ? 1 : Math.min(maxDpr, 1.35),
-  );
-  const bounds = isMobile
-    ? { min: 0.85, max: 1.25 }
-    : lowPower
-      ? { min: 0.9, max: 1.5 }
-      : { min: 1, max: Math.min(maxDpr, 2) };
-
+  const { invalidate } = useThree();
   useEffect(() => {
-    currentDpr.current = Math.min(
-      bounds.max,
-      Math.max(bounds.min, currentDpr.current),
-    );
-    setDpr(currentDpr.current);
-  }, [bounds.max, bounds.min, setDpr]);
-
-  useFrame((state) => {
     if (!active) return;
-    frameCount.current += 1;
-    const now = state.clock.elapsedTime;
-    if (lastCheck.current === 0) {
-      lastCheck.current = now;
-      return;
-    }
-
-    const elapsed = now - lastCheck.current;
-    if (elapsed < 2) return;
-
-    const fps = frameCount.current / elapsed;
-    frameCount.current = 0;
-    lastCheck.current = now;
-
-    if (fps < 48 && currentDpr.current > bounds.min) {
-      currentDpr.current = Math.max(bounds.min, currentDpr.current - 0.12);
-      setDpr(currentDpr.current);
-    } else if (fps > 58 && currentDpr.current < bounds.max) {
-      currentDpr.current = Math.min(bounds.max, currentDpr.current + 0.06);
-      setDpr(currentDpr.current);
-    }
-  });
-
+    let frame = 0,
+      last = 0,
+      count = 0,
+      start = performance.now(),
+      slowWindows = 0;
+    const tick = (now: number) => {
+      if (now - last >= 1000 / 30 - 1) {
+        last = now;
+        count++;
+        invalidate();
+      }
+      if (now - start > 2500) {
+        if (count / ((now - start) / 1000) < 18) slowWindows++;
+        else slowWindows = 0;
+        count = 0;
+        start = now;
+        if (slowWindows >= 2) {
+          onSlow();
+          return;
+        }
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [active, invalidate, onSlow]);
   return null;
 }
-
-export const CanvasScene: React.FC<CanvasSceneProps> = ({
+export function CanvasScene({
   accent,
   secondary,
   darkMode,
   paused = false,
-}) => {
-  const hostRef = useRef<HTMLDivElement>(null);
+  onSlow,
+}: {
+  accent: string;
+  secondary: string;
+  darkMode: boolean;
+  paused?: boolean;
+  onSlow: () => void;
+}) {
+  const [visible, setVisible] = useState(true);
   const [inView, setInView] = useState(false);
-  const [pageVisible, setPageVisible] = useState(true);
-  const { isMobile, lowPower, maxDpr } = useMemo(() => getDeviceProfile(), []);
-
+  const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
-
-    if (!("IntersectionObserver" in window)) {
-      setInView(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { rootMargin: lowPower ? "40px" : "120px", threshold: 0.01 },
+    const update = () => setVisible(document.visibilityState === "visible");
+    update();
+    document.addEventListener("visibilitychange", update);
+    const observer = new IntersectionObserver(([entry]) =>
+      setInView(entry.isIntersecting),
     );
-
-    observer.observe(host);
-    return () => observer.disconnect();
-  }, [lowPower]);
-
-  useEffect(() => {
-    const updateVisibility = () => {
-      setPageVisible(document.visibilityState === "visible");
+    if (host.current) observer.observe(host.current);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
     };
-
-    updateVisibility();
-    document.addEventListener("visibilitychange", updateVisibility);
-    return () =>
-      document.removeEventListener("visibilitychange", updateVisibility);
   }, []);
-
-  const active = inView && pageVisible && !paused;
-  const camera = isMobile
-    ? { position: [0, 0.6, 19] as [number, number, number], fov: 48 }
-    : { position: [0, 1.2, 16] as [number, number, number], fov: 42 };
-
+  const active = visible && inView && !paused;
   return (
-    <div ref={hostRef} className="h-full w-full">
+    <div ref={host} className="h-full w-full">
       <Canvas
-        camera={camera}
-        dpr={
-          (isMobile
-            ? [0.85, 1.25]
-            : lowPower
-              ? [0.9, 1.5]
-              : [1, Math.min(maxDpr, 2)]) as [number, number]
-        }
-        frameloop={active ? "always" : "demand"}
-        performance={{ min: lowPower ? 0.4 : 0.6 }}
+        camera={{ position: [0, 1.2, 16], fov: 42 }}
+        dpr={[1, 1.25]}
+        frameloop="demand"
         gl={{
-          antialias: true,
+          antialias: false,
           alpha: true,
-          powerPreference: "high-performance",
+          powerPreference: "low-power",
           stencil: false,
-          depth: true,
         }}
       >
-        <AdaptiveDprGovernor
-          active={active}
-          lowPower={lowPower}
-          isMobile={isMobile}
-          maxDpr={maxDpr}
-        />
+        <FrameBudget active={active} onSlow={onSlow} />
         <OpticalCompositor
           accent={accent}
           secondary={secondary}
           darkMode={darkMode}
           active={active}
-          lowPower={lowPower}
-          isMobile={isMobile}
+          lowPower={false}
+          isMobile={false}
         />
       </Canvas>
     </div>
   );
-};
+}

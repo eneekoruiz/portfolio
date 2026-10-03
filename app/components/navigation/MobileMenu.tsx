@@ -66,14 +66,14 @@ export function MobileMenu({
           {UI_COPY[lang].navigation}
         </h2>
         <nav className="flex flex-col gap-4">
-          {t.menu.map((link: string, i: number) => (
+          {[0, 2, 3, 1, 4, 5].map((i) => (
             <a
-              key={link}
+              key={t.hrefs[i]}
               href={t.hrefs[i]}
               onClick={() => setMenu(false)}
               className="font-black text-[2.2rem] tracking-tight text-ink no-underline block active:text-brand"
             >
-              {link}
+              {t.menu[i]}
             </a>
           ))}
         </nav>

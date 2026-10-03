@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { UI_COPY } from "../../../data/interface-translations";
 import { TX } from "../../../data/translations";
@@ -77,25 +77,11 @@ export function PremiumWorkRow({
   useProjectTension(rowRef, enabled, isExpanded, idx);
   useSpringAccordion(bodyRef, contentRef, isExpanded, enabled, skipAnimation);
   const prefetch = () => {
-    if (theme.hasAudit && !prefetched.current) {
+    if (theme.hasAudit && enabled && !prefetched.current) {
       prefetched.current = true;
       router.prefetch(`/work/${safeId}`);
     }
   };
-  useEffect(() => {
-    if (!theme.hasAudit || !rowRef.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting || prefetched.current) return;
-        prefetched.current = true;
-        router.prefetch(`/work/${safeId}`);
-        observer.disconnect();
-      },
-      { rootMargin: "240px" },
-    );
-    observer.observe(rowRef.current);
-    return () => observer.disconnect();
-  }, [router, safeId, theme.hasAudit]);
   const handleNavigate = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (
       event.button !== 0 ||
@@ -162,10 +148,11 @@ export function PremiumWorkRow({
             data-project-title
             className="work-project-title text-balance break-words text-[clamp(1.65rem,4vw,4.2rem)] font-bold capitalize leading-[1.04] tracking-[-0.055em]"
           >
-            {safeId === "ana-peluquera"
-              ? "AG Beauty Salon"
-              : proj.name.replace(/[-_]/g, " ")}
+            {content?.title ?? proj.name.replace(/[-_]/g, " ")}
           </h3>
+          <p className="mt-4 max-w-lg text-sm font-normal leading-relaxed tracking-normal text-lead line-clamp-3">
+            {content?.objective ?? proj.desc}
+          </p>
         </div>
         <div
           className="order-4 col-span-3 mt-3 min-w-0 md:order-3 md:col-span-1 md:mt-0"

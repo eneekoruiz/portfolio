@@ -18,6 +18,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
+import { useMotionEnabled } from "./useMotionEnabled";
 
 interface MagneticOptions {
   /** Strength of the attraction (0–1). Default: 0.35 */
@@ -41,10 +42,11 @@ export function useMagnetic<T extends HTMLElement>(
   } = options;
 
   const ref = useRef<T>(null);
+  const enabled = useMotionEnabled();
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || !enabled) return;
 
     // Only on devices with a precise pointer (mouse)
     if (!window.matchMedia("(pointer: fine)").matches) return;
@@ -109,7 +111,7 @@ export function useMagnetic<T extends HTMLElement>(
       gsap.set(el, { x: 0, y: 0 });
       if (inner) gsap.set(inner, { x: 0, y: 0 });
     };
-  }, [strength, innerStrength, range, returnDuration]);
+  }, [enabled, strength, innerStrength, range, returnDuration]);
 
   return ref;
 }

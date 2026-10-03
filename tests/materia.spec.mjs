@@ -31,14 +31,21 @@ async function home(page) {
   await page.goto("/");
   await expect(page.locator("#main-content")).toBeVisible();
   await expect(page.locator("#hero h1")).toHaveText("EnekoEnekoRuiz.Ruiz.");
-  if (
-    !(await page.evaluate(
-      () => matchMedia("(prefers-reduced-motion: reduce)").matches,
-    ))
-  ) {
+  const motionState = await page.evaluate(() => {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const touch = matchMedia(
+      "(hover: none), (pointer: coarse), (max-width: 767px)",
+    ).matches;
+    const memory = navigator.deviceMemory;
+    const lightweight = touch || (memory !== undefined && memory <= 4);
+    return { reduced, lightweight };
+  });
+  if (!motionState.reduced && !motionState.lightweight) {
     await expect(
       page.locator(".materia-canvas canvas[data-materia-renderer]"),
     ).toBeVisible();
+  } else {
+    await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   }
 }
 

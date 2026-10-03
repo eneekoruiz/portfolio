@@ -6,9 +6,11 @@ import "./styles/materia.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";
-import { InfallibleCursor } from "./components/motion/InfallibleCursor";
+
 import { MateriaLayer } from "./components/motion/MateriaLayer";
 import { UmbralProvider } from "./components/motion/UmbralProvider";
+import { CustomCursor } from "./components/ui/CustomCursor";
+import { NoiseOverlay } from "./components/ui/NoiseOverlay";
 import { baseMetadata, jsonLd } from "./lib/metadata";
 
 export const metadata = baseMetadata;
@@ -26,6 +28,13 @@ export default async function RootLayout({
       <head>
         <meta name="theme-color" content="#f5f5f7" />
         <meta name="color-scheme" content="light dark" />
+        <link
+          rel="preload"
+          href="/fonts/roboto-flex-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <link
           rel="preconnect"
           href="https://eneko-ruiz-curriculum.vercel.app"
@@ -122,9 +131,11 @@ export default async function RootLayout({
           enableSystem={true}
           nonce={nonce}
         >
+          <NoiseOverlay />
+          <CustomCursor />
           <SmoothScroll />
           <EasterEgg />
-          <InfallibleCursor />
+
           <IntroProvider>
             <MateriaLayer />
             <UmbralProvider>{children}</UmbralProvider>

@@ -95,6 +95,7 @@ async function enrichRepoLanguages(
     const langRes = await fetch(repo.languages_url, {
       headers,
       next: { revalidate: CACHE_TTL },
+      signal: AbortSignal.timeout(4500),
     });
     if (langRes.ok) {
       const langData: Record<string, number> = await langRes.json();
@@ -113,6 +114,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { sort, direction, perPage } = validated;
+  const summary = request.nextUrl.searchParams.get("summary") === "1";
 
   const cleanParams = new URLSearchParams({
     sort,
@@ -135,6 +137,7 @@ export async function GET(request: NextRequest) {
     const res = await fetch(endpoint, {
       headers: requestHeaders,
       next: { revalidate: CACHE_TTL },
+      signal: AbortSignal.timeout(4500),
     });
 
     // Handle Rate Limiting (403/429)
@@ -169,16 +172,30 @@ export async function GET(request: NextRequest) {
     const repos: GitHubRepo[] = await res.json();
 
     // Parallel Enrichment (Hardened)
-    const enrichedRepos = await Promise.all(
-      repos
-        .filter((r) => !r.fork)
-        .slice(0, 8)
-        .map((repo) => enrichRepoLanguages(repo, requestHeaders)),
-    );
+    const enrichedRepos = summary
+      ? []
+      : await Promise.all(
+          repos
+            .filter((r) => !r.fork)
+            .slice(0, 8)
+            .map((repo) => enrichRepoLanguages(repo, requestHeaders)),
+        );
 
     const finalData = repos.map((r) => {
       const enriched = enrichedRepos.find((er) => er.id === r.id);
-      return enriched ?? r;
+      if (!summary) return enriched ?? r;
+      return {
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        html_url: r.html_url,
+        language: r.language,
+        pushed_at: r.pushed_at,
+        fork: r.fork,
+        size: r.size,
+        stargazers_count: r.stargazers_count,
+        languages_url: r.languages_url,
+      };
     });
 
     return NextResponse.json(finalData, {

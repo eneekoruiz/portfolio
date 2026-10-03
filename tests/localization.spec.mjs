@@ -46,7 +46,7 @@ test("all 20 languages reach project descriptions, technology labels, contact an
     );
     await expect(page.locator("[data-motion-toggle]")).toHaveAttribute(
       "aria-label",
-      UI_COPY[lang].motionPause,
+      UI_COPY[lang].motionResume,
     );
     await expect(page.locator("[data-skill-card] h3")).toHaveText(
       TX[lang].skCats,
@@ -64,9 +64,11 @@ test("all 20 languages reach project descriptions, technology labels, contact an
       row.getByRole("link", { name: UI_COPY[lang].explore, exact: true }),
     ).toBeVisible();
     await expect(
-      row.getByText(PROJECTS_CONTENT["ana-peluquera"][lang].objective, {
-        exact: true,
-      }),
+      row
+        .locator("[data-lens-panel]")
+        .getByText(PROJECTS_CONTENT["ana-peluquera"][lang].objective, {
+          exact: true,
+        }),
     ).toBeVisible();
     await expect(
       page.locator("#contact").getByRole("link", { name: UI_COPY[lang].email }),
@@ -256,6 +258,10 @@ test("touch reading map moves between chapters without hiding the contact route"
     .click();
   const map = page.locator("[data-reading-nav]");
   await expect(map).toBeVisible();
+  await expect(map).toContainText("02 / 06");
+  await map.locator('a[href="#about"]').click();
+  await expect(map).toContainText("03 / 06");
+  await map.locator('a[href="#skills"]').click();
   await expect(map).toContainText("04 / 06");
   await map.locator('a[href="#values"]').click();
   await expect(map).toContainText("05 / 06");

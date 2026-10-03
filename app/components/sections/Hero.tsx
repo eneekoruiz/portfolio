@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { LiveStatus } from "../ui/LiveStatus";
 import { KineticText } from "../motion/KineticText";
+import { FloatingNodes } from "../motion/FloatingNodes";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
@@ -29,10 +30,23 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
     const video = portraitRef.current;
     if (!video) return;
     let visible = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const update = () => {
-      if (enabled && visible && document.visibilityState === "visible")
-        void video.play().catch(() => {});
-      else video.pause();
+      if (enabled && visible && document.visibilityState === "visible") {
+        if (!video.getAttribute("src")) {
+          if (!timer)
+            timer = setTimeout(() => {
+              timer = undefined;
+              video.src = "/memoji.webm";
+              video.load();
+              void video.play().catch(() => {});
+            }, 800);
+        } else void video.play().catch(() => {});
+      } else {
+        clearTimeout(timer);
+        timer = undefined;
+        video.pause();
+      }
     };
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -42,6 +56,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
     document.addEventListener("visibilitychange", update);
     update();
     return () => {
+      clearTimeout(timer);
       observer.disconnect();
       document.removeEventListener("visibilitychange", update);
       video.pause();
@@ -54,7 +69,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   );
   const prismRef = useRef<HTMLDivElement>(null);
   useMateriaSurface(prismRef, "#0066ff", enabled, 26);
-  const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 36, heroRef);
+  const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 6);
   const scrollTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
@@ -79,6 +94,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       aria-label="Eneko Ruiz"
       className="materia-hero relative flex min-h-[100svh] lg:h-[100svh] lg:max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
+      <FloatingNodes />
       <div className="hero-light" aria-hidden="true" />
       <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
@@ -90,7 +106,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         <div className="relative z-10 min-w-0">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(4.8rem,11.5vw,11.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] text-ink"
+            className="m-0 text-[clamp(4.8rem,13vw,14rem)] font-black uppercase leading-[0.75] tracking-[-0.07em] text-ink"
           >
             <KineticText
               text="Eneko"
@@ -103,19 +119,19 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               enabled={enabled}
               interactive
               delay={0.28}
-              className="mt-[0.13em] text-brand"
+              className="mt-[0.08em] text-brand block"
             />
           </h1>
-          <div className="mt-6 flex max-w-xl items-start gap-4 md:mt-8 md:gap-5">
+          <div className="mt-8 flex max-w-2xl items-start gap-5 md:mt-10 md:gap-6">
             <span
-              className="mt-2 h-px w-8 md:w-10 shrink-0 bg-brand"
+              className="mt-2.5 h-px w-10 md:w-16 shrink-0 bg-brand"
               aria-hidden="true"
             />
             <div>
-              <p className="text-base font-semibold text-ink md:text-xl">
+              <p className="text-lg font-bold uppercase tracking-wide text-ink md:text-2xl">
                 {t.role}
               </p>
-              <p className="mt-2 md:mt-3 max-w-sm text-sm leading-relaxed text-lead">
+              <p className="mt-3 md:mt-4 max-w-md text-sm leading-relaxed text-lead md:text-base">
                 {t.tagline}
               </p>
             </div>
@@ -130,15 +146,15 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
             <span>ER — 01</span>
             <span aria-hidden="true">↗</span>
           </div>
-          <div className="hero-portrait-frame absolute inset-x-4 top-1/2 -translate-y-1/2 mx-auto">
+          <div className="hero-portrait-frame absolute inset-x-4 top-1/2 mx-auto">
             <video
               ref={portraitRef}
-              src="/memoji.webm"
-              autoPlay={enabled}
+              poster="/memoji-poster.webp"
+              autoPlay={false}
               loop={enabled}
               muted
               playsInline
-              preload="metadata"
+              preload="none"
               aria-hidden="true"
               className="hero-portrait block h-full w-full object-cover"
             />
