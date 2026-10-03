@@ -4,7 +4,6 @@ test("404 retains its magnetic return link and native home navigation", async ({
   page,
 }, info) => {
   await page.addInitScript(() => {
-    sessionStorage.setItem("hasSeenIntro", "true");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
   });

@@ -10,7 +10,6 @@ import { SmoothScroll } from "./components/motion/SmoothScroll";
 import { MateriaLayer } from "./components/motion/MateriaLayer";
 import { UmbralProvider } from "./components/motion/UmbralProvider";
 import { CustomCursor } from "./components/ui/CustomCursor";
-import { NoiseOverlay } from "./components/ui/NoiseOverlay";
 import { baseMetadata, jsonLd } from "./lib/metadata";
 
 export const metadata = baseMetadata;
@@ -76,6 +75,7 @@ export default async function RootLayout({
         {/* Elite Graceful Degradation for JS-disabled clients */}
         <noscript>
           <style
+            nonce={nonce}
             dangerouslySetInnerHTML={{
               __html: `
                 #main-content {
@@ -131,7 +131,6 @@ export default async function RootLayout({
           enableSystem={true}
           nonce={nonce}
         >
-          <NoiseOverlay />
           <CustomCursor />
           <SmoothScroll />
           <EasterEgg />

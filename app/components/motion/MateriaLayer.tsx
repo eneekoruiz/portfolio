@@ -40,7 +40,7 @@ export function MateriaLayer() {
   const { resolvedTheme } = useTheme();
   const { phase } = useIntro();
 
-  const { enabled, lightweight } = useMotionPolicy();
+  const { allowed, enabled, lightweight } = useMotionPolicy();
   const [sceneReady, setSceneReady] = useState(false);
   const [heroVisible, setHeroVisible] = useState(true);
   const [degraded, setDegraded] = useState(false);
@@ -48,22 +48,27 @@ export function MateriaLayer() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   useEffect(() => {
-    if (!enabled || lightweight || degraded) return;
+    if (!enabled || sceneReady || lightweight || degraded) return;
+    const prepare = () => {
+      if (document.visibilityState === "visible") setSceneReady(true);
+    };
     const timer = setTimeout(() => {
       if ("requestIdleCallback" in window)
-        idle = window.requestIdleCallback(() => setSceneReady(true), {
+        idle = window.requestIdleCallback(prepare, {
           timeout: 1500,
         });
-      else setSceneReady(true);
+      else prepare();
     }, 500);
     let idle = 0;
     return () => {
       clearTimeout(timer);
       if (idle) window.cancelIdleCallback(idle);
     };
-  }, [enabled, lightweight, degraded]);
+  }, [enabled, sceneReady, lightweight, degraded]);
   useEffect(() => {
-    const hero = document.getElementById("hero");
+    const hero =
+      document.getElementById("hero") ??
+      document.querySelector("[data-umbral-destination]");
     if (!hero) {
       setHeroVisible(true);
       return;
@@ -105,19 +110,19 @@ export function MateriaLayer() {
     <div
       className="materia-canvas fixed inset-0 z-0 pointer-events-none overflow-hidden"
       data-scene-active={heroVisible && enabled}
+      data-scene-ready={ready}
       data-scene-degraded={degraded || undefined}
       aria-hidden="true"
-      style={{ opacity: ready ? 1 : 0 }}
     >
       <GraphicsBoundary>
-        {!enabled || lightweight || !sceneReady || degraded ? (
+        {!allowed || lightweight || !sceneReady || degraded ? (
           <StaticDNA />
         ) : (
           <CanvasScene
             accent="#0066ff"
             secondary="#8aa8dc"
             darkMode={resolvedTheme === "dark"}
-            paused={!ready || !heroVisible}
+            paused={!enabled || !ready || !heroVisible}
             onSlow={degrade}
           />
         )}

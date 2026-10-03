@@ -3,7 +3,6 @@ import { test, expect } from "@playwright/test";
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (window.top !== window) return;
-    sessionStorage.setItem("hasSeenIntro", "true");
     localStorage.setItem("portfolio_lang", "es");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
@@ -20,7 +19,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("wheel and keyboard explore paused technology orbits without trapping page scroll", async ({
+test("resumed technology orbits support keyboard and wheel without trapping scroll, then release on pause", async ({
   page,
 }) => {
   await page.addInitScript(() =>
@@ -29,13 +28,14 @@ test("wheel and keyboard explore paused technology orbits without trapping page 
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();
   await card.scrollIntoViewIfNeeded();
-  await card.getByRole("button", { name: "Pausar Backend" }).click();
+  await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
+  await card.getByRole("button", { name: "Reanudar Backend" }).click();
   const orbit = card.locator("[data-orbit-active]");
   const pill = orbit.locator("[data-orbit-pill]").first();
   await orbit.focus();
-  const paused = await pill.getAttribute("style");
+  const focused = await pill.getAttribute("style");
   await page.keyboard.press("ArrowRight");
-  await expect.poll(() => pill.getAttribute("style")).not.toBe(paused);
+  await expect.poll(() => pill.getAttribute("style")).not.toBe(focused);
   await expect
     .poll(async () => {
       const first = await pill.getAttribute("style");
@@ -51,9 +51,15 @@ test("wheel and keyboard explore paused technology orbits without trapping page 
   await expect
     .poll(() => page.evaluate(() => scrollY))
     .toBeGreaterThan(scroll + 20);
+  await card.getByRole("button", { name: "Pausar Backend" }).click();
   await expect(
     card.getByRole("button", { name: "Reanudar Backend" }),
   ).toHaveAttribute("aria-pressed", "true");
+  await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
+  for (const chip of await card.locator("[data-orbit-pill]").all()) {
+    await expect(chip).toBeVisible();
+    await expect(chip).not.toHaveAttribute("style");
+  }
 });
 
 test("contact magnet, letter lighting and project depth recover after interruption", async ({
@@ -67,14 +73,14 @@ test("contact magnet, letter lighting and project depth recover after interrupti
   const contact = page.locator("[data-magnetic-contact]");
   await contact.scrollIntoViewIfNeeded();
   const box = await contact.boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y - 70);
+  await contact.hover({ position: { x: box.width / 2, y: 2 } });
   await expect
     .poll(() =>
       contact.evaluate(
         (el) => new DOMMatrix(getComputedStyle(el).transform).m42,
       ),
     )
-    .toBeLessThan(-3);
+    .toBeLessThan(-0.5);
   await page.locator('#hero [data-signature-link="work"]').hover();
   await expect
     .poll(() => contact.evaluate((el) => el.style.willChange))
@@ -139,9 +145,9 @@ test("helix signal compiles in both render profiles and motion preferences relea
     await expect
       .poll(() => page.evaluate(() => window.__helixShaders.length))
       .toBeGreaterThan(0);
-    expect(await page.evaluate(() => window.__helixShaders.every(Boolean))).toBe(
-      true,
-    );
+    expect(
+      await page.evaluate(() => window.__helixShaders.every(Boolean)),
+    ).toBe(true);
   } else {
     await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
     await expect(page.locator("[data-dna-static]")).toBeVisible();

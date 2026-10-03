@@ -16,7 +16,7 @@
  * Only activates on devices with a fine pointer (mouse).
  */
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useMotionEnabled } from "./useMotionEnabled";
 
@@ -108,6 +108,8 @@ export function useMagnetic<T extends HTMLElement>(
       el.removeEventListener("mousemove", onMove);
       el.removeEventListener("mouseleave", onLeave);
       // Reset transforms on cleanup
+      gsap.killTweensOf(el);
+      if (inner) gsap.killTweensOf(inner);
       gsap.set(el, { x: 0, y: 0 });
       if (inner) gsap.set(inner, { x: 0, y: 0 });
     };

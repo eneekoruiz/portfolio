@@ -20,7 +20,6 @@ const test = base.extend({
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (window.top !== window) return;
-    sessionStorage.setItem("hasSeenIntro", "true");
     localStorage.setItem("portfolio_lang", "es");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
@@ -248,9 +247,15 @@ test("dark theme and animation preference keep content readable", async ({
     "eclipse",
   );
   await page.screenshot({ path: testInfo.outputPath("hero-dark.png") });
-  await page
-    .getByRole("button", { name: "Pausar animaciones", exact: true })
-    .click();
+  if ((await page.locator("html").getAttribute("data-motion")) === "on") {
+    await page
+      .getByRole("button", { name: "Pausar animaciones", exact: true })
+      .click();
+  } else {
+    await expect(
+      page.getByRole("button", { name: "Activar animaciones", exact: true }),
+    ).toBeVisible();
+  }
   await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   await expect(page.locator("#main-content")).toBeVisible();
   const row = await openFirstProject(page);
@@ -264,6 +269,7 @@ test("first visit with reduced motion reaches readable content", async ({
 }, testInfo) => {
   const profile = testInfo.project.use;
   const context = await browser.newContext({
+    baseURL: profile.baseURL,
     viewport: profile.viewport,
     isMobile: profile.isMobile,
     hasTouch: profile.hasTouch,
@@ -274,10 +280,11 @@ test("first visit with reduced motion reaches readable content", async ({
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   try {
-    await page.goto("http://localhost:3100/");
+    await page.goto("/");
     await expect(page.locator("#main-content")).toBeVisible();
     await expect(page.locator("#hero h1")).toHaveText("EnekoEnekoRuiz.Ruiz.");
     await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
+    await expect(page.locator(".identity-splash, #preloader")).toHaveCount(0);
     expect(errors).toEqual([]);
   } finally {
     await context.close();

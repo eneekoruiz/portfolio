@@ -18,10 +18,22 @@ test("first visit shows content without an intro or GitHub request", async ({
 }, info) => {
   let github = 0;
   const errors = [];
+  const resourceErrors = [];
   page.on("request", (request) => {
     if (request.url().includes("/api/github/")) github++;
   });
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (/violat.*Content Security Policy|Refused to/i.test(message.text()))
+      resourceErrors.push(message.text());
+  });
+  page.on("response", (response) => {
+    if (
+      response.status() >= 400 &&
+      /\.(woff2|webp|png|svg|webm)(\?|$)/.test(response.url())
+    )
+      resourceErrors.push(`${response.status()} ${response.url()}`);
+  });
   await page.goto("/");
   await expect(page.locator("#hero h1")).toBeVisible();
   await expect(page.locator('#hero a[href="#work"]')).toBeVisible();
@@ -39,11 +51,24 @@ test("first visit shows content without an intro or GitHub request", async ({
       performance.getEntriesByType("navigation")[0].domContentLoadedEventEnd,
   }));
   expect(result.width).toBeLessThanOrEqual(page.viewportSize().width + 1);
-  expect(result.sections.slice(0, 2)).toEqual(["hero", "work"]);
+  expect(result.sections.slice(0, 3)).toEqual(["hero", "expertise", "work"]);
   expect(result.contact).toBe(true);
   expect(errors).toEqual([]);
+  expect(resourceErrors).toEqual([]);
   await info.attach("local-navigation", {
     body: JSON.stringify(result),
+    contentType: "application/json",
+  });
+  await info.attach("local-resources", {
+    body: JSON.stringify(
+      await page.evaluate(() =>
+        performance.getEntriesByType("resource").map((entry) => ({
+          url: entry.name.replace(location.origin, ""),
+          bytes: entry.transferSize,
+          duration: Math.round(entry.duration),
+        })),
+      ),
+    ),
     contentType: "application/json",
   });
   await page.screenshot({ path: info.outputPath("hero.png") });
@@ -124,17 +149,36 @@ test("optional activity loads on approach and failure preserves featured work an
   ).toBeVisible();
 });
 
-test("content and contact survive disabled JavaScript", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false });
+test("content and contact survive disabled JavaScript", async ({
+  browser,
+}, info) => {
+  const profile = info.project.use;
+  const context = await browser.newContext({
+    baseURL: profile.baseURL,
+    viewport: profile.viewport,
+    isMobile: profile.isMobile,
+    hasTouch: profile.hasTouch,
+    userAgent: profile.userAgent,
+    deviceScaleFactor: profile.deviceScaleFactor,
+    javaScriptEnabled: false,
+  });
   const page = await context.newPage();
-  await page.goto("http://localhost:3100/");
-  await expect(page.locator("#hero h1")).toBeVisible();
-  await expect(page.locator("[data-project-title]")).toHaveCount(5);
-  await page.locator("#contact").scrollIntoViewIfNeeded();
-  await expect(
-    page.locator('#contact a[href^="mailto:"]').first(),
-  ).toBeVisible();
-  await context.close();
+  try {
+    await page.goto("/");
+    await expect(page.locator("#hero h1")).toBeVisible();
+    expect(
+      await page
+        .locator("body")
+        .evaluate((body) => getComputedStyle(body).cursor),
+    ).not.toBe("none");
+    await expect(page.locator("[data-project-title]")).toHaveCount(5);
+    await page.locator("#contact").scrollIntoViewIfNeeded();
+    await expect(
+      page.locator('#contact a[href^="mailto:"]').first(),
+    ).toBeVisible();
+  } finally {
+    await context.close();
+  }
 });
 
 test("project accordion, route and native back remain usable", async ({
@@ -184,6 +228,38 @@ test("desktop scene stops drawing when its hero leaves the viewport", async ({
   await expect
     .poll(() => page.evaluate(() => window.__draws))
     .toBeGreaterThan(0);
+  // Visibility pauses an existing scene instead of destroying and re-baking it.
+  const canvas = await page.locator(".materia-canvas canvas").elementHandle();
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => "hidden",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
+  const degraded =
+    (await page
+      .locator(".materia-canvas")
+      .getAttribute("data-scene-degraded")) === "true";
+  if (degraded) {
+    // A slow software GPU may legitimately release the scene during this check.
+    await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
+    await expect(page.locator("[data-dna-static]")).toBeVisible();
+  } else
+    expect(await canvas.evaluate((element) => element.isConnected)).toBe(true);
+  await page.evaluate(() => {
+    delete document.visibilityState;
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect(page.locator("html")).toHaveAttribute("data-motion", "on");
+  if (!degraded)
+    expect(
+      await canvas.evaluate(
+        (element) =>
+          element === document.querySelector(".materia-canvas canvas"),
+      ),
+    ).toBe(true);
   await page.locator("#contact").scrollIntoViewIfNeeded();
   await expect(page.locator(".materia-canvas")).toHaveAttribute(
     "data-scene-active",
@@ -195,4 +271,112 @@ test("desktop scene stops drawing when its hero leaves the viewport", async ({
   expect(await page.evaluate(() => window.__draws)).toBe(draws);
   await page.locator("[data-motion-toggle]").click();
   await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
+});
+
+test("decorations pause outside their viewport and custom cursor releases native ownership", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop");
+  await page.goto("/");
+  await expect(page.locator("[data-floating-active]")).toHaveAttribute(
+    "data-floating-active",
+    "true",
+  );
+  await expect(page.locator("[data-marquee-active]")).toHaveAttribute(
+    "data-marquee-active",
+    "false",
+  );
+  await page.mouse.move(100, 120);
+  await expect(page.locator("html")).toHaveClass(/has-custom-cursor/);
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new PointerEvent("pointerout", { relatedTarget: document.body }),
+    ),
+  );
+  await expect(page.locator("html")).toHaveClass(/has-custom-cursor/);
+  await page.locator("[data-marquee-active]").scrollIntoViewIfNeeded();
+  await page.mouse.move(1, 1);
+  await expect(page.locator("[data-marquee-active]")).toHaveAttribute(
+    "data-marquee-active",
+    "true",
+  );
+  await expect(page.locator("[data-floating-active]")).toHaveAttribute(
+    "data-floating-active",
+    "false",
+  );
+  await page.locator("#contact").scrollIntoViewIfNeeded();
+  await expect(page.locator("[data-marquee-active]")).toHaveAttribute(
+    "data-marquee-active",
+    "false",
+  );
+  expect(
+    await page
+      .locator(".portfolio-marquee-track")
+      .evaluate((element) => getComputedStyle(element).animationPlayState),
+  ).toBe("paused");
+  await page.locator("[data-motion-toggle]").click();
+  await expect(page.locator("html")).not.toHaveClass(/has-custom-cursor/);
+  expect(
+    await page
+      .locator("body")
+      .evaluate((body) => getComputedStyle(body).cursor),
+  ).not.toBe("none");
+});
+
+test("project diagrams pause offscreen and hidden tabs preserve the reading position", async ({
+  page,
+}, info) => {
+  await page.addInitScript(() => {
+    window.__diagramDraws = 0;
+    const clear = CanvasRenderingContext2D.prototype.clearRect;
+    CanvasRenderingContext2D.prototype.clearRect = function (...args) {
+      if (this.canvas.parentElement?.hasAttribute("data-distributed-active"))
+        window.__diagramDraws++;
+      return clear.apply(this, args);
+    };
+  });
+  await page.goto("/work/rides24ofiziala");
+  await expect(page.locator("iframe")).toHaveCount(0);
+  const diagram = page.locator("[data-distributed-active]");
+  await diagram.scrollIntoViewIfNeeded();
+  const animated = info.project.name === "desktop";
+  await expect(diagram).toHaveAttribute(
+    "data-distributed-active",
+    String(animated),
+  );
+  if (animated) {
+    await expect(page.locator("[data-terrain-active]")).toHaveAttribute(
+      "data-terrain-active",
+      "false",
+    );
+    const position = await page.evaluate(() => scrollY);
+    const height = await page.evaluate(
+      () => document.documentElement.scrollHeight,
+    );
+    await page.evaluate(() => {
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        get: () => "hidden",
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    await expect(diagram).toHaveAttribute("data-distributed-active", "false");
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => scrollY)).toBe(position);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollHeight),
+    ).toBe(height);
+    await page.evaluate(() => {
+      delete document.visibilityState;
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    await expect(diagram).toHaveAttribute("data-distributed-active", "true");
+  }
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await diagram.scrollIntoViewIfNeeded();
+  await expect(diagram).toHaveAttribute("data-distributed-active", "false");
+  await page.waitForTimeout(500);
+  const draws = await page.evaluate(() => window.__diagramDraws);
+  await page.waitForTimeout(500);
+  expect(await page.evaluate(() => window.__diagramDraws)).toBe(draws);
 });

@@ -263,7 +263,18 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           lang={lang}
         />
         <Expertise t={t} lang={lang} />
-        <InfiniteMarquee text={lang === "es" ? "Diseño Premium • Código Limpio • Animación Fluida" : "Premium Design • Clean Code • Fluid Animation"} />
+        <InfiniteMarquee
+          text={
+            lang === "es"
+              ? "Diseño Premium • Código Limpio • Animación Fluida"
+              : lang === "en"
+                ? "Premium Design • Clean Code • Fluid Animation"
+                : t.vals
+                    .slice(0, 3)
+                    .map((value) => value.t)
+                    .join(" • ")
+          }
+        />
         <MemoProjects
           t={t}
           lang={lang}
@@ -308,7 +319,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       />
 
       {/* 🛠️ Masterclass Utilities */}
-      <div className="hud-scanline" aria-hidden="true" />
       <div className="hud-vignette" aria-hidden="true" />
       {process.env.NODE_ENV === "development" && <DebugHUD />}
       <PortalTransition />

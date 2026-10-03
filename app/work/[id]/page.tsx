@@ -34,7 +34,7 @@ import { PROJECTS_CONTENT, CODE_SNIPPETS } from "../../data/projects";
 import { LANG_COLORS, getTechColor } from "../../lib/constants";
 import type { Lang } from "../../types";
 import { useMagnetic } from "../../hooks/useMagnetic";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useTextScramble } from "../../hooks/useTextScramble";
 import { ProjectHero } from "./components/ProjectHero";
 import { materia } from "../../lib/materia";
@@ -273,7 +273,7 @@ export default function ProjectPage() {
 
   const { lang } = useTranslations();
   const [darkMode, setDarkMode] = useState(false);
-  const userMotionEnabled = useMotionEnabled();
+  const { allowed: userMotionEnabled } = useMotionPolicy();
   const reducedMotion = usePreferredMotion();
   const motionEnabled = userMotionEnabled && !reducedMotion;
 
@@ -523,7 +523,11 @@ export default function ProjectPage() {
         );
       });
     },
-    { scope: main, dependencies: [content, motionEnabled] },
+    {
+      scope: main,
+      dependencies: [content, motionEnabled],
+      revertOnUpdate: true,
+    },
   );
 
   // ── Helix Animation is now handled internally in Canvas-based DNAHelix ─────

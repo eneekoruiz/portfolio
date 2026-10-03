@@ -24,8 +24,8 @@ function SkillOrbit({
 }) {
   const cardRef = useRef<HTMLElement>(null);
   const orbitRef = useRef<HTMLUListElement>(null);
-  const [paused, setPaused] = useState(false);
-  const pausedRef = useRef(false);
+  const [paused, setPaused] = useState(true);
+  const pausedRef = useRef(true);
   useEffect(() => {
     pausedRef.current = paused;
     orbitRef.current?.dispatchEvent(new Event("orbit-pause"));
@@ -269,9 +269,6 @@ function SkillOrbit({
       className="materia-surface skill-orbit-card relative overflow-hidden rounded-[24px] border p-5 md:p-6"
       style={{ "--surface-color": category.c } as CSSProperties}
     >
-      <div data-debug style={{position:"absolute", zIndex:999, background:"red", color:"white"}}>
-        motion: {String(motion)}, paused: {String(paused)}
-      </div>
       <header className="relative z-10 flex items-center gap-4">
         <span
           className="skill-orbit-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]"

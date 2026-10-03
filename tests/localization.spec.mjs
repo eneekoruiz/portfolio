@@ -41,6 +41,18 @@ test("all 20 languages reach project descriptions, technology labels, contact an
   await row.locator("button[aria-expanded]").click();
   for (const lang of Object.keys(LANG_LABELS)) {
     await language(page, lang);
+    if (lang !== "es" && lang !== "en") {
+      await expect(page.locator("#expertise h2")).toHaveText(TX[lang].skH);
+      await expect(page.locator("#expertise h3")).toHaveText(
+        TX[lang].vals.slice(0, 3).map((value) => value.t),
+      );
+      await expect(page.locator("[data-marquee-active] > .sr-only")).toHaveText(
+        TX[lang].vals
+          .slice(0, 3)
+          .map((value) => value.t)
+          .join(" • "),
+      );
+    }
     await expect(page.locator('a[href="#main-content"]')).toHaveText(
       UI_COPY[lang].skip,
     );
@@ -96,7 +108,7 @@ test("navigation adapts to label width and restores full links when space return
   page,
 }, info) => {
   test.skip(
-    info.project.name === "mobile",
+    info.project.name !== "desktop",
     "Desktop navigation adapts before reaching the touch breakpoint.",
   );
   await page.goto("/");

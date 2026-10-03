@@ -1,86 +1,109 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 
+/** Pointer events wake a short interpolation; idle cursors do no work. */
 export function CustomCursor() {
   const enabled = useMotionEnabled();
-  const [isVisible, setIsVisible] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-  
-  const springConfig = { damping: 25, stiffness: 400, mass: 0.2 };
-  const smoothX = useSpring(cursorX, springConfig);
-  const smoothY = useSpring(cursorY, springConfig);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!enabled || !window.matchMedia("(pointer: fine)").matches) return;
-
-    const moveCursor = (e: MouseEvent) => {
-      cursorX.set(e.clientX - (isHovering ? 24 : 8));
-      cursorY.set(e.clientY - (isHovering ? 24 : 8));
-      if (!isVisible) setIsVisible(true);
+    const element = ref.current;
+    if (!element || !enabled) return;
+    const media = matchMedia(
+      "(min-width: 768px) and (hover: hover) and (pointer: fine)",
+    );
+    let visible = false;
+    let frame = 0;
+    let lastTime = 0;
+    let x = -100,
+      y = -100,
+      targetX = -100,
+      targetY = -100;
+    const draw = (now: number) => {
+      frame = 0;
+      if (!visible || !media.matches || document.visibilityState !== "visible")
+        return;
+      const dt = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
+      const blend = 1 - Math.exp(-30 * dt);
+      x += (targetX - x) * blend;
+      y += (targetY - y) * blend;
+      const settled =
+        Math.abs(targetX - x) < 0.1 && Math.abs(targetY - y) < 0.1;
+      if (settled) {
+        x = targetX;
+        y = targetY;
+      }
+      element.style.transform = `translate3d(${x - 24}px,${y - 24}px,0)`;
+      if (!settled) frame = requestAnimationFrame(draw);
+      else element.style.willChange = "";
     };
-
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName.toLowerCase() === "a" ||
-        target.tagName.toLowerCase() === "button" ||
-        target.closest("a") ||
-        target.closest("button") ||
-        target.hasAttribute("data-cursor-plus")
-      ) {
-        setIsHovering(true);
-        // adjust offset immediately so it expands from center
-        cursorX.set(e.clientX - 24);
-        cursorY.set(e.clientY - 24);
-      } else {
-        setIsHovering(false);
-        cursorX.set(e.clientX - 8);
-        cursorY.set(e.clientY - 8);
+    const hide = () => {
+      visible = false;
+      cancelAnimationFrame(frame);
+      frame = 0;
+      element.style.opacity = "0";
+      element.style.willChange = "";
+      document.documentElement.classList.remove("has-custom-cursor");
+    };
+    const move = (event: PointerEvent) => {
+      if (!media.matches || event.pointerType !== "mouse") {
+        hide();
+        return;
+      }
+      targetX = event.clientX;
+      targetY = event.clientY;
+      const target = event.target;
+      const hovering =
+        target instanceof Element &&
+        !!target.closest(
+          "a,button,input,textarea,select,[role=button],[data-cursor-plus],[data-cursor-minus]",
+        );
+      element.dataset.hovering = String(hovering);
+      if (!visible) {
+        x = targetX;
+        y = targetY;
+        element.style.transform = `translate3d(${x - 24}px,${y - 24}px,0)`;
+        element.style.opacity = "1";
+        visible = true;
+        document.documentElement.classList.add("has-custom-cursor");
+      }
+      if (!frame) {
+        lastTime = performance.now();
+        element.style.willChange = "transform";
+        frame = requestAnimationFrame(draw);
       }
     };
-
-    const handleMouseOut = () => {
-      setIsVisible(false);
+    const out = (event: PointerEvent) => {
+      if (!event.relatedTarget) hide();
     };
-
-    window.addEventListener("mousemove", moveCursor);
-    window.addEventListener("mouseover", handleMouseOver);
-    window.addEventListener("mouseout", handleMouseOut);
-
+    const mediaChanged = () => {
+      if (!media.matches) hide();
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerout", out);
+    window.addEventListener("blur", hide);
+    media.addEventListener("change", mediaChanged);
     return () => {
-      window.removeEventListener("mousemove", moveCursor);
-      window.removeEventListener("mouseover", handleMouseOver);
-      window.removeEventListener("mouseout", handleMouseOut);
+      hide();
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerout", out);
+      window.removeEventListener("blur", hide);
+      media.removeEventListener("change", mediaChanged);
     };
-  }, [enabled, isVisible, isHovering, cursorX, cursorY]);
-
-  if (!enabled) return null;
+  }, [enabled]);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-[100] mix-blend-difference hidden md:block"
-      style={{
-        x: smoothX,
-        y: smoothY,
-        opacity: isVisible ? 1 : 0,
-      }}
+    <div
+      ref={ref}
+      aria-hidden="true"
+      data-custom-cursor
+      className="custom-cursor fixed top-0 left-0 pointer-events-none z-[100000] mix-blend-difference hidden md:block"
+      style={{ opacity: 0 }}
     >
-      <motion.div
-        animate={{
-          width: isHovering ? 48 : 16,
-          height: isHovering ? 48 : 16,
-          backgroundColor: isHovering ? "transparent" : "#ffffff",
-          border: isHovering ? "2px solid #ffffff" : "0px solid transparent",
-        }}
-        transition={{ duration: 0.15, ease: "easeOut" }}
-        className="rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-      />
-    </motion.div>
+      <div className="custom-cursor-visual rounded-full" />
+    </div>
   );
 }

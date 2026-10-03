@@ -37,6 +37,12 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           if (!timer)
             timer = setTimeout(() => {
               timer = undefined;
+              if (
+                !enabled ||
+                !visible ||
+                document.visibilityState !== "visible"
+              )
+                return;
               video.src = "/memoji.webm";
               video.load();
               void video.play().catch(() => {});

@@ -637,6 +637,9 @@ html[dir="rtl"] .hero-prism {
 .materia-canvas[data-scene-active="false"] {
   opacity: 0.13 !important;
 }
+.materia-canvas[data-scene-ready="false"] {
+  opacity: 0 !important;
+}
 .materia-surface {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -694,6 +697,80 @@ html[data-motion="off"] *::after {
 
 body::after {
   animation: none !important;
+}
+
+/* CSS owns decorative motion; only visible hosts promote a compositing layer. */
+.portfolio-marquee-track {
+  animation: portfolio-marquee var(--marquee-duration, 25s) linear infinite;
+  animation-play-state: paused;
+}
+[data-marquee-active="true"] .portfolio-marquee-track {
+  animation-play-state: running;
+  will-change: transform;
+}
+[data-marquee-active="true"]:hover .portfolio-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes portfolio-marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.floating-node {
+  cursor: grab;
+}
+.floating-node[data-dragging="true"] {
+  cursor: grabbing;
+  z-index: 10;
+}
+.floating-node-visual {
+  animation: portfolio-float var(--float-duration, 7s) ease-in-out
+    var(--float-delay, 0s) 1;
+  animation-play-state: paused;
+}
+[data-floating-active="true"] .floating-node-visual {
+  animation-play-state: running;
+}
+@keyframes portfolio-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -12px, 0);
+  }
+}
+.custom-cursor,
+.custom-cursor-visual {
+  width: 48px;
+  height: 48px;
+}
+@keyframes delayed-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-delayed-fade-in {
+  animation: delayed-fade-in 300ms both;
+}
+.custom-cursor-visual {
+  background: white;
+  border: 2px solid transparent;
+  transform: scale(0.333333);
+  transition:
+    transform 150ms ease-out,
+    background-color 150ms ease-out,
+    border-color 150ms ease-out;
+}
+[data-hovering="true"] .custom-cursor-visual {
+  transform: scale(1);
+  background: transparent;
+  border-color: white;
 }
 
 @media (max-width: 767px) {

@@ -1,12 +1,14 @@
 /** A single subscription shared by every visual component. */
 type Connection = EventTarget & { saveData?: boolean };
 type MotionSnapshot = {
+  allowed: boolean;
   enabled: boolean;
   reduced: boolean;
   visible: boolean;
   lightweight: boolean;
 };
 const serverSnapshot: MotionSnapshot = {
+  allowed: false,
   enabled: false,
   reduced: true,
   visible: true,
@@ -44,21 +46,28 @@ export function subscribeMotion(listener: () => void) {
         (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) ||
         (nav.hardwareConcurrency > 0 && nav.hardwareConcurrency <= 4);
       const visible = document.visibilityState === "visible";
-      const enabled =
-        visible &&
+      const allowed =
         !reduced.matches &&
         !nav.connection?.saveData &&
         window.__LITE !== true &&
         (preference ?? !lightweight);
+      const enabled = visible && allowed;
       document.documentElement.dataset.motion = enabled ? "on" : "off";
       if (
+        snapshot.allowed === allowed &&
         snapshot.enabled === enabled &&
         snapshot.reduced === reduced.matches &&
         snapshot.visible === visible &&
         snapshot.lightweight === lightweight
       )
         return;
-      snapshot = { enabled, reduced: reduced.matches, visible, lightweight };
+      snapshot = {
+        allowed,
+        enabled,
+        reduced: reduced.matches,
+        visible,
+        lightweight,
+      };
       for (const notify of listeners) notify();
     };
     const change = (event: Event) => {

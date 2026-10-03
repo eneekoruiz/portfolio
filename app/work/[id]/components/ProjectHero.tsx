@@ -33,7 +33,7 @@ import {
   MoveUp,
   GithubIcon,
 } from "lucide-react";
-import { useMotionEnabled } from "../../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../../hooks/useMotionEnabled";
 import type { Lang } from "../../../types";
 import { STUDIO_TX } from "../../../data/studio-translations";
 import { materia } from "../../../lib/materia";
@@ -82,8 +82,8 @@ export function ProjectHero({
 }: ProjectHeroProps) {
   const s = STUDIO_TX[lang] ?? STUDIO_TX["en"];
   const ui = UI_COPY[lang];
-  const motionEnabled = useMotionEnabled();
-  const staticStudioLayout = !motionEnabled;
+  const { allowed, enabled: motionEnabled, visible } = useMotionPolicy();
+  const staticStudioLayout = !allowed;
   const [embeddingOrigin, setEmbeddingOrigin] = useState<string | null>(null);
   useEffect(() => setEmbeddingOrigin(window.location.origin), []);
   // The live salon site permits framing only from its published portfolio hosts.
@@ -106,6 +106,11 @@ export function ProjectHero({
   const screenRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const heroVisibleRef = useRef(false);
+  const idleTweenRef = useRef<gsap.core.Tween | null>(null);
+  const [heroInView, setHeroInView] = useState(false);
+  const [screenInView, setScreenInView] = useState(false);
 
   // HUD scroll progress refs
   const scrollProgressRef = useRef<HTMLDivElement>(null);
@@ -141,23 +146,76 @@ export function ProjectHero({
   }, [shouldLoad]);
 
   useEffect(() => {
-    if (!motionEnabled) {
-      setShouldLoad(true);
+    // The server snapshot and a hidden tab are not media-loading consent.
+    if (embeddingOrigin !== null && staticStudioLayout) {
       setCanInteract(true);
     }
-  }, [motionEnabled]);
+  }, [embeddingOrigin, staticStudioLayout]);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+    const screen = screenRef.current;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === hero) {
+          heroVisibleRef.current = entry.isIntersecting;
+          setHeroInView(entry.isIntersecting);
+        }
+        if (entry.target === screen) setScreenInView(entry.isIntersecting);
+      }
+    });
+    if (hero) observer.observe(hero);
+    if (screen) observer.observe(screen);
+    return () => observer.disconnect();
+  }, [staticStudioLayout]);
+
+  useEffect(() => {
+    if (motionEnabled && heroInView) idleTweenRef.current?.resume();
+    else idleTweenRef.current?.pause();
+  }, [motionEnabled, heroInView, isReady, projectId]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const canPlay =
+      shouldLoad && visible && screenInView && (allowed || isInteracting);
+    if (canPlay && videoUrl) {
+      if (!video.getAttribute("src")) {
+        video.src = videoUrl;
+        video.load();
+      }
+      void video.play().catch(() => {
+        // Autoplay can be declined by the browser; native controls remain usable.
+      });
+    } else video.pause();
+    return () => video.pause();
+  }, [shouldLoad, visible, screenInView, allowed, isInteracting, videoUrl]);
+
+  const enterStudio = () => {
+    if (!canInteract || document.visibilityState !== "visible") return;
+    setIframeLoaded(false);
+    shouldLoadRef.current = true;
+    setShouldLoad(true);
+    setIsInteracting(true);
+  };
 
   const disableStudio = projectId === "rides24ofiziala";
-  const staticMotionMode = !motionEnabled;
 
   // Iframe loading safety fallback
   useEffect(() => {
-    if (!liveUrl || iframeLoaded || !shouldLoad || !embeddingAllowed) return;
+    if (
+      !liveUrl ||
+      iframeLoaded ||
+      !shouldLoad ||
+      !embeddingAllowed ||
+      !isInteracting
+    )
+      return;
     const timer = setTimeout(() => {
       setIframeLoaded(true);
     }, 6000); // 6s fallback for heavy sites
     return () => clearTimeout(timer);
-  }, [liveUrl, iframeLoaded, shouldLoad, embeddingAllowed]);
+  }, [liveUrl, iframeLoaded, shouldLoad, embeddingAllowed, isInteracting]);
 
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
   useGSAP(
@@ -168,7 +226,7 @@ export function ProjectHero({
         !bgImageRef.current ||
         !titleRef.current ||
         !screenRef.current ||
-        !motionEnabled
+        !allowed
       )
         return;
 
@@ -191,7 +249,12 @@ export function ProjectHero({
             }
 
             // Trigger deferred loading when the user begins to scroll down
-            if (self.progress > 0.05 && !shouldLoadRef.current) {
+            if (
+              self.progress > 0.05 &&
+              heroVisibleRef.current &&
+              document.visibilityState === "visible" &&
+              !shouldLoadRef.current
+            ) {
               shouldLoadRef.current = true;
               setShouldLoad(true);
             }
@@ -316,13 +379,14 @@ export function ProjectHero({
 
       // 2. Idle floating
       if (titleRef.current) {
-        gsap.to(titleRef.current, {
+        idleTweenRef.current = gsap.to(titleRef.current, {
           y: "+=12",
           duration: 4,
-          repeat: -1,
+          repeat: 1,
           yoyo: true,
           ease: "sine.inOut",
           force3D: true,
+          paused: true,
         });
       }
 
@@ -373,7 +437,13 @@ export function ProjectHero({
 
       // 3. Mouse Interaction (Optimized)
       const onMove = (e: MouseEvent) => {
-        if (!titleRef.current || interRef.current) return;
+        if (
+          !titleRef.current ||
+          interRef.current ||
+          !heroVisibleRef.current ||
+          document.visibilityState !== "visible"
+        )
+          return;
         const { clientX, clientY } = e;
         const { innerWidth, innerHeight } = window;
         const mx = (clientX / innerWidth - 0.5) * 2;
@@ -391,19 +461,20 @@ export function ProjectHero({
       window.addEventListener("mousemove", onMove);
       return () => {
         window.removeEventListener("mousemove", onMove);
+        idleTweenRef.current = null;
         materia.studio.target = 0;
       };
     },
     {
       scope: heroRef,
-      dependencies: [isReady, motionEnabled, projectId],
+      dependencies: [isReady, allowed, projectId],
       revertOnUpdate: true,
     },
   );
 
   // ── 🚀 STUDIO MODE TRANSITION (Fullscreen Takeover) ────────────────
   useGSAP(() => {
-    if (!screenRef.current || !motionEnabled) return;
+    if (!screenRef.current || !allowed) return;
 
     if (isInteracting) {
       // Clear all GSAP-set transforms so position:fixed works correctly
@@ -421,7 +492,7 @@ export function ProjectHero({
       // On exit, ScrollTrigger refresh will re-apply the animated state
       ScrollTrigger.refresh();
     }
-  }, [isInteracting, motionEnabled]);
+  }, [isInteracting, allowed]);
 
   // ── 🚀 STUDIO MODE SIDE EFFECTS (Scroll Lock & ESC Key) ────────────────
   useEffect(() => {
@@ -546,7 +617,14 @@ export function ProjectHero({
   // Mobile CTA sheen animation (subtle). Respect reduced-motion preferences.
   useGSAP(
     () => {
-      if (!mobileCtaRef.current || !sheenRef.current || !motionEnabled) return;
+      if (
+        !mobileCtaRef.current ||
+        !sheenRef.current ||
+        !motionEnabled ||
+        !screenInView ||
+        !matchMedia("(max-width: 767px)").matches
+      )
+        return;
 
       const prefersReduced =
         typeof window !== "undefined" &&
@@ -558,7 +636,7 @@ export function ProjectHero({
       const anim = gsap.to(sheenRef.current, {
         x: "160%",
         duration: 1.4,
-        repeat: -1,
+        repeat: 1,
         ease: "power1.inOut",
         repeatDelay: 1.2,
         yoyo: false,
@@ -567,7 +645,7 @@ export function ProjectHero({
 
       return () => anim.kill();
     },
-    { dependencies: [motionEnabled] },
+    { dependencies: [motionEnabled, screenInView], revertOnUpdate: true },
   );
 
   const renderScreenContents = () => {
@@ -660,7 +738,7 @@ export function ProjectHero({
               backgroundColor: canInteract ? "rgba(0,0,0,0.6)" : "transparent",
               backdropFilter: canInteract ? "blur(15px)" : "none",
             }}
-            onClick={() => canInteract && setIsInteracting(true)}
+            onClick={enterStudio}
           >
             {canInteract && !isInteracting && (
               <div
@@ -671,7 +749,7 @@ export function ProjectHero({
                 {/* Desktop/Tablet CTA (md+) */}
                 <button
                   type="button"
-                  onClick={() => canInteract && setIsInteracting(true)}
+                  onClick={enterStudio}
                   className="hidden md:flex flex-col items-center gap-6 rounded-2xl p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                 >
                   <div
@@ -698,7 +776,7 @@ export function ProjectHero({
                     ref={mobileCtaRef}
                     type="button"
                     aria-label={s.enterStudio}
-                    onClick={() => canInteract && setIsInteracting(true)}
+                    onClick={enterStudio}
                     onPointerDown={() => setMobilePressed(true)}
                     onPointerUp={() => setMobilePressed(false)}
                     onPointerCancel={() => setMobilePressed(false)}
@@ -794,6 +872,13 @@ export function ProjectHero({
                 <ExternalLink size={16} aria-hidden="true" />
               </a>
             </div>
+          ) : liveUrl && !isInteracting ? (
+            <div className="relative h-full w-full bg-neutral-950">
+              <ProjectVisual
+                id={projectId}
+                className="h-full w-full opacity-80"
+              />
+            </div>
           ) : shouldLoad && liveUrl ? (
             <>
               {!iframeLoaded && (
@@ -833,11 +918,12 @@ export function ProjectHero({
           ) : shouldLoad && videoUrl ? (
             <div className="w-full h-full bg-black relative">
               <video
-                src={videoUrl}
-                autoPlay
-                loop
+                ref={videoRef}
+                controls={isInteracting}
+                loop={allowed}
                 muted
                 playsInline
+                preload="none"
                 className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
                 style={{
                   opacity: canInteract && !isInteracting ? 0.4 : 1,
@@ -867,11 +953,13 @@ export function ProjectHero({
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
                   {projectId === "pke-web"
                     ? ui.previewUnavailable
-                    : liveUrl || videoUrl
-                      ? s.preparing
-                      : projectId === "rides24ofiziala"
-                        ? s.demoWorking
-                        : s.comingSoon}
+                    : staticStudioLayout && (liveUrl || videoUrl)
+                      ? s.enterStudio
+                      : liveUrl || videoUrl
+                        ? s.preparing
+                        : projectId === "rides24ofiziala"
+                          ? s.demoWorking
+                          : s.comingSoon}
                 </span>
                 <div className="w-12 h-px bg-white/10" />
                 <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
@@ -925,7 +1013,7 @@ export function ProjectHero({
         data-umbral-destination={projectId}
         className="relative h-[100dvh] w-full overflow-hidden flex flex-col items-center justify-center bg-transparent"
         style={{
-          perspective: isInteracting || !motionEnabled ? "none" : "2000px",
+          perspective: isInteracting || !allowed ? "none" : "2000px",
         }}
       >
         {/* ── Background Layer ── */}
