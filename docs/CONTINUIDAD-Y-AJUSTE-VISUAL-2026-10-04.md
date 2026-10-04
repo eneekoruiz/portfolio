@@ -13,6 +13,7 @@ Se conserva el lenguaje visual del portfolio: nombre grande y cinético, azul, M
 - El inicio y las capacidades vuelven a describir a un estudiante y desarrollador. Se reducen los motivos gráficos de marca, la saturación del contacto y la ornamentación de las métricas. El hero puede crecer en ventanas bajas y las métricas largas ajustan su tamaño.
 - Las etiquetas de tecnologías mantienen el arrastre y su movimiento acotado dentro de una franja propia, sin atravesar el retrato. Capacidades usa un fondo opaco para separar la lectura de la hélice; el marquee enumera tecnologías reales en lugar de promesas de diseño premium.
 - Las órbitas rechazan notificaciones de observadores retirados. Su regresión comprueba reglas de estilo vacías, transformación nula y opacidad completa tras pausar, y entrega deliberadamente notificaciones antiguas. Chromium puede conservar un atributo `style=""` vacío: su mera presencia no acredita una animación activa.
+- El texto pequeño de la tercera métrica usa el color de tinta para mejorar su contraste sobre el azul tenue. La comprobación de las tres etiquetas calcula su contraste con el fondo compuesto en ambos temas; el mínimo para estos textos es 4,5:1.
 - Se sustituyen cifras de facturación, carga y Lighthouse sin informes de respaldo por descripciones de los fragmentos de código disponibles. El estudio deja de mostrar telemetría, permisos y cifras de latencia ficticios.
 
 ## Límites de continuidad
@@ -25,4 +26,10 @@ No se recuperan un preloader que retrase el contenido ni bucles ambientales de p
 
 Compilación de producción, TypeScript, ESLint, muelles, once pruebas de la frontera GitHub y estructura de los veinte idiomas: aprobados localmente. La revisión inicial de capturas no detectó errores de consola ni recursos visuales fallidos.
 
-La verificación final de Playwright y sus resultados se registran al terminar la ronda contra la compilación definitiva. Las capturas y los informes locales están en `scratch/continuity-20261004`; no son una medición en teléfonos físicos ni una certificación de todos los navegadores.
+La batería completa de Playwright contra la compilación de `bba7de4` terminó con **94 aprobados, 14 omisiones previstas por el perfil de interacción y cero fallos**, sin reintentos. Incluye navegación SPA y Atrás, veinte idiomas, teclado y diálogos, cinco rutas de proyectos, estudios, preferencias de movimiento, interrupciones, visibilidad, errores de API y continuidad de la hélice al cambiar de tamaño. Las regresiones específicas de órbitas y los veinte idiomas también pasaron en 375, 768 y 1440 px.
+
+El único cambio visual posterior a esa batería es el color de la etiqueta de la tercera métrica. Su compilación final es correcta y la comprobación final de diseño y contraste terminó con **6 de 6 aprobados**: 375, 768 y 1440 px, temas claro/oscuro, etiquetas largas y RTL. Las tres etiquetas de métricas cumplen el mínimo probado de 4,5:1 en ambos temas. La nueva consulta final de GitHub no encontró cambios pendientes de incorporar desde `origin/main`.
+
+Comandos reproducibles: `npm run build`, `npm run lint`, `npm run test:motion`, `node --test tests/github-boundary.node.mjs`, `npm run check-i18n`, `npx playwright test --trace=off --workers=1` y `npx playwright test --config=playwright.performance.config.mjs tests/design.spec.mjs --trace=off --workers=1`.
+
+Las capturas y los informes locales están en `scratch/continuity-20261004`; no son una medición en teléfonos físicos ni una certificación de todos los navegadores. La pasada final no identifica más correcciones demostradas pendientes en el alcance revisado; no equivale a garantizar ausencia absoluta de defectos.

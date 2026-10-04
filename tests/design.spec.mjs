@@ -51,6 +51,51 @@ test("editorial composition remains readable and usable in both themes", async (
           );
         expect(Math.max(...baselines) - Math.min(...baselines)).toBeLessThan(2);
       }
+      if (id === "about") {
+        const contrasts = await section.locator("dt").evaluateAll((labels) => {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = 1;
+          const context = canvas.getContext("2d");
+          const pageColor = getComputedStyle(
+            document.documentElement,
+          ).getPropertyValue("--page");
+          const luminance = (pixel) => {
+            const channels = [...pixel].slice(0, 3).map((channel) => {
+              const value = channel / 255;
+              return value <= 0.04045
+                ? value / 12.92
+                : ((value + 0.055) / 1.055) ** 2.4;
+            });
+            return (
+              channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+            );
+          };
+          return labels.map((label) => {
+            context.clearRect(0, 0, 1, 1);
+            context.fillStyle = pageColor;
+            context.fillRect(0, 0, 1, 1);
+            context.fillStyle = getComputedStyle(
+              label.closest(".about-metric"),
+            ).backgroundColor;
+            context.fillRect(0, 0, 1, 1);
+            const background = luminance(context.getImageData(0, 0, 1, 1).data);
+            context.fillStyle = getComputedStyle(label).color;
+            context.fillRect(0, 0, 1, 1);
+            const foreground = luminance(context.getImageData(0, 0, 1, 1).data);
+            return {
+              text: label.textContent,
+              ratio:
+                (Math.max(background, foreground) + 0.05) /
+                (Math.min(background, foreground) + 0.05),
+            };
+          });
+        });
+        for (const contrast of contrasts)
+          expect(
+            contrast.ratio,
+            `${theme} metric label: ${contrast.text}`,
+          ).toBeGreaterThanOrEqual(4.5);
+      }
       await section.screenshot({ path: info.outputPath(`${id}-${theme}.png`) });
     }
   }

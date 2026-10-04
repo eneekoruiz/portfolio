@@ -53,7 +53,7 @@
 }
 .about-metric[data-metric-index="2"] dt,
 .about-metric[data-metric-index="2"] .about-metric-index {
-  color: var(--lead);
+  color: var(--ink);
 }
 .about-metric[data-metric-index="2"] dd {
   color: var(--brand);
