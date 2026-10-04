@@ -4,66 +4,66 @@ import type { Lang, Tx, Val } from "../types";
 const VALS_ES: Val[] = [
   {
     icon: Target,
-    t: "Orientado al detalle",
-    d: "Los pequeños detalles separan lo bueno de lo memorable. Los noto antes de que nadie los pida.",
+    t: "0 Tolerancia a la Fricción",
+    d: "Si el usuario tiene que pensar o esperar, la interfaz ha fallado. Priorizo feedback inmediato por encima del virtuosismo técnico.",
   },
   {
     icon: Code2,
-    t: "Clean Code siempre",
-    d: "El código que nadie puede leer en 6 meses es deuda técnica. Escribo para humanos.",
+    t: "Complejidad Oculta",
+    d: "Las bases de código que nadie entiende en 6 meses son deuda tóxica. Oculto la complejidad detrás de primitivas declarativas inmutables.",
   },
   {
     icon: Zap,
-    t: "Rendimiento como valor",
-    d: "La velocidad es respeto. Cada milisegundo importa.",
+    t: "Presupuesto de Rendimiento",
+    d: "La fluidez a 120fps no ocurre por accidente. Restrinjo las capas de renderizado, memory leaks y reflows del DOM desde el primer día.",
   },
   {
     icon: Users,
-    t: "Colaboración real",
-    d: "Aprendo más en una sesión de pair programming que en una semana en solitario.",
+    t: "Alineación de Producto",
+    d: "No escribo código en el vacío. Cada decisión técnica debe estar alineada con el modelo mental del usuario y las métricas de negocio.",
   },
   {
     icon: BookOpen,
-    t: "Aprendizaje continuo",
-    d: "La tecnología evoluciona cada semana. Dedico tiempo a entender por qué importa.",
+    t: "Escepticismo Tecnológico",
+    d: "No adopto herramientas porque sean tendencia. Evalúo dependencias por su coste de red, mantenibilidad y estabilidad a largo plazo.",
   },
   {
     icon: Heart,
-    t: "Resolución de problemas",
-    d: "Enfrento la complejidad con método. Un problema bien definido ya está medio resuelto.",
+    t: "Artesanía Física",
+    d: "Rechazo las plantillas sin alma. Construyo interacciones táctiles que responden a la física del mundo real: aceleración, tensión y resistencia.",
   },
 ];
 
 const VALS_EN: Val[] = [
   {
     icon: Target,
-    t: "Detail oriented",
-    d: "Small details separate good from memorable. I notice them before anyone asks.",
+    t: "0 Friction Tolerance",
+    d: "If the user has to think or wait, the interface has failed. I prioritize TTI, LCP, and immediate feedback over technical virtuosity.",
   },
   {
     icon: Code2,
-    t: "Clean Code always",
-    d: "Code nobody can read in 6 months is technical debt. I write for humans.",
+    t: "Hidden Complexity",
+    d: "Codebases nobody can understand in 6 months are toxic debt. I hide complexity behind immutable declarative primitives.",
   },
   {
     icon: Zap,
-    t: "Performance as value",
-    d: "Speed is respect. Every millisecond matters.",
+    t: "Strict Performance Budgets",
+    d: "120fps fluidity doesn't happen by accident. I restrict render layers, memory leaks, and DOM reflows from day one.",
   },
   {
     icon: Users,
-    t: "Real collaboration",
-    d: "I learn more in a pair programming session than a week alone.",
+    t: "Product Alignment",
+    d: "I don't write code in a vacuum. Every technical decision must align with the user's mental model and business metrics.",
   },
   {
     icon: BookOpen,
-    t: "Lifelong learner",
-    d: "Technology evolves every week. I spend time understanding why it matters.",
+    t: "Technological Skepticism",
+    d: "I don't adopt tools just because they're trending. I evaluate dependencies by their network cost, maintainability, and long-term stability.",
   },
   {
     icon: Heart,
-    t: "Problem solving",
-    d: "I face complexity with method. A well-defined problem is already half solved.",
+    t: "Physical Craftsmanship",
+    d: "I reject soulless templates. I build tactile interactions that respond to real-world physics: acceleration, tension, and resistance.",
   },
 ];
 
