@@ -119,6 +119,9 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   // Modal and menu state managers
   const [cmd, setCmd] = useModalState();
   const [menu, setMenu] = useMobileMenu();
+  useEffect(() => {
+    if (cmd) setMenu(false);
+  }, [cmd, setMenu]);
 
   // Scroll controls & observer integration
   const activeSection = useActiveSection(
@@ -310,7 +313,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       )}
 
       <MobileMenu
-        menu={menu}
+        menu={menu && !cmd}
         setMenu={setMenu}
         lang={lang}
         setLang={setLang}

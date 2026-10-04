@@ -25,11 +25,6 @@ function SkillOrbit({
   const cardRef = useRef<HTMLElement>(null);
   const orbitRef = useRef<HTMLUListElement>(null);
   const [paused, setPaused] = useState(true);
-  const pausedRef = useRef(true);
-  useEffect(() => {
-    pausedRef.current = paused;
-    orbitRef.current?.dispatchEvent(new Event("orbit-pause"));
-  }, [paused]);
   useMateriaSurface(cardRef, category.c, motion, 32);
 
   useEffect(() => {
@@ -41,12 +36,10 @@ function SkillOrbit({
     const angle = new SpringValue(0, 110, 19);
     let visible = false,
       focused = false,
-      hovering = false,
       dragging = false;
     let pointerId = -1,
       startX = 0,
-      startAngle = 0,
-      elapsed = 0;
+      startAngle = 0;
     let lastX = 0,
       lastTime = 0,
       releaseVelocity = 0;
@@ -102,11 +95,10 @@ function SkillOrbit({
     };
     const tick = (_time: number, delta: number) => {
       const dt = delta / 1000;
-      const rotating = !pausedRef.current && !focused && !dragging;
+      const rotating = !focused && !dragging;
       if (rotating) {
         const advance = Math.min(dt, 0.08);
         angle.target += advance * 0.28;
-        elapsed += advance;
       }
       angle.step(dt);
       pitch.target = Math.max(-1, Math.min(1, angle.velocity * 0.15));
@@ -118,18 +110,20 @@ function SkillOrbit({
     function wake() {
       if (visible && document.visibilityState === "visible")
         gsap.ticker.add(tick);
-      else gsap.ticker.remove(tick);
+      else {
+        gsap.ticker.remove(tick);
+        for (const item of items) item.style.willChange = "";
+      }
     }
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (!visible) cancel();
       wake();
     });
     const enter = () => {
-      hovering = true;
       wake();
     };
     const leave = () => {
-      hovering = false;
       interacting = false;
       wake();
     };
@@ -137,7 +131,12 @@ function SkillOrbit({
       focused = true;
       wake();
     };
-    const blur = () => {
+    const blur = (event: FocusEvent) => {
+      if (
+        event.relatedTarget instanceof Node &&
+        orbit.contains(event.relatedTarget)
+      )
+        return;
       focused = false;
       wake();
     };
@@ -191,11 +190,19 @@ function SkillOrbit({
       wake();
     };
     const cancel = () => {
-      dragging = hovering = interacting = false;
+      dragging = interacting = false;
       releaseVelocity = 0;
       if (pointerId >= 0 && orbit.hasPointerCapture(pointerId))
         orbit.releasePointerCapture(pointerId);
       pointerId = -1;
+      angle.snap(angle.value);
+      pitch.snap(0);
+      for (const displacement of displacements) {
+        displacement.x.snap(0);
+        displacement.y.snap(0);
+        displacement.z.snap(0);
+      }
+      draw();
       wake();
     };
     const wheel = (event: WheelEvent) => {
@@ -234,7 +241,6 @@ function SkillOrbit({
     orbit.addEventListener("lostpointercapture", release);
     orbit.addEventListener("focusin", focus);
     orbit.addEventListener("focusout", blur);
-    orbit.addEventListener("orbit-pause", wake);
     document.addEventListener("visibilitychange", wake);
     window.addEventListener("blur", cancel);
     draw();
@@ -255,9 +261,10 @@ function SkillOrbit({
       orbit.removeEventListener("lostpointercapture", release);
       orbit.removeEventListener("focusin", focus);
       orbit.removeEventListener("focusout", blur);
-      orbit.removeEventListener("orbit-pause", wake);
       document.removeEventListener("visibilitychange", wake);
       window.removeEventListener("blur", cancel);
+      if (pointerId >= 0 && orbit.hasPointerCapture(pointerId))
+        orbit.releasePointerCapture(pointerId);
     };
   }, [motion, category.techs, paused]);
 

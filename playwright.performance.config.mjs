@@ -2,7 +2,8 @@ import config from "./playwright.config.mjs";
 import { devices } from "@playwright/test";
 export default {
   ...config,
-  testMatch: /(performance|localization|design)\.spec\.mjs/,
+  testMatch:
+    /(performance|localization|design|motion-cleanup|overlays|overlay-focus|github-client)\.spec\.mjs/,
   use: { ...config.use, baseURL: "http://localhost:3102" },
   projects: [
     {

@@ -132,6 +132,7 @@ export function Navbar({
           <MotionToggle />
           <button
             onClick={() => setCmd(true)}
+            data-command-trigger
             aria-label={UI_COPY[lang].search}
             title={`${UI_COPY[lang].search} (⌘K)`}
             className="p-2 border border-black/10 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"

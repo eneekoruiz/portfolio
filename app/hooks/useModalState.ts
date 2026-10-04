@@ -1,26 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useBodyScrollLock } from "./useBodyScrollLock";
 
 export function useModalState() {
   const [cmd, setCmd] = useState(false);
 
-  useEffect(() => {
-    if (cmd) {
-      document.body.style.overflow = "hidden";
-      document.body.style.height = "100vh";
-      document.body.style.touchAction = "none";
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.height = "";
-      document.body.style.touchAction = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.height = "";
-      document.body.style.touchAction = "";
-    };
-  }, [cmd]);
+  useBodyScrollLock(cmd);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

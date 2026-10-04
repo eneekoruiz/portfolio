@@ -21,9 +21,29 @@ export function useSpringAccordion(
     if (!body || !content || !spring) return;
     let running = false;
     let contentHeight = content.offsetHeight;
-    const instant =
-      !animated || skip || matchMedia("(pointer: coarse)").matches;
+    const host = body.parentElement;
+    const bounds = host?.getBoundingClientRect();
+    let visible = !bounds || (bounds.bottom > 0 && bounds.top < innerHeight);
+    const media = matchMedia(
+      "(pointer: coarse), (prefers-reduced-motion: reduce)",
+    );
+    const instant = !animated || skip;
+    const finish = () => {
+      spring.snap(expanded ? contentHeight : 0);
+      body.style.height = expanded ? "auto" : "0px";
+      body.style.opacity = expanded ? "1" : "0";
+      body.parentElement?.style.setProperty(
+        "--accordion-progress",
+        expanded ? "1" : "0",
+      );
+      gsap.ticker.remove(tick);
+      running = false;
+    };
     const tick = (_time: number, delta: number) => {
+      if (!visible || media.matches || document.visibilityState !== "visible") {
+        finish();
+        return;
+      }
       const height = Math.max(0, spring.step(delta / 1000));
       body.style.height = `${height}px`;
       body.style.opacity = String(
@@ -34,23 +54,27 @@ export function useSpringAccordion(
         String(Math.min(1, height / Math.max(contentHeight, 1))),
       );
       if (spring.settled) {
-        body.style.height = expanded ? "auto" : "0px";
-        gsap.ticker.remove(tick);
-        running = false;
+        finish();
         ScrollTrigger.refresh();
       }
     };
     const resize = () => {
+      const previousHeight = contentHeight;
+      const expandedAtRest =
+        expanded && spring.settled && body.style.height === "auto";
       contentHeight = content.offsetHeight;
       spring.target = expanded ? contentHeight : 0;
-      if (instant) {
-        spring.snap(spring.target);
-        body.style.height = expanded ? "auto" : "0px";
-        body.style.opacity = expanded ? "1" : "0";
-        body.parentElement?.style.setProperty(
-          "--accordion-progress",
-          expanded ? "1" : "0",
-        );
+      if (
+        instant ||
+        media.matches ||
+        !visible ||
+        document.visibilityState !== "visible" ||
+        expandedAtRest ||
+        spring.settled
+      ) {
+        finish();
+        if (expanded && previousHeight !== contentHeight)
+          ScrollTrigger.refresh();
         return;
       }
       body.style.height = `${Math.max(0, spring.value)}px`;
@@ -63,8 +87,21 @@ export function useSpringAccordion(
     resize();
     const observer = new ResizeObserver(resize);
     observer.observe(content);
+    const viewport = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (!visible && running) finish();
+    });
+    if (host) viewport.observe(host);
+    const interrupt = () => {
+      if (document.visibilityState !== "visible" || media.matches) finish();
+    };
+    document.addEventListener("visibilitychange", interrupt);
+    media.addEventListener("change", interrupt);
     return () => {
       observer.disconnect();
+      viewport.disconnect();
+      document.removeEventListener("visibilitychange", interrupt);
+      media.removeEventListener("change", interrupt);
       gsap.ticker.remove(tick);
     };
   }, [bodyRef, contentRef, expanded, animated, skip]);

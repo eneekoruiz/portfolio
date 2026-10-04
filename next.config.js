@@ -30,6 +30,7 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   outputFileTracingRoot: __dirname,
+  headers: async () => [{ source: "/:path*", headers: securityHeaders }],
 };
 
 module.exports = nextConfig;
