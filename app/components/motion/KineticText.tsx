@@ -45,6 +45,7 @@ export function KineticText({
     let releaseAt = -1;
     let releaseFrom = 0;
     let previousVelocity = 0;
+    let hasLightCoordinates = false;
     const wake = () => {
       if (visible && document.visibilityState === "visible")
         gsap.ticker.add(tick);
@@ -72,12 +73,14 @@ export function KineticText({
           "--type-light",
           String(light.step(delta / 1000)),
         );
-        if (light.settled && light.value === 0) {
-          for (const char of characters) {
-            char.style.removeProperty("--glyph-light-x");
-            char.style.removeProperty("--glyph-light-y");
-          }
+      }
+      // A pointer may enter and leave before the spring advances a frame.
+      if (hasLightCoordinates && light.settled && light.value === 0) {
+        for (const char of characters) {
+          char.style.removeProperty("--glyph-light-x");
+          char.style.removeProperty("--glyph-light-y");
         }
+        hasLightCoordinates = false;
       }
       const changing =
         !tension.settled ||
@@ -145,6 +148,7 @@ export function KineticText({
           `${event.clientY - rectangles[i].top}px`,
         );
       });
+      hasLightCoordinates = true;
       for (let i = 0; i < waves.length; i++) {
         const distance = x - (i + 0.5) / waves.length;
         waves[i].target = Math.exp(-distance * distance * 32);

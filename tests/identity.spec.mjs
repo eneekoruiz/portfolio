@@ -45,6 +45,10 @@ test("technology cards start static, resume moving pills, support drag and relea
   await card.getByRole("button", { name: "Reanudar Backend" }).click();
   const orbit = card.locator("[data-orbit-active]");
   await expect(orbit).toBeVisible();
+  // Expanding the card can put the orbit below the viewport. Offscreen motion
+  // intentionally pauses, so observe it before asserting rotation.
+  await orbit.scrollIntoViewIfNeeded();
+  await expect(orbit).toBeInViewport();
   const pill = orbit.locator("[data-orbit-pill]").first();
   const initial = await pill.getAttribute("style");
   await expect.poll(() => pill.getAttribute("style")).not.toBe(initial);
@@ -86,6 +90,27 @@ test("hero is static by default on touch and pointer letters recover after inter
     await letter.hover();
     await expect.poll(() => letter.getAttribute("style")).not.toBe(resting);
     await page.mouse.move(3, 3);
+    await expect.poll(() => letter.getAttribute("style")).toBe(resting);
+    // Enter and leave synchronously to cover the zero-frame interruption.
+    const wroteLight = await page.evaluate(() => {
+      const word = document.querySelector("#hero [data-kinetic-interactive]");
+      const bounds = word.getBoundingClientRect();
+      word.dispatchEvent(
+        new PointerEvent("pointermove", {
+          pointerType: "mouse",
+          clientX: bounds.left + bounds.width / 2,
+          clientY: bounds.top + bounds.height / 2,
+        }),
+      );
+      const wrote = !!word
+        .querySelector("[data-kinetic-char]")
+        .style.getPropertyValue("--glyph-light-x");
+      word.dispatchEvent(
+        new PointerEvent("pointerleave", { pointerType: "mouse" }),
+      );
+      return wrote;
+    });
+    expect(wroteLight).toBe(true);
     await expect.poll(() => letter.getAttribute("style")).toBe(resting);
   } else {
     await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
@@ -133,7 +158,9 @@ test("project opens into a reversible desktop studio or readable static mobile s
   await expect(page).toHaveURL(/\/work\/ana-peluquera/);
   await expect(page.locator("html")).not.toHaveAttribute("data-umbral");
   if (info.project.name !== "desktop") {
-    await expect(page.locator('[data-studio-screen="cinematic"]')).toHaveCount(0);
+    await expect(page.locator('[data-studio-screen="cinematic"]')).toHaveCount(
+      0,
+    );
     await expect(page.locator("[data-project-atmosphere]")).toHaveCount(0);
     await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
     const staticScreen = page.locator('[data-studio-screen="static"]');
