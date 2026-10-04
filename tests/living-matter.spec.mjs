@@ -58,7 +58,11 @@ test("resumed technology orbits support keyboard and wheel without trapping scro
   await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
   for (const chip of await card.locator("[data-orbit-pill]").all()) {
     await expect(chip).toBeVisible();
-    await expect(chip).not.toHaveAttribute("style");
+    await expect
+      .poll(() => chip.evaluate((element) => element.style.cssText))
+      .toBe("");
+    await expect(chip).toHaveCSS("transform", "none");
+    await expect(chip).toHaveCSS("opacity", "1");
   }
 });
 

@@ -100,7 +100,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       aria-label="Eneko Ruiz"
       className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
-      <FloatingNodes />
       <div className="hero-light" aria-hidden="true" />
       <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
@@ -172,6 +171,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           </div>
         </div>
       </div>
+      <FloatingNodes />
       <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 md:gap-6 border-t border-ink/15 py-3 md:py-4 shrink-0">
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <SignatureLink

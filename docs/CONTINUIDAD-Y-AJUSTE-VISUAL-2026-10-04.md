@@ -11,6 +11,8 @@ Se conserva el lenguaje visual del portfolio: nombre grande y cinético, azul, M
 - El zoom reversible del estudio se conserva. Un equipo de escritorio con memoria o CPU modestos mantiene ese recorrido CSS 3D y usa SVG para el fondo. En táctil, las animaciones siguen siendo opcionales; movimiento reducido, ahorro de datos y modo ligero tienen prioridad.
 - Se recuperan los fragmentos de código como vistas de Who Are Ya, Rides y SpotShare. La peluquería mantiene su captura real; PKE mantiene el aviso de previsualización no disponible. Cada detalle tiene acceso nativo a GitHub sin tener que entrar al estudio.
 - El inicio y las capacidades vuelven a describir a un estudiante y desarrollador. Se reducen los motivos gráficos de marca, la saturación del contacto y la ornamentación de las métricas. El hero puede crecer en ventanas bajas y las métricas largas ajustan su tamaño.
+- Las etiquetas de tecnologías mantienen el arrastre y su movimiento acotado dentro de una franja propia, sin atravesar el retrato. Capacidades usa un fondo opaco para separar la lectura de la hélice; el marquee enumera tecnologías reales en lugar de promesas de diseño premium.
+- Las órbitas rechazan notificaciones de observadores retirados. Su regresión comprueba reglas de estilo vacías, transformación nula y opacidad completa tras pausar, y entrega deliberadamente notificaciones antiguas. Chromium puede conservar un atributo `style=""` vacío: su mera presencia no acredita una animación activa.
 - Se sustituyen cifras de facturación, carga y Lighthouse sin informes de respaldo por descripciones de los fragmentos de código disponibles. El estudio deja de mostrar telemetría, permisos y cifras de latencia ficticios.
 
 ## Límites de continuidad

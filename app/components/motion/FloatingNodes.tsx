@@ -4,14 +4,13 @@ import { useRef, type CSSProperties, type PointerEvent } from "react";
 import { useViewportMotion } from "../../hooks/useViewportMotion";
 
 const NODES = [
-  { id: "react", label: "React / Next.js", top: "15%", left: "10%", delay: 0 },
-  { id: "node", label: "Node.js / Express", top: "35%", left: "75%", delay: 1 },
-  { id: "java", label: "Java / JAX-WS", top: "81%", left: "3%", delay: 0.5 },
+  { id: "react", label: "React / Next.js", left: "1%", delay: 0 },
+  { id: "node", label: "Node.js / Express", left: "26%", delay: 1 },
+  { id: "java", label: "Java / JAX-WS", left: "51%", delay: 0.5 },
   {
     id: "data",
     label: "MongoDB / Firebase",
-    top: "65%",
-    left: "65%",
+    left: "76%",
     delay: 1.5,
   },
 ];
@@ -85,7 +84,7 @@ export function FloatingNodes() {
       ref={ref}
       aria-hidden="true"
       data-floating-active={active}
-      className="absolute inset-0 z-0 pointer-events-none overflow-hidden hidden lg:block"
+      className="relative z-10 mx-auto h-20 w-full max-w-[1440px] shrink-0 pointer-events-none overflow-hidden hidden lg:block"
     >
       {NODES.map((node) => (
         <div
@@ -96,7 +95,7 @@ export function FloatingNodes() {
           onPointerCancel={stopDrag}
           onLostPointerCapture={stopDrag}
           className="floating-node absolute pointer-events-auto select-none"
-          style={{ top: node.top, left: node.left }}
+          style={{ top: "25%", left: node.left }}
         >
           <div
             className="floating-node-visual rounded-full border border-ink/20 bg-page/40 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-ink shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)]"

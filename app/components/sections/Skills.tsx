@@ -49,6 +49,7 @@ function SkillOrbit({
       y: new SpringValue(0, 165, 18),
       z: new SpringValue(0, 155, 19),
     }));
+    let disposed = false;
     let pointerX = 0,
       pointerY = 0,
       interacting = false;
@@ -58,6 +59,7 @@ function SkillOrbit({
       wake();
     });
     const draw = (dt = 0) => {
+      if (disposed) return true;
       let settled = true;
       for (let i = 0; i < items.length; i++) {
         const theta = (i * Math.PI * 2) / items.length + angle.value;
@@ -94,6 +96,7 @@ function SkillOrbit({
       return settled;
     };
     const tick = (_time: number, delta: number) => {
+      if (disposed) return;
       const dt = delta / 1000;
       const rotating = !focused && !dragging;
       if (rotating) {
@@ -108,6 +111,7 @@ function SkillOrbit({
         gsap.ticker.remove(tick);
     };
     function wake() {
+      if (disposed) return;
       if (visible && document.visibilityState === "visible")
         gsap.ticker.add(tick);
       else {
@@ -190,6 +194,7 @@ function SkillOrbit({
       wake();
     };
     const cancel = () => {
+      if (disposed) return;
       dragging = interacting = false;
       releaseVelocity = 0;
       if (pointerId >= 0 && orbit.hasPointerCapture(pointerId))
@@ -245,6 +250,7 @@ function SkillOrbit({
     window.addEventListener("blur", cancel);
     draw();
     return () => {
+      disposed = true;
       observer.disconnect();
       resize.disconnect();
       gsap.ticker.remove(tick);

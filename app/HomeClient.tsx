@@ -266,18 +266,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           lang={lang}
         />
         <Expertise t={t} lang={lang} />
-        <InfiniteMarquee
-          text={
-            lang === "es"
-              ? "Diseño Premium • Código Limpio • Animación Fluida"
-              : lang === "en"
-                ? "Premium Design • Clean Code • Fluid Animation"
-                : t.vals
-                    .slice(0, 3)
-                    .map((value) => value.t)
-                    .join(" • ")
-          }
-        />
+        <InfiniteMarquee text="React / Next.js • Node.js / Express • Java / JAX-WS • MongoDB / Firebase" />
         <MemoProjects
           t={t}
           lang={lang}

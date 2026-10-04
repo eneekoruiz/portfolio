@@ -52,7 +52,9 @@ async function expectSettledHero(page) {
         return (
           glyphs.length > 0 &&
           glyphs.every(
-            (glyph) => Number(getComputedStyle(glyph).opacity) >= 0.99,
+            (glyph) =>
+              Number(getComputedStyle(glyph).opacity) >= 0.99 &&
+              !glyph.style.willChange,
           )
         );
       }),
@@ -100,9 +102,7 @@ async function expectSceneContinuity(page, rendererExpected) {
     page.evaluate((needsRenderer) => {
       const state = window.__sceneContinuity;
       const dna = document.querySelector("[data-dna-static]");
-      const renderer = document.querySelector(
-        "canvas[data-materia-renderer]",
-      );
+      const renderer = document.querySelector("canvas[data-materia-renderer]");
       const degradedAnimatedFallback = document.querySelector(
         '.materia-canvas[data-scene-degraded="true"] [data-dna-static][data-dna-animated="true"]',
       );
@@ -178,6 +178,7 @@ test("hero reading areas and portrait plate stay clear at supported widths and t
           footer: "#hero > div:last-child",
           topLabel: ".hero-identity-plate > div:first-child",
           bottomLabel: ".hero-identity-plate > div:last-child",
+          technologies: "[data-floating-active]",
         };
         const read = (selector) => {
           const element = document.querySelector(selector);
@@ -229,7 +230,13 @@ test("hero reading areas and portrait plate stay clear at supported widths and t
         `${viewport.width}/${theme} DNA scene`,
       ).toBe(true);
 
-      const activeAreas = ["heading", "introduction", "plate", "footer"]
+      const activeAreas = [
+        "heading",
+        "introduction",
+        "plate",
+        "footer",
+        "technologies",
+      ]
         .filter((name) => layout.boxes[name]?.visible)
         .map((name) => ({ name, ...layout.boxes[name] }));
       for (const area of activeAreas) {

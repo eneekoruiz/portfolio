@@ -1,5 +1,32 @@
 import { test, expect } from "@playwright/test";
 
+test.afterEach(async ({ page }, info) => {
+  if (info.status === info.expectedStatus) return;
+  await info.attach("orbit-cleanup-state", {
+    body: JSON.stringify(
+      await page
+        .locator("[data-skill-card]")
+        .first()
+        .evaluate((card) => ({
+          motion: document.documentElement.dataset.motion,
+          active: card
+            .querySelector(".skill-orbit")
+            ?.getAttribute("data-orbit-active"),
+          pills: [...card.querySelectorAll("[data-orbit-pill]")].map(
+            (pill) => ({
+              text: pill.textContent,
+              hasStyle: pill.hasAttribute("style"),
+              style: pill.getAttribute("style"),
+              css: pill.style.cssText,
+              html: pill.outerHTML,
+            }),
+          ),
+        })),
+    ),
+    contentType: "application/json",
+  });
+});
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (window.top !== window) return;
@@ -30,6 +57,23 @@ test("technology cards start static, resume moving pills, support drag and relea
   page,
 }, info) => {
   await page.addInitScript(() => {
+    window.__orbitResizeDeliveries = [];
+    const NativeResizeObserver = window.ResizeObserver;
+    window.ResizeObserver = class extends NativeResizeObserver {
+      constructor(callback) {
+        super((entries, observer) => {
+          const orbit = entries.find((entry) =>
+            entry.target.matches(".skill-orbit"),
+          );
+          if (orbit)
+            window.__orbitResizeDeliveries.push({
+              target: orbit.target,
+              deliver: () => callback(entries, observer),
+            });
+          callback(entries, observer);
+        });
+      }
+    };
     localStorage.setItem("portfolio-motion-enabled", "true");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
@@ -40,7 +84,11 @@ test("technology cards start static, resume moving pills, support drag and relea
   await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
   for (const chip of await card.locator("[data-orbit-pill]").all()) {
     await expect(chip).toBeVisible();
-    await expect(chip).not.toHaveAttribute("style");
+    await expect
+      .poll(() => chip.evaluate((element) => element.style.cssText))
+      .toBe("");
+    await expect(chip).toHaveCSS("transform", "none");
+    await expect(chip).toHaveCSS("opacity", "1");
   }
   await card.getByRole("button", { name: "Reanudar Backend" }).click();
   const orbit = card.locator("[data-orbit-active]");
@@ -67,9 +115,23 @@ test("technology cards start static, resume moving pills, support drag and relea
     card.getByRole("button", { name: "Reanudar Backend" }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
+  // A queued notification from the retired observer must not restart the orbit.
+  const delivered = await card.locator(".skill-orbit").evaluate((orbit) => {
+    const notifications = window.__orbitResizeDeliveries.filter(
+      (notification) => notification.target === orbit,
+    );
+    for (const notification of notifications) notification.deliver();
+    return notifications.length;
+  });
+  expect(delivered).toBeGreaterThan(0);
+  await page.waitForTimeout(250);
   for (const chip of await card.locator("[data-orbit-pill]").all()) {
     await expect(chip).toBeVisible();
-    await expect(chip).not.toHaveAttribute("style");
+    await expect
+      .poll(() => chip.evaluate((element) => element.style.cssText))
+      .toBe("");
+    await expect(chip).toHaveCSS("transform", "none");
+    await expect(chip).toHaveCSS("opacity", "1");
   }
   await page.screenshot({ path: info.outputPath("technology-orbits.png") });
 });
