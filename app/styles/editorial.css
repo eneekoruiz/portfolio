@@ -1,0 +1,203 @@
+/* Static editorial details. No additional animation loop or media asset. */
+.hero-composition {
+  grid-template-columns: minmax(0, 1fr);
+}
+.hero-identity-plate.hero-prism {
+  margin-inline: 0;
+  align-self: center;
+  height: min(49svh, 440px);
+  background: color-mix(in srgb, var(--page) 94%, transparent);
+}
+.hero-registration {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: color-mix(in srgb, var(--ink) 10%, transparent);
+  stroke-width: 0.8;
+  pointer-events: none;
+}
+.hero-registration-accent {
+  stroke: var(--brand);
+  stroke-width: 1.5;
+}
+.hero-plate-monogram {
+  font-family: "Materia Sans", var(--font-sans);
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+  color: var(--brand);
+}
+#about .about-manifesto {
+  padding-top: 5.5rem;
+}
+.about-quote-mark {
+  position: absolute;
+  inset-inline-start: 1.5rem;
+  top: 0.6rem;
+  font-family: "Materia Sans", var(--font-sans);
+  font-size: 7rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--brand);
+  pointer-events: none;
+}
+.about-metric {
+  min-height: 210px;
+}
+.about-metric-index {
+  position: absolute;
+  inset-inline-start: 1.5rem;
+  top: 1.5rem;
+  font:
+    9px ui-monospace,
+    monospace;
+  letter-spacing: 0.14em;
+  color: var(--lead);
+}
+.about-metric dd {
+  font-family: "Materia Sans", var(--font-sans);
+}
+#about .about-metric[data-metric-index="2"] {
+  background: var(--ink);
+  min-height: 180px;
+}
+.about-metric[data-metric-index="2"] dt,
+.about-metric[data-metric-index="2"] .about-metric-index {
+  color: color-mix(in srgb, var(--page) 72%, var(--ink));
+}
+.about-metric[data-metric-index="2"] dd {
+  color: var(--page);
+  font-size: 5rem;
+  text-align: end;
+}
+#contact > .contact-composition {
+  background: var(--brand);
+  border-color: var(--brand);
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  color: #fff;
+}
+.contact-composition > :not(.contact-direction-mark) {
+  position: relative;
+  z-index: 1;
+}
+.contact-composition .text-lead,
+.contact-composition .text-ink {
+  color: #fff;
+}
+.contact-composition > .grid {
+  border-color: #ffffff40;
+}
+.contact-composition .contact-email {
+  margin-block: clamp(2.5rem, 5vw, 4.5rem);
+  font-family: "Materia Sans", var(--font-sans);
+  text-decoration-color: #ffffff80;
+  text-underline-offset: 0.18em;
+}
+.contact-composition .materia-button {
+  background: #fff;
+  border-color: #ffffff70;
+  color: #1d1d1f;
+}
+.contact-composition [data-signature-link] {
+  background: transparent;
+  color: #fff;
+}
+.contact-composition :focus-visible {
+  outline-color: #fff;
+}
+.contact-composition .bg-emerald-600 {
+  background: #8bf5b2;
+}
+.contact-direction-mark {
+  position: absolute;
+  right: -2rem;
+  bottom: -3rem;
+  width: clamp(180px, 25vw, 360px);
+  height: auto;
+  color: #ffffff14;
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  .hero-composition {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    column-gap: 1.5rem;
+  }
+  .hero-introduction {
+    grid-column: 1 / -1;
+  }
+  .hero-identity-plate.hero-prism {
+    height: min(39svh, 360px);
+    min-height: 280px;
+  }
+  #about .about-manifesto {
+    padding-top: 6rem;
+  }
+  .about-quote-mark,
+  .about-metric-index {
+    inset-inline-start: 2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .hero-composition {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.65fr);
+  }
+  .hero-identity-plate.hero-prism {
+    height: min(49svh, 440px);
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-composition {
+    align-content: center;
+    row-gap: 2.5rem;
+  }
+  .hero-composition > div:first-child {
+    display: contents;
+  }
+  .hero-composition h1 {
+    font-size: clamp(6rem, 12.5vw, 8rem);
+  }
+  .hero-introduction {
+    order: 3;
+    margin-top: 0;
+  }
+  .hero-identity-plate .hero-portrait-frame {
+    width: min(calc(100% - 2rem), 190px);
+  }
+  .hero-identity-plate > div:last-child {
+    gap: 0.5rem;
+  }
+  .hero-identity-plate > div:last-child > span:first-child {
+    font-size: 8px;
+    letter-spacing: 0.05em;
+  }
+}
+@media (max-width: 479px) {
+  .about-metric {
+    min-height: 195px;
+    padding: 1.25rem;
+  }
+  .about-metric-index {
+    inset-inline-start: 1.25rem;
+    top: 1.25rem;
+  }
+  .about-metric dt {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    overflow-wrap: anywhere;
+  }
+  .about-metric dd {
+    font-size: clamp(2.1rem, 9vw, 3rem);
+  }
+}
+@media print {
+  #contact > .contact-composition {
+    background: var(--page);
+    color: var(--ink);
+  }
+  .contact-composition .text-lead,
+  .contact-composition .text-ink {
+    color: var(--ink);
+  }
+}

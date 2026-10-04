@@ -108,7 +108,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </p>
         <LiveStatus label={t.status} />
       </div>
-      <div className="relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-6 py-4 md:py-6 lg:grid-cols-[1.4fr_0.6fr] lg:gap-0 lg:py-4">
+      <div className="hero-composition relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-6 py-4 md:py-6 lg:gap-0 lg:py-4">
         <div className="relative z-10 min-w-0">
           <h1
             dir="ltr"
@@ -128,7 +128,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               className="mt-[0.08em] text-brand block"
             />
           </h1>
-          <div className="mt-8 flex max-w-2xl items-start gap-5 md:mt-10 md:gap-6">
+          <div className="hero-introduction mt-8 flex max-w-2xl items-start gap-5 md:mt-10 md:gap-6">
             <span
               className="mt-2.5 h-px w-10 md:w-16 shrink-0 bg-brand"
               aria-hidden="true"
@@ -145,13 +145,27 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </div>
         <div
           ref={prismRef}
-          className="materia-surface hero-prism relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 lg:block overflow-hidden"
+          className="materia-surface hero-prism hero-identity-plate relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 md:block overflow-hidden"
           data-materia-surface="hero"
         >
           <div className="absolute inset-x-5 top-5 z-10 flex items-center justify-between text-[10px] font-mono tracking-[0.18em] text-lead">
             <span>ER — 01</span>
             <span aria-hidden="true">↗</span>
           </div>
+          <svg
+            className="hero-registration"
+            viewBox="0 0 400 440"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path d="M200 0v440M0 220h400" />
+            <circle cx="200" cy="220" r="157" />
+            <circle cx="200" cy="220" r="172" strokeDasharray="2 10" />
+            <path
+              className="hero-registration-accent"
+              d="M200 63a157 157 0 0 1 157 157M28 220h16m312 0h16M200 48v16m0 312v16"
+            />
+          </svg>
           <div className="hero-portrait-frame absolute inset-x-4 top-1/2 mx-auto">
             <video
               ref={portraitRef}
@@ -167,7 +181,10 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           </div>
           <div className="absolute bottom-5 left-5 right-5 z-10 flex items-end justify-between border-t border-ink/15 pt-4">
             <span className="font-mono text-[10px] tracking-[0.14em] text-lead">
-              SOFTWARE / SYSTEMS
+              DESIGN / ENGINEERING
+            </span>
+            <span className="hero-plate-monogram" aria-hidden="true">
+              ER.
             </span>
           </div>
         </div>

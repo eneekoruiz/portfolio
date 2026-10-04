@@ -43,7 +43,7 @@ npx playwright test --config playwright.performance.config.mjs
 npm run test:e2e
 ```
 
-The performance configuration covers 1440×900 desktop, 768×1024 tablet, and 375×667 mobile. It verifies deferred requests, offscreen pausing, cursor fallback, reduced motion, navigation, JavaScript-disabled content, and all 20 supported languages. Browser measurements are local diagnostics, not field Core Web Vitals.
+The performance configuration covers 1440×900 desktop, 768×1024 tablet, and 375×667 mobile. It verifies deferred requests, offscreen pausing, cursor fallback, reduced motion, navigation, JavaScript-disabled content, and all 20 supported languages. It also captures the editorial sections in both themes and checks heading overflow, RTL, keyboard-operated project panels, and browser/asset errors. Browser measurements are local diagnostics, not field Core Web Vitals.
 
 ## Links
 

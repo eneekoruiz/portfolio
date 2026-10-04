@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { SkipLink } from "./components/ui/SkipLink";
 import "./styles/globals.css";
 import "./styles/materia.css";
+import "./styles/editorial.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";

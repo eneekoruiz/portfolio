@@ -1,0 +1,199 @@
+/* Static, source-grounded project studies. All effects are local and paint once. */
+.project-plate {
+  container-type: inline-size;
+  --plate-accent: var(--surface-color, var(--brand));
+}
+.project-plate .project-plate-frame {
+  border-radius: 9px;
+  border-color: color-mix(in srgb, var(--ink) 18%, transparent);
+  box-shadow: 0 16px 32px -24px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+.project-plate .project-plate-chrome {
+  height: 30px;
+  padding-inline: 12px;
+  gap: 12px;
+  color: var(--ink);
+  background: var(--page);
+  font-size: 9px;
+  letter-spacing: 0.015em;
+}
+.project-plate-index {
+  color: var(--plate-accent);
+  font-weight: 700;
+  flex-shrink: 0;
+  border-inline-end: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  padding-inline-end: 10px;
+}
+.project-plate-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.project-plate-arrow {
+  color: var(--plate-accent);
+}
+.project-plate .project-plate-content {
+  height: calc(100% - 30px);
+}
+.project-capture {
+  position: absolute;
+  inset: 0;
+}
+.project-capture-label {
+  position: absolute;
+  inset-inline-start: 12px;
+  bottom: 12px;
+  padding: 6px 9px;
+  border: 1px solid #ffffff70;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  font:
+    8px ui-monospace,
+    monospace;
+  letter-spacing: 0.06em;
+}
+.project-study {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  padding: clamp(12px, 4cqw, 24px);
+  background: color-mix(in srgb, var(--plate-accent) 4%, var(--page));
+  color: var(--ink);
+}
+.project-study-label {
+  position: absolute;
+  top: clamp(12px, 4cqw, 24px);
+  inset-inline-start: clamp(12px, 4cqw, 24px);
+  font:
+    8px ui-monospace,
+    monospace;
+  letter-spacing: 0.14em;
+  color: var(--lead);
+}
+.project-study-mark {
+  position: absolute;
+  inset-inline-start: clamp(12px, 4cqw, 24px);
+  top: 30%;
+  font-size: clamp(25px, 16cqw, 88px);
+  font-weight: 850;
+  line-height: 0.9;
+  letter-spacing: -0.09em;
+  color: var(--plate-accent);
+}
+.project-study-diagram {
+  position: absolute;
+  inset-inline-end: -3%;
+  top: 5%;
+  width: 78%;
+  height: 82%;
+  color: var(--plate-accent);
+}
+.project-study-diagram text {
+  font:
+    9px ui-monospace,
+    monospace;
+  text-anchor: middle;
+  fill: var(--ink);
+}
+.study-rule {
+  stroke: color-mix(in srgb, var(--ink) 26%, transparent);
+  stroke-width: 1;
+}
+.study-route {
+  stroke: var(--plate-accent);
+  stroke-width: 2;
+}
+.study-node {
+  fill: var(--page);
+  stroke: color-mix(in srgb, var(--ink) 36%, transparent);
+  stroke-width: 1;
+}
+.study-node-primary {
+  fill: var(--plate-accent);
+  stroke: var(--plate-accent);
+}
+.project-study-diagram .study-text-primary {
+  fill: var(--page);
+}
+.project-study-who-are-ya-backend .study-text-primary,
+.project-study-spotshare-parking .study-text-primary {
+  fill: #102019;
+}
+.study-database,
+.study-parking,
+.study-focus,
+.study-lock {
+  stroke: var(--plate-accent);
+  stroke-width: 1.5;
+}
+.study-stop {
+  fill: var(--page);
+  stroke: var(--plate-accent);
+  stroke-width: 2;
+}
+.study-dot {
+  fill: var(--plate-accent);
+}
+.project-study-diagram .study-parking-mark {
+  font:
+    23px var(--font-sans),
+    sans-serif;
+}
+.project-study-diagram .study-glyph {
+  font:
+    70px var(--font-sans),
+    sans-serif;
+  letter-spacing: -0.075em;
+  fill: var(--plate-accent);
+}
+.project-study-caption {
+  position: absolute;
+  bottom: clamp(10px, 3cqw, 18px);
+  inset-inline-start: clamp(12px, 4cqw, 24px);
+  inset-inline-end: 12px;
+  color: var(--lead);
+  font:
+    clamp(7px, 2cqw, 10px) ui-monospace,
+    monospace;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.project-study-disclaimer {
+  position: absolute;
+  bottom: clamp(10px, 3cqw, 18px);
+  inset-inline-start: clamp(12px, 4cqw, 24px);
+  inset-inline-end: clamp(12px, 4cqw, 24px);
+  font-size: clamp(8px, 2.1cqw, 11px);
+  line-height: 1.4;
+  color: var(--lead);
+}
+.project-study-pke-web .project-study-mark {
+  visibility: hidden;
+}
+.project-study-pke-web .project-study-caption {
+  display: none;
+}
+.project-study-pke-web .project-study-diagram {
+  width: 100%;
+  inset-inline-end: 0;
+  height: 76%;
+}
+.project-study-spotshare-parking .project-study-mark {
+  font-size: clamp(30px, 20cqw, 100px);
+}
+.project-follower-visual.project-plate .project-plate-content {
+  height: 100%;
+}
+.project-follower-visual .project-study-label,
+.project-follower-visual .project-study-caption,
+.project-follower-visual .project-study-disclaimer,
+.project-follower-visual .project-capture-label {
+  display: none;
+}
+.project-follower-visual .project-study-diagram {
+  top: 0;
+  height: 100%;
+}
