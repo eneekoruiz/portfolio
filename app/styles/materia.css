@@ -286,7 +286,7 @@ html[data-umbral]::view-transition-new(project-surface) {
   }
 }
 .dna-static {
-  opacity: 0.6;
+  opacity: 0.85;
 }
 .contact-flip-visual {
   transform-style: preserve-3d;
@@ -635,7 +635,7 @@ html[dir="rtl"] .hero-prism {
   transition: opacity 240ms ease;
 }
 .materia-canvas[data-scene-active="false"] {
-  opacity: 0.13 !important;
+  opacity: 0.2 !important;
 }
 .materia-canvas[data-scene-ready="false"] {
   opacity: 0 !important;

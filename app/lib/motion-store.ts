@@ -52,7 +52,9 @@ export function subscribeMotion(listener: () => void) {
         !reduced.matches &&
         !nav.connection?.saveData &&
         window.__LITE !== true &&
-        (preference ?? !lightweight);
+        // Modest desktop hardware keeps the site's motion and studio layout;
+        // lightweight only selects the lower-cost SVG scene. Touch defaults off.
+        (preference ?? !touch.matches);
       const enabled = visible && allowed && !isBodyScrollLocked();
       document.documentElement.dataset.motion = enabled ? "on" : "off";
       if (

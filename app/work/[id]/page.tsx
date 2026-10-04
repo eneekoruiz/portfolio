@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   CheckCircle2,
   Radar,
+  Github,
 } from "lucide-react";
 
 import { TX } from "../../data/translations";
@@ -572,7 +573,7 @@ export default function ProjectPage() {
               <span className="xs:hidden">{TX[lang]?.back ?? "Back"}</span>
             </span>
           </button>
-          <div className="flex items-center gap-2 font-mono text-[8px] md:text-[9px] uppercase tracking-widest px-2.5 md:px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 truncate max-w-[120px] md:max-w-none">
+          <div className="hidden sm:flex items-center gap-2 font-mono text-[8px] md:text-[9px] uppercase tracking-widest px-2.5 md:px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 truncate max-w-[120px] md:max-w-none">
             <Activity
               size={10}
               style={{ color: theme.accent }}
@@ -580,6 +581,17 @@ export default function ProjectPage() {
             />
             <span className="truncate">{theme.label}</span>
           </div>
+          {githubUrl && (
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-11 items-center gap-2 px-3 text-xs font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-full"
+            >
+              <Github size={16} aria-hidden="true" />
+              GitHub
+            </a>
+          )}
         </div>
       </header>
 

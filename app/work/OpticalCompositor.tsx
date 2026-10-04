@@ -10,7 +10,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { materia } from "../lib/materia";
 import { DNAHelix3D } from "./DNAHelix3D";
 
-const MAX_SURFACES = 8;
+const MAX_SURFACES = 6;
 const vertexShader = `
   varying vec2 vUv;
   void main() {

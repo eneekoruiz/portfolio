@@ -41,7 +41,11 @@ function MetricCard({
       <span className="about-metric-index" aria-hidden="true">
         0{index + 1} / ER
       </span>
-      <dl ref={visualRef} data-metric-visual>
+      <dl
+        ref={visualRef}
+        data-metric-visual
+        data-metric-copy={value.length > 4 || undefined}
+      >
         <dt className="mb-4 font-mono text-[10px] uppercase tracking-[0.15em] text-lead">
           {label}
         </dt>

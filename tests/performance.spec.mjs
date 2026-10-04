@@ -107,10 +107,11 @@ test("lightweight and reduced motion never allocate a WebGL canvas or fetch hidd
   );
 });
 
-test("mobile and modest devices start with static decoration and readable skills", async ({
+test("mobile stays static while modest desktop keeps lightweight motion and readable skills", async ({
   page,
 }, info) => {
-  if (info.project.name === "desktop")
+  const modestDesktop = info.project.name === "desktop";
+  if (modestDesktop)
     await page.addInitScript(() =>
       Object.defineProperty(navigator, "deviceMemory", {
         get: () => 2,
@@ -118,19 +119,59 @@ test("mobile and modest devices start with static decoration and readable skills
       }),
     );
   await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-motion",
+    modestDesktop ? "on" : "off",
+  );
   await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
+  await expect(page.locator("[data-dna-static]")).toBeVisible();
+  if (modestDesktop) {
+    const rung = page.locator("[data-dna-static] line").first();
+    await expect(rung).toBeVisible();
+    const startingX = await rung.getAttribute("x1");
+    await expect.poll(() => rung.getAttribute("x1")).not.toBe(startingX);
+  }
   const skills = page.locator("#skills");
   await skills.scrollIntoViewIfNeeded();
-  await expect(skills.locator("[data-orbit-active]")).toHaveCount(0);
+  if (!modestDesktop)
+    await expect(skills.locator("[data-orbit-active]")).toHaveCount(0);
   for (const text of ["Python", "Java", "Node.js", "React", "TypeScript"])
     await expect(skills.getByText(text, { exact: true })).toBeVisible();
+  if (modestDesktop) {
+    await page.goto("/work/ana-peluquera");
+    const studio = page.locator('[data-studio-screen="cinematic"]');
+    await expect(studio).toBeVisible();
+    await expect(studio).toHaveCSS("transform-style", "preserve-3d");
+  }
 });
 
 test("optional activity loads on approach and failure preserves featured work and contact", async ({
   page,
-}) => {
+}, info) => {
   let calls = 0;
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    window.__activityObserverEvents = [];
+    const NativeObserver = window.IntersectionObserver;
+    window.IntersectionObserver = class extends NativeObserver {
+      constructor(callback, options) {
+        super((entries, observer) => {
+          for (const entry of entries) {
+            if (entry.target.id === "github")
+              window.__activityObserverEvents.push({
+                near: entry.isIntersecting,
+                connected: entry.target.isConnected,
+                visibility: document.visibilityState,
+                top: entry.boundingClientRect.top,
+                bottom: entry.boundingClientRect.bottom,
+              });
+          }
+          callback(entries, observer);
+        }, options);
+      }
+    };
+  });
   await page.route("**/api/github/repos?**", async (route) => {
     calls++;
     await route.fulfill({ status: 503, body: "{}" });
@@ -138,7 +179,28 @@ test("optional activity loads on approach and failure preserves featured work an
   await page.goto("/");
   expect(calls).toBe(0);
   await page.locator("#github").scrollIntoViewIfNeeded();
-  await expect.poll(() => calls).toBe(1);
+  try {
+    await expect.poll(() => calls).toBe(1);
+  } catch (error) {
+    await info.attach("activity-observer-diagnostic", {
+      body: JSON.stringify({
+        calls,
+        errors,
+        page: await page.evaluate(() => ({
+          visibility: document.visibilityState,
+          observerEvents: window.__activityObserverEvents,
+          sections: [...document.querySelectorAll("#github")].map(
+            (section) => ({
+              connected: section.isConnected,
+              rect: section.getBoundingClientRect().toJSON(),
+            }),
+          ),
+        })),
+      }),
+      contentType: "application/json",
+    });
+    throw error;
+  }
   await expect(
     page.locator('#github a[href="https://github.com/eneekoruiz"]').first(),
   ).toBeVisible();
@@ -147,6 +209,7 @@ test("optional activity loads on approach and failure preserves featured work an
   await expect(
     page.locator('#contact a[href^="mailto:"]').first(),
   ).toBeVisible();
+  expect(errors).toEqual([]);
 });
 
 test("content and contact survive disabled JavaScript", async ({

@@ -98,7 +98,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       ref={heroRef}
       id="hero"
       aria-label="Eneko Ruiz"
-      className="materia-hero relative flex min-h-[100svh] lg:h-[100svh] lg:max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
+      className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
       <FloatingNodes />
       <div className="hero-light" aria-hidden="true" />
@@ -134,7 +134,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               aria-hidden="true"
             />
             <div>
-              <p className="text-lg font-bold uppercase tracking-wide text-ink md:text-2xl">
+              <p className="text-base font-semibold tracking-tight text-ink md:text-lg">
                 {t.role}
               </p>
               <p className="mt-3 md:mt-4 max-w-md text-sm leading-relaxed text-lead md:text-base">
@@ -152,20 +152,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
             <span>ER — 01</span>
             <span aria-hidden="true">↗</span>
           </div>
-          <svg
-            className="hero-registration"
-            viewBox="0 0 400 440"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path d="M200 0v440M0 220h400" />
-            <circle cx="200" cy="220" r="157" />
-            <circle cx="200" cy="220" r="172" strokeDasharray="2 10" />
-            <path
-              className="hero-registration-accent"
-              d="M200 63a157 157 0 0 1 157 157M28 220h16m312 0h16M200 48v16m0 312v16"
-            />
-          </svg>
           <div className="hero-portrait-frame absolute inset-x-4 top-1/2 mx-auto">
             <video
               ref={portraitRef}
@@ -181,10 +167,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           </div>
           <div className="absolute bottom-5 left-5 right-5 z-10 flex items-end justify-between border-t border-ink/15 pt-4">
             <span className="font-mono text-[10px] tracking-[0.14em] text-lead">
-              DESIGN / ENGINEERING
-            </span>
-            <span className="hero-plate-monogram" aria-hidden="true">
-              ER.
+              DONOSTIA / SOFTWARE
             </span>
           </div>
         </div>

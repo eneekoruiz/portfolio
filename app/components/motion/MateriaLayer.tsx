@@ -23,7 +23,7 @@ const CanvasScene = dynamic(
 );
 
 class GraphicsBoundary extends Component<
-  { children: ReactNode },
+  { animateFallback: boolean; children: ReactNode },
   { failed: boolean }
 > {
   state = { failed: false };
@@ -31,7 +31,11 @@ class GraphicsBoundary extends Component<
     return { failed: true };
   }
   render() {
-    return this.state.failed ? <StaticDNA /> : this.props.children;
+    return this.state.failed ? (
+      <StaticDNA animate={this.props.animateFallback} />
+    ) : (
+      this.props.children
+    );
   }
 }
 
@@ -105,6 +109,7 @@ export function MateriaLayer() {
   }, [enabled]);
   const routeHasScene = pathname === "/" || pathname.startsWith("/work/");
   const ready = pathname !== "/" || phase === "ready";
+  const animateFallback = enabled && heroVisible && ready;
   if (!mounted || !routeHasScene) return null;
   return (
     <div
@@ -114,9 +119,9 @@ export function MateriaLayer() {
       data-scene-degraded={degraded || undefined}
       aria-hidden="true"
     >
-      <GraphicsBoundary>
+      <GraphicsBoundary animateFallback={animateFallback}>
         {!allowed || lightweight || !sceneReady || degraded ? (
-          <StaticDNA />
+          <StaticDNA animate={animateFallback} />
         ) : (
           <CanvasScene
             accent="#0066ff"

@@ -1,34 +1,46 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OpticalCompositor } from "./OpticalCompositor";
+import { StaticDNA } from "../components/motion/StaticDNA";
 
 /** A decorative scene gets at most 30 frames/s, even on 120/144 Hz screens. */
 function FrameBudget({
   active,
   onSlow,
+  onReady,
 }: {
   active: boolean;
   onSlow: () => void;
+  onReady: () => void;
 }) {
   const { invalidate } = useThree();
+  const renderedFrames = useRef(0);
+  const reportedReady = useRef(false);
+  useFrame(() => {
+    renderedFrames.current += 1;
+    if (active && !reportedReady.current) {
+      reportedReady.current = true;
+      onReady();
+    }
+  });
   useEffect(() => {
     if (!active) return;
     let frame = 0,
       last = 0,
-      count = 0,
       start = performance.now(),
+      lastRenderedFrames = renderedFrames.current,
       slowWindows = 0;
     const tick = (now: number) => {
       if (now - last >= 1000 / 30 - 1) {
         last = now;
-        count++;
         invalidate();
       }
       if (now - start > 2500) {
-        if (count / ((now - start) / 1000) < 18) slowWindows++;
+        const rendered = renderedFrames.current - lastRenderedFrames;
+        if (rendered / ((now - start) / 1000) < 18) slowWindows++;
         else slowWindows = 0;
-        count = 0;
+        lastRenderedFrames = renderedFrames.current;
         start = now;
         if (slowWindows >= 2) {
           onSlow();
@@ -56,6 +68,8 @@ export function CanvasScene({
   onSlow: () => void;
 }) {
   const [visible, setVisible] = useState(true);
+  const [rendered, setRendered] = useState(false);
+  const ready = useCallback(() => setRendered(true), []);
   const [inView, setInView] = useState(false);
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -85,7 +99,7 @@ export function CanvasScene({
           stencil: false,
         }}
       >
-        <FrameBudget active={active} onSlow={onSlow} />
+        <FrameBudget active={active} onSlow={onSlow} onReady={ready} />
         <OpticalCompositor
           accent={accent}
           secondary={secondary}
@@ -95,6 +109,7 @@ export function CanvasScene({
           isMobile={false}
         />
       </Canvas>
+      {!rendered && <StaticDNA />}
     </div>
   );
 }

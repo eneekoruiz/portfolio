@@ -8,36 +8,15 @@
   height: min(49svh, 440px);
   background: color-mix(in srgb, var(--page) 94%, transparent);
 }
-.hero-registration {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  stroke: color-mix(in srgb, var(--ink) 10%, transparent);
-  stroke-width: 0.8;
-  pointer-events: none;
-}
-.hero-registration-accent {
-  stroke: var(--brand);
-  stroke-width: 1.5;
-}
-.hero-plate-monogram {
-  font-family: "Materia Sans", var(--font-sans);
-  font-size: 30px;
-  font-weight: 900;
-  line-height: 0.8;
-  letter-spacing: -0.07em;
-  color: var(--brand);
-}
 #about .about-manifesto {
-  padding-top: 5.5rem;
+  padding-top: 4.5rem;
 }
 .about-quote-mark {
   position: absolute;
   inset-inline-start: 1.5rem;
   top: 0.6rem;
   font-family: "Materia Sans", var(--font-sans);
-  font-size: 7rem;
+  font-size: 5rem;
   font-weight: 900;
   line-height: 1;
   color: var(--brand);
@@ -45,6 +24,10 @@
 }
 .about-metric {
   min-height: 210px;
+}
+.about-metric dt {
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 .about-metric-index {
   position: absolute;
@@ -58,25 +41,30 @@
 }
 .about-metric dd {
   font-family: "Materia Sans", var(--font-sans);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.about-metric [data-metric-copy] dd {
+  font-size: clamp(1.5rem, 3.2vw, 2.6rem);
 }
 #about .about-metric[data-metric-index="2"] {
-  background: var(--ink);
+  background: color-mix(in srgb, var(--brand) 5%, var(--page));
   min-height: 180px;
 }
 .about-metric[data-metric-index="2"] dt,
 .about-metric[data-metric-index="2"] .about-metric-index {
-  color: color-mix(in srgb, var(--page) 72%, var(--ink));
+  color: var(--lead);
 }
 .about-metric[data-metric-index="2"] dd {
-  color: var(--page);
-  font-size: 5rem;
+  color: var(--brand);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   text-align: end;
 }
 #contact > .contact-composition {
-  background: var(--brand);
-  border-color: var(--brand);
+  background: var(--page);
+  border-color: color-mix(in srgb, var(--brand) 25%, var(--ink) 10%);
   padding: clamp(1.5rem, 4vw, 3.5rem);
-  color: #fff;
+  color: var(--ink);
 }
 .contact-composition > :not(.contact-direction-mark) {
   position: relative;
@@ -84,31 +72,34 @@
 }
 .contact-composition .text-lead,
 .contact-composition .text-ink {
-  color: #fff;
+  color: var(--ink);
+}
+.contact-composition .text-lead {
+  color: var(--lead);
 }
 .contact-composition > .grid {
-  border-color: #ffffff40;
+  border-color: color-mix(in srgb, var(--ink) 15%, transparent);
 }
 .contact-composition .contact-email {
   margin-block: clamp(2.5rem, 5vw, 4.5rem);
   font-family: "Materia Sans", var(--font-sans);
-  text-decoration-color: #ffffff80;
+  text-decoration-color: color-mix(in srgb, var(--brand) 50%, transparent);
   text-underline-offset: 0.18em;
 }
 .contact-composition .materia-button {
-  background: #fff;
-  border-color: #ffffff70;
-  color: #1d1d1f;
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
 }
 .contact-composition [data-signature-link] {
   background: transparent;
-  color: #fff;
+  color: var(--ink);
 }
 .contact-composition :focus-visible {
-  outline-color: #fff;
+  outline-color: var(--brand);
 }
 .contact-composition .bg-emerald-600 {
-  background: #8bf5b2;
+  background: #059669;
 }
 .contact-direction-mark {
   position: absolute;
@@ -116,7 +107,7 @@
   bottom: -3rem;
   width: clamp(180px, 25vw, 360px);
   height: auto;
-  color: #ffffff14;
+  color: color-mix(in srgb, var(--brand) 5%, transparent);
   pointer-events: none;
 }
 @media (min-width: 768px) {
@@ -125,14 +116,14 @@
     column-gap: 1.5rem;
   }
   .hero-introduction {
-    grid-column: 1 / -1;
+    max-width: 34rem;
   }
   .hero-identity-plate.hero-prism {
     height: min(39svh, 360px);
     min-height: 280px;
   }
   #about .about-manifesto {
-    padding-top: 6rem;
+    padding-top: 4.5rem;
   }
   .about-quote-mark,
   .about-metric-index {
@@ -148,19 +139,29 @@
   }
 }
 @media (min-width: 768px) and (max-width: 1023px) {
+  .about-metric {
+    padding: 1.5rem;
+  }
+  .about-metric-index {
+    inset-inline-start: 1.5rem;
+    top: 1.5rem;
+  }
   .hero-composition {
     align-content: center;
     row-gap: 2.5rem;
   }
   .hero-composition > div:first-child {
-    display: contents;
+    min-width: 0;
   }
   .hero-composition h1 {
     font-size: clamp(6rem, 12.5vw, 8rem);
   }
   .hero-introduction {
-    order: 3;
-    margin-top: 0;
+    margin-top: 2rem;
+    gap: 0.75rem;
+  }
+  .hero-introduction > span {
+    width: 1.25rem;
   }
   .hero-identity-plate .hero-portrait-frame {
     width: min(calc(100% - 2rem), 190px);

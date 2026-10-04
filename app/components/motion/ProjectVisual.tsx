@@ -233,6 +233,10 @@ export function ProjectVisual({
                 AG / BEAUTY SALON
               </span>
             </div>
+          ) : code && !unavailable ? (
+            <pre dir="ltr" className="preview-source" data-project-source={id}>
+              <code>{code.split("\n").slice(0, 11).join("\n")}</code>
+            </pre>
           ) : plate ? (
             <div
               className={`project-study project-study-${id}`}

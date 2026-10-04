@@ -5,9 +5,15 @@ import { useViewportMotion } from "../../hooks/useViewportMotion";
 
 const NODES = [
   { id: "react", label: "React / Next.js", top: "15%", left: "10%", delay: 0 },
-  { id: "gsap", label: "GSAP / Motion", top: "35%", left: "75%", delay: 1 },
-  { id: "brand", label: "Brand Identity", top: "81%", left: "3%", delay: 0.5 },
-  { id: "perf", label: "Webgl / Webgpu", top: "65%", left: "65%", delay: 1.5 },
+  { id: "node", label: "Node.js / Express", top: "35%", left: "75%", delay: 1 },
+  { id: "java", label: "Java / JAX-WS", top: "81%", left: "3%", delay: 0.5 },
+  {
+    id: "data",
+    label: "MongoDB / Firebase",
+    top: "65%",
+    left: "65%",
+    delay: 1.5,
+  },
 ];
 
 export function FloatingNodes() {

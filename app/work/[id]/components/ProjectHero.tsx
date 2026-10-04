@@ -658,27 +658,8 @@ export function ProjectHero({
               <div className="flex items-center gap-3 pr-6 border-r border-white/10">
                 <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
                 <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[120px] md:max-w-none">
-                  {title}{" "}
-                  <span className="hidden xs:inline">
-                    {" // SYSTEM.ACTIVE"}
-                  </span>
+                  {title}
                 </span>
-              </div>
-
-              {/* Real-time Telemetry (Decorative) */}
-              <div className="hidden md:flex items-center gap-6 text-white/40 font-mono text-[8px] uppercase tracking-widest">
-                <div className="flex flex-col">
-                  <span className="text-white/20">Latency</span>
-                  <span className="text-brand">24ms</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-white/20">Security</span>
-                  <span className="text-green-400">Hardened</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-white/20">Environment</span>
-                  <span className="text-white/60">Vercel.Edge</span>
-                </div>
               </div>
             </div>
 
@@ -690,7 +671,7 @@ export function ProjectHero({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group flex items-center gap-2"
-                  title="View Source Code"
+                  title={s.sourceCode}
                 >
                   <GithubIcon size={16} className="group-hover:scale-110" />
                   <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
@@ -983,19 +964,11 @@ export function ProjectHero({
         {isInteracting && (
           <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[10000]">
             <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-              Auth: <span className="text-brand">Developer_Privileges</span>{" "}
-              {" // "} Root_Access: <span className="text-green-400">True</span>
+              {title}
             </div>
 
             <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-white/20" />
-                <span>Signal_Strength: 98%</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-white/20" />
-                <span>Data_integrity: Verified</span>
-              </div>
+              <span>{s.enterStudio}</span>
             </div>
           </footer>
         )}

@@ -176,17 +176,17 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     }
 
     return {
-      pairs: lowPower ? 50 : 68,
+      pairs: lowPower ? 42 : 56,
       radius: lowPower ? 2.95 : 3.35,
       height: 24,
       turns: lowPower ? 3.1 : 3.4,
-      tubeSegments: lowPower ? 112 : 168,
-      radialSegments: lowPower ? 6 : 8,
-      nodeSegments: lowPower ? 10 : 14,
+      tubeSegments: lowPower ? 96 : 144,
+      radialSegments: lowPower ? 5 : 7,
+      nodeSegments: lowPower ? 8 : 11,
       strandRadius: lowPower ? 0.042 : 0.054,
       rungRadius: lowPower ? 0.035 : 0.045,
       nodeScale: lowPower ? 0.15 : 0.175,
-      rotationSpeed: lowPower ? 0.18 : 0.26,
+      rotationSpeed: lowPower ? 0.12 : 0.18,
       scale: [1.25, 1.08, 1.25] as [number, number, number],
       rotation: [7, 18, -10] as [number, number, number],
     };
@@ -314,7 +314,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         new THREE.MeshPhysicalMaterial({
           color: accentColor,
           emissive: accentColor,
-          emissiveIntensity: darkMode ? 0.4 : 0.08,
+          emissiveIntensity: darkMode ? 0.34 : 0.08,
           roughness: lowPower ? 0.38 : 0.24,
           metalness: lowPower ? 0.18 : 0.42,
           clearcoat: lowPower ? 0 : 0.75,
@@ -331,7 +331,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         new THREE.MeshPhysicalMaterial({
           color: secondaryColor,
           emissive: secondaryColor,
-          emissiveIntensity: darkMode ? 0.3 : 0.06,
+          emissiveIntensity: darkMode ? 0.27 : 0.06,
           roughness: lowPower ? 0.4 : 0.27,
           metalness: lowPower ? 0.16 : 0.48,
           clearcoat: lowPower ? 0 : 0.6,
@@ -404,7 +404,10 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         : 0;
     const scrollMax =
       typeof document !== "undefined"
-        ? Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
+        ? Math.max(
+            1,
+            document.documentElement.scrollHeight - window.innerHeight,
+          )
         : 4000;
     const scrollFraction = Math.min(1, Math.max(0, currentScrollY / scrollMax));
     const targetScrollTurn =
@@ -416,8 +419,8 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
     baseRotationRef.current +=
       Math.min(delta, 0.05) *
       (config.rotationSpeed +
-        Math.min(Math.abs(materia.velocity) * 0.0018, 0.5)) *
-      (1 + materia.warp.value * 6 + studio * 0.8);
+        Math.min(Math.abs(materia.velocity) * 0.0015, 0.3)) *
+      (1 + materia.warp.value * 3 + studio * 0.5);
 
     groupRef.current.position.y =
       Math.sin(time * 0.32) * 0.26 +
@@ -450,11 +453,11 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       matA.color.lerp(liveColors.accent, blend);
       matA.emissive.copy(matA.color);
       matA.emissiveIntensity =
-        (darkMode ? 0.45 : 0.15) * (1 + materia.warp.value * 1.4);
+        (darkMode ? 0.38 : 0.12) * (1 + materia.warp.value * 1.2);
       matB.color.lerp(liveColors.secondary, blend);
       matB.emissive.copy(matB.color);
       matB.emissiveIntensity =
-        (darkMode ? 0.35 : 0.12) * (1 + materia.warp.value * 1.4);
+        (darkMode ? 0.29 : 0.09) * (1 + materia.warp.value * 1.2);
     }
   });
 
