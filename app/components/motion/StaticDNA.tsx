@@ -10,13 +10,21 @@ const pairs = Array.from({ length: 36 }, (_, i) => {
   const phase = progress * Math.PI * 6;
   return { y, phase };
 });
+// Cubic tangents keep the strands smooth at the same geometry/sample budget.
+const pathSegment = (i: number, yaw: number, direction: number) => {
+  const { y, phase } = pairs[i];
+  const x = 150 + Math.sin(phase + yaw) * 82 * direction;
+  if (!i) return `M${x.toFixed(2)},${y.toFixed(2)}`;
+  const previous = pairs[i - 1];
+  const third = (y - previous.y) / 3;
+  const slope = (82 * Math.PI * 6 * direction) / 780;
+  const previousX = 150 + Math.sin(previous.phase + yaw) * 82 * direction;
+  const controlA = previousX + Math.cos(previous.phase + yaw) * slope * third;
+  const controlB = x - Math.cos(phase + yaw) * slope * third;
+  return `C${controlA.toFixed(2)},${(previous.y + third).toFixed(2)} ${controlB.toFixed(2)},${(y - third).toFixed(2)} ${x.toFixed(2)},${y.toFixed(2)}`;
+};
 const pathFor = (direction: number) =>
-  pairs
-    .map(({ y, phase }, i) => {
-      const x = 150 + Math.sin(phase) * 82 * direction;
-      return `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`;
-    })
-    .join(" ");
+  pairs.map((_, i) => pathSegment(i, 0, direction)).join(" ");
 
 export function StaticDNA({ animate = false }: { animate?: boolean }) {
   const strandARef = useRef<SVGPathElement>(null);
@@ -45,13 +53,13 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
       const dA: string[] = [];
       const dB: string[] = [];
       for (let i = 0; i < pairs.length; i++) {
-        const { y, phase } = pairs[i];
+        const { phase } = pairs[i];
         const angle = phase + yaw;
         const front = Math.cos(angle);
         const xA = 150 + Math.sin(angle) * 82;
         const xB = 150 - Math.sin(angle) * 82;
-        dA.push(`${i ? "L" : "M"}${xA.toFixed(2)},${y.toFixed(2)}`);
-        dB.push(`${i ? "L" : "M"}${xB.toFixed(2)},${y.toFixed(2)}`);
+        dA.push(pathSegment(i, yaw, 1));
+        dB.push(pathSegment(i, yaw, -1));
 
         const rung = rungsRef.current[i];
         const nodeA = nodesARef.current[i];

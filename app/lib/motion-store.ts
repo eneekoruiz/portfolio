@@ -31,6 +31,9 @@ export function subscribeMotion(listener: () => void) {
       connection?: Connection;
     };
     let preference: boolean | null = null;
+    // A click can opt into light motion for this visit. A stored preference
+    // alone never overrides the operating system's reduced-motion setting.
+    let explicitOptIn = false;
     const readPreference = () => {
       try {
         const value = localStorage.getItem("portfolio-motion-enabled");
@@ -43,24 +46,25 @@ export function subscribeMotion(listener: () => void) {
     const update = () => {
       const lightweight =
         touch.matches ||
+        reduced.matches ||
         window.__LITE === true ||
         !!nav.connection?.saveData ||
         (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) ||
         (nav.hardwareConcurrency > 0 && nav.hardwareConcurrency <= 4);
       const visible = document.visibilityState === "visible";
+      const reducedMotion = reduced.matches && !explicitOptIn;
       const allowed =
-        !reduced.matches &&
-        !nav.connection?.saveData &&
-        window.__LITE !== true &&
-        // Modest desktop hardware keeps the site's motion and studio layout;
-        // lightweight only selects the lower-cost SVG scene. Touch defaults off.
-        (preference ?? !touch.matches);
+        !reducedMotion &&
+        (preference ??
+          (!touch.matches &&
+            !nav.connection?.saveData &&
+            window.__LITE !== true));
       const enabled = visible && allowed && !isBodyScrollLocked();
       document.documentElement.dataset.motion = enabled ? "on" : "off";
       if (
         snapshot.allowed === allowed &&
         snapshot.enabled === enabled &&
-        snapshot.reduced === reduced.matches &&
+        snapshot.reduced === reducedMotion &&
         snapshot.visible === visible &&
         snapshot.lightweight === lightweight
       )
@@ -68,20 +72,33 @@ export function subscribeMotion(listener: () => void) {
       snapshot = {
         allowed,
         enabled,
-        reduced: reduced.matches,
+        reduced: reducedMotion,
         visible,
         lightweight,
       };
       for (const notify of listeners) notify();
     };
     const change = (event: Event) => {
-      const value = (event as CustomEvent<{ enabled?: boolean }>).detail
-        ?.enabled;
-      if (typeof value === "boolean") preference = value;
-      else readPreference();
+      const detail = (
+        event as CustomEvent<{
+          enabled?: boolean;
+          userInitiated?: boolean;
+        }>
+      ).detail;
+      if (typeof detail?.enabled === "boolean") {
+        preference = detail.enabled;
+        explicitOptIn = detail.enabled && detail.userInitiated === true;
+      } else {
+        explicitOptIn = false;
+        readPreference();
+      }
       update();
     };
-    reduced.addEventListener("change", update);
+    const systemPreferenceChanged = () => {
+      explicitOptIn = false;
+      update();
+    };
+    reduced.addEventListener("change", systemPreferenceChanged);
     touch.addEventListener("change", update);
     nav.connection?.addEventListener("change", update);
     document.addEventListener("visibilitychange", update);
@@ -89,7 +106,7 @@ export function subscribeMotion(listener: () => void) {
     window.addEventListener("portfolio-motion-changed", change);
     window.addEventListener("storage", change);
     dispose = () => {
-      reduced.removeEventListener("change", update);
+      reduced.removeEventListener("change", systemPreferenceChanged);
       touch.removeEventListener("change", update);
       nav.connection?.removeEventListener("change", update);
       document.removeEventListener("visibilitychange", update);

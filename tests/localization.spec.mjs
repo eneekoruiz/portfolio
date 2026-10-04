@@ -41,23 +41,6 @@ test("all 20 languages reach project descriptions, technology labels, contact an
   await row.locator("button[aria-expanded]").click();
   for (const lang of Object.keys(LANG_LABELS)) {
     await language(page, lang);
-    if (lang !== "es" && lang !== "en") {
-      await expect(page.locator("#expertise h2")).toHaveText(TX[lang].skH);
-      await expect(page.locator("#expertise h3")).toHaveText([
-        TX[lang].skCats[1],
-        TX[lang].skCats[0],
-        TX[lang].skCats[2],
-      ]);
-    }
-    for (const technology of [
-      "React / Next.js",
-      "Node.js / Express",
-      "Java / JAX-WS",
-      "MongoDB / Firebase",
-    ])
-      await expect(
-        page.locator("[data-marquee-active] > .sr-only"),
-      ).toContainText(technology);
     await expect(page.locator('a[href="#main-content"]')).toHaveText(
       UI_COPY[lang].skip,
     );

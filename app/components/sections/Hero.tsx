@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { LiveStatus } from "../ui/LiveStatus";
 import { KineticText } from "../motion/KineticText";
-import { FloatingNodes } from "../motion/FloatingNodes";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useSpringHover } from "../../hooks/useSpringHover";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
 import type { Tx, Lang } from "../../types";
@@ -23,7 +22,7 @@ interface HeroProps {
 
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const ui = UI_COPY[lang];
-  const motion = useMotionEnabled();
+  const { enabled: motion, lightweight } = useMotionPolicy();
   const enabled = motion && !reduced && phase === "ready";
   const portraitRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -32,7 +31,12 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
     let visible = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const update = () => {
-      if (enabled && visible && document.visibilityState === "visible") {
+      if (
+        enabled &&
+        !lightweight &&
+        visible &&
+        document.visibilityState === "visible"
+      ) {
         if (!video.getAttribute("src")) {
           if (!timer)
             timer = setTimeout(() => {
@@ -67,7 +71,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       document.removeEventListener("visibilitychange", update);
       video.pause();
     };
-  }, [enabled]);
+  }, [enabled, lightweight]);
   const heroRef = useRef<HTMLElement>(null);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
@@ -171,7 +175,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           </div>
         </div>
       </div>
-      <FloatingNodes />
       <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 md:gap-6 border-t border-ink/15 py-3 md:py-4 shrink-0">
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <SignatureLink

@@ -60,8 +60,6 @@ import { Hero } from "./components/sections/Hero";
 import { About } from "./components/sections/About";
 import { Skills } from "./components/sections/Skills";
 import { Projects } from "./components/sections/Projects";
-import { Expertise } from "./components/sections/Expertise";
-import { InfiniteMarquee } from "./components/motion/InfiniteMarquee";
 import { memo } from "react";
 
 // ── Memoized Sections for performance ──
@@ -265,8 +263,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           phase={phase}
           lang={lang}
         />
-        <Expertise t={t} lang={lang} />
-        <InfiniteMarquee text="React / Next.js • Node.js / Express • Java / JAX-WS • MongoDB / Firebase" />
         <MemoProjects
           t={t}
           lang={lang}

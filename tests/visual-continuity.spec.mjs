@@ -300,8 +300,8 @@ test("hero reading areas and portrait plate stay clear at supported widths and t
         path: `${screenshots}/${viewport.width}-${viewport.height}-${theme}-hero.png`,
       });
       await page.evaluate(() => window.scrollTo(0, 0));
-      await page.locator("#expertise").screenshot({
-        path: `${screenshots}/${viewport.width}-${viewport.height}-${theme}-expertise.png`,
+      await page.locator("#work").screenshot({
+        path: `${screenshots}/${viewport.width}-${viewport.height}-${theme}-work.png`,
       });
       await page.locator("#about").scrollIntoViewIfNeeded();
       const metricBoxes = await page

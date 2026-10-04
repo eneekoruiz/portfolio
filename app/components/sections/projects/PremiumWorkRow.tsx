@@ -77,7 +77,8 @@ export function PremiumWorkRow({
   useProjectTension(rowRef, enabled, isExpanded, idx);
   useSpringAccordion(bodyRef, contentRef, isExpanded, enabled, skipAnimation);
   const prefetch = () => {
-    if (theme.hasAudit && enabled && !prefetched.current) {
+    // Hover/focus signals navigation intent even when decorative motion is off.
+    if (theme.hasAudit && !menu && !prefetched.current) {
       prefetched.current = true;
       router.prefetch(`/work/${safeId}`);
     }

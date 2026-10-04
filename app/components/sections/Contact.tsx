@@ -49,13 +49,8 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
       <div
         ref={cardRef}
         data-section-reveal
-        className="materia-surface contact-composition relative overflow-hidden rounded-[24px] border border-ink/15 p-5 md:p-8 transition-colors duration-300"
+        className="materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 p-5 md:p-8 transition-colors duration-300"
       >
-        <ArrowUpRight
-          className="contact-direction-mark"
-          strokeWidth={0.7}
-          aria-hidden="true"
-        />
         <div className="grid gap-4 border-b border-ink/15 pb-6 md:grid-cols-[1.2fr_0.8fr] md:items-end">
           <p className="max-w-xl text-lg leading-relaxed tracking-tight text-lead md:text-2xl">
             {t.coP}

@@ -30,7 +30,7 @@ test("editorial composition remains readable and usable in both themes", async (
       document.documentElement.classList.toggle("dark", value === "dark");
       document.documentElement.classList.toggle("light", value === "light");
     }, theme);
-    for (const id of ["hero", "expertise", "work", "about", "contact"]) {
+    for (const id of ["hero", "work", "about", "skills", "contact"]) {
       const section = page.locator(`#${id}`);
       await section.scrollIntoViewIfNeeded();
       expect(
@@ -42,14 +42,6 @@ test("editorial composition remains readable and usable in both themes", async (
           width: element.clientWidth,
         }));
         expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width + 2);
-      }
-      if (id === "expertise" && page.viewportSize().width >= 640) {
-        const baselines = await section
-          .locator("h3")
-          .evaluateAll((headings) =>
-            headings.map((heading) => heading.getBoundingClientRect().top),
-          );
-        expect(Math.max(...baselines) - Math.min(...baselines)).toBeLessThan(2);
       }
       if (id === "about") {
         const contrasts = await section.locator("dt").evaluateAll((labels) => {
@@ -136,7 +128,7 @@ test("long labels and RTL preserve the editorial grid without overflow", async (
       "dir",
       lang === "ar" ? "rtl" : "ltr",
     );
-    for (const id of ["hero", "expertise", "work", "about", "contact"]) {
+    for (const id of ["hero", "work", "about", "skills", "contact"]) {
       await page.locator(`#${id}`).scrollIntoViewIfNeeded();
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth),

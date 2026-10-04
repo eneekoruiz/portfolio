@@ -51,7 +51,13 @@ test("first visit shows content without an intro or GitHub request", async ({
       performance.getEntriesByType("navigation")[0].domContentLoadedEventEnd,
   }));
   expect(result.width).toBeLessThanOrEqual(page.viewportSize().width + 1);
-  expect(result.sections.slice(0, 3)).toEqual(["hero", "expertise", "work"]);
+  expect(result.sections.slice(0, 2)).toEqual(["hero", "work"]);
+  expect(result.sections).toEqual(
+    expect.arrayContaining(["github", "about", "skills", "values", "contact"]),
+  );
+  await expect(page.locator("#expertise, [data-marquee-active]")).toHaveCount(
+    0,
+  );
   expect(result.contact).toBe(true);
   expect(errors).toEqual([]);
   expect(resourceErrors).toEqual([]);
@@ -105,6 +111,106 @@ test("lightweight and reduced motion never allocate a WebGL canvas or fetch hidd
   expect(bounds.x + bounds.width).toBeLessThanOrEqual(
     page.viewportSize().width + 1,
   );
+});
+
+for (const profile of ["lite", "one-gigabyte", "save-data", "reduced-motion"]) {
+  test(`the real start button animates, pauses and resumes DNA with ${profile}`, async ({
+    page,
+  }) => {
+    if (profile === "reduced-motion")
+      await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.addInitScript((profile) => {
+      if (localStorage.getItem("portfolio-motion-enabled") === null)
+        localStorage.setItem("portfolio-motion-enabled", "false");
+      if (profile === "lite") localStorage.setItem("lite", "1");
+      if (profile === "one-gigabyte")
+        Object.defineProperty(navigator, "deviceMemory", {
+          get: () => 1,
+          configurable: true,
+        });
+      if (profile === "save-data") {
+        const connection = new EventTarget();
+        connection.saveData = true;
+        Object.defineProperty(navigator, "connection", {
+          get: () => connection,
+          configurable: true,
+        });
+      }
+    }, profile);
+    const videos = [];
+    page.on("request", (request) => {
+      if (request.url().endsWith("memoji.webm")) videos.push(request.url());
+    });
+    await page.goto("/");
+    const toggle = page.locator("[data-motion-toggle]");
+    const dna = page.locator("[data-dna-static]");
+    const rung = dna.locator("line").first();
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await expect(dna).toHaveAttribute("data-dna-animated", "false");
+    const initialX = await rung.getAttribute("x1");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await expect(dna).toHaveAttribute("data-dna-animated", "true");
+    await expect.poll(() => rung.getAttribute("x1")).not.toBe(initialX);
+    await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
+    await toggle.click();
+    await expect(dna).toHaveAttribute("data-dna-animated", "false");
+    const pausedX = await rung.getAttribute("x1");
+    await page.waitForTimeout(300);
+    expect(await rung.getAttribute("x1")).toBe(pausedX);
+    await toggle.click();
+    await expect.poll(() => rung.getAttribute("x1")).not.toBe(pausedX);
+    await page.waitForTimeout(1000);
+    expect(videos).toEqual([]);
+    // An explicit gesture overrides reduced motion for this visit only.
+    if (profile === "reduced-motion") {
+      await page.reload();
+      expect(
+        await page.evaluate(() =>
+          localStorage.getItem("portfolio-motion-enabled"),
+        ),
+      ).toBe("true");
+      await expect(dna).toHaveAttribute("data-dna-animated", "false");
+      await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    }
+  });
+}
+
+test("paused project navigation keeps one document and Back restores the expanded project", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("portfolio-motion-enabled", "false"),
+  );
+  await page.goto("/");
+  const row = page.locator('[data-materia-surface="ana-peluquera"]');
+  await row.locator("button[aria-expanded]").click();
+  const marker = await page.evaluate(() => {
+    window.__navigationIdentity = crypto.randomUUID();
+    return window.__navigationIdentity;
+  });
+  const documents = [];
+  page.on("request", (request) => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+      documents.push(request.url());
+  });
+  await row
+    .getByRole("link", { name: "Explorar proyecto", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/work\/ana-peluquera$/);
+  await expect(page.locator("[data-umbral-destination] h1")).toBeVisible();
+  expect(await page.evaluate(() => window.__navigationIdentity)).toBe(marker);
+  await page.goBack();
+  await expect(row.locator("button[aria-expanded]")).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+  await expect(
+    row.getByRole("link", { name: "Explorar proyecto", exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => window.__navigationIdentity)).toBe(marker);
+  expect(documents).toEqual([]);
+  await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
 });
 
 test("mobile stays static while modest desktop keeps lightweight motion and readable skills", async ({
@@ -341,14 +447,8 @@ test("decorations pause outside their viewport and custom cursor releases native
 }, info) => {
   test.skip(info.project.name !== "desktop");
   await page.goto("/");
-  await expect(page.locator("[data-floating-active]")).toHaveAttribute(
-    "data-floating-active",
-    "true",
-  );
-  await expect(page.locator("[data-marquee-active]")).toHaveAttribute(
-    "data-marquee-active",
-    "false",
-  );
+  const portrait = page.locator("#hero video");
+  await expect(portrait).toHaveJSProperty("paused", false);
   await page.mouse.move(100, 120);
   await expect(page.locator("html")).toHaveClass(/has-custom-cursor/);
   await page.evaluate(() =>
@@ -357,26 +457,10 @@ test("decorations pause outside their viewport and custom cursor releases native
     ),
   );
   await expect(page.locator("html")).toHaveClass(/has-custom-cursor/);
-  await page.locator("[data-marquee-active]").scrollIntoViewIfNeeded();
+  await page.locator("#work").scrollIntoViewIfNeeded();
   await page.mouse.move(1, 1);
-  await expect(page.locator("[data-marquee-active]")).toHaveAttribute(
-    "data-marquee-active",
-    "true",
-  );
-  await expect(page.locator("[data-floating-active]")).toHaveAttribute(
-    "data-floating-active",
-    "false",
-  );
+  await expect(portrait).toHaveJSProperty("paused", true);
   await page.locator("#contact").scrollIntoViewIfNeeded();
-  await expect(page.locator("[data-marquee-active]")).toHaveAttribute(
-    "data-marquee-active",
-    "false",
-  );
-  expect(
-    await page
-      .locator(".portfolio-marquee-track")
-      .evaluate((element) => getComputedStyle(element).animationPlayState),
-  ).toBe("paused");
   await page.locator("[data-motion-toggle]").click();
   await expect(page.locator("html")).not.toHaveClass(/has-custom-cursor/);
   expect(
