@@ -1,3 +1,5 @@
+import { isBodyScrollLocked } from "./body-scroll-lock";
+
 /** A single subscription shared by every visual component. */
 type Connection = EventTarget & { saveData?: boolean };
 type MotionSnapshot = {
@@ -51,7 +53,7 @@ export function subscribeMotion(listener: () => void) {
         !nav.connection?.saveData &&
         window.__LITE !== true &&
         (preference ?? !lightweight);
-      const enabled = visible && allowed;
+      const enabled = visible && allowed && !isBodyScrollLocked();
       document.documentElement.dataset.motion = enabled ? "on" : "off";
       if (
         snapshot.allowed === allowed &&
@@ -81,6 +83,7 @@ export function subscribeMotion(listener: () => void) {
     touch.addEventListener("change", update);
     nav.connection?.addEventListener("change", update);
     document.addEventListener("visibilitychange", update);
+    window.addEventListener("portfolio-overlay-changed", update);
     window.addEventListener("portfolio-motion-changed", change);
     window.addEventListener("storage", change);
     dispose = () => {
@@ -88,6 +91,7 @@ export function subscribeMotion(listener: () => void) {
       touch.removeEventListener("change", update);
       nav.connection?.removeEventListener("change", update);
       document.removeEventListener("visibilitychange", update);
+      window.removeEventListener("portfolio-overlay-changed", update);
       window.removeEventListener("portfolio-motion-changed", change);
       window.removeEventListener("storage", change);
       dispose = undefined;

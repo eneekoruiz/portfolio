@@ -16,7 +16,7 @@ import type { Lang, Tx } from "../../types";
 import { UI_COPY } from "../../data/interface-translations";
 import { COMMAND_COPY } from "../../data/command-translations";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 export function CmdModal({
@@ -35,7 +35,8 @@ export function CmdModal({
   const inp = useRef<HTMLInputElement>(null);
   const dialogRef = useFocusTrap(true);
   const listRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const motion = useMotionEnabled();
+  const { allowed, visible } = useMotionPolicy();
+  const motion = allowed && visible;
   const closing = useRef(false);
   const timeline = useRef<gsap.core.Timeline | null>(null);
   const closeRef = useRef(onClose);
@@ -240,7 +241,7 @@ export function CmdModal({
         tabIndex={-1}
       >
         {/* ── Input row ── */}
-        <div className="flex items-center gap-3 px-5 border-b border-black/7 dark:border-white/10 shrink-0 bg-white/70 dark:bg-white/[0.02]">
+        <div className="flex items-center gap-3 px-5 border-b border-black/[0.07] dark:border-white/10 shrink-0 bg-white/70 dark:bg-white/[0.02]">
           <Search aria-hidden="true" size={16} className="text-lead shrink-0" />
           <input
             ref={inp}
@@ -296,7 +297,7 @@ export function CmdModal({
                     ref={(el) => {
                       listRefs.current[item.id] = el;
                     }}
-                    className={`min-h-11 md:min-h-0 w-full flex items-center gap-[.7rem] px-5 py-[.55rem] rounded-[11px] text-[13px] transition-colors duration-75 text-start focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "bg-brand/7 text-brand" : "text-lead hover:bg-brand/7 hover:text-brand"}`}
+                    className={`cmd-option min-h-11 md:min-h-0 w-full flex items-center gap-[.7rem] px-5 py-[.55rem] rounded-[11px] text-[13px] transition-colors duration-75 text-start focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "cmd-option-active text-brand" : "text-lead hover:text-brand"}`}
                     onClick={item.action}
                     onMouseEnter={() => setSel(idx)}
                   >
@@ -332,7 +333,7 @@ export function CmdModal({
                       ref={(el) => {
                         listRefs.current[item.id] = el;
                       }}
-                      className={`min-h-11 md:min-h-0 w-full flex items-center gap-[.7rem] px-3 py-[.52rem] rounded-[10px] text-[13px] transition-colors duration-75 text-start focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "bg-brand/7 text-brand" : "text-lead hover:bg-brand/7 hover:text-brand"}`}
+                      className={`cmd-option min-h-11 md:min-h-0 w-full flex items-center gap-[.7rem] px-3 py-[.52rem] rounded-[10px] text-[13px] transition-colors duration-75 text-start focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "cmd-option-active text-brand" : "text-lead hover:text-brand"}`}
                       onClick={item.action}
                       onMouseEnter={() => setSel(idx)}
                     >
@@ -343,7 +344,7 @@ export function CmdModal({
                 })}
               </div>
 
-              <div className="mx-4 my-2 h-px bg-black/6 dark:bg-white/8" />
+              <div className="mx-4 my-2 h-px bg-black/[0.06] dark:bg-white/[0.08]" />
 
               {/* Languages — 2-col grid, all visible at once */}
               <div className="px-2">
@@ -360,7 +361,7 @@ export function CmdModal({
                         ref={(el) => {
                           listRefs.current[item.id] = el;
                         }}
-                        className={`min-h-11 md:min-h-0 flex items-center justify-between px-3 py-[.48rem] rounded-[9px] text-[12px] transition-colors duration-75 text-start focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "bg-brand/7 text-brand" : "text-lead hover:bg-brand/7 hover:text-brand"}`}
+                        className={`cmd-option min-h-11 md:min-h-0 flex items-center justify-between px-3 py-[.48rem] rounded-[9px] text-[12px] transition-colors duration-75 text-start focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none ${sel === idx ? "cmd-option-active text-brand" : "text-lead hover:text-brand"}`}
                         onClick={item.action}
                         onMouseEnter={() => setSel(idx)}
                       >

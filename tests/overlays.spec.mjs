@@ -133,3 +133,70 @@ test("command navigation moves focus after unlocking and localizes empty search"
     await page.keyboard.press("Escape");
   }
 });
+
+test.describe("background work behind a dialog", () => {
+  test.use({ reducedMotion: "no-preference" });
+  test("command pauses actual WebGL draws and resumes the same canvas", async ({
+    page,
+  }, info) => {
+    test.skip(
+      info.project.name !== "desktop",
+      "Fine-pointer WebGL rendering coverage.",
+    );
+    await page.addInitScript(() => {
+      localStorage.setItem("portfolio-motion-enabled", "true");
+      Object.defineProperty(navigator, "hardwareConcurrency", {
+        get: () => 16,
+      });
+      Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
+      window.__overlayDraws = 0;
+      for (const context of [
+        window.WebGLRenderingContext,
+        window.WebGL2RenderingContext,
+      ]) {
+        if (!context) continue;
+        for (const name of [
+          "drawArrays",
+          "drawElements",
+          "drawArraysInstanced",
+          "drawElementsInstanced",
+        ]) {
+          const original = context.prototype[name];
+          if (!original) continue;
+          context.prototype[name] = function (...args) {
+            window.__overlayDraws++;
+            return original.apply(this, args);
+          };
+        }
+      }
+    });
+    await page.goto("/");
+    const scene = page.locator(".materia-canvas");
+    await expect
+      .poll(() => page.evaluate(() => window.__overlayDraws))
+      .toBeGreaterThan(0);
+    const canvas = await scene.locator("canvas").elementHandle();
+    expect(canvas).not.toBeNull();
+    await page.keyboard.press("Control+k");
+    await expect(page.locator(".cmd-overlay input")).toBeFocused();
+    await expect(scene).toHaveAttribute("data-scene-active", "false");
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
+    // Drain the render already scheduled before the shared policy changed.
+    await page.waitForTimeout(250);
+    const paused = await page.evaluate(() => window.__overlayDraws);
+    await page.waitForTimeout(350);
+    expect(await page.evaluate(() => window.__overlayDraws)).toBe(paused);
+    expect(await canvas.evaluate((element) => element.isConnected)).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".cmd-overlay")).toHaveCount(0);
+    await expect(scene).toHaveAttribute("data-scene-active", "true");
+    await expect
+      .poll(() => page.evaluate(() => window.__overlayDraws))
+      .toBeGreaterThan(paused);
+    expect(
+      await scene
+        .locator("canvas")
+        .evaluate((element, original) => element === original, canvas),
+    ).toBe(true);
+  });
+});

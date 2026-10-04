@@ -3,6 +3,10 @@ const locks = new Set<symbol>();
 let saved: Map<string, SavedProperty> | undefined;
 let stoppedLenis: Window["__lenis"];
 
+export function isBodyScrollLocked() {
+  return locks.size > 0;
+}
+
 /** Each overlay owns a release; only the final release restores the page. */
 export function lockBodyScroll() {
   const token = Symbol("body-scroll-lock");
@@ -35,6 +39,8 @@ export function lockBodyScroll() {
     }
   }
   locks.add(token);
+  if (locks.size === 1)
+    window.dispatchEvent(new Event("portfolio-overlay-changed"));
   return () => {
     if (!locks.delete(token) || locks.size) return;
     for (const [property, previous] of saved ?? []) {
@@ -49,5 +55,6 @@ export function lockBodyScroll() {
     saved = undefined;
     stoppedLenis?.start();
     stoppedLenis = undefined;
+    window.dispatchEvent(new Event("portfolio-overlay-changed"));
   };
 }

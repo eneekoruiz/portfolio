@@ -794,6 +794,11 @@ html {
   animation: cmd-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.cmd-option:hover,
+.cmd-option-active {
+  background-color: color-mix(in srgb, var(--brand) 7%, transparent);
+}
+
 @keyframes cmd-fade-in {
   from {
     opacity: 0;
