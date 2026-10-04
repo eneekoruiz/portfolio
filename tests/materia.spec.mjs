@@ -40,11 +40,25 @@ async function home(page) {
     return { reduced, lightweight };
   });
   if (!motionState.reduced && !motionState.lightweight) {
-    await expect(
-      page.locator(".materia-canvas canvas[data-materia-renderer]"),
-    ).toBeVisible();
+    const scene = page.locator(".materia-canvas");
+    await expect
+      .poll(
+        async () => {
+          if (await scene.locator("canvas[data-materia-renderer]").isVisible())
+            return true;
+          return (
+            (await scene.getAttribute("data-scene-degraded")) === "true" &&
+            (await scene.locator("[data-dna-static]").isVisible())
+          );
+        },
+        { message: "Ready renderer or validated adaptive static fallback" },
+      )
+      .toBe(true);
   } else {
     await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
+    await expect(
+      page.locator(".materia-canvas [data-dna-static]"),
+    ).toBeVisible();
   }
 }
 
