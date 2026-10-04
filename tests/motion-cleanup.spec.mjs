@@ -19,7 +19,10 @@ test("leaving an orbit mid-drag releases capture and preserves keyboard resume",
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();
   await card.scrollIntoViewIfNeeded();
-  await card.getByRole("button", { name: "Reanudar Backend" }).click();
+  await expect(page.locator("[data-motion-toggle]")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   const orbit = card.locator("[data-orbit-active]");
   await expect(orbit).toBeVisible();
   await orbit.evaluate((element) => {
@@ -31,7 +34,7 @@ test("leaving an orbit mid-drag releases capture and preserves keyboard resume",
       { once: true },
     );
   });
-  // Resuming increases the orbit's height; bring its actual hitbox into view.
+  // The automatically rotating orbit must have its actual hitbox in view.
   await orbit.scrollIntoViewIfNeeded();
   await orbit.hover({ position: { x: 30, y: 30 } });
   await page.mouse.down();
@@ -64,7 +67,7 @@ test("leaving an orbit mid-drag releases capture and preserves keyboard resume",
   const initial = await pill.getAttribute("style");
   await page.keyboard.press("ArrowRight");
   await expect.poll(() => pill.getAttribute("style")).not.toBe(initial);
-  await card.getByRole("button", { name: "Pausar Backend" }).click();
+  await page.locator("[data-motion-toggle]").click();
   await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
   await expect(pill).not.toHaveAttribute("style");
 });

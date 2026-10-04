@@ -359,7 +359,9 @@ test("project accordion, route and native back remain usable", async ({
   await button.click();
   await expect(button).toHaveAttribute("aria-expanded", "true");
   await page
-    .locator('#panel-ana-peluquera a[href="/work/ana-peluquera"]')
+    .locator(
+      '[data-materia-surface="ana-peluquera"] a[href="/work/ana-peluquera"]',
+    )
     .click();
   await expect(page).toHaveURL(/\/work\/ana-peluquera$/);
   await expect(

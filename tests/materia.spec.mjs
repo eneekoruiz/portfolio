@@ -155,7 +155,7 @@ test("project navigation keeps the document and the canvas; browser Back restore
   );
   await expect(
     page
-      .locator("#panel-ana-peluquera")
+      .locator('[data-materia-surface="ana-peluquera"]')
       .getByRole("link", { name: "Explorar proyecto" }),
   ).toBeVisible();
 });
@@ -174,7 +174,7 @@ test("Spanish and English controls update together", async ({ page }) => {
     row.getByRole("link", { name: "Explore project" }),
   ).toBeVisible();
   await expect(
-    row.getByText("From concept to production").first(),
+    row.getByRole("tablist", { name: "From concept to production" }),
   ).toBeVisible();
 });
 
