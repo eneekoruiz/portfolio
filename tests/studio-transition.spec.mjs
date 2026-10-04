@@ -88,17 +88,13 @@ function expectContainedAndUncovered(geometry, label) {
     expect(box.rect.left, `${label} ${box.name} left`).toBeGreaterThanOrEqual(
       -1,
     );
-    expect(
-      box.rect.right,
-      `${label} ${box.name} right`,
-    ).toBeLessThanOrEqual(geometry.viewport.width + 1);
-    expect(box.rect.top, `${label} ${box.name} top`).toBeGreaterThanOrEqual(
-      -1,
+    expect(box.rect.right, `${label} ${box.name} right`).toBeLessThanOrEqual(
+      geometry.viewport.width + 1,
     );
-    expect(
-      box.rect.bottom,
-      `${label} ${box.name} bottom`,
-    ).toBeLessThanOrEqual(geometry.viewport.height + 1);
+    expect(box.rect.top, `${label} ${box.name} top`).toBeGreaterThanOrEqual(-1);
+    expect(box.rect.bottom, `${label} ${box.name} bottom`).toBeLessThanOrEqual(
+      geometry.viewport.height + 1,
+    );
   }
 
   const overlaps = [];
@@ -144,9 +140,7 @@ test("cinematic studio stays clear through scroll progress and reverses into the
     await expect(hero).toBeVisible();
     await expect(screen).toHaveCount(1);
     await expect(page.locator("html")).toHaveAttribute("data-motion", "on");
-    await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(
-      0,
-    );
+    await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
     await expect
       .poll(() =>
         page
@@ -156,8 +150,9 @@ test("cinematic studio stays clear through scroll progress and reverses into the
       .toBeGreaterThan(0.95);
     await expect
       .poll(() =>
-        hero.evaluate((element) =>
-          element.parentElement?.classList.contains("pin-spacer") ?? false,
+        hero.evaluate(
+          (element) =>
+            element.parentElement?.classList.contains("pin-spacer") ?? false,
         ),
       )
       .toBe(true);
@@ -179,7 +174,8 @@ test("cinematic studio stays clear through scroll progress and reverses into the
       expect(initial.spacer.range).toBeGreaterThan(viewport.height);
 
       // ScrollTrigger's pin spacer carries the real scroll distance for this viewport.
-      const targetY = initial.spacer.documentTop + initial.spacer.range * progress;
+      const targetY =
+        initial.spacer.documentTop + initial.spacer.range * progress;
       await setScroll(page, targetY);
       await expect
         .poll(async () => (await readTransitionGeometry(page))?.progress, {
@@ -217,6 +213,12 @@ test("cinematic studio stays clear through scroll progress and reverses into the
         geometry,
         `${viewport.width}x${viewport.height} @ ${progress}`,
       );
+      if (progress === 0 || progress === 0.5 || progress === 0.72)
+        await page.screenshot({
+          path: info.outputPath(
+            `${viewport.width}-${viewport.height}-${progress}-studio.png`,
+          ),
+        });
     }
 
     // Retrace the pinned section and ensure GSAP restores the opening state.
@@ -236,7 +238,9 @@ test("cinematic studio stays clear through scroll progress and reverses into the
       );
     }
     await expect
-      .poll(() => screen.evaluate((element) => Number(getComputedStyle(element).opacity)))
+      .poll(() =>
+        screen.evaluate((element) => Number(getComputedStyle(element).opacity)),
+      )
       .toBeLessThan(0.05);
   }
 
@@ -244,9 +248,7 @@ test("cinematic studio stays clear through scroll progress and reverses into the
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
-  await expect(page.locator('[data-studio-screen="cinematic"]')).toHaveCount(
-    0,
-  );
+  await expect(page.locator('[data-studio-screen="cinematic"]')).toHaveCount(0);
   await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
   const staticScreen = page.locator('[data-studio-screen="static"]');
   await staticScreen.scrollIntoViewIfNeeded();
@@ -254,15 +256,13 @@ test("cinematic studio stays clear through scroll progress and reverses into the
   await expect(
     staticScreen.getByRole("link", { name: "Abrir en otra pestaña" }),
   ).toHaveAttribute("href", "https://agpeluqueria.vercel.app");
-  await expect(
-    staticScreen.getByRole("button", { name: "Entrar al Estudio" }),
-  ).toBeVisible();
   await expect(page.locator("iframe")).toHaveCount(0);
-
-  await staticScreen.getByRole("button", { name: "Entrar al Estudio" }).click();
-  await expect(page.locator("body")).toHaveClass(/studio-active/);
-  await expect(staticScreen).toHaveCSS("position", "fixed");
-  await page.keyboard.press("Escape");
-  await expect(page.locator("body")).not.toHaveClass(/studio-active/);
-  await expect(staticScreen).toBeVisible();
+  // Localhost is deliberately outside the salon's framing policy. Its usable
+  // reduced-motion fallback is a native external link, not a fullscreen embed.
+  await expect(
+    staticScreen.getByRole("link", { name: "Abrir en otra pestaña" }),
+  ).toBeVisible();
+  await expect(
+    staticScreen.getByRole("link", { name: "Abrir en otra pestaña" }),
+  ).toHaveAttribute("target", "_blank");
 });
