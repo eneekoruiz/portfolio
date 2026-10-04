@@ -398,7 +398,17 @@ test("desktop scene stops drawing when its hero leaves the viewport", async ({
     .poll(() => page.evaluate(() => window.__draws))
     .toBeGreaterThan(0);
   // Visibility pauses an existing scene instead of destroying and re-baking it.
-  const canvas = await page.locator(".materia-canvas canvas").elementHandle();
+  // Capture without waiting: adaptation can replace WebGL after its first draw.
+  const initialRenderer = await page.evaluate(() => {
+    window.__retainedCanvas = document.querySelector(".materia-canvas canvas");
+    return {
+      canvas: !!window.__retainedCanvas,
+      degraded:
+        document.querySelector(".materia-canvas")?.dataset.sceneDegraded ===
+        "true",
+    };
+  });
+  expect(initialRenderer.canvas || initialRenderer.degraded).toBe(true);
   await page.evaluate(() => {
     Object.defineProperty(document, "visibilityState", {
       configurable: true,
@@ -416,17 +426,24 @@ test("desktop scene stops drawing when its hero leaves the viewport", async ({
     await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
     await expect(page.locator("[data-dna-static]")).toBeVisible();
   } else
-    expect(await canvas.evaluate((element) => element.isConnected)).toBe(true);
+    expect(
+      await page.evaluate(() => window.__retainedCanvas?.isConnected),
+    ).toBe(true);
   await page.evaluate(() => {
     delete document.visibilityState;
     document.dispatchEvent(new Event("visibilitychange"));
   });
   await expect(page.locator("html")).toHaveAttribute("data-motion", "on");
-  if (!degraded)
+  if (
+    (await page
+      .locator(".materia-canvas")
+      .getAttribute("data-scene-degraded")) !== "true"
+  )
     expect(
-      await canvas.evaluate(
-        (element) =>
-          element === document.querySelector(".materia-canvas canvas"),
+      await page.evaluate(
+        () =>
+          window.__retainedCanvas ===
+          document.querySelector(".materia-canvas canvas"),
       ),
     ).toBe(true);
   await page.locator("#contact").scrollIntoViewIfNeeded();
@@ -436,8 +453,16 @@ test("desktop scene stops drawing when its hero leaves the viewport", async ({
   );
   await page.waitForTimeout(700);
   const draws = await page.evaluate(() => window.__draws);
+  const fallbackGeometry = await page
+    .locator("[data-dna-static]")
+    .evaluateAll((elements) => elements.map((element) => element.innerHTML));
   await page.waitForTimeout(600);
   expect(await page.evaluate(() => window.__draws)).toBe(draws);
+  expect(
+    await page
+      .locator("[data-dna-static]")
+      .evaluateAll((elements) => elements.map((element) => element.innerHTML)),
+  ).toEqual(fallbackGeometry);
   await page.locator("[data-motion-toggle]").click();
   await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
 });

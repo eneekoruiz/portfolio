@@ -69,12 +69,20 @@ test("resumed technology orbits support keyboard and wheel without trapping scro
 test("contact magnet, letter lighting and project depth recover after interruption", async ({
   page,
 }, info) => {
-  test.skip(
-    info.project.name === "mobile",
-    "Proximity lighting and magnetic attraction require a fine pointer.",
-  );
   await page.goto("/");
   const contact = page.locator("[data-magnetic-contact]");
+  if (
+    !(await page.evaluate(
+      () => matchMedia("(hover: hover) and (pointer: fine)").matches,
+    ))
+  ) {
+    await expect(contact).toHaveCSS("transform", "none");
+    await contact.click();
+    await expect(page).toHaveURL(/#contact$/);
+    await expect(page.locator("#contact")).toBeFocused();
+    await expect(page.locator(".contact-email")).toBeVisible();
+    return;
+  }
   await contact.scrollIntoViewIfNeeded();
   const box = await contact.boundingBox();
   await contact.hover({ position: { x: box.width / 2, y: 2 } });
