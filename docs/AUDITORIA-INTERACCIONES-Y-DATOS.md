@@ -29,6 +29,8 @@ npx playwright test --config playwright.performance.config.mjs
 npm audit --omit=dev
 ```
 
+Las pruebas instrumentan llamadas WebGL y verifican tanto la reanudación del canvas conservado como la alternativa estática. Un planificador de fotogramas ralentizado de forma controlada activa la protección real del renderizador; no se desactiva esa protección para hacer pasar la prueba.
+
 Los navegadores usan una compilación de producción. La configuración responsive incluye Chromium a 1440, 768 y 375 píxeles. Las pruebas de gestos de ratón se omiten en perfiles táctiles; los estados sin movimiento se verifican por separado. Las capturas y trazas se guardan localmente en `test-results` y los informes en `scratch`.
 
 ## Dependencias y límites

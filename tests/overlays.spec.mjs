@@ -136,67 +136,132 @@ test("command navigation moves focus after unlocking and localizes empty search"
 
 test.describe("background work behind a dialog", () => {
   test.use({ reducedMotion: "no-preference" });
-  test("command pauses actual WebGL draws and resumes the same canvas", async ({
-    page,
-  }, info) => {
-    test.skip(
-      info.project.name !== "desktop",
-      "Fine-pointer WebGL rendering coverage.",
-    );
-    await page.addInitScript(() => {
-      localStorage.setItem("portfolio-motion-enabled", "true");
-      Object.defineProperty(navigator, "hardwareConcurrency", {
-        get: () => 16,
-      });
-      Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
-      window.__overlayDraws = 0;
-      for (const context of [
-        window.WebGLRenderingContext,
-        window.WebGL2RenderingContext,
-      ]) {
-        if (!context) continue;
-        for (const name of [
-          "drawArrays",
-          "drawElements",
-          "drawArraysInstanced",
-          "drawElementsInstanced",
-        ]) {
-          const original = context.prototype[name];
-          if (!original) continue;
-          context.prototype[name] = function (...args) {
-            window.__overlayDraws++;
-            return original.apply(this, args);
-          };
-        }
+  for (const slowDevice of [false, true])
+    test(`command pauses graphics with ${slowDevice ? "slow" : "normal"} frame scheduling`, async ({
+      page,
+    }, info) => {
+      test.skip(
+        info.project.name !== "desktop",
+        "Fine-pointer WebGL rendering coverage.",
+      );
+      await page.addInitScript(
+        ({ slowDevice }) => {
+          if (slowDevice) {
+            // Simulate a persistently slow frame scheduler without changing app state.
+            const nativeFrame = window.requestAnimationFrame.bind(window);
+            const nativeCancel = window.cancelAnimationFrame.bind(window);
+            const pending = new Map();
+            let nextId = 0;
+            window.requestAnimationFrame = (callback) => {
+              const id = ++nextId;
+              const job = { frame: 0, timer: 0 };
+              pending.set(id, job);
+              job.timer = setTimeout(() => {
+                job.frame = nativeFrame((time) => {
+                  pending.delete(id);
+                  callback(time);
+                });
+              }, 160);
+              return id;
+            };
+            window.cancelAnimationFrame = (id) => {
+              const job = pending.get(id);
+              if (!job) return;
+              clearTimeout(job.timer);
+              nativeCancel(job.frame);
+              pending.delete(id);
+            };
+          }
+          localStorage.setItem("portfolio-motion-enabled", "true");
+          Object.defineProperty(navigator, "hardwareConcurrency", {
+            get: () => 16,
+          });
+          Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
+          window.__overlayDraws = 0;
+          for (const context of [
+            window.WebGLRenderingContext,
+            window.WebGL2RenderingContext,
+          ]) {
+            if (!context) continue;
+            for (const name of [
+              "drawArrays",
+              "drawElements",
+              "drawArraysInstanced",
+              "drawElementsInstanced",
+            ]) {
+              const original = context.prototype[name];
+              if (!original) continue;
+              context.prototype[name] = function (...args) {
+                window.__overlayDraws++;
+                return original.apply(this, args);
+              };
+            }
+          }
+        },
+        { slowDevice },
+      );
+      await page.goto("/");
+      const scene = page.locator(".materia-canvas");
+      if (slowDevice)
+        await expect(scene).toHaveAttribute("data-scene-degraded", "true");
+      await expect
+        .poll(
+          async () =>
+            (await scene.locator("canvas").count()) > 0 ||
+            (await scene.getAttribute("data-scene-degraded")) === "true",
+        )
+        .toBe(true);
+      // Capture without waiting for a canvas that adaptive quality may release.
+      const canvas =
+        (await scene.locator("canvas").elementHandles())[0] ?? null;
+      await expect
+        .poll(
+          async () =>
+            (await page.evaluate(() => window.__overlayDraws)) > 0 ||
+            (await scene.getAttribute("data-scene-degraded")) === "true",
+        )
+        .toBe(true);
+      await page.keyboard.press("Control+k");
+      await expect(page.locator(".cmd-overlay input")).toBeFocused();
+      await expect(scene).toHaveAttribute("data-scene-active", "false");
+      await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
+      // Drain the render already scheduled before the shared policy changed.
+      await page.waitForTimeout(250);
+      const paused = await page.evaluate(() => window.__overlayDraws);
+      await page.waitForTimeout(350);
+      expect(await page.evaluate(() => window.__overlayDraws)).toBe(paused);
+      const degraded =
+        (await scene.getAttribute("data-scene-degraded")) === "true";
+      if (degraded) {
+        await expect(scene.locator("canvas")).toHaveCount(0);
+        await expect(scene.locator("[data-dna-static]")).toBeVisible();
+      } else {
+        expect(canvas).not.toBeNull();
+        expect(await canvas.evaluate((element) => element.isConnected)).toBe(
+          true,
+        );
       }
+      await page.keyboard.press("Escape");
+      await expect(page.locator(".cmd-overlay")).toHaveCount(0);
+      await expect(scene).toHaveAttribute("data-scene-active", "true");
+      if (degraded) {
+        await expect(scene.locator("canvas")).toHaveCount(0);
+        await expect(scene.locator("[data-dna-static]")).toBeVisible();
+        await page.waitForTimeout(350);
+        expect(await page.evaluate(() => window.__overlayDraws)).toBe(paused);
+      } else {
+        await expect
+          .poll(() => page.evaluate(() => window.__overlayDraws))
+          .toBeGreaterThan(paused);
+        expect(
+          await scene
+            .locator("canvas")
+            .evaluate((element, original) => element === original, canvas),
+        ).toBe(true);
+      }
+      await info.attach("graphics-path", {
+        body: JSON.stringify({ degraded, pausedDraws: paused }),
+        contentType: "application/json",
+      });
     });
-    await page.goto("/");
-    const scene = page.locator(".materia-canvas");
-    await expect
-      .poll(() => page.evaluate(() => window.__overlayDraws))
-      .toBeGreaterThan(0);
-    const canvas = await scene.locator("canvas").elementHandle();
-    expect(canvas).not.toBeNull();
-    await page.keyboard.press("Control+k");
-    await expect(page.locator(".cmd-overlay input")).toBeFocused();
-    await expect(scene).toHaveAttribute("data-scene-active", "false");
-    await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
-    // Drain the render already scheduled before the shared policy changed.
-    await page.waitForTimeout(250);
-    const paused = await page.evaluate(() => window.__overlayDraws);
-    await page.waitForTimeout(350);
-    expect(await page.evaluate(() => window.__overlayDraws)).toBe(paused);
-    expect(await canvas.evaluate((element) => element.isConnected)).toBe(true);
-    await page.keyboard.press("Escape");
-    await expect(page.locator(".cmd-overlay")).toHaveCount(0);
-    await expect(scene).toHaveAttribute("data-scene-active", "true");
-    await expect
-      .poll(() => page.evaluate(() => window.__overlayDraws))
-      .toBeGreaterThan(paused);
-    expect(
-      await scene
-        .locator("canvas")
-        .evaluate((element, original) => element === original, canvas),
-    ).toBe(true);
-  });
 });
