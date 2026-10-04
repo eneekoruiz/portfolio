@@ -139,7 +139,7 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
               x2={150 - x}
               y1={y}
               y2={y}
-              stroke="var(--lead)"
+              stroke="var(--dna-secondary, var(--lead))"
               strokeOpacity="0.35"
             />
             <circle
@@ -149,7 +149,7 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
               cx={150 + x}
               cy={y}
               r="3"
-              fill="var(--brand)"
+              fill="var(--dna-accent, var(--brand))"
             />
             <circle
               ref={(node) => {
@@ -158,7 +158,7 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
               cx={150 - x}
               cy={y}
               r="3"
-              fill="var(--lead)"
+              fill="var(--dna-secondary, var(--lead))"
             />
           </g>
         );
@@ -166,13 +166,15 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
       <path
         ref={strandARef}
         d={pathFor(1)}
-        stroke="var(--brand)"
+        data-dna-strand="accent"
+        stroke="var(--dna-accent, var(--brand))"
         strokeWidth="2"
       />
       <path
         ref={strandBRef}
         d={pathFor(-1)}
-        stroke="var(--lead)"
+        data-dna-strand="secondary"
+        stroke="var(--dna-secondary, var(--lead))"
         strokeWidth="2"
       />
     </svg>

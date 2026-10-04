@@ -82,3 +82,84 @@ test("malformed-only optional data shows offline fallback and keeps projects and
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("repository rows expose top technologies, hover and focus descriptions, and a native desktop link", async ({
+  page,
+}, info) => {
+  await page.route("**/api/github/repos?**", (route) =>
+    route.fulfill({
+      json: [
+        {
+          ...validRepository,
+          all_languages: ["TypeScript", "Python", "HTML", "CSS"],
+        },
+      ],
+    }),
+  );
+  await page.goto("/");
+  const activity = page.locator("#github");
+  await activity.scrollIntoViewIfNeeded();
+  const row = activity.locator("[data-repo-row]");
+  const repoLink = row.getByRole("link", { name: validRepository.name });
+  const description = row.locator(`#repo-description-${validRepository.id} p`);
+
+  await expect(repoLink).toHaveAttribute("href", validRepository.html_url);
+  await expect(repoLink).toHaveAttribute("target", "_blank");
+  await expect(repoLink).toHaveAttribute("rel", "noopener noreferrer");
+  await expect(row.getByText("TypeScript", { exact: true })).toBeVisible();
+  await expect(row.getByText("Python", { exact: true })).toBeVisible();
+  await expect(row.getByText("HTML", { exact: true })).toBeVisible();
+  await expect(row.getByText("+1", { exact: true })).toBeVisible();
+
+  if (info.project.name === "desktop") await row.hover();
+  else await row.click({ position: { x: 8, y: 8 } });
+  await expect(repoLink).toHaveAttribute("aria-expanded", "true");
+  await expect(description).toHaveText(validRepository.description);
+  if (info.project.name === "desktop") {
+    await page.mouse.move(0, 0);
+    await expect(repoLink).toHaveAttribute("aria-expanded", "false");
+  }
+  await repoLink.focus();
+  await expect(repoLink).toHaveAttribute("aria-expanded", "true");
+  await expect(description).toHaveText(validRepository.description);
+
+  const popupPromise = page.waitForEvent("popup");
+  await repoLink.click();
+  const popup = await popupPromise;
+  await expect(popup).toHaveURL(validRepository.html_url);
+  await popup.close();
+});
+
+test("touch rows disclose details on a row tap while the repository link stays navigable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route("**/api/github/repos?**", (route) =>
+    route.fulfill({
+      json: [
+        {
+          ...validRepository,
+          all_languages: ["TypeScript", "Python", "HTML", "CSS"],
+        },
+      ],
+    }),
+  );
+  await page.goto("/");
+  const activity = page.locator("#github");
+  await activity.scrollIntoViewIfNeeded();
+  const row = activity.locator("[data-repo-row]");
+  const repoLink = row.getByRole("link", { name: validRepository.name });
+  const description = row.locator(`#repo-description-${validRepository.id} p`);
+
+  const rowBox = await row.boundingBox();
+  expect(rowBox).not.toBeNull();
+  await row.click({ position: { x: 8, y: 8 } });
+  await expect(repoLink).toHaveAttribute("aria-expanded", "true");
+  await expect(description).toHaveText(validRepository.description);
+
+  const popupPromise = page.waitForEvent("popup");
+  await repoLink.click();
+  const popup = await popupPromise;
+  await expect(popup).toHaveURL(validRepository.html_url);
+  await popup.close();
+});

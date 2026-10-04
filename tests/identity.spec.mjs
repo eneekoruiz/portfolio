@@ -53,9 +53,13 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("technology cards start static, resume moving pills, support drag and release styles on pause", async ({
+test("technology orbits auto-run under shared motion control and release styles when paused", async ({
   page,
 }, info) => {
+  test.skip(
+    info.project.name !== "desktop",
+    "Orbit motion is desktop-only by default",
+  );
   await page.addInitScript(() => {
     window.__orbitResizeDeliveries = [];
     const NativeResizeObserver = window.ResizeObserver;
@@ -81,17 +85,12 @@ test("technology cards start static, resume moving pills, support drag and relea
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();
   await card.scrollIntoViewIfNeeded();
-  await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
-  for (const chip of await card.locator("[data-orbit-pill]").all()) {
-    await expect(chip).toBeVisible();
-    await expect
-      .poll(() => chip.evaluate((element) => element.style.cssText))
-      .toBe("");
-    await expect(chip).toHaveCSS("transform", "none");
-    await expect(chip).toHaveCSS("opacity", "1");
-  }
-  await card.getByRole("button", { name: "Reanudar Backend" }).click();
-  const orbit = card.locator("[data-orbit-active]");
+  const orbit = card.locator(".skill-orbit");
+  const motionToggle = page.locator("[data-motion-toggle]");
+  await expect(motionToggle).toHaveAttribute("aria-pressed", "true");
+  await expect(card.getByRole("button")).toHaveCount(0);
+  await orbit.scrollIntoViewIfNeeded();
+  await expect(orbit).toHaveAttribute("data-orbit-active", "true");
   await expect(orbit).toBeVisible();
   // Expanding the card can put the orbit below the viewport. Offscreen motion
   // intentionally pauses, so observe it before asserting rotation.
@@ -110,11 +109,9 @@ test("technology cards start static, resume moving pills, support drag and relea
   });
   await page.mouse.up();
   await expect.poll(() => pill.getAttribute("style")).not.toBe(beforeDrag);
-  await card.getByRole("button", { name: "Pausar Backend" }).click();
-  await expect(
-    card.getByRole("button", { name: "Reanudar Backend" }),
-  ).toHaveAttribute("aria-pressed", "true");
-  await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
+  await motionToggle.click();
+  await expect(motionToggle).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("[data-orbit-active]")).toHaveCount(0);
   // A queued notification from the retired observer must not restart the orbit.
   const delivered = await card.locator(".skill-orbit").evaluate((orbit) => {
     const notifications = window.__orbitResizeDeliveries.filter(
@@ -133,6 +130,9 @@ test("technology cards start static, resume moving pills, support drag and relea
     await expect(chip).toHaveCSS("transform", "none");
     await expect(chip).toHaveCSS("opacity", "1");
   }
+  await motionToggle.click();
+  await expect(motionToggle).toHaveAttribute("aria-pressed", "true");
+  await expect(orbit).toHaveAttribute("data-orbit-active", "true");
   await page.screenshot({ path: info.outputPath("technology-orbits.png") });
 });
 

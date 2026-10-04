@@ -118,7 +118,6 @@ export function ProjectHero({
   const scrollBarRef = useRef<HTMLDivElement>(null);
   const scrollHintDefaultRef = useRef<HTMLDivElement>(null);
   const scrollHintProgressRef = useRef<HTMLDivElement>(null);
-  const chevronRef = useRef<HTMLSpanElement>(null);
   const mobileCtaRef = useRef<HTMLButtonElement>(null);
   const sheenRef = useRef<HTMLDivElement>(null);
   const [mobilePressed, setMobilePressed] = useState(false);
@@ -242,6 +241,15 @@ export function ProjectHero({
           anticipatePin: 1,
           onUpdate: (self: ScrollTrigger) => {
             materia.studio.target = self.progress;
+            if (heroRef.current) {
+              heroRef.current.dataset.studioProgress = self.progress.toFixed(3);
+              heroRef.current.dataset.studioPhase =
+                self.progress < 0.12
+                  ? "intro"
+                  : self.progress < 0.9
+                    ? "reveal"
+                    : "ready";
+            }
             const isLocked = self.progress > 0.88; // Trigger CTA earlier
             if (!disableStudio && canRef.current !== isLocked) {
               canRef.current = isLocked;
@@ -309,23 +317,23 @@ export function ProjectHero({
           .to(
             contentRef.current,
             {
-              y: -120,
+              y: -64,
               opacity: 0,
-              scale: 0.9,
+              scale: 0.96,
               force3D: true,
-              ease: "power2.in",
-              duration: 1.2,
+              ease: "power2.inOut",
+              duration: 0.48,
             },
             0,
           )
           .to(
             bgImageRef.current,
             {
-              scale: disableStudio ? 1.4 : 2.2,
+              scale: disableStudio ? 1.18 : 1.38,
               opacity: disableStudio ? 0.3 : 0.1,
               force3D: true,
               ease: "power2.inOut",
-              duration: 2.5,
+              duration: 2,
             },
             0,
           );
@@ -333,20 +341,21 @@ export function ProjectHero({
 
       if (!disableStudio && screenRef.current && overlayRef.current) {
         tl
-          // Phase 2: Screen reveals with a "Window" effect
+          // Phase 2: The frame rises into the reserved area below the page header.
           .fromTo(
             screenRef.current,
             {
-              scale: 0.05,
+              scale: 0.78,
               opacity: 0,
-              z: -1500,
-              rotateX: 18,
-              rotateY: -22,
-              // Explicitly center the start state so it appears in the center, not corner
+              z: -420,
+              rotateX: 12,
+              rotateY: -10,
+              x: 0,
+              y: 0,
               xPercent: -50,
               yPercent: -50,
               left: "50%",
-              top: "50%",
+              top: "calc(50% + clamp(3rem, 7.5vh, 4rem))",
             },
             {
               scale: 1,
@@ -354,15 +363,17 @@ export function ProjectHero({
               z: 0,
               rotateX: 0,
               rotateY: 0,
+              x: 0,
+              y: 0,
               xPercent: -50,
               yPercent: -50,
               left: "50%",
-              top: "50%",
+              top: "calc(50% + clamp(3rem, 7.5vh, 4rem))",
               force3D: true,
-              ease: "expo.inOut",
-              duration: 2.2,
+              ease: "power3.out",
+              duration: 1.85,
             },
-            0.5,
+            0.56,
           )
 
           // Phase 3: Darkening for focus
@@ -371,7 +382,7 @@ export function ProjectHero({
             {
               opacity: 1,
               backgroundColor: "rgba(0,0,0,0.94)",
-              duration: 1.8,
+              duration: 1.5,
             },
             0.8,
           );
@@ -984,6 +995,8 @@ export function ProjectHero({
       <div
         ref={heroRef}
         data-umbral-destination={projectId}
+        data-studio-phase="intro"
+        data-studio-progress="0"
         className="relative h-[100dvh] w-full overflow-hidden flex flex-col items-center justify-center bg-transparent"
         style={{
           perspective: isInteracting || !allowed ? "none" : "2000px",
@@ -1016,10 +1029,11 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full will-change-transform"
+          data-hero-role="intro-content"
+          className="relative z-20 flex flex-col items-center justify-center text-center px-6 pt-[clamp(5.5rem,14vh,7.5rem)] pb-[clamp(4.5rem,9vh,6rem)] w-full will-change-transform"
         >
           <div
-            className="relative group mb-12"
+            className="relative group mb-5 sm:mb-7"
             style={{ transformStyle: "preserve-3d" }}
           >
             <div
@@ -1027,7 +1041,7 @@ export function ProjectHero({
               className="relative flex flex-col items-center justify-center will-change-transform pointer-events-none"
             >
               <span
-                className="font-mono text-[clamp(0.9rem,1.5vw,1.2rem)] opacity-85 mb-3 tracking-[0.4em]"
+                className="font-mono text-[clamp(0.65rem,1vw,0.8rem)] opacity-75 mb-2 tracking-[0.32em]"
                 style={{ color: accent }}
               >
                 PROJECT // {index.toString().padStart(2, "0")}
@@ -1036,7 +1050,7 @@ export function ProjectHero({
               <h1
                 className="font-black uppercase italic tracking-[-0.05em] leading-[0.85] text-center max-w-[1200px]"
                 style={{
-                  fontSize: "clamp(3.5rem, 15vw, 12rem)",
+                  fontSize: "clamp(3rem, 11vw, 9rem)",
                   color: accent,
                   textShadow: `0 30px 100px ${accent}40`,
                 }}
@@ -1047,17 +1061,17 @@ export function ProjectHero({
           </div>
 
           <p
-            className="text-xl md:text-2xl font-normal tracking-tight max-w-2xl mb-12 opacity-80"
+            className="text-base sm:text-lg md:text-xl font-normal tracking-tight max-w-2xl mb-5 sm:mb-7 opacity-75"
             style={{ color: darkMode ? "#fff" : "#000" }}
           >
             {subtitle}
           </p>
 
-          <div className="flex items-center gap-6 flex-wrap justify-center">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
             {langs.slice(0, 3).map((lang) => (
               <div
                 key={lang}
-                className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border"
+                className="font-mono text-[9px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border bg-black/5 backdrop-blur-sm"
                 style={{ borderColor: `${accent}40`, color: accent }}
               >
                 {lang}
@@ -1071,6 +1085,7 @@ export function ProjectHero({
           <div
             ref={screenRef}
             data-studio-screen="cinematic"
+            data-studio-role="safe-frame"
             className={
               isInteracting
                 ? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
@@ -1097,9 +1112,13 @@ export function ProjectHero({
                     transformStyle: "preserve-3d",
                     willChange: "transform, opacity",
                     width: "min(94vw, 1400px)",
-                    height: "82dvh",
-                    borderRadius: "2.5rem",
+                    height: "min(68dvh, calc(100dvh - 240px))",
+                    maxHeight: "calc(100dvh - 240px)",
+                    top: "calc(50% + clamp(3rem, 7.5vh, 4rem))",
+                    borderRadius: "clamp(1.25rem, 3vw, 2.25rem)",
                     borderColor: "rgba(255,255,255,0.1)",
+                    boxShadow:
+                      "0 48px 120px rgba(0,0,0,0.44), 0 12px 36px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12)",
                   }
             }
           >
@@ -1111,22 +1130,20 @@ export function ProjectHero({
         {!disableStudio && motionEnabled && (
           <div
             ref={scrollProgressRef}
-            className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-500 w-[250px] max-w-[88vw] px-5 py-3 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
+            data-hero-role="scroll-hint-rail"
+            className="absolute left-1/2 -translate-x-1/2 z-[40] flex items-center justify-center pointer-events-none transition-opacity duration-300 w-[min(220px,88vw)] px-3 py-2 rounded-full bg-black/55 backdrop-blur-lg border border-white/[0.09] shadow-[0_8px_24px_rgba(0,0,0,0.28)]"
             style={{
               opacity: 1,
-              bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)",
+              bottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)",
             }}
           >
             {/* Layout 1: Default hint before scroll */}
-            <div
-              ref={scrollHintDefaultRef}
-              className="flex flex-col items-center gap-2.5"
-            >
+            <div ref={scrollHintDefaultRef} className="flex items-center gap-2">
               {/* Elegant scroll wheel animation pill */}
-              <div className="w-5 h-8 rounded-full border border-white/20 flex justify-center pt-1.5 relative overflow-hidden bg-white/[0.02]">
-                <div className="w-1 h-1.5 rounded-full bg-white/70 animate-scroll-dot" />
+              <div className="w-3 h-5 rounded-full border border-white/25 flex justify-center pt-1 relative overflow-hidden bg-white/[0.02]">
+                <div className="w-1 h-1 rounded-full bg-white/75 animate-scroll-dot" />
               </div>
-              <p className="font-mono text-[8px] uppercase tracking-[0.4em] text-white/50 text-center leading-relaxed">
+              <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/65 text-center leading-relaxed">
                 {s.deepScroll}
               </p>
             </div>
@@ -1134,10 +1151,10 @@ export function ProjectHero({
             {/* Layout 2: Progress telemetry during scroll */}
             <div
               ref={scrollHintProgressRef}
-              className="hidden flex-col items-center gap-2.5 w-full"
+              className="hidden flex-col items-center gap-1 w-full"
             >
               <div
-                className="flex items-center justify-between w-full font-mono text-[8px] uppercase tracking-[0.3em] text-white/60 font-black"
+                className="flex items-center justify-between w-full font-mono text-[7px] uppercase tracking-[0.16em] text-white/65 font-bold"
                 role="status"
                 aria-live="polite"
               >
@@ -1157,21 +1174,7 @@ export function ProjectHero({
                   }}
                 />
               </div>
-              <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">
-                <span
-                  className="truncate"
-                  style={{ textShadow: `0 6px 30px ${accent}40` }}
-                >
-                  {s.keepScrolling}
-                </span>
-                <span
-                  ref={chevronRef}
-                  className="inline-block animate-bounce font-sans text-xs"
-                  aria-hidden
-                >
-                  ↓
-                </span>
-              </span>
+              <span className="sr-only">{s.keepScrolling}</span>
             </div>
           </div>
         )}

@@ -35,7 +35,7 @@ function MetricCard({
   return (
     <div
       ref={ref}
-      className={`materia-surface about-metric relative overflow-hidden rounded-[24px] border border-ink/15 p-6 md:p-8 transition-colors duration-300 flex flex-col justify-end ${className}`}
+      className={`materia-surface about-metric relative flex !min-h-0 flex-col justify-center overflow-hidden rounded-2xl border border-ink/15 !p-4 transition-colors duration-300 ${className}`}
       data-metric-index={index}
     >
       <dl
@@ -43,10 +43,10 @@ function MetricCard({
         data-metric-visual
         data-metric-copy={value.length > 4 || undefined}
       >
-        <dt className="mb-4 font-mono text-[10px] uppercase tracking-[0.15em] text-lead">
+        <dt className="mb-1 font-mono text-[9px] uppercase tracking-[0.12em] text-lead">
           {label}
         </dt>
-        <dd className="text-4xl md:text-5xl lg:text-6xl font-black leading-none tracking-[-0.07em] text-ink">
+        <dd className="!text-lg font-black leading-tight tracking-[-0.04em] text-ink sm:!text-xl">
           {value}
         </dd>
       </dl>

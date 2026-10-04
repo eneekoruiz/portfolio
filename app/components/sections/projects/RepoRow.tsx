@@ -24,27 +24,52 @@ function RepoRowComponent({
   menu,
 }: RepoRowProps) {
   const isActive = activeRepo === idx;
+  const isDescriptionOpen = isActive && !menu;
+  const topLanguages = (r.langs ?? []).reduce<string[]>((languages, value) => {
+    const language = value.trim();
+    if (
+      language &&
+      !languages.some(
+        (existing) => existing.toLowerCase() === language.toLowerCase(),
+      )
+    ) {
+      languages.push(language);
+    }
+    return languages;
+  }, []);
+  const visibleLanguages = topLanguages.slice(0, 3);
+  const remainingLanguages = topLanguages.length - visibleLanguages.length;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
   return (
     <div
       ref={lineRef}
+      data-repo-row
       className="border-b border-black/[0.06] dark:border-white/[0.08] transition-colors duration-150 hover:bg-black/[0.012] dark:hover:bg-white/[0.02]"
     >
       <div
-        className="py-[18px] md:py-5 cursor-pointer relative z-10 select-none"
+        className={`py-[18px] md:py-5 relative z-10 select-none ${isMobile ? "cursor-pointer" : ""}`}
         onPointerEnter={() => !isMobile && setActiveRepo(idx)}
-        onPointerLeave={() => !isMobile && setActiveRepo(null)}
-        onFocus={() => !isMobile && setActiveRepo(idx)}
-        onBlur={() => !isMobile && setActiveRepo(null)}
-        tabIndex={0}
-        onClick={() => {
-          if (isMobile) {
-            setActiveRepo(isActive ? null : idx);
-          } else {
-            window.open(r.html_url, "_blank", "noopener,noreferrer");
+        onPointerLeave={(event) => {
+          if (
+            !isMobile &&
+            !event.currentTarget.contains(document.activeElement)
+          ) {
+            setActiveRepo(null);
           }
+        }}
+        onFocus={() => setActiveRepo(idx)}
+        onBlur={(event) => {
+          if (
+            !event.currentTarget.contains(event.relatedTarget as Node | null) &&
+            !event.currentTarget.matches(":hover")
+          ) {
+            setActiveRepo(null);
+          }
+        }}
+        onClick={() => {
+          if (isMobile) setActiveRepo(isActive ? null : idx);
         }}
       >
         <div className="flex items-start md:items-center gap-4 md:gap-5">
@@ -53,16 +78,22 @@ function RepoRowComponent({
           </span>
           <div className="flex-1 min-w-0">
             <div className="flex flex-col md:flex-row md:items-center gap-y-2 gap-x-3">
-              <span
-                className={`font-mono text-[13px] font-bold md:font-medium tracking-[-0.01em] transition-colors duration-150 ${!isActive ? "text-ink" : ""}`}
+              <a
+                href={r.html_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(event) => event.stopPropagation()}
+                aria-expanded={isDescriptionOpen}
+                aria-controls={`repo-description-${r.id}`}
+                className={`font-mono text-[13px] font-bold md:font-medium tracking-[-0.01em] transition-colors duration-150 cursor-pointer ${!isActive ? "text-ink" : ""}`}
                 style={
                   isActive ? { color: getTechColor(r.langs?.[0]) } : undefined
                 }
               >
                 {r.name}
-              </span>
+              </a>
               <div className="flex flex-wrap gap-[0.3rem]">
-                {r.langs?.map((l) => {
+                {visibleLanguages.map((l) => {
                   const tColor = getTechColor(l);
                   return (
                     <span
@@ -87,22 +118,30 @@ function RepoRowComponent({
                     </span>
                   );
                 })}
+                {remainingLanguages > 0 && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-mono text-lead/60 border border-black/[0.08] dark:border-white/[0.1] whitespace-nowrap">
+                    +{remainingLanguages}
+                  </span>
+                )}
               </div>
             </div>
             <div
+              id={`repo-description-${r.id}`}
               className="repo-description-panel grid transition-[grid-template-rows] duration-200 ease-out will-change-[grid-template-rows]"
               style={{
-                gridTemplateRows: isActive && !menu ? "1fr" : "0fr",
+                gridTemplateRows: isDescriptionOpen ? "1fr" : "0fr",
               }}
             >
               <div
                 className="overflow-hidden transition-[opacity,transform] duration-200 ease-out will-change-[transform,opacity]"
                 style={{
-                  opacity: isActive && !menu ? 1 : 0,
-                  transform: isActive && !menu ? "translate3d(0, 0, 0)" : "translate3d(0, -5px, 0)",
-                  pointerEvents: isActive && !menu ? "auto" : "none",
+                  opacity: isDescriptionOpen ? 1 : 0,
+                  transform: isDescriptionOpen
+                    ? "translate3d(0, 0, 0)"
+                    : "translate3d(0, -5px, 0)",
+                  pointerEvents: isDescriptionOpen ? "auto" : "none",
                 }}
-                aria-hidden={!(isActive && !menu)}
+                aria-hidden={!isDescriptionOpen}
               >
                 <div className="pt-3">
                   {r.description && (
@@ -144,7 +183,11 @@ function RepoRowComponent({
             <span className="font-mono text-[10px] text-lead/30">
               {r.pushed_at.split("-")[0]}
             </span>
-            <div
+            <a
+              href={r.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => event.stopPropagation()}
               className={`flex items-center justify-center gap-2 rounded-full border transition-[padding,background-color,border-color,box-shadow] duration-200 ease-out ${
                 isActive
                   ? "px-4 py-2 text-white shadow-md"
@@ -175,7 +218,7 @@ function RepoRowComponent({
                 size={12}
                 className={`transition-colors duration-150 shrink-0 ${isActive ? "text-white" : "text-lead"}`}
               />
-            </div>
+            </a>
           </div>
         </div>
       </div>
@@ -188,7 +231,7 @@ export const RepoRow = memo(RepoRowComponent, (prev, next) => {
   const nextActive = next.activeRepo === next.idx;
   return (
     prevActive === nextActive &&
-    prev.r.id === next.r.id &&
+    prev.r === next.r &&
     prev.menu === next.menu &&
     prev.isMobile === next.isMobile
   );

@@ -19,20 +19,32 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("resumed technology orbits support keyboard and wheel without trapping scroll, then release on pause", async ({
+test("automatic technology orbits support keyboard and wheel, pause offscreen, and follow shared motion", async ({
   page,
-}) => {
+}, info) => {
+  test.skip(
+    info.project.name !== "desktop",
+    "Orbit interaction coverage uses a fine pointer",
+  );
   await page.addInitScript(() =>
     localStorage.setItem("portfolio-motion-enabled", "true"),
   );
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();
   await card.scrollIntoViewIfNeeded();
-  await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
-  await card.getByRole("button", { name: "Reanudar Backend" }).click();
-  const orbit = card.locator("[data-orbit-active]");
+  const orbit = card.locator(".skill-orbit");
+  await orbit.scrollIntoViewIfNeeded();
+  await expect(orbit).toHaveAttribute("data-orbit-active", "true");
   const pill = orbit.locator("[data-orbit-pill]").first();
   await orbit.focus();
+  // Focus temporarily stops automatic rotation so keyboard movement is clear.
+  await expect
+    .poll(async () => {
+      const first = await pill.getAttribute("style");
+      await page.waitForTimeout(120);
+      return first === (await pill.getAttribute("style"));
+    })
+    .toBe(true);
   const focused = await pill.getAttribute("style");
   await page.keyboard.press("ArrowRight");
   await expect.poll(() => pill.getAttribute("style")).not.toBe(focused);
@@ -51,11 +63,29 @@ test("resumed technology orbits support keyboard and wheel without trapping scro
   await expect
     .poll(() => page.evaluate(() => scrollY))
     .toBeGreaterThan(scroll + 20);
-  await card.getByRole("button", { name: "Pausar Backend" }).click();
-  await expect(
-    card.getByRole("button", { name: "Reanudar Backend" }),
-  ).toHaveAttribute("aria-pressed", "true");
-  await expect(card.locator("[data-orbit-active]")).toHaveCount(0);
+
+  // Moving the orbit out of view stops its ticker and drops temporary layers.
+  await page.locator("[data-motion-toggle]").focus();
+  await page.evaluate(() =>
+    window.__lenis
+      ? window.__lenis.scrollTo(0, { immediate: true, force: true })
+      : window.scrollTo(0, 0),
+  );
+  await expect
+    .poll(() => pill.evaluate((element) => element.style.willChange))
+    .toBe("");
+  const offscreenStyle = await pill.getAttribute("style");
+  await page.waitForTimeout(150);
+  await expect(pill).toHaveAttribute("style", offscreenStyle);
+
+  await orbit.scrollIntoViewIfNeeded();
+  await expect.poll(() => pill.getAttribute("style")).not.toBe(offscreenStyle);
+  await page.locator("[data-motion-toggle]").click();
+  await expect(page.locator("[data-motion-toggle]")).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+  await expect(page.locator("[data-orbit-active]")).toHaveCount(0);
   for (const chip of await card.locator("[data-orbit-pill]").all()) {
     await expect(chip).toBeVisible();
     await expect
@@ -64,6 +94,12 @@ test("resumed technology orbits support keyboard and wheel without trapping scro
     await expect(chip).toHaveCSS("transform", "none");
     await expect(chip).toHaveCSS("opacity", "1");
   }
+  await page.locator("[data-motion-toggle]").click();
+  await expect(page.locator("[data-motion-toggle]")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(orbit).toHaveAttribute("data-orbit-active", "true");
 });
 
 test("contact magnet, letter lighting and project depth recover after interruption", async ({

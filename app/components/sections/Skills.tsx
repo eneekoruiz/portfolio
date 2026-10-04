@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import gsap from "gsap";
-import { Pause, Play } from "lucide-react";
 import { SKILLS, type SkillCategory } from "../../lib/constants";
 import type { Lang, Tx } from "../../types";
 import { SectionFrame } from "./SectionFrame";
@@ -24,12 +23,11 @@ function SkillOrbit({
 }) {
   const cardRef = useRef<HTMLElement>(null);
   const orbitRef = useRef<HTMLUListElement>(null);
-  const [paused, setPaused] = useState(true);
   useMateriaSurface(cardRef, category.c, motion, 32);
 
   useEffect(() => {
     const orbit = orbitRef.current;
-    if (!orbit || !motion || paused) return;
+    if (!orbit || !motion) return;
     const items = Array.from(
       orbit.querySelectorAll<HTMLElement>("[data-orbit-pill]"),
     );
@@ -272,7 +270,7 @@ function SkillOrbit({
       if (pointerId >= 0 && orbit.hasPointerCapture(pointerId))
         orbit.releasePointerCapture(pointerId);
     };
-  }, [motion, category.techs, paused]);
+  }, [motion, category.techs]);
 
   return (
     <article
@@ -292,21 +290,10 @@ function SkillOrbit({
         <h3 className="text-lg font-black uppercase tracking-tight text-ink md:text-xl">
           {label}
         </h3>
-        {motion && (
-          <button
-            type="button"
-            onClick={() => setPaused((value) => !value)}
-            aria-pressed={paused}
-            aria-label={`${paused ? UI_COPY[lang].resume : UI_COPY[lang].pause} ${label}`}
-            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/15 text-lead focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-          >
-            {paused ? <Play size={14} /> : <Pause size={14} />}
-          </button>
-        )}
       </header>
       <ul
         ref={orbitRef}
-        tabIndex={motion && !paused ? 0 : undefined}
+        tabIndex={motion ? 0 : undefined}
         aria-label={label}
         aria-describedby={`orbit-help-${category.g.replace(/\W/g, "")}`}
         className="skill-orbit mt-4 flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
@@ -329,7 +316,7 @@ function SkillOrbit({
         id={`orbit-help-${category.g.replace(/\W/g, "")}`}
         className="relative mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-lead"
       >
-        {motion && !paused
+        {motion
           ? UI_COPY[lang].orbitHelp
           : `${UI_COPY[lang].technologies}: ${category.techs.length}`}
       </p>

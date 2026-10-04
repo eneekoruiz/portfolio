@@ -14,7 +14,7 @@ import gsap from "gsap";
 import { useIntro } from "../IntroProvider";
 
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
-import { tickMateria } from "../../lib/materia";
+import { materia, tickMateria } from "../../lib/materia";
 import { StaticDNA } from "./StaticDNA";
 
 const CanvasScene = dynamic(
@@ -124,8 +124,8 @@ export function MateriaLayer() {
           <StaticDNA animate={animateFallback} />
         ) : (
           <CanvasScene
-            accent="#0066ff"
-            secondary="#8aa8dc"
+            accent={materia.accent}
+            secondary={materia.secondary}
             darkMode={resolvedTheme === "dark"}
             paused={!enabled || !ready || !heroVisible}
             onSlow={degrade}

@@ -29,7 +29,7 @@ import { useMobileMenu } from "./hooks/useMobileMenu";
 import { useIntroPhase } from "./hooks/useIntroPhase";
 import { useDnaColors } from "./hooks/useDnaColors";
 import { useNavbarInteractions } from "./hooks/useNavbarInteractions";
-import { materia } from "./lib/materia";
+import { materia, setMateriaPalette } from "./lib/materia";
 import { useSceneJourney } from "./hooks/useSceneJourney";
 import { ReadingNav } from "./components/navigation/ReadingNav";
 
@@ -223,8 +223,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     hoveredProject,
   );
   useEffect(() => {
-    materia.accent = dnaColors.accent;
-    materia.secondary = dnaColors.secondary;
+    setMateriaPalette(dnaColors.accent, dnaColors.secondary);
     materia.paused = menu;
     if (hoveredProject) {
       materia.warp.target = 0.85;

@@ -38,7 +38,7 @@ import { useMagnetic } from "../../hooks/useMagnetic";
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useTextScramble } from "../../hooks/useTextScramble";
 import { ProjectHero } from "./components/ProjectHero";
-import { materia } from "../../lib/materia";
+import { materia, setMateriaPalette } from "../../lib/materia";
 import { umbral } from "../../components/motion/UmbralProvider";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 import {
@@ -309,8 +309,7 @@ export default function ProjectPage() {
   const safeId = id as string;
   const theme = THEMES[safeId] ?? DEFAULT_THEME;
   useEffect(() => {
-    materia.accent = theme.helixA;
-    materia.secondary = theme.helixB;
+    setMateriaPalette(theme.helixA, theme.helixB);
     materia.composition.target = 0;
     materia.chapter.target = 3;
     materia.studio.target = 0;

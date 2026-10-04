@@ -114,61 +114,111 @@ export function PremiumWorkRow({
         prefetch();
         onHoverProject({ name: proj.name, color: theme.color });
       }}
-      onPointerLeave={() => onHoverProject(null)}
+      onPointerLeave={(event) => {
+        if (!event.currentTarget.contains(document.activeElement))
+          onHoverProject(null);
+      }}
       onFocus={() => {
         prefetch();
         onHoverProject({ name: proj.name, color: theme.color });
       }}
-      onBlur={() => onHoverProject(null)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget))
+          onHoverProject(null);
+      }}
     >
-      <div className="work-orbit-mark" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
-      <button
-        id={`btn-${safeId}`}
-        onClick={onToggle}
-        aria-expanded={isExpanded}
-        aria-controls={panelId}
-        onPointerEnter={prefetch}
-        onFocus={prefetch}
-        className="work-surface-header relative z-10 grid w-full grid-cols-[1.5rem_1fr_2.5rem] items-center gap-3 px-4 py-7 text-start outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand rounded-[20px] md:grid-cols-[2rem_1.1fr_0.9fr_2.5rem] md:gap-5 md:px-8 md:py-10"
-        data-cursor-plus={isExpanded ? undefined : "true"}
-        data-cursor-minus={isExpanded ? "true" : undefined}
-      >
-        <span className="order-1 self-start pt-2 font-mono text-[11px] tabular-nums text-lead">
-          {String(idx + 1).padStart(2, "0")}
-        </span>
-        <div className="order-2 min-w-0">
+      <div className="work-surface-header relative z-10 grid gap-5 p-5 md:grid-cols-[1.2fr_0.8fr] md:items-center md:gap-8 md:p-7">
+        <div className="min-w-0">
           <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-lead">
+            <span>{String(idx + 1).padStart(2, "0")}</span>
             <span>{TX[lang].projectTags[idx] ?? proj.tag}</span>
             <span>{proj.year}</span>
           </div>
           <h3
             data-project-title
-            className="work-project-title text-balance break-words text-[clamp(1.65rem,4vw,4.2rem)] font-bold capitalize leading-[1.04] tracking-[-0.055em]"
+            className="work-project-title text-balance break-words text-[clamp(1.65rem,3vw,2.6rem)] font-bold capitalize leading-[1.08] tracking-[-0.045em]"
           >
             {content?.title ?? proj.name.replace(/[-_]/g, " ")}
           </h3>
-          <p className="mt-4 max-w-lg text-sm font-normal leading-relaxed tracking-normal text-lead line-clamp-3">
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-lead line-clamp-2">
             {content?.objective ?? proj.desc}
           </p>
+          <div
+            className="mt-4 flex flex-wrap gap-x-4 gap-y-2"
+            aria-label={copy.technologies}
+          >
+            {proj.langs.map((language) => (
+              <span
+                key={language}
+                className="flex items-center gap-1.5 text-[11px] font-medium text-lead"
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: getTechColor(language) }}
+                  aria-hidden="true"
+                />
+                {language}
+              </span>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+            <a
+              ref={actionRef}
+              href={
+                theme.hasAudit
+                  ? `/work/${safeId}`
+                  : `https://github.com/eneekoruiz/${proj.name}`
+              }
+              onClick={theme.hasAudit ? handleNavigate : undefined}
+              onFocus={prefetch}
+              onPointerEnter={prefetch}
+              target={theme.hasAudit ? undefined : "_blank"}
+              rel={theme.hasAudit ? undefined : "noopener noreferrer"}
+              className="materia-button work-project-action bg-ink text-page !min-h-11 !py-2.5 !px-5"
+            >
+              {theme.hasAudit ? copy.explore : copy.source}
+              {theme.hasAudit ? (
+                <ArrowRight size={16} aria-hidden="true" />
+              ) : (
+                <ArrowUpRight size={16} aria-hidden="true" />
+              )}
+            </a>
+            <button
+              id={`btn-${safeId}`}
+              type="button"
+              onClick={onToggle}
+              aria-expanded={isExpanded}
+              aria-controls={panelId}
+              className="flex min-h-11 items-center gap-2 text-xs font-medium text-lead hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+            >
+              {copy.preview}
+              <Plus
+                className="work-expand-icon"
+                size={15}
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+            </button>
+            {theme.hasAudit && (
+              <a
+                href={`https://github.com/eneekoruiz/${proj.name}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={copy.source}
+                className="flex min-h-11 items-center gap-1.5 text-xs text-lead hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+              >
+                GitHub <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            )}
+          </div>
         </div>
         <div
-          className="order-4 col-span-3 mt-3 min-w-0 md:order-3 md:col-span-1 md:mt-0"
+          className="work-preview min-w-0 overflow-hidden rounded-xl"
           aria-hidden="true"
         >
           <ProjectVisual id={safeId} />
         </div>
-        <span
-          className="work-expand-icon order-3 flex h-10 w-10 items-center justify-center rounded-full border border-current md:order-4"
-          style={{ color: theme.color }}
-          aria-hidden="true"
-        >
-          <Plus size={18} strokeWidth={1.5} />
-        </span>
-      </button>
+      </div>
       <div
         ref={bodyRef}
         id={panelId}
@@ -180,204 +230,72 @@ export function PremiumWorkRow({
         className="relative z-10 overflow-hidden"
         style={{ height: isExpanded ? "auto" : 0, opacity: isExpanded ? 1 : 0 }}
       >
-        <div
-          ref={contentRef}
-          className="grid gap-4 px-4 pb-4 pt-1 md:grid-cols-[1fr_1.5fr] md:px-5 md:pb-5"
-        >
+        <div ref={contentRef} className="px-5 pb-5 md:px-7 md:pb-7">
           <div
             data-work-panel
-            className="work-lifecycle flex flex-col justify-between gap-5 rounded-2xl border p-4 md:p-5"
-          >
-            <div>
-              <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.14em] text-lead">
-                {copy.lifecycle}
-              </p>
-              <ol className="work-lifecycle-track flex flex-col gap-4">
-                {copy.stages.map((stage, i) => (
-                  <li
-                    key={stage}
-                    className="relative flex items-start gap-4 text-xs leading-relaxed"
-                  >
-                    <span
-                      className="relative z-10 mt-1 h-2 w-2 shrink-0 rounded-full"
-                      style={{
-                        background:
-                          i < theme.progress ? theme.color : "var(--lead)",
-                        opacity: i < theme.progress ? 1 : 0.3,
-                      }}
-                      aria-hidden="true"
-                    />
-                    <span
-                      className={i < theme.progress ? "text-ink" : "text-lead"}
-                    >
-                      {stage}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-            <a
-              ref={actionRef}
-              href={
-                theme.hasAudit
-                  ? `/work/${safeId}`
-                  : `https://github.com/eneekoruiz/${proj.name}`
-              }
-              onClick={theme.hasAudit ? handleNavigate : undefined}
-              onFocus={prefetch}
-              onPointerEnter={(event) => {
-                prefetch();
-                if (enabled && event.pointerType !== "touch")
-                  onHoverProject({ name: proj.name, color: theme.color });
-              }}
-              onPointerLeave={() => onHoverProject(null)}
-              onPointerCancel={() => onHoverProject(null)}
-              target={theme.hasAudit ? undefined : "_blank"}
-              rel={theme.hasAudit ? undefined : "noopener noreferrer"}
-              className="materia-button work-project-action mt-4 w-fit bg-ink text-page !min-h-[40px] !py-2.5 !px-5"
-            >
-              {theme.hasAudit ? copy.explore : copy.source}
-              {theme.hasAudit ? (
-                <ArrowRight size={16} aria-hidden="true" />
-              ) : (
-                <ArrowUpRight size={16} aria-hidden="true" />
-              )}
-            </a>
-          </div>
-          <div
-            data-work-panel
-            className="flex flex-col justify-between gap-5 rounded-2xl border border-ink/10 bg-page/80 p-4 md:p-5"
+            data-decision-lens
+            className="border-t border-ink/10 pt-3"
           >
             <div
-              data-decision-lens
-              className="rounded-xl border border-ink/10 bg-page/60 p-4 md:p-5"
+              role="tablist"
+              aria-label={copy.lifecycle}
+              className="relative flex flex-wrap gap-x-5 border-b border-ink/10"
             >
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-lead">
-                  {copy.lifecycle}
-                </p>
-                <span
-                  className="font-mono text-[10px] tabular-nums text-lead"
-                  aria-live="polite"
-                >
-                  {String(lensStep + 1).padStart(2, "0")} / 03
-                </span>
-              </div>
-              <div
-                role="tablist"
-                aria-label={copy.lifecycle}
-                className="relative grid grid-cols-3 border-b border-ink/10"
-              >
-                {lens.map((item, i) => (
-                  <button
-                    key={item.label}
-                    id={`${panelId}-lens-tab-${i}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={lensStep === i}
-                    aria-controls={`${panelId}-lens-panel`}
-                    tabIndex={lensStep === i ? 0 : -1}
-                    onClick={() => setLensStep(i)}
-                    onKeyDown={(event) => {
-                      const next =
-                        event.key === "ArrowRight"
-                          ? (i + 1) % lens.length
-                          : event.key === "ArrowLeft"
-                            ? (i - 1 + lens.length) % lens.length
-                            : event.key === "Home"
-                              ? 0
-                              : event.key === "End"
-                                ? lens.length - 1
-                                : null;
-                      if (next === null) return;
-                      event.preventDefault();
-                      setLensStep(next);
-                      requestAnimationFrame(() =>
-                        document
-                          .getElementById(`${panelId}-lens-tab-${next}`)
-                          ?.focus(),
-                      );
-                    }}
-                    className="relative min-h-11 px-1 text-start font-mono text-[9px] uppercase tracking-[0.08em] text-lead transition-colors duration-300 hover:text-ink focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand md:px-2 md:text-[10px]"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute bottom-[-1px] left-0 h-px w-1/3 transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)]"
-                  style={{
-                    background: theme.color,
-                    transform: `translate3d(${lensStep * 100}%, 0, 0)`,
+              {lens.map((item, i) => (
+                <button
+                  key={item.label}
+                  id={`${panelId}-lens-tab-${i}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={lensStep === i}
+                  aria-controls={`${panelId}-lens-panel`}
+                  tabIndex={lensStep === i ? 0 : -1}
+                  onClick={() => setLensStep(i)}
+                  onKeyDown={(event) => {
+                    const next =
+                      event.key === "ArrowRight"
+                        ? (i + 1) % lens.length
+                        : event.key === "ArrowLeft"
+                          ? (i - 1 + lens.length) % lens.length
+                          : event.key === "Home"
+                            ? 0
+                            : event.key === "End"
+                              ? lens.length - 1
+                              : null;
+                    if (next === null) return;
+                    event.preventDefault();
+                    setLensStep(next);
+                    requestAnimationFrame(() =>
+                      document
+                        .getElementById(`${panelId}-lens-tab-${next}`)
+                        ?.focus(),
+                    );
                   }}
-                />
-              </div>
-              <div
-                key={`${safeId}-${lang}-${lensStep}`}
-                id={`${panelId}-lens-panel`}
-                role="tabpanel"
-                aria-labelledby={`${panelId}-lens-tab-${lensStep}`}
-                data-lens-panel
-                className="work-lens-panel pt-5"
-              >
-                <h4 className="mb-2 text-balance text-lg font-semibold tracking-[-0.03em] md:text-xl">
-                  {lens[lensStep].title}
-                </h4>
-                <p className="max-w-xl text-sm leading-relaxed text-lead md:text-base">
-                  {lens[lensStep].body}
-                </p>
-              </div>
+                  className="min-h-11 border-b-2 px-1 font-mono text-[10px] uppercase tracking-[0.06em] text-lead hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+                  style={{
+                    borderColor: lensStep === i ? theme.color : "transparent",
+                    color: lensStep === i ? "var(--ink)" : undefined,
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
-            <dl className="grid grid-cols-[1fr_1fr] gap-5">
-              <div>
-                <dt className="mb-1 font-mono text-[10px] uppercase tracking-wider text-lead">
-                  {copy.year}
-                </dt>
-                <dd className="text-sm font-semibold">{proj.year}</dd>
-              </div>
-              <div>
-                <dt className="mb-1 font-mono text-[10px] uppercase tracking-wider text-lead">
-                  {copy.size}
-                </dt>
-                <dd dir="ltr" className="text-sm font-semibold">
-                  {proj.size === "Premium" ? "—" : proj.size}
-                </dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="mb-3 font-mono text-[10px] uppercase tracking-wider text-lead">
-                  {copy.technologies}
-                </dt>
-                <dd className="flex flex-wrap gap-2">
-                  {proj.langs.map((language) => (
-                    <span
-                      key={language}
-                      className="flex items-center gap-2 rounded-full border border-ink/15 px-3 py-1 text-[11px] font-medium"
-                      style={{
-                        background: `${getTechColor(language)}15`,
-                        borderColor: `${getTechColor(language)}55`,
-                      }}
-                    >
-                      <span
-                        className="h-1 w-1 rounded-full"
-                        style={{ background: getTechColor(language) }}
-                      />
-                      {language}
-                    </span>
-                  ))}
-                </dd>
-              </div>
-            </dl>
-            {theme.hasAudit && (
-              <a
-                href={`https://github.com/eneekoruiz/${proj.name}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-11 w-fit items-center gap-3 text-xs font-semibold text-ink underline decoration-ink/25 underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-              >
-                {copy.source}
-                <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            )}
+            <div
+              key={`${safeId}-${lang}-${lensStep}`}
+              id={`${panelId}-lens-panel`}
+              role="tabpanel"
+              aria-labelledby={`${panelId}-lens-tab-${lensStep}`}
+              data-lens-panel
+              className="work-lens-panel pt-4"
+            >
+              <h4 className="mb-2 text-balance text-base font-semibold tracking-[-0.02em]">
+                {lens[lensStep].title}
+              </h4>
+              <p className="max-w-3xl text-sm leading-relaxed text-lead">
+                {lens[lensStep].body}
+              </p>
+            </div>
           </div>
         </div>
       </div>

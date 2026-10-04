@@ -190,6 +190,11 @@
 .work-surface-header {
   -webkit-tap-highlight-color: transparent;
 }
+.work-preview .project-visual {
+  height: clamp(140px, 20vw, 220px);
+  max-height: 220px;
+  aspect-ratio: auto;
+}
 .work-expand-icon {
   transform: rotate(calc(var(--accordion-progress, 0) * 135deg));
 }
@@ -631,11 +636,11 @@ html[dir="rtl"] .hero-prism {
 /* Decorative layers are clipped and subordinate to the reading surface. */
 .materia-canvas {
   contain: strict;
-  opacity: 0.4 !important;
+  opacity: 0.55 !important;
   transition: opacity 240ms ease;
 }
 .materia-canvas[data-scene-active="false"] {
-  opacity: 0.2 !important;
+  opacity: 0.38 !important;
 }
 .materia-canvas[data-scene-ready="false"] {
   opacity: 0 !important;
@@ -667,7 +672,7 @@ html {
 }
 @media (max-width: 767px) {
   .materia-canvas {
-    opacity: 0.18 !important;
+    opacity: 0.32 !important;
   }
   .glass-hud {
     backdrop-filter: none;

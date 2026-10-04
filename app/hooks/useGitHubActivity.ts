@@ -99,10 +99,9 @@ export function useGitHubActivity() {
       document.removeEventListener("visibilitychange", load);
       timer = setTimeout(() => controller.abort(), 8000);
       try {
-        const response = await fetch(
-          "/api/github/repos?per_page=12&summary=1",
-          { signal: controller.signal },
-        );
+        const response = await fetch("/api/github/repos?per_page=12", {
+          signal: controller.signal,
+        });
         if (!response.ok) throw new Error("Unavailable");
         const data: unknown = await response.json();
         if (!Array.isArray(data)) throw new Error("Invalid response");

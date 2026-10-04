@@ -152,12 +152,17 @@ async function enrichRepoLanguages(
       return fallback;
     const languages = Object.entries(data)
       .filter(
-        ([language, bytes]) =>
-          language.length > 0 &&
-          language.length <= 64 &&
-          typeof bytes === "number" &&
-          Number.isFinite(bytes) &&
-          bytes >= 0,
+        (entry): entry is [string, number] =>
+          entry[0].length > 0 &&
+          entry[0].length <= 64 &&
+          typeof entry[1] === "number" &&
+          Number.isFinite(entry[1]) &&
+          entry[1] >= 0,
+      )
+      .sort(
+        ([languageA, bytesA], [languageB, bytesB]) =>
+          bytesB - bytesA ||
+          (languageA < languageB ? -1 : languageA > languageB ? 1 : 0),
       )
       .slice(0, 30)
       .map(([language]) => language);

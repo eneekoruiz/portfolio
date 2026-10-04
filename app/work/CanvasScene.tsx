@@ -89,6 +89,7 @@ export function CanvasScene({
   return (
     <div ref={host} className="h-full w-full">
       <Canvas
+        style={{ visibility: paused ? "hidden" : "visible" }}
         camera={{ position: [0, 1.2, 16], fov: 42 }}
         dpr={[1, 1.25]}
         frameloop="demand"
@@ -109,7 +110,7 @@ export function CanvasScene({
           isMobile={false}
         />
       </Canvas>
-      {!rendered && <StaticDNA />}
+      {(!rendered || paused) && <StaticDNA />}
     </div>
   );
 }

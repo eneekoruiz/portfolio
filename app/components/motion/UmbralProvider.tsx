@@ -12,7 +12,11 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
-import { materia, type OpticalSurface } from "../../lib/materia";
+import {
+  materia,
+  setMateriaPalette,
+  type OpticalSurface,
+} from "../../lib/materia";
 import { SpringValue } from "../../lib/spring";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
@@ -97,7 +101,7 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         tangentY: new SpringValue(-1),
       };
       materia.surfaces.add(optical);
-      materia.accent = color;
+      setMateriaPalette(color, materia.secondary);
       materia.warp.target = 1;
       umbral.active = true;
       const oldOverflow = document.body.style.overflow;

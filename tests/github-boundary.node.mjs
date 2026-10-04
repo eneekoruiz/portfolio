@@ -141,14 +141,26 @@ test("language work has three concurrent workers, eight repositories and canonic
     peak = Math.max(peak, active);
     await new Promise((resolve) => setTimeout(resolve, 5));
     active--;
-    return Response.json({ TypeScript: 300, Invalid: -1 });
+    return Response.json({
+      Python: 200,
+      TypeScript: 300,
+      HTML: 100,
+      Zero: 0,
+      Invalid: -1,
+      Malformed: "50",
+    });
   });
   const response = await GET(request());
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(languages, 8);
   assert.equal(peak, 3);
-  assert.deepEqual(body[0].all_languages, ["TypeScript"]);
+  assert.deepEqual(body[0].all_languages, [
+    "TypeScript",
+    "Python",
+    "HTML",
+    "Zero",
+  ]);
   assert.equal(body.length, 10);
 });
 
@@ -241,13 +253,15 @@ function mountHook(fetcher, visibility = "visible") {
 
 test("hidden intersection does not fetch; foreground approach fetches only once and drops malformed rows", async () => {
   let calls = 0;
-  const hook = mountHook(async () => {
+  let requestedUrl = "";
+  const hook = mountHook(async (url) => {
     calls++;
+    requestedUrl = url;
     return Response.json([
       null,
       {
         ...repository(),
-        all_languages: ["TypeScript", "TypeScript", null, ""],
+        all_languages: ["TypeScript", "Python", "HTML", "TypeScript", null, ""],
       },
       repository(),
       { ...repository(2), size: "invalid" },
@@ -260,10 +274,14 @@ test("hidden intersection does not fetch; foreground approach fetches only once 
   hook.enter();
   await new Promise(setImmediate);
   assert.equal(calls, 1);
+  assert.equal(requestedUrl, "/api/github/repos?per_page=12");
   assert.equal(hook.updates.length, 1);
   assert.equal(hook.updates[0].repos.length, 1);
   assert.equal(hook.updates[0].repos[0].langs[0], "TypeScript");
-  assert.equal(hook.updates[0].repos[0].langs.length, 1);
+  assert.deepEqual(
+    [...hook.updates[0].repos[0].langs],
+    ["TypeScript", "Python", "HTML"],
+  );
   assert.equal(hook.updates[0].offline, false);
   hook.cleanup();
 });
