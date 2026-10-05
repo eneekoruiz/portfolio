@@ -189,13 +189,26 @@ test("helix signal compiles in both render profiles and motion preferences relea
   });
 
   if (!motionState.reduced && !motionState.lightweight) {
-    await expect(page.locator("canvas[data-materia-renderer]")).toBeVisible();
     await expect
       .poll(() => page.evaluate(() => window.__helixShaders.length))
       .toBeGreaterThan(0);
     expect(
       await page.evaluate(() => window.__helixShaders.every(Boolean)),
     ).toBe(true);
+    // A slow GPU may retire before navigation's load event. It must have
+    // compiled the real shaders first and keep the visible animated fallback.
+    if (await page.locator('[data-scene-degraded="true"]').count()) {
+      await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(
+        0,
+      );
+      await expect(page.locator("[data-dna-static]")).toBeVisible();
+      await expect(page.locator("[data-dna-static]")).toHaveAttribute(
+        "data-dna-animated",
+        "true",
+      );
+    } else {
+      await expect(page.locator("canvas[data-materia-renderer]")).toBeVisible();
+    }
   } else {
     await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
     await expect(page.locator("[data-dna-static]")).toBeVisible();

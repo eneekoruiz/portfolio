@@ -119,6 +119,8 @@ function expectContainedAndUncovered(geometry, label) {
 test("cinematic studio stays clear through scroll progress and reverses into the static reduced-motion route", async ({
   page,
 }, info) => {
+  // This is four complete viewport journeys with forward/reverse checkpoints.
+  test.setTimeout(240000);
   test.skip(
     info.project.name !== "desktop",
     "This test sets its own viewport sizes and uses the desktop browser context.",
