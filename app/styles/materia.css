@@ -606,13 +606,6 @@ html[dir="rtl"] .hero-prism {
   top: 84px;
   width: calc(100vw - 24px);
 }
-@media (max-width: 767px) {
-  .reading-nav {
-    left: 50dvw;
-    top: calc(100dvh - 5.75rem);
-    bottom: auto;
-  }
-}
 @media (min-width: 768px) {
   [data-nav-compact="true"] .navbar-links {
     position: absolute;
@@ -784,8 +777,5 @@ body::after {
     background: var(--page);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-  .reading-nav {
-    background: var(--page);
   }
 }

@@ -139,6 +139,11 @@ test("cinematic studio stays clear through scroll progress and reverses into the
     const screen = page.locator('[data-studio-screen="cinematic"]');
     await expect(hero).toBeVisible();
     await expect(screen).toHaveCount(1);
+    await expect(
+      screen.locator(
+        '[data-studio-external-preview] [data-preview-kind="capture"]',
+      ),
+    ).toHaveCount(1);
     await expect(page.locator("html")).toHaveAttribute("data-motion", "on");
     await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
     await expect
@@ -199,11 +204,32 @@ test("cinematic studio stays clear through scroll progress and reverses into the
           geometry.boxes.some((box) => box.name.startsWith("intro-")),
           `${viewport.width}x${viewport.height} intro remains visible`,
         ).toBe(true);
-      if (progress >= 0.5 && progress < 0.9)
+      if (progress >= 0.5 && progress < 0.9) {
         expect(
           geometry.boxes.some((box) => box.name === "studio-screen"),
           `${viewport.width}x${viewport.height} studio frame is visible`,
         ).toBe(true);
+        const preview = screen.locator("[data-studio-external-preview]");
+        const link = preview.getByRole("link", {
+          name: "Abrir en otra pestaña",
+        });
+        await expect(link).toBeVisible();
+        const fits = await link.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const parent = element
+            .closest("[data-studio-screen]")
+            .getBoundingClientRect();
+          return (
+            rect.top >= parent.top - 1 &&
+            rect.bottom <= parent.bottom + 1 &&
+            rect.left >= parent.left - 1 &&
+            rect.right <= parent.right + 1
+          );
+        });
+        expect(fits, "External project action stays within its 3D screen").toBe(
+          true,
+        );
+      }
       if (progress < 0.85)
         expect(
           geometry.boxes.some((box) => box.name === "scroll-hud"),

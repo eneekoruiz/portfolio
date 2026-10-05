@@ -169,6 +169,7 @@ test("Spanish and English controls update together", async ({ page }) => {
     page.locator("#hero").getByRole("link", { name: "See work" }),
   ).toBeVisible();
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
+  await expect(row.locator("button[aria-expanded]")).toHaveText("Details");
   await row.locator("button[aria-expanded]").click();
   await expect(
     row.getByRole("link", { name: "Explore project" }),

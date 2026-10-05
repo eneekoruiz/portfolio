@@ -17,12 +17,14 @@ test("projects expose their direct action before disclosure and keep the brief c
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
+  await expect(page.locator("[data-reading-nav]")).toHaveCount(0);
   const rows = page.locator("#work [data-materia-surface]");
   await expect(rows).toHaveCount(5);
   for (const row of await rows.all()) {
     await row.scrollIntoViewIfNeeded();
     const action = row.locator(".work-project-action");
     const disclosure = row.locator("button[aria-expanded]");
+    await expect(disclosure).toHaveText(/Detalles/);
     await expect(disclosure).toHaveAttribute("aria-expanded", "false");
     await expect(action).toBeVisible();
     await expect(action).toBeInViewport();
@@ -54,6 +56,8 @@ test("projects expose their direct action before disclosure and keep the brief c
     await tabs.first().focus();
     await page.keyboard.press("ArrowRight");
     await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+    await tabs.nth(2).click();
+    await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
     await expect(row.getByRole("tabpanel")).toBeVisible();
     await page.screenshot({
       path: info.outputPath(

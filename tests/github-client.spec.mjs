@@ -15,8 +15,16 @@ const validRepository = {
   all_languages: ["TypeScript", "TypeScript", null, "", { name: "invalid" }],
 };
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, context }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
+  // Verify native popup navigation independently of the availability of the
+  // deliberately fictitious destination repository on GitHub.
+  await context.route(validRepository.html_url, (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: "<title>Repository destination</title>",
+    }),
+  );
 });
 
 test("malformed optional data preserves valid activity and deduplicates language chips", async ({

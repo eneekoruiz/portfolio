@@ -255,9 +255,7 @@ test("project opens into a reversible desktop studio or readable static mobile s
     )
     .toBeGreaterThan(0.7);
   await expect(
-    screen
-      .getByText("Entrar al Estudio", { exact: true })
-      .filter({ visible: true }),
+    screen.locator('[data-studio-external-preview] [data-preview-kind="capture"]'),
   ).toBeVisible();
   await expect(
     screen.getByRole("link", { name: "Abrir en otra pestaña" }),

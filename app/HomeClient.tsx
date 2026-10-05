@@ -31,7 +31,6 @@ import { useDnaColors } from "./hooks/useDnaColors";
 import { useNavbarInteractions } from "./hooks/useNavbarInteractions";
 import { materia, setMateriaPalette } from "./lib/materia";
 import { useSceneJourney } from "./hooks/useSceneJourney";
-import { ReadingNav } from "./components/navigation/ReadingNav";
 
 // ── UI & Navigation ────────────────────────────────────────────────────────
 import { useGitHubActivity } from "./hooks/useGitHubActivity";
@@ -283,9 +282,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         <MemoContact t={t} lang={lang} />
         <MemoFooter t={t} />
       </main>
-      {ready && !menu && !cmd && (
-        <ReadingNav active={activeSection} t={t} lang={lang} />
-      )}
 
       {cmd && (
         <CmdModal

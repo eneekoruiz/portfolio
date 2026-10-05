@@ -244,29 +244,37 @@ test("saved language survives case studies and a missing-page return", async ({
   await expect(page.locator("#hero")).toBeVisible();
 });
 
-test("touch reading map moves between chapters without hiding the contact route", async ({
+test("touch main navigation keeps every chapter reachable without covering project details", async ({
   page,
 }, info) => {
   test.skip(
-    info.project.name !== "mobile",
-    "The reading map supplements collapsed touch navigation.",
+    info.project.name === "desktop",
+    "Touch and compact navigation profiles.",
   );
   await page.goto("/");
-  await page
-    .locator("#hero")
-    .getByRole("link", { name: "Ver proyectos", exact: true })
-    .click();
-  const map = page.locator("[data-reading-nav]");
-  await expect(map).toBeVisible();
-  await expect(map).toContainText("02 / 06");
-  await map.locator('a[href="#about"]').click();
-  await expect(map).toContainText("03 / 06");
-  await map.locator('a[href="#skills"]').click();
-  await expect(map).toContainText("04 / 06");
-  await map.locator('a[href="#values"]').click();
-  await expect(map).toContainText("05 / 06");
-  await map.locator('a[href="#contact"]').click();
-  await expect(map).toContainText("06 / 06");
+  await expect(page.locator("[data-reading-nav]")).toHaveCount(0);
+  await page.evaluate(() => {
+    window.__chapterDocument = "same-document";
+  });
+  for (const id of ["work", "about", "skills", "values", "contact"]) {
+    const trigger = page.getByRole("button", {
+      name: UI_COPY.es.openMenu,
+      exact: true,
+    });
+    if (await trigger.isVisible()) {
+      await trigger.click();
+      const menu = page.getByRole("dialog");
+      await expect(menu).toBeVisible();
+      await menu.locator('a[href="#' + id + '"]').click();
+      await expect(menu).toHaveCount(0);
+    } else {
+      await page.locator('header nav a[href="#' + id + '"]').click();
+    }
+    await expect(page.locator("#" + id)).toBeInViewport();
+    expect(await page.evaluate(() => window.__chapterDocument)).toBe(
+      "same-document",
+    );
+  }
   await expect(
     page.locator("#contact").getByRole("link", { name: "Escríbeme" }),
   ).toBeVisible();

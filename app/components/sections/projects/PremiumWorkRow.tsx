@@ -191,7 +191,7 @@ export function PremiumWorkRow({
               aria-controls={panelId}
               className="flex min-h-11 items-center gap-2 text-xs font-medium text-lead hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
             >
-              {copy.preview}
+              {copy.details}
               <Plus
                 className="work-expand-icon"
                 size={15}

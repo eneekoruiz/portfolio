@@ -846,23 +846,36 @@ export function ProjectHero({
           )}
 
           {liveUrl && !embeddingAllowed ? (
-            <div className="relative z-[110] flex h-full w-full flex-col items-center justify-center gap-6 bg-neutral-950 px-8 py-12 text-center text-white">
-              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/70">
-                {s.enterStudio}
-              </span>
-              <p className="text-2xl font-semibold tracking-tight">{title}</p>
-              <p className="max-w-md text-sm leading-relaxed text-white/70">
-                {subtitle}
-              </p>
-              <a
-                href={liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="materia-button bg-white text-black focus-visible:outline-white"
+            <div
+              data-studio-external-preview
+              className="relative z-[110] grid h-full w-full min-h-0 grid-rows-[42%_1fr] overflow-hidden bg-neutral-950 text-white sm:grid-cols-[1.15fr_1fr] sm:grid-rows-1"
+            >
+              <div
+                className="relative min-h-0 min-w-0 overflow-hidden border-b border-white/10 sm:border-b-0 sm:border-e"
+                aria-hidden="true"
               >
-                {TX[lang].openDirect}
-                <ExternalLink size={16} aria-hidden="true" />
-              </a>
+                <ProjectVisual id={projectId} className="!h-full !w-full" />
+              </div>
+              <div className="flex min-h-0 flex-col items-center justify-center gap-3 px-4 py-4 text-center sm:gap-5 sm:px-6">
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/60">
+                  {ui.preview}
+                </span>
+                <p className="text-xl font-semibold tracking-tight sm:text-2xl">
+                  {title}
+                </p>
+                <p className="max-w-xs text-xs leading-relaxed text-white/70 sm:text-sm">
+                  {subtitle}
+                </p>
+                <a
+                  href={liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="materia-button bg-white text-black !min-h-11 !px-4 !py-2.5 !text-xs focus-visible:outline-white"
+                >
+                  {TX[lang].openDirect}
+                  <ExternalLink size={16} aria-hidden="true" />
+                </a>
+              </div>
             </div>
           ) : liveUrl && !isInteracting ? (
             <div className="relative h-full w-full bg-neutral-950">
