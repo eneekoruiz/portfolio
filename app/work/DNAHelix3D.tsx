@@ -169,7 +169,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
         strandRadius: 0.045,
         rungRadius: 0.036,
         nodeScale: 0.155,
-        rotationSpeed: 0.15,
+        rotationSpeed: 0.28,
         scale: [0.96, 1.08, 0.96] as [number, number, number],
         rotation: [4, 10, -6] as [number, number, number],
       };
@@ -186,7 +186,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       strandRadius: lowPower ? 0.048 : 0.066,
       rungRadius: lowPower ? 0.035 : 0.045,
       nodeScale: lowPower ? 0.15 : 0.175,
-      rotationSpeed: lowPower ? 0.12 : 0.18,
+      rotationSpeed: lowPower ? 0.24 : 0.34,
       scale: [1.25, 1.08, 1.25] as [number, number, number],
       rotation: [7, 18, -10] as [number, number, number],
     };

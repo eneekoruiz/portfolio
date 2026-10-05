@@ -17,6 +17,8 @@ import { usePreferredMotion } from "../../../hooks/usePreferredMotion";
 import { useProjectTension } from "../../../hooks/useProjectTension";
 import { useUmbral } from "../../motion/UmbralProvider";
 import { ProjectVisual } from "../../motion/ProjectVisual";
+import { useProjectStage } from "../../../hooks/useProjectStage";
+import { useMotionPolicy } from "../../../hooks/useMotionEnabled";
 
 interface WorkRowProps {
   proj: ProjectCard;
@@ -45,6 +47,7 @@ export function PremiumWorkRow({
   const navigate = useUmbral();
   const reduced = usePreferredMotion();
   const enabled = motionEnabled && !reduced && !menu;
+  const { allowed } = useMotionPolicy();
   const rowRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -75,6 +78,7 @@ export function PremiumWorkRow({
   const actionRef = useSpringHover<HTMLAnchorElement>(enabled);
   useMateriaSurface(rowRef, theme.color, enabled);
   useProjectTension(rowRef, enabled, isExpanded, idx);
+  useProjectStage(rowRef, allowed && !reduced && !menu && !isExpanded, lang);
   useSpringAccordion(bodyRef, contentRef, isExpanded, enabled, skipAnimation);
   const prefetch = () => {
     // Hover/focus signals navigation intent even when decorative motion is off.
@@ -94,7 +98,7 @@ export function PremiumWorkRow({
     )
       return;
     event.preventDefault();
-    saveNavState({ openIdx: idx, scrollY: window.scrollY });
+    saveNavState({ openIdx: isExpanded ? idx : null, scrollY: window.scrollY });
     onHoverProject(null);
     navigate({
       source: rowRef.current,
@@ -187,7 +191,17 @@ export function PremiumWorkRow({
             <button
               id={`btn-${safeId}`}
               type="button"
-              onClick={onToggle}
+              onClick={() => {
+                onToggle();
+                if (!isExpanded && rowRef.current?.dataset.projectStage) {
+                  requestAnimationFrame(() =>
+                    bodyRef.current?.scrollIntoView({
+                      block: "nearest",
+                      behavior: "smooth",
+                    }),
+                  );
+                }
+              }}
               aria-expanded={isExpanded}
               aria-controls={panelId}
               className="flex min-h-11 items-center gap-2 text-xs font-medium text-lead hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"

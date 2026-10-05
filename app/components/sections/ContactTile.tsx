@@ -69,6 +69,7 @@ export function ContactTile({
       ref={host}
       data-section-reveal
       data-contact-motion={motion ? "on" : "off"}
+      data-contact-service={label.toLowerCase()}
       className="contact-tile materia-surface relative rounded-[28px]"
       style={{ "--surface-color": color } as CSSProperties}
     >

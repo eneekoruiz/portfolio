@@ -8,18 +8,15 @@ import { SectionFrame } from "./SectionFrame";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { SpringValue } from "../../lib/spring";
-import { UI_COPY } from "../../data/interface-translations";
 
 function SkillOrbit({
   category,
   label,
   motion,
-  lang,
 }: {
   category: SkillCategory;
   label: string;
   motion: boolean;
-  lang: Lang;
 }) {
   const cardRef = useRef<HTMLElement>(null);
   const orbitRef = useRef<HTMLUListElement>(null);
@@ -296,7 +293,6 @@ function SkillOrbit({
         ref={orbitRef}
         tabIndex={motion ? 0 : undefined}
         aria-label={label}
-        aria-describedby={`orbit-help-${category.g.replace(/\W/g, "")}`}
         className="skill-orbit mt-4 flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
       >
         {category.techs.map((tech) => (
@@ -313,19 +309,11 @@ function SkillOrbit({
           </li>
         ))}
       </ul>
-      <p
-        id={`orbit-help-${category.g.replace(/\W/g, "")}`}
-        className="skill-orbit-help relative font-mono text-[10px] uppercase tracking-[0.08em] text-lead"
-      >
-        {motion
-          ? UI_COPY[lang].orbitHelp
-          : `${UI_COPY[lang].technologies}: ${category.techs.length}`}
-      </p>
     </article>
   );
 }
 
-export function Skills({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
+export function Skills({ t }: { t: Tx; lang?: Lang }) {
   const motion = useMotionEnabled();
   return (
     <SectionFrame id="skills" index="03" label={t.skLb} title={t.skH}>
@@ -336,7 +324,6 @@ export function Skills({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
             category={category}
             label={t.skCats[index] ?? category.g}
             motion={motion}
-            lang={lang}
           />
         ))}
       </div>

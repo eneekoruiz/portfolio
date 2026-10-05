@@ -50,10 +50,13 @@ function RepoRowComponent({
     >
       <div
         className={`py-[18px] md:py-5 relative z-10 select-none ${isMobile ? "cursor-pointer" : ""}`}
-        onPointerEnter={() => !isMobile && setActiveRepo(idx)}
+        onPointerEnter={(event) => {
+          // A narrow desktop window still has a mouse; width is not input type.
+          if (event.pointerType !== "touch") setActiveRepo(idx);
+        }}
         onPointerLeave={(event) => {
           if (
-            !isMobile &&
+            event.pointerType !== "touch" &&
             !event.currentTarget.contains(document.activeElement)
           ) {
             setActiveRepo(null);
@@ -68,8 +71,11 @@ function RepoRowComponent({
             setActiveRepo(null);
           }
         }}
-        onClick={() => {
-          if (isMobile) setActiveRepo(isActive ? null : idx);
+        onClick={(event) => {
+          const touch =
+            (event.nativeEvent as PointerEvent).pointerType === "touch" ||
+            matchMedia("(pointer: coarse)").matches;
+          if (touch) setActiveRepo(isActive ? null : idx);
         }}
       >
         <div className="flex items-start md:items-center gap-4 md:gap-5">
@@ -127,13 +133,13 @@ function RepoRowComponent({
             </div>
             <div
               id={`repo-description-${r.id}`}
-              className="repo-description-panel grid transition-[grid-template-rows] duration-200 ease-out will-change-[grid-template-rows]"
+              className="repo-description-panel grid transition-[grid-template-rows] duration-200 ease-out"
               style={{
                 gridTemplateRows: isDescriptionOpen ? "1fr" : "0fr",
               }}
             >
               <div
-                className="overflow-hidden transition-[opacity,transform] duration-200 ease-out will-change-[transform,opacity]"
+                className="overflow-hidden transition-[opacity,transform] duration-200 ease-out"
                 style={{
                   opacity: isDescriptionOpen ? 1 : 0,
                   transform: isDescriptionOpen
@@ -145,7 +151,7 @@ function RepoRowComponent({
               >
                 <div className="pt-3">
                   {r.description && (
-                    <p className="text-[11px] text-lead/80 leading-[1.7] mb-3 pr-4">
+                    <p className="text-xs text-lead leading-[1.7] mb-3 pr-4">
                       {r.description}
                     </p>
                   )}

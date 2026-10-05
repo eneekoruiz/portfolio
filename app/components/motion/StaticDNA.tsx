@@ -72,7 +72,7 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
       scrollTurn += (targetTurn - scrollTurn) * 0.16;
       leanX += (pointerX - leanX) * 0.12;
       leanY += (pointerY - leanY) * 0.12;
-      const yaw = elapsedRef.current * 0.34 + scrollTurn;
+      const yaw = elapsedRef.current * 0.68 + scrollTurn;
       compositionRef.current?.setAttribute(
         "transform",
         `translate(${(leanX * 7).toFixed(2)} ${(leanY * 5).toFixed(2)}) rotate(${(leanX * 2.5).toFixed(2)} 150 410)`,
@@ -120,7 +120,7 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
       const pathB = dB.join(" ");
       strandARef.current?.setAttribute("d", pathA);
       strandBRef.current?.setAttribute("d", pathB);
-      const lightOffset = -(elapsedRef.current * 0.085) % 1;
+      const lightOffset = -(elapsedRef.current * 0.13) % 1;
       for (const [light, path] of [
         [lightARef.current, pathA],
         [lightBRef.current, pathB],

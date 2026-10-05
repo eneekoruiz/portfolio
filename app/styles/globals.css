@@ -48,7 +48,7 @@ body {
   font-family: var(--font-sans);
   background: var(--page);
   color: var(--ink);
-  overflow-x: hidden;
+  overflow-x: clip;
   /* Optimized transitions: faster for responsiveness, cubic-bezier for organic feel */
   transition:
     background 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),

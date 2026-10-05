@@ -70,12 +70,27 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         router.push(url, { scroll: false });
         return;
       }
-      const rect = source.getBoundingClientRect();
+      const stageHeader = source.hasAttribute("data-project-stage")
+        ? source.querySelector<HTMLElement>(".work-surface-header")
+        : null;
+      const rect = (stageHeader ?? source).getBoundingClientRect();
       const clone = source.cloneNode(true) as HTMLElement;
       clone.removeAttribute("id");
       clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
       clone.setAttribute("data-umbral-clone", "");
       clone.style.height = "100%";
+      if (stageHeader) {
+        // Frame the visible studio, keeping its inherited colors and depth.
+        // The extra scroll runway is not part of the transition snapshot.
+        clone.style.minHeight = "0";
+        const header = clone.querySelector<HTMLElement>(".work-surface-header");
+        if (header)
+          Object.assign(header.style, {
+            position: "relative",
+            top: "0",
+            minHeight: "100%",
+          });
+      }
       const heading = clone.querySelector<HTMLElement>("[data-project-title]");
       const visual = clone.querySelector<HTMLElement>("[data-project-visual]");
       shell.replaceChildren(clone);
