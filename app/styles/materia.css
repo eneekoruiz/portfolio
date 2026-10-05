@@ -269,9 +269,6 @@ html[data-umbral]::view-transition-new(project-surface) {
 }
 
 @media (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .materia-canvas > div {
-    opacity: 0.55;
-  }
   .materia-surface {
     background: color-mix(in srgb, var(--page) 94%, transparent);
   }
@@ -629,11 +626,11 @@ html[dir="rtl"] .hero-prism {
 /* Decorative layers are clipped and subordinate to the reading surface. */
 .materia-canvas {
   contain: strict;
-  opacity: 0.55 !important;
+  opacity: 0.72 !important;
   transition: opacity 240ms ease;
 }
 .materia-canvas[data-scene-active="false"] {
-  opacity: 0.38 !important;
+  opacity: 0.58 !important;
 }
 .materia-canvas[data-scene-ready="false"] {
   opacity: 0 !important;
@@ -665,7 +662,7 @@ html {
 }
 @media (max-width: 767px) {
   .materia-canvas {
-    opacity: 0.32 !important;
+    opacity: 0.48 !important;
   }
   .glass-hud {
     backdrop-filter: none;

@@ -108,6 +108,7 @@ export function PremiumWorkRow({
       ref={rowRef}
       data-materia-surface={safeId}
       data-expanded={isExpanded}
+      data-preview-motion={enabled}
       className="materia-surface work-surface group/work relative rounded-[20px] border border-ink/15 text-ink"
       style={{ "--surface-color": theme.color } as CSSProperties}
       onPointerEnter={() => {
@@ -127,24 +128,24 @@ export function PremiumWorkRow({
           onHoverProject(null);
       }}
     >
-      <div className="work-surface-header relative z-10 grid gap-5 p-5 md:grid-cols-[1.2fr_0.8fr] md:items-center md:gap-8 md:p-7">
+      <div className="work-surface-header relative z-10 grid gap-5 p-5 md:grid-cols-[1.15fr_0.85fr] md:items-center md:gap-6 md:p-6">
         <div className="min-w-0">
-          <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-lead">
+          <div className="mb-2.5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-lead">
             <span>{String(idx + 1).padStart(2, "0")}</span>
             <span>{TX[lang].projectTags[idx] ?? proj.tag}</span>
             <span>{proj.year}</span>
           </div>
           <h3
             data-project-title
-            className="work-project-title text-balance break-words text-[clamp(1.65rem,3vw,2.6rem)] font-bold capitalize leading-[1.08] tracking-[-0.045em]"
+            className="work-project-title text-balance break-words text-[clamp(1.5rem,2.6vw,2.25rem)] font-bold capitalize leading-[1.08] tracking-[-0.045em]"
           >
             {content?.title ?? proj.name.replace(/[-_]/g, " ")}
           </h3>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-lead line-clamp-2">
+          <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-lead line-clamp-2">
             {content?.objective ?? proj.desc}
           </p>
           <div
-            className="mt-4 flex flex-wrap gap-x-4 gap-y-2"
+            className="mt-3 flex flex-wrap gap-x-4 gap-y-2"
             aria-label={copy.technologies}
           >
             {proj.langs.map((language) => (
@@ -161,7 +162,7 @@ export function PremiumWorkRow({
               </span>
             ))}
           </div>
-          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
             <a
               ref={actionRef}
               href={
@@ -212,12 +213,31 @@ export function PremiumWorkRow({
             )}
           </div>
         </div>
-        <div
-          className="work-preview min-w-0 overflow-hidden rounded-xl"
-          aria-hidden="true"
+        <a
+          href={
+            theme.hasAudit
+              ? `/work/${safeId}`
+              : `https://github.com/eneekoruiz/${proj.name}`
+          }
+          onClick={theme.hasAudit ? handleNavigate : undefined}
+          onFocus={prefetch}
+          onPointerEnter={prefetch}
+          target={theme.hasAudit ? undefined : "_blank"}
+          rel={theme.hasAudit ? undefined : "noopener noreferrer"}
+          aria-label={`${copy.preview}: ${content?.title ?? proj.name}`}
+          className="work-preview min-w-0 rounded-xl"
         >
-          <ProjectVisual id={safeId} />
-        </div>
+          <div className="work-preview-object" aria-hidden="true">
+            <ProjectVisual id={safeId} presentation="studio" />
+          </div>
+          <span className="work-preview-caption" aria-hidden="true">
+            <span>{copy.preview}</span>
+            <span className="work-preview-open">
+              {theme.hasAudit ? copy.explore : copy.source}
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </span>
+          </span>
+        </a>
       </div>
       <div
         ref={bodyRef}

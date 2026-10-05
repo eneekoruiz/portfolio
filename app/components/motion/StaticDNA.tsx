@@ -29,6 +29,9 @@ const pathFor = (direction: number) =>
 export function StaticDNA({ animate = false }: { animate?: boolean }) {
   const strandARef = useRef<SVGPathElement>(null);
   const strandBRef = useRef<SVGPathElement>(null);
+  const lightARef = useRef<SVGPathElement>(null);
+  const lightBRef = useRef<SVGPathElement>(null);
+  const compositionRef = useRef<SVGGElement>(null);
   const rungsRef = useRef<(SVGLineElement | null)[]>([]);
   const nodesARef = useRef<(SVGCircleElement | null)[]>([]);
   const nodesBRef = useRef<(SVGCircleElement | null)[]>([]);
@@ -41,6 +44,23 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
     let timer = 0;
     let frame = 0;
     let lastTime = 0;
+    let scrollTurn = window.scrollY * 0.0012;
+    let targetTurn = scrollTurn;
+    let pointerX = 0;
+    let pointerY = 0;
+    let leanX = 0;
+    let leanY = 0;
+    const scroll = () => {
+      targetTurn = window.scrollY * 0.0012;
+    };
+    const pointer = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
+      pointerX = (event.clientX / window.innerWidth - 0.5) * 2;
+      pointerY = (event.clientY / window.innerHeight - 0.5) * 2;
+    };
+    const leave = () => {
+      pointerX = pointerY = 0;
+    };
 
     const update = (now: number) => {
       if (!active) return;
@@ -49,7 +69,14 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
 
       // Rotate the helix phase itself so the projected strands keep their
       // width through a turn instead of flattening into a line.
-      const yaw = elapsedRef.current * 0.24;
+      scrollTurn += (targetTurn - scrollTurn) * 0.16;
+      leanX += (pointerX - leanX) * 0.12;
+      leanY += (pointerY - leanY) * 0.12;
+      const yaw = elapsedRef.current * 0.34 + scrollTurn;
+      compositionRef.current?.setAttribute(
+        "transform",
+        `translate(${(leanX * 7).toFixed(2)} ${(leanY * 5).toFixed(2)}) rotate(${(leanX * 2.5).toFixed(2)} 150 410)`,
+      );
       const dA: string[] = [];
       const dB: string[] = [];
       for (let i = 0; i < pairs.length; i++) {
@@ -67,26 +94,40 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
         if (rung) {
           rung.setAttribute("x1", xA.toFixed(2));
           rung.setAttribute("x2", xB.toFixed(2));
+          rung.setAttribute(
+            "stroke-opacity",
+            String(0.18 + Math.abs(front) * 0.3),
+          );
         }
         if (nodeA) {
           nodeA.setAttribute("cx", xA.toFixed(2));
-          nodeA.setAttribute("r", String(2.6 + Math.max(0, front) * 0.8));
+          nodeA.setAttribute("r", String(2 + Math.max(0, front) * 2));
           nodeA.setAttribute(
             "fill-opacity",
-            String(0.5 + Math.max(0, front) * 0.45),
+            String(0.3 + Math.max(0, front) * 0.7),
           );
         }
         if (nodeB) {
           nodeB.setAttribute("cx", xB.toFixed(2));
-          nodeB.setAttribute("r", String(2.6 + Math.max(0, -front) * 0.8));
+          nodeB.setAttribute("r", String(2 + Math.max(0, -front) * 2));
           nodeB.setAttribute(
             "fill-opacity",
-            String(0.5 + Math.max(0, -front) * 0.45),
+            String(0.3 + Math.max(0, -front) * 0.7),
           );
         }
       }
-      strandARef.current?.setAttribute("d", dA.join(" "));
-      strandBRef.current?.setAttribute("d", dB.join(" "));
+      const pathA = dA.join(" ");
+      const pathB = dB.join(" ");
+      strandARef.current?.setAttribute("d", pathA);
+      strandBRef.current?.setAttribute("d", pathB);
+      const lightOffset = -(elapsedRef.current * 0.085) % 1;
+      for (const [light, path] of [
+        [lightARef.current, pathA],
+        [lightBRef.current, pathB],
+      ] as const) {
+        light?.setAttribute("d", path);
+        light?.setAttribute("stroke-dashoffset", lightOffset.toFixed(4));
+      }
       timer = window.setTimeout(() => {
         frame = window.requestAnimationFrame(update);
       }, 50);
@@ -111,10 +152,16 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
     };
 
     document.addEventListener("visibilitychange", syncVisibility);
+    window.addEventListener("scroll", scroll, { passive: true });
+    window.addEventListener("pointermove", pointer, { passive: true });
+    window.addEventListener("blur", leave);
     start();
     return () => {
       stop();
       document.removeEventListener("visibilitychange", syncVisibility);
+      window.removeEventListener("scroll", scroll);
+      window.removeEventListener("pointermove", pointer);
+      window.removeEventListener("blur", leave);
     };
   }, [animate]);
 
@@ -127,56 +174,79 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
       className="dna-static absolute right-[8%] top-1/2 h-[110%] w-[min(65vw,480px)] -translate-y-1/2 -rotate-12"
       fill="none"
     >
-      {pairs.map(({ y, phase }, i) => {
-        const x = Math.sin(phase) * 82;
-        return (
-          <g key={i}>
-            <line
-              ref={(node) => {
-                rungsRef.current[i] = node;
-              }}
-              x1={150 + x}
-              x2={150 - x}
-              y1={y}
-              y2={y}
-              stroke="var(--dna-secondary, var(--lead))"
-              strokeOpacity="0.35"
-            />
-            <circle
-              ref={(node) => {
-                nodesARef.current[i] = node;
-              }}
-              cx={150 + x}
-              cy={y}
-              r="3"
-              fill="var(--dna-accent, var(--brand))"
-            />
-            <circle
-              ref={(node) => {
-                nodesBRef.current[i] = node;
-              }}
-              cx={150 - x}
-              cy={y}
-              r="3"
-              fill="var(--dna-secondary, var(--lead))"
-            />
-          </g>
-        );
-      })}
-      <path
-        ref={strandARef}
-        d={pathFor(1)}
-        data-dna-strand="accent"
-        stroke="var(--dna-accent, var(--brand))"
-        strokeWidth="2"
-      />
-      <path
-        ref={strandBRef}
-        d={pathFor(-1)}
-        data-dna-strand="secondary"
-        stroke="var(--dna-secondary, var(--lead))"
-        strokeWidth="2"
-      />
+      <g ref={compositionRef}>
+        {pairs.map(({ y, phase }, i) => {
+          const x = Math.sin(phase) * 82;
+          return (
+            <g key={i}>
+              <line
+                ref={(node) => {
+                  rungsRef.current[i] = node;
+                }}
+                x1={150 + x}
+                x2={150 - x}
+                y1={y}
+                y2={y}
+                stroke="var(--dna-secondary, var(--lead))"
+                strokeOpacity="0.35"
+              />
+              <circle
+                ref={(node) => {
+                  nodesARef.current[i] = node;
+                }}
+                cx={150 + x}
+                cy={y}
+                r="3"
+                fill="var(--dna-accent, var(--brand))"
+              />
+              <circle
+                ref={(node) => {
+                  nodesBRef.current[i] = node;
+                }}
+                cx={150 - x}
+                cy={y}
+                r="3"
+                fill="var(--dna-secondary, var(--lead))"
+              />
+            </g>
+          );
+        })}
+        <path
+          ref={strandARef}
+          d={pathFor(1)}
+          data-dna-strand="accent"
+          stroke="var(--dna-accent, var(--brand))"
+          strokeWidth="2.6"
+        />
+        <path
+          ref={strandBRef}
+          d={pathFor(-1)}
+          data-dna-strand="secondary"
+          stroke="var(--dna-secondary, var(--lead))"
+          strokeWidth="2.2"
+        />
+        <path
+          ref={lightARef}
+          data-dna-light
+          d={pathFor(1)}
+          pathLength="1"
+          stroke="var(--dna-accent, var(--brand))"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray="0.045 0.955"
+          opacity="0.65"
+        />
+        <path
+          ref={lightBRef}
+          d={pathFor(-1)}
+          pathLength="1"
+          stroke="var(--dna-secondary, var(--lead))"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray="0.045 0.955"
+          opacity="0.55"
+        />
+      </g>
     </svg>
   );
 }

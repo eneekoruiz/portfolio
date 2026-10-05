@@ -109,7 +109,8 @@ export function MateriaLayer() {
   }, [enabled]);
   const routeHasScene = pathname === "/" || pathname.startsWith("/work/");
   const ready = pathname !== "/" || phase === "ready";
-  const animateFallback = enabled && heroVisible && ready;
+  // Outside the hero the GPU sleeps; the same bounded SVG projection remains alive.
+  const animateFallback = enabled && ready;
   if (!mounted || !routeHasScene) return null;
   return (
     <div
@@ -128,6 +129,7 @@ export function MateriaLayer() {
             secondary={materia.secondary}
             darkMode={resolvedTheme === "dark"}
             paused={!enabled || !ready || !heroVisible}
+            animateFallback={animateFallback}
             onSlow={degrade}
           />
         )}

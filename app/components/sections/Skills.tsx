@@ -51,9 +51,10 @@ function SkillOrbit({
     let pointerX = 0,
       pointerY = 0,
       interacting = false;
-    let radius = 135;
+    let radius = 100;
     const resize = new ResizeObserver(([entry]) => {
-      radius = Math.min(195, Math.max(105, entry.contentRect.width * 0.34));
+      const width = entry.contentRect.width;
+      radius = Math.min(155, width * 0.32, Math.max(55, (width - 110) / 2));
       wake();
     });
     const draw = (dt = 0) => {
@@ -63,7 +64,7 @@ function SkillOrbit({
         const theta = (i * Math.PI * 2) / items.length + angle.value;
         const depth = (Math.cos(theta) + 1) / 2;
         const x = Math.sin(theta) * radius;
-        const y = Math.sin(theta) * 6 + pitch.value * 12;
+        const y = Math.sin(theta * 2) * 14 + pitch.value * 10;
         const dx = x - pointerX,
           dy = y - pointerY;
         const distance = Math.sqrt(dx * dx + dy * dy + 400);
@@ -280,14 +281,14 @@ function SkillOrbit({
       className="materia-surface skill-orbit-card relative overflow-hidden rounded-[24px] border p-5 md:p-6"
       style={{ "--surface-color": category.c } as CSSProperties}
     >
-      <header className="relative z-10 flex items-center gap-4">
+      <header className="skill-orbit-header relative z-10 flex items-center">
         <span
           className="skill-orbit-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]"
           aria-hidden="true"
         >
           <category.I size={22} />
         </span>
-        <h3 className="text-lg font-black uppercase tracking-tight text-ink md:text-xl">
+        <h3 className="font-black uppercase tracking-tight text-ink">
           {label}
         </h3>
       </header>
@@ -314,7 +315,7 @@ function SkillOrbit({
       </ul>
       <p
         id={`orbit-help-${category.g.replace(/\W/g, "")}`}
-        className="relative mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-lead"
+        className="skill-orbit-help relative font-mono text-[10px] uppercase tracking-[0.08em] text-lead"
       >
         {motion
           ? UI_COPY[lang].orbitHelp
@@ -328,23 +329,15 @@ export function Skills({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const motion = useMotionEnabled();
   return (
     <SectionFrame id="skills" index="03" label={t.skLb} title={t.skH}>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-7">
+      <div className="skills-grid grid">
         {SKILLS.map((category, index) => (
-          <div
+          <SkillOrbit
             key={category.g}
-            className={
-              index === SKILLS.length - 1
-                ? "md:col-span-2 md:mx-auto md:w-[calc(50%-0.875rem)]"
-                : ""
-            }
-          >
-            <SkillOrbit
-              category={category}
-              label={t.skCats[index] ?? category.g}
-              motion={motion}
-              lang={lang}
-            />
-          </div>
+            category={category}
+            label={t.skCats[index] ?? category.g}
+            motion={motion}
+            lang={lang}
+          />
         ))}
       </div>
     </SectionFrame>

@@ -59,12 +59,14 @@ export function CanvasScene({
   secondary,
   darkMode,
   paused = false,
+  animateFallback = false,
   onSlow,
 }: {
   accent: string;
   secondary: string;
   darkMode: boolean;
   paused?: boolean;
+  animateFallback?: boolean;
   onSlow: () => void;
 }) {
   const [visible, setVisible] = useState(true);
@@ -110,7 +112,7 @@ export function CanvasScene({
           isMobile={false}
         />
       </Canvas>
-      {(!rendered || paused) && <StaticDNA />}
+      {(!rendered || paused) && <StaticDNA animate={animateFallback} />}
     </div>
   );
 }

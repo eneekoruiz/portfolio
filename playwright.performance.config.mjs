@@ -3,7 +3,7 @@ import { devices } from "@playwright/test";
 export default {
   ...config,
   testMatch:
-    /(performance|localization|design|visual-continuity|identity|living-matter|motion-cleanup|overlays|overlay-focus|github-client|feedback|studio-transition|materia|continuity)\.spec\.mjs/,
+    /(performance|localization|design|visual-continuity|visual-refinement|identity|living-matter|motion-cleanup|overlays|overlay-focus|github-client|feedback|studio-transition|materia|continuity)\.spec\.mjs/,
   use: { ...config.use, baseURL: "http://localhost:3102" },
   projects: [
     {

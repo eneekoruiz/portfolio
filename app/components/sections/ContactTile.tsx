@@ -34,10 +34,16 @@ export function ContactTile({
       data-contact-flip
     >
       <span className="contact-flip-face relative flex min-h-56 flex-col items-start gap-4 rounded-[28px] border p-6">
-        <Icon size={28} aria-hidden="true" style={{ color }} />
-        <span className="text-xl font-bold text-ink">{label}</span>
-        <span className="break-all font-mono text-xs text-lead">{value}</span>
-        <span className="mt-auto flex items-center gap-3 text-xs font-bold text-ink">
+        <span className="contact-tile-icon" aria-hidden="true">
+          <Icon size={26} style={{ color }} />
+        </span>
+        <span className="contact-tile-label text-xl font-bold text-ink">
+          {label}
+        </span>
+        <span className="contact-tile-value break-all font-mono text-xs text-lead">
+          {value}
+        </span>
+        <span className="contact-tile-action mt-auto flex items-center gap-3 text-xs font-bold text-ink">
           {action}
           <ArrowUpRight size={14} aria-hidden="true" />
         </span>
@@ -46,7 +52,9 @@ export function ContactTile({
         aria-hidden="true"
         className="contact-flip-face contact-flip-back absolute inset-0 flex flex-col items-center justify-center gap-5 rounded-[28px] border p-6"
       >
-        <Icon size={42} style={{ color }} />
+        <span className="contact-tile-icon">
+          <Icon size={34} style={{ color }} />
+        </span>
         <span className="text-base font-bold text-ink">{action}</span>
         <span className="break-all text-center font-mono text-xs text-lead">
           {value}
@@ -60,7 +68,8 @@ export function ContactTile({
     <div
       ref={host}
       data-section-reveal
-      className="materia-surface relative rounded-[28px]"
+      data-contact-motion={motion ? "on" : "off"}
+      className="contact-tile materia-surface relative rounded-[28px]"
       style={{ "--surface-color": color } as CSSProperties}
     >
       {href ? (

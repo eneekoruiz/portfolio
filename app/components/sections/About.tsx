@@ -35,7 +35,7 @@ function MetricCard({
   return (
     <div
       ref={ref}
-      className={`materia-surface about-metric relative flex !min-h-0 flex-col justify-center overflow-hidden rounded-2xl border border-ink/15 !p-4 transition-colors duration-300 ${className}`}
+      className={`materia-surface about-metric relative flex flex-col justify-center overflow-hidden rounded-2xl border border-ink/15 transition-colors duration-300 ${className}`}
       data-metric-index={index}
     >
       <dl
@@ -46,7 +46,7 @@ function MetricCard({
         <dt className="mb-1 font-mono text-[9px] uppercase tracking-[0.12em] text-lead">
           {label}
         </dt>
-        <dd className="!text-lg font-black leading-tight tracking-[-0.04em] text-ink sm:!text-xl">
+        <dd className="font-black leading-tight tracking-[-0.04em] text-ink">
           {value}
         </dd>
       </dl>
@@ -60,22 +60,22 @@ export function About({ t }: { t: Tx }) {
 
   return (
     <SectionFrame id="about" index="02" label={t.abLb} title={t.abH}>
-      <div className="relative z-10 grid gap-10 lg:gap-14">
+      <div className="about-composition relative z-10 grid">
         <div data-section-reveal className="relative">
-          <p className="max-w-3xl text-pretty text-[clamp(1.4rem,2.8vw,2.4rem)] font-medium leading-[1.5] tracking-[-0.025em] text-ink relative z-10">
+          <p className="about-copy max-w-3xl text-pretty font-medium tracking-[-0.025em] text-ink relative z-10">
             <MaskedCopy text={t.mf} enabled={motion} />
           </p>
           <Link
             ref={linkRef}
             href="/curriculum"
-            className="materia-button mt-8 relative z-10 border border-ink/20 bg-page/90 text-ink"
+            className="about-cv materia-button relative z-10 border border-ink/20 bg-page/90 text-ink"
           >
             {t.ctaCv}
             <ArrowUpRight size={16} aria-hidden="true" />
           </Link>
         </div>
 
-        <div data-section-reveal className="grid gap-4 sm:grid-cols-3">
+        <div data-section-reveal className="about-metrics grid grid-cols-3">
           {t.metrics.map(([value, label], index) => (
             <MetricCard
               key={label}

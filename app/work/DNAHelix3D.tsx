@@ -183,7 +183,7 @@ export const DNAHelix3D: React.FC<DNAHelix3DProps> = ({
       tubeSegments: lowPower ? 96 : 144,
       radialSegments: lowPower ? 5 : 7,
       nodeSegments: lowPower ? 8 : 11,
-      strandRadius: lowPower ? 0.042 : 0.054,
+      strandRadius: lowPower ? 0.048 : 0.066,
       rungRadius: lowPower ? 0.035 : 0.045,
       nodeScale: lowPower ? 0.15 : 0.175,
       rotationSpeed: lowPower ? 0.12 : 0.18,

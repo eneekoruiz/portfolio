@@ -180,15 +180,17 @@ function ProjectStudy({ id }: { id: string }) {
   );
 }
 
-/** The same static project plate is used in the work list, follower and hero. */
+/** Shared source-grounded plate; the work list adds a local studio treatment. */
 export function ProjectVisual({
   id,
   className = "",
   priority = false,
+  presentation = "plate",
 }: {
   id: string;
   className?: string;
   priority?: boolean;
+  presentation?: "plate" | "studio";
 }) {
   const { ui } = useTranslations();
   const media = PROJECT_MEDIA[id];
@@ -199,6 +201,7 @@ export function ProjectVisual({
   return (
     <div
       data-project-visual={id}
+      data-preview-presentation={presentation}
       data-preview-kind={
         media ? "capture" : unavailable ? "unavailable" : "code"
       }
@@ -225,7 +228,11 @@ export function ProjectVisual({
                 src={media.src}
                 alt={`${ui.preview}: ${media.title}`}
                 fill
-                sizes="(max-width: 768px) 90vw, 520px"
+                sizes={
+                  presentation === "studio"
+                    ? "(max-width: 767px) 80vw, (max-width: 1023px) 35vw, 520px"
+                    : "(max-width: 768px) 90vw, 520px"
+                }
                 preload={priority}
                 className="object-cover object-top"
               />
