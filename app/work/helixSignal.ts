@@ -18,7 +18,7 @@ export class HelixSignal {
     this.breath =
       1 + Math.sin(this.elapsed * 0.72) * (lowPower ? 0.006 : 0.012);
     this.energy.value =
-      (lowPower ? 0.16 : 0.34) + Math.abs(flow) * 0.35 + warp * 0.8;
+      (lowPower ? 0.2 : 0.48) + Math.abs(flow) * 0.35 + warp * 0.8;
   }
 
   apply(material: MeshStandardMaterial) {

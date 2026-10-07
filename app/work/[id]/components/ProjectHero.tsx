@@ -33,7 +33,7 @@ import {
   MoveUp,
   GithubIcon,
 } from "lucide-react";
-import { useMotionEnabled } from "../../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../../hooks/useMotionEnabled";
 import type { Lang } from "../../../types";
 import { STUDIO_TX } from "../../../data/studio-translations";
 import { materia } from "../../../lib/materia";
@@ -82,8 +82,8 @@ export function ProjectHero({
 }: ProjectHeroProps) {
   const s = STUDIO_TX[lang] ?? STUDIO_TX["en"];
   const ui = UI_COPY[lang];
-  const motionEnabled = useMotionEnabled();
-  const staticStudioLayout = !motionEnabled;
+  const { allowed, enabled: motionEnabled, visible } = useMotionPolicy();
+  const staticStudioLayout = !allowed;
   const [embeddingOrigin, setEmbeddingOrigin] = useState<string | null>(null);
   useEffect(() => setEmbeddingOrigin(window.location.origin), []);
   // The live salon site permits framing only from its published portfolio hosts.
@@ -106,6 +106,11 @@ export function ProjectHero({
   const screenRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const heroVisibleRef = useRef(false);
+  const idleTweenRef = useRef<gsap.core.Tween | null>(null);
+  const [heroInView, setHeroInView] = useState(false);
+  const [screenInView, setScreenInView] = useState(false);
 
   // HUD scroll progress refs
   const scrollProgressRef = useRef<HTMLDivElement>(null);
@@ -113,7 +118,6 @@ export function ProjectHero({
   const scrollBarRef = useRef<HTMLDivElement>(null);
   const scrollHintDefaultRef = useRef<HTMLDivElement>(null);
   const scrollHintProgressRef = useRef<HTMLDivElement>(null);
-  const chevronRef = useRef<HTMLSpanElement>(null);
   const mobileCtaRef = useRef<HTMLButtonElement>(null);
   const sheenRef = useRef<HTMLDivElement>(null);
   const [mobilePressed, setMobilePressed] = useState(false);
@@ -141,23 +145,76 @@ export function ProjectHero({
   }, [shouldLoad]);
 
   useEffect(() => {
-    if (!motionEnabled) {
-      setShouldLoad(true);
+    // The server snapshot and a hidden tab are not media-loading consent.
+    if (embeddingOrigin !== null && staticStudioLayout) {
       setCanInteract(true);
     }
-  }, [motionEnabled]);
+  }, [embeddingOrigin, staticStudioLayout]);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+    const screen = screenRef.current;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === hero) {
+          heroVisibleRef.current = entry.isIntersecting;
+          setHeroInView(entry.isIntersecting);
+        }
+        if (entry.target === screen) setScreenInView(entry.isIntersecting);
+      }
+    });
+    if (hero) observer.observe(hero);
+    if (screen) observer.observe(screen);
+    return () => observer.disconnect();
+  }, [staticStudioLayout]);
+
+  useEffect(() => {
+    if (motionEnabled && heroInView) idleTweenRef.current?.resume();
+    else idleTweenRef.current?.pause();
+  }, [motionEnabled, heroInView, isReady, projectId]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const canPlay =
+      shouldLoad && visible && screenInView && (allowed || isInteracting);
+    if (canPlay && videoUrl) {
+      if (!video.getAttribute("src")) {
+        video.src = videoUrl;
+        video.load();
+      }
+      void video.play().catch(() => {
+        // Autoplay can be declined by the browser; native controls remain usable.
+      });
+    } else video.pause();
+    return () => video.pause();
+  }, [shouldLoad, visible, screenInView, allowed, isInteracting, videoUrl]);
+
+  const enterStudio = () => {
+    if (!canInteract || document.visibilityState !== "visible") return;
+    setIframeLoaded(false);
+    shouldLoadRef.current = true;
+    setShouldLoad(true);
+    setIsInteracting(true);
+  };
 
   const disableStudio = projectId === "rides24ofiziala";
-  const staticMotionMode = !motionEnabled;
 
   // Iframe loading safety fallback
   useEffect(() => {
-    if (!liveUrl || iframeLoaded || !shouldLoad || !embeddingAllowed) return;
+    if (
+      !liveUrl ||
+      iframeLoaded ||
+      !shouldLoad ||
+      !embeddingAllowed ||
+      !isInteracting
+    )
+      return;
     const timer = setTimeout(() => {
       setIframeLoaded(true);
     }, 6000); // 6s fallback for heavy sites
     return () => clearTimeout(timer);
-  }, [liveUrl, iframeLoaded, shouldLoad, embeddingAllowed]);
+  }, [liveUrl, iframeLoaded, shouldLoad, embeddingAllowed, isInteracting]);
 
   // ── CINEMATIC MULTI-STAGE ANIMATION ────────────────────────────────────
   useGSAP(
@@ -168,7 +225,7 @@ export function ProjectHero({
         !bgImageRef.current ||
         !titleRef.current ||
         !screenRef.current ||
-        !motionEnabled
+        !allowed
       )
         return;
 
@@ -184,6 +241,15 @@ export function ProjectHero({
           anticipatePin: 1,
           onUpdate: (self: ScrollTrigger) => {
             materia.studio.target = self.progress;
+            if (heroRef.current) {
+              heroRef.current.dataset.studioProgress = self.progress.toFixed(3);
+              heroRef.current.dataset.studioPhase =
+                self.progress < 0.12
+                  ? "intro"
+                  : self.progress < 0.9
+                    ? "reveal"
+                    : "ready";
+            }
             const isLocked = self.progress > 0.88; // Trigger CTA earlier
             if (!disableStudio && canRef.current !== isLocked) {
               canRef.current = isLocked;
@@ -191,7 +257,12 @@ export function ProjectHero({
             }
 
             // Trigger deferred loading when the user begins to scroll down
-            if (self.progress > 0.05 && !shouldLoadRef.current) {
+            if (
+              self.progress > 0.05 &&
+              heroVisibleRef.current &&
+              document.visibilityState === "visible" &&
+              !shouldLoadRef.current
+            ) {
               shouldLoadRef.current = true;
               setShouldLoad(true);
             }
@@ -246,23 +317,23 @@ export function ProjectHero({
           .to(
             contentRef.current,
             {
-              y: -120,
+              y: -64,
               opacity: 0,
-              scale: 0.9,
+              scale: 0.96,
               force3D: true,
-              ease: "power2.in",
-              duration: 1.2,
+              ease: "power2.inOut",
+              duration: 0.48,
             },
             0,
           )
           .to(
             bgImageRef.current,
             {
-              scale: disableStudio ? 1.4 : 2.2,
+              scale: disableStudio ? 1.18 : 1.38,
               opacity: disableStudio ? 0.3 : 0.1,
               force3D: true,
               ease: "power2.inOut",
-              duration: 2.5,
+              duration: 2,
             },
             0,
           );
@@ -270,20 +341,21 @@ export function ProjectHero({
 
       if (!disableStudio && screenRef.current && overlayRef.current) {
         tl
-          // Phase 2: Screen reveals with a "Window" effect
+          // Phase 2: The frame rises into the reserved area below the page header.
           .fromTo(
             screenRef.current,
             {
-              scale: 0.05,
+              scale: 0.78,
               opacity: 0,
-              z: -1500,
-              rotateX: 18,
-              rotateY: -22,
-              // Explicitly center the start state so it appears in the center, not corner
+              z: -420,
+              rotateX: 12,
+              rotateY: -10,
+              x: 0,
+              y: 0,
               xPercent: -50,
               yPercent: -50,
               left: "50%",
-              top: "50%",
+              top: "calc(50% + clamp(3rem, 7.5vh, 4rem))",
             },
             {
               scale: 1,
@@ -291,15 +363,17 @@ export function ProjectHero({
               z: 0,
               rotateX: 0,
               rotateY: 0,
+              x: 0,
+              y: 0,
               xPercent: -50,
               yPercent: -50,
               left: "50%",
-              top: "50%",
+              top: "calc(50% + clamp(3rem, 7.5vh, 4rem))",
               force3D: true,
-              ease: "expo.inOut",
-              duration: 2.2,
+              ease: "power3.out",
+              duration: 1.85,
             },
-            0.5,
+            0.56,
           )
 
           // Phase 3: Darkening for focus
@@ -308,7 +382,7 @@ export function ProjectHero({
             {
               opacity: 1,
               backgroundColor: "rgba(0,0,0,0.94)",
-              duration: 1.8,
+              duration: 1.5,
             },
             0.8,
           );
@@ -316,13 +390,14 @@ export function ProjectHero({
 
       // 2. Idle floating
       if (titleRef.current) {
-        gsap.to(titleRef.current, {
+        idleTweenRef.current = gsap.to(titleRef.current, {
           y: "+=12",
           duration: 4,
-          repeat: -1,
+          repeat: 1,
           yoyo: true,
           ease: "sine.inOut",
           force3D: true,
+          paused: true,
         });
       }
 
@@ -373,7 +448,13 @@ export function ProjectHero({
 
       // 3. Mouse Interaction (Optimized)
       const onMove = (e: MouseEvent) => {
-        if (!titleRef.current || interRef.current) return;
+        if (
+          !titleRef.current ||
+          interRef.current ||
+          !heroVisibleRef.current ||
+          document.visibilityState !== "visible"
+        )
+          return;
         const { clientX, clientY } = e;
         const { innerWidth, innerHeight } = window;
         const mx = (clientX / innerWidth - 0.5) * 2;
@@ -391,19 +472,20 @@ export function ProjectHero({
       window.addEventListener("mousemove", onMove);
       return () => {
         window.removeEventListener("mousemove", onMove);
+        idleTweenRef.current = null;
         materia.studio.target = 0;
       };
     },
     {
       scope: heroRef,
-      dependencies: [isReady, motionEnabled, projectId],
+      dependencies: [isReady, allowed, projectId],
       revertOnUpdate: true,
     },
   );
 
   // ── 🚀 STUDIO MODE TRANSITION (Fullscreen Takeover) ────────────────
   useGSAP(() => {
-    if (!screenRef.current || !motionEnabled) return;
+    if (!screenRef.current || !allowed) return;
 
     if (isInteracting) {
       // Clear all GSAP-set transforms so position:fixed works correctly
@@ -421,7 +503,7 @@ export function ProjectHero({
       // On exit, ScrollTrigger refresh will re-apply the animated state
       ScrollTrigger.refresh();
     }
-  }, [isInteracting, motionEnabled]);
+  }, [isInteracting, allowed]);
 
   // ── 🚀 STUDIO MODE SIDE EFFECTS (Scroll Lock & ESC Key) ────────────────
   useEffect(() => {
@@ -546,7 +628,14 @@ export function ProjectHero({
   // Mobile CTA sheen animation (subtle). Respect reduced-motion preferences.
   useGSAP(
     () => {
-      if (!mobileCtaRef.current || !sheenRef.current || !motionEnabled) return;
+      if (
+        !mobileCtaRef.current ||
+        !sheenRef.current ||
+        !motionEnabled ||
+        !screenInView ||
+        !matchMedia("(max-width: 767px)").matches
+      )
+        return;
 
       const prefersReduced =
         typeof window !== "undefined" &&
@@ -558,7 +647,7 @@ export function ProjectHero({
       const anim = gsap.to(sheenRef.current, {
         x: "160%",
         duration: 1.4,
-        repeat: -1,
+        repeat: 1,
         ease: "power1.inOut",
         repeatDelay: 1.2,
         yoyo: false,
@@ -567,7 +656,7 @@ export function ProjectHero({
 
       return () => anim.kill();
     },
-    { dependencies: [motionEnabled] },
+    { dependencies: [motionEnabled, screenInView], revertOnUpdate: true },
   );
 
   const renderScreenContents = () => {
@@ -580,27 +669,8 @@ export function ProjectHero({
               <div className="flex items-center gap-3 pr-6 border-r border-white/10">
                 <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
                 <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[120px] md:max-w-none">
-                  {title}{" "}
-                  <span className="hidden xs:inline">
-                    {" // SYSTEM.ACTIVE"}
-                  </span>
+                  {title}
                 </span>
-              </div>
-
-              {/* Real-time Telemetry (Decorative) */}
-              <div className="hidden md:flex items-center gap-6 text-white/40 font-mono text-[8px] uppercase tracking-widest">
-                <div className="flex flex-col">
-                  <span className="text-white/20">Latency</span>
-                  <span className="text-brand">24ms</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-white/20">Security</span>
-                  <span className="text-green-400">Hardened</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-white/20">Environment</span>
-                  <span className="text-white/60">Vercel.Edge</span>
-                </div>
               </div>
             </div>
 
@@ -612,7 +682,7 @@ export function ProjectHero({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all group flex items-center gap-2"
-                  title="View Source Code"
+                  title={s.sourceCode}
                 >
                   <GithubIcon size={16} className="group-hover:scale-110" />
                   <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
@@ -660,7 +730,7 @@ export function ProjectHero({
               backgroundColor: canInteract ? "rgba(0,0,0,0.6)" : "transparent",
               backdropFilter: canInteract ? "blur(15px)" : "none",
             }}
-            onClick={() => canInteract && setIsInteracting(true)}
+            onClick={enterStudio}
           >
             {canInteract && !isInteracting && (
               <div
@@ -671,7 +741,7 @@ export function ProjectHero({
                 {/* Desktop/Tablet CTA (md+) */}
                 <button
                   type="button"
-                  onClick={() => canInteract && setIsInteracting(true)}
+                  onClick={enterStudio}
                   className="hidden md:flex flex-col items-center gap-6 rounded-2xl p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                 >
                   <div
@@ -698,7 +768,7 @@ export function ProjectHero({
                     ref={mobileCtaRef}
                     type="button"
                     aria-label={s.enterStudio}
-                    onClick={() => canInteract && setIsInteracting(true)}
+                    onClick={enterStudio}
                     onPointerDown={() => setMobilePressed(true)}
                     onPointerUp={() => setMobilePressed(false)}
                     onPointerCancel={() => setMobilePressed(false)}
@@ -776,23 +846,43 @@ export function ProjectHero({
           )}
 
           {liveUrl && !embeddingAllowed ? (
-            <div className="relative z-[110] flex h-full w-full flex-col items-center justify-center gap-6 bg-neutral-950 px-8 py-12 text-center text-white">
-              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/70">
-                {s.enterStudio}
-              </span>
-              <p className="text-2xl font-semibold tracking-tight">{title}</p>
-              <p className="max-w-md text-sm leading-relaxed text-white/70">
-                {subtitle}
-              </p>
-              <a
-                href={liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="materia-button bg-white text-black focus-visible:outline-white"
+            <div
+              data-studio-external-preview
+              className="relative z-[110] grid h-full w-full min-h-0 grid-rows-[42%_1fr] overflow-hidden bg-neutral-950 text-white sm:grid-cols-[1.15fr_1fr] sm:grid-rows-1"
+            >
+              <div
+                className="relative min-h-0 min-w-0 overflow-hidden border-b border-white/10 sm:border-b-0 sm:border-e"
+                aria-hidden="true"
               >
-                {TX[lang].openDirect}
-                <ExternalLink size={16} aria-hidden="true" />
-              </a>
+                <ProjectVisual id={projectId} className="!h-full !w-full" />
+              </div>
+              <div className="flex min-h-0 flex-col items-center justify-center gap-3 px-4 py-4 text-center sm:gap-5 sm:px-6">
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/60">
+                  {ui.preview}
+                </span>
+                <p className="text-xl font-semibold tracking-tight sm:text-2xl">
+                  {title}
+                </p>
+                <p className="max-w-xs text-xs leading-relaxed text-white/70 sm:text-sm">
+                  {subtitle}
+                </p>
+                <a
+                  href={liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="materia-button bg-white text-black !min-h-11 !px-4 !py-2.5 !text-xs focus-visible:outline-white"
+                >
+                  {TX[lang].openDirect}
+                  <ExternalLink size={16} aria-hidden="true" />
+                </a>
+              </div>
+            </div>
+          ) : liveUrl && !isInteracting ? (
+            <div className="relative h-full w-full bg-neutral-950">
+              <ProjectVisual
+                id={projectId}
+                className="h-full w-full opacity-80"
+              />
             </div>
           ) : shouldLoad && liveUrl ? (
             <>
@@ -833,11 +923,12 @@ export function ProjectHero({
           ) : shouldLoad && videoUrl ? (
             <div className="w-full h-full bg-black relative">
               <video
-                src={videoUrl}
-                autoPlay
-                loop
+                ref={videoRef}
+                controls={isInteracting}
+                loop={allowed}
                 muted
                 playsInline
+                preload="none"
                 className={`w-full h-full object-cover transition-all duration-1000 ${isInteracting ? "scale-100" : "scale-[1.05]"}`}
                 style={{
                   opacity: canInteract && !isInteracting ? 0.4 : 1,
@@ -867,11 +958,13 @@ export function ProjectHero({
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
                   {projectId === "pke-web"
                     ? ui.previewUnavailable
-                    : liveUrl || videoUrl
-                      ? s.preparing
-                      : projectId === "rides24ofiziala"
-                        ? s.demoWorking
-                        : s.comingSoon}
+                    : staticStudioLayout && (liveUrl || videoUrl)
+                      ? s.enterStudio
+                      : liveUrl || videoUrl
+                        ? s.preparing
+                        : projectId === "rides24ofiziala"
+                          ? s.demoWorking
+                          : s.comingSoon}
                 </span>
                 <div className="w-12 h-px bg-white/10" />
                 <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
@@ -895,19 +988,11 @@ export function ProjectHero({
         {isInteracting && (
           <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[10000]">
             <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-              Auth: <span className="text-brand">Developer_Privileges</span>{" "}
-              {" // "} Root_Access: <span className="text-green-400">True</span>
+              {title}
             </div>
 
             <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-white/20" />
-                <span>Signal_Strength: 98%</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-white/20" />
-                <span>Data_integrity: Verified</span>
-              </div>
+              <span>{s.enterStudio}</span>
             </div>
           </footer>
         )}
@@ -923,9 +1008,11 @@ export function ProjectHero({
       <div
         ref={heroRef}
         data-umbral-destination={projectId}
+        data-studio-phase="intro"
+        data-studio-progress="0"
         className="relative h-[100dvh] w-full overflow-hidden flex flex-col items-center justify-center bg-transparent"
         style={{
-          perspective: isInteracting || !motionEnabled ? "none" : "2000px",
+          perspective: isInteracting || !allowed ? "none" : "2000px",
         }}
       >
         {/* ── Background Layer ── */}
@@ -955,10 +1042,11 @@ export function ProjectHero({
         {/* ── Phase 1 Content: Title focus ── */}
         <div
           ref={contentRef}
-          className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full will-change-transform"
+          data-hero-role="intro-content"
+          className="relative z-20 flex flex-col items-center justify-center text-center px-6 pt-[clamp(5.5rem,14vh,7.5rem)] pb-[clamp(4.5rem,9vh,6rem)] w-full will-change-transform"
         >
           <div
-            className="relative group mb-12"
+            className="relative group mb-5 sm:mb-7"
             style={{ transformStyle: "preserve-3d" }}
           >
             <div
@@ -966,7 +1054,7 @@ export function ProjectHero({
               className="relative flex flex-col items-center justify-center will-change-transform pointer-events-none"
             >
               <span
-                className="font-mono text-[clamp(0.9rem,1.5vw,1.2rem)] opacity-85 mb-3 tracking-[0.4em]"
+                className="font-mono text-[clamp(0.65rem,1vw,0.8rem)] opacity-75 mb-2 tracking-[0.32em]"
                 style={{ color: accent }}
               >
                 PROJECT // {index.toString().padStart(2, "0")}
@@ -975,7 +1063,7 @@ export function ProjectHero({
               <h1
                 className="font-black uppercase italic tracking-[-0.05em] leading-[0.85] text-center max-w-[1200px]"
                 style={{
-                  fontSize: "clamp(3.5rem, 15vw, 12rem)",
+                  fontSize: "clamp(3rem, 11vw, 9rem)",
                   color: accent,
                   textShadow: `0 30px 100px ${accent}40`,
                 }}
@@ -986,17 +1074,17 @@ export function ProjectHero({
           </div>
 
           <p
-            className="text-xl md:text-2xl font-normal tracking-tight max-w-2xl mb-12 opacity-80"
+            className="text-base sm:text-lg md:text-xl font-normal tracking-tight max-w-2xl mb-5 sm:mb-7 opacity-75"
             style={{ color: darkMode ? "#fff" : "#000" }}
           >
             {subtitle}
           </p>
 
-          <div className="flex items-center gap-6 flex-wrap justify-center">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
             {langs.slice(0, 3).map((lang) => (
               <div
                 key={lang}
-                className="font-mono text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full border"
+                className="font-mono text-[9px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border bg-black/5 backdrop-blur-sm"
                 style={{ borderColor: `${accent}40`, color: accent }}
               >
                 {lang}
@@ -1010,6 +1098,7 @@ export function ProjectHero({
           <div
             ref={screenRef}
             data-studio-screen="cinematic"
+            data-studio-role="safe-frame"
             className={
               isInteracting
                 ? "absolute inset-0 z-[9999] w-full h-[100dvh] bg-[#0d0d0d] flex flex-col pointer-events-auto shadow-none"
@@ -1036,9 +1125,13 @@ export function ProjectHero({
                     transformStyle: "preserve-3d",
                     willChange: "transform, opacity",
                     width: "min(94vw, 1400px)",
-                    height: "82dvh",
-                    borderRadius: "2.5rem",
+                    height: "min(68dvh, calc(100dvh - 240px))",
+                    maxHeight: "calc(100dvh - 240px)",
+                    top: "calc(50% + clamp(3rem, 7.5vh, 4rem))",
+                    borderRadius: "clamp(1.25rem, 3vw, 2.25rem)",
                     borderColor: "rgba(255,255,255,0.1)",
+                    boxShadow:
+                      "0 48px 120px rgba(0,0,0,0.44), 0 12px 36px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12)",
                   }
             }
           >
@@ -1050,22 +1143,20 @@ export function ProjectHero({
         {!disableStudio && motionEnabled && (
           <div
             ref={scrollProgressRef}
-            className="absolute left-1/2 -translate-x-1/2 z-[40] flex flex-col items-center pointer-events-none transition-all duration-500 w-[250px] max-w-[88vw] px-5 py-3 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset]"
+            data-hero-role="scroll-hint-rail"
+            className="absolute left-1/2 -translate-x-1/2 z-[40] flex items-center justify-center pointer-events-none transition-opacity duration-300 w-[min(220px,88vw)] px-3 py-2 rounded-full bg-black/55 backdrop-blur-lg border border-white/[0.09] shadow-[0_8px_24px_rgba(0,0,0,0.28)]"
             style={{
               opacity: 1,
-              bottom: "calc(env(safe-area-inset-bottom, 1rem) + 1.25rem)",
+              bottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)",
             }}
           >
             {/* Layout 1: Default hint before scroll */}
-            <div
-              ref={scrollHintDefaultRef}
-              className="flex flex-col items-center gap-2.5"
-            >
+            <div ref={scrollHintDefaultRef} className="flex items-center gap-2">
               {/* Elegant scroll wheel animation pill */}
-              <div className="w-5 h-8 rounded-full border border-white/20 flex justify-center pt-1.5 relative overflow-hidden bg-white/[0.02]">
-                <div className="w-1 h-1.5 rounded-full bg-white/70 animate-scroll-dot" />
+              <div className="w-3 h-5 rounded-full border border-white/25 flex justify-center pt-1 relative overflow-hidden bg-white/[0.02]">
+                <div className="w-1 h-1 rounded-full bg-white/75 animate-scroll-dot" />
               </div>
-              <p className="font-mono text-[8px] uppercase tracking-[0.4em] text-white/50 text-center leading-relaxed">
+              <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/65 text-center leading-relaxed">
                 {s.deepScroll}
               </p>
             </div>
@@ -1073,10 +1164,10 @@ export function ProjectHero({
             {/* Layout 2: Progress telemetry during scroll */}
             <div
               ref={scrollHintProgressRef}
-              className="hidden flex-col items-center gap-2.5 w-full"
+              className="hidden flex-col items-center gap-1 w-full"
             >
               <div
-                className="flex items-center justify-between w-full font-mono text-[8px] uppercase tracking-[0.3em] text-white/60 font-black"
+                className="flex items-center justify-between w-full font-mono text-[7px] uppercase tracking-[0.16em] text-white/65 font-bold"
                 role="status"
                 aria-live="polite"
               >
@@ -1096,21 +1187,7 @@ export function ProjectHero({
                   }}
                 />
               </div>
-              <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white font-bold mt-2 flex items-center gap-2 whitespace-nowrap">
-                <span
-                  className="truncate"
-                  style={{ textShadow: `0 6px 30px ${accent}40` }}
-                >
-                  {s.keepScrolling}
-                </span>
-                <span
-                  ref={chevronRef}
-                  className="inline-block animate-bounce font-sans text-xs"
-                  aria-hidden
-                >
-                  ↓
-                </span>
-              </span>
+              <span className="sr-only">{s.keepScrolling}</span>
             </div>
           </div>
         )}

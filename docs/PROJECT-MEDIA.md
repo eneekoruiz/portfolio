@@ -8,10 +8,12 @@
 
 ## Proyectos sin captura
 
-- PKE Web: el enlace publicado devolvió 404. El usuario confirmó que debe aparecer sin previsualización por ahora. Se conserva su caso de estudio y su código documentado; se deja de intentar cargar la URL caída en un iframe.
-- Who Are Ya, Rides y SpotShare: las tarjetas muestran fragmentos ya documentados en `app/data/projects.ts`. Son vistas de código, no capturas de una interfaz ni nuevas afirmaciones sobre un repositorio externo.
+- PKE Web: el enlace publicado devolvió 404. El usuario confirmó que debe aparecer sin previsualización por ahora. La tarjeta mantiene ese aviso junto a un estudio tipográfico decorativo; se conserva su caso de estudio y se evita cargar la URL caída en un iframe.
+- Who Are Ya, Rides y SpotShare: se recuperan las vistas de los fragmentos de código ya documentados en `app/data/projects.ts` (filtrado, reserva transaccional y reserva de aparcamiento). No se presentan como capturas de una interfaz ni como nuevas pruebas de un repositorio externo.
 - No se ha presentado `public/loginjsf.mp4` como captura de Rides: la inspección de ese archivo mostró un avatar. El archivo original se conserva.
 
 ## Continuidad
 
 `ProjectVisual` comparte el recurso entre tarjeta, vista junto al cursor y cabecera del detalle. Umbral conserva y transforma el elemento durante la expansión, y usa el mismo nombre de transición para la entrega de la imagen al destino. Sin View Transitions conserva el fundido existente; con movimiento reducido o puntero táctil mantiene navegación inmediata.
+
+Las vistas de código usan HTML y CSS locales, sin recursos remotos, bucles de animación ni paralaje. El retrato de la portada también aparece en tablet mediante su póster; el vídeo sigue sujeto a la política de movimiento y visibilidad existente.

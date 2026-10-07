@@ -30,8 +30,7 @@ export function useDeviceTilt() {
 
     const requestPermission = async () => {
       const eventConstructor = DeviceOrientationEvent as
-        | DeviceOrientationEventWithPermission
-        | undefined;
+        DeviceOrientationEventWithPermission | undefined;
 
       if (typeof eventConstructor?.requestPermission === "function") {
         try {

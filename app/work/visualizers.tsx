@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
-import { Database, Server, Radar, CheckCircle2, Layers } from "lucide-react";
+import { Server, Radar, CheckCircle2 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useViewportMotion } from "../hooks/useViewportMotion";
+import { useMotionPolicy } from "../hooks/useMotionEnabled";
 
 const getAdaptivePixelRatio = () => Math.min(window.devicePixelRatio || 1, 1.5);
 
@@ -358,40 +361,42 @@ export const TerrainMesh = ({
   accent: string;
   darkMode: boolean;
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef = useRef<number>(undefined);
+  const { ref: canvasRef, active: inViewport } =
+    useViewportMotion<HTMLCanvasElement>();
+  const { lightweight } = useMotionPolicy();
+  const pathname = usePathname();
+  const [heroVisible, setHeroVisible] = useState(false);
   const tRef = useRef(0);
-  const activeRef = useRef(false);
   const pointsRef = useRef<{ x: number; y: number }[]>(
     Array.from({ length: (12 + 1) * (20 + 1) }, () => ({ x: 0, y: 0 })),
   );
+
+  useEffect(() => {
+    const hero = document.querySelector("[data-umbral-destination]");
+    if (!hero) return;
+    const observer = new IntersectionObserver(([entry]) =>
+      setHeroVisible(entry.isIntersecting && entry.intersectionRatio > 0),
+    );
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, [pathname]);
+  const active = inViewport && heroVisible && !lightweight;
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    let previousTime = 0;
-
-    const resize = () => {
-      const ratio = getAdaptivePixelRatio();
-      canvas.width = Math.floor(canvas.offsetWidth * ratio);
-      canvas.height = Math.floor(canvas.offsetHeight * ratio);
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    };
-
+    let previousTime = 0,
+      frame = 0;
+    let W = 0,
+      H = 0;
     const draw = (time: number) => {
-      if (!activeRef.current || document.visibilityState !== "visible") {
-        animRef.current = 0;
-        return;
-      }
-
-      const W = canvas.offsetWidth,
-        H = canvas.offsetHeight;
       ctx.clearRect(0, 0, W, H);
-      const dt = previousTime
-        ? Math.min((time - previousTime) / 1000, 0.05)
-        : 0;
+      const dt =
+        active && previousTime
+          ? Math.min((time - previousTime) / 1000, 0.05)
+          : 0;
       previousTime = time;
       tRef.current += dt * 0.21;
 
@@ -444,42 +449,39 @@ export const TerrainMesh = ({
           ctx.fill();
         }
       });
-
-      animRef.current = requestAnimationFrame(draw);
     };
-
-    const resume = () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-      animRef.current = 0;
+    const tick = (time: number) => {
+      frame = 0;
+      if (!active || document.visibilityState !== "visible") return;
+      if (!previousTime || time - previousTime >= 1000 / 30) draw(time);
+      frame = requestAnimationFrame(tick);
+    };
+    const resize = () => {
+      const ratio = getAdaptivePixelRatio();
+      W = canvas.offsetWidth;
+      H = canvas.offsetHeight;
+      canvas.width = Math.floor(W * ratio);
+      canvas.height = Math.floor(H * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       previousTime = 0;
-      if (activeRef.current && document.visibilityState === "visible")
-        animRef.current = requestAnimationFrame(draw);
+      draw(performance.now());
     };
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        activeRef.current = entry.isIntersecting;
-        resume();
-      },
-      { threshold: 0.01 },
-    );
-
+    const observer = new ResizeObserver(resize);
     resize();
     observer.observe(canvas);
-    window.addEventListener("resize", resize);
-    document.addEventListener("visibilitychange", resume);
-
+    if (active) frame = requestAnimationFrame(tick);
     return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
+      cancelAnimationFrame(frame);
       observer.disconnect();
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("visibilitychange", resume);
     };
-  }, [accent, darkMode]);
+  }, [accent, darkMode, active, canvasRef]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none opacity-80 will-change-transform"
+      aria-hidden="true"
+      data-terrain-active={active}
+      className="absolute inset-0 w-full h-full pointer-events-none opacity-80"
       style={{ mixBlendMode: darkMode ? "screen" : "multiply" }}
     />
   );
@@ -494,27 +496,47 @@ export const FloatingArtifact = ({
   accent: string;
   idx: number;
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const ctxRef = useRef<gsap.Context>(undefined);
+  const { ref, active } = useViewportMotion<HTMLDivElement>();
+  const tweenRef = useRef<gsap.core.Tween | null>(null);
 
   useEffect(() => {
     if (!ref.current) return;
 
-    ctxRef.current = gsap.context(() => {
-      gsap.to(ref.current, {
+    const element = ref.current;
+    const context = gsap.context(() => {
+      tweenRef.current = gsap.to(element, {
         y: `${-16 - idx * 4}`,
         x: `${Math.sin(idx) * 12}`,
         rotate: idx % 2 === 0 ? 360 : -360,
         duration: 3.6 + idx * 0.45,
-        repeat: -1,
+        repeat: 1,
         yoyo: true,
+        paused: true,
         ease: "power1.inOut",
         force3D: true,
+        onComplete: () => {
+          element.style.willChange = "";
+        },
       });
     });
 
-    return () => ctxRef.current?.revert();
-  }, [idx]);
+    return () => {
+      context.revert();
+      tweenRef.current = null;
+    };
+  }, [idx, ref]);
+  useEffect(() => {
+    const tween = tweenRef.current;
+    const element = ref.current;
+    if (!tween || !element) return;
+    if (active && tween.totalProgress() < 1) {
+      element.style.willChange = "transform";
+      tween.play();
+    } else {
+      tween.pause();
+      element.style.willChange = "";
+    }
+  }, [active, idx, ref]);
 
   const shapes = [
     <div
@@ -537,7 +559,8 @@ export const FloatingArtifact = ({
   return (
     <div
       ref={ref}
-      className="absolute pointer-events-none will-change-transform"
+      aria-hidden="true"
+      className="absolute pointer-events-none"
       style={{
         top: `${20 + idx * 12}%`,
         left: idx % 2 === 0 ? "10%" : "85%",
@@ -552,8 +575,9 @@ export const FloatingArtifact = ({
 // ── Visualizers ───────────────────────────────────────────────────────────────
 
 export const SandwichDiagram = ({ accent }: { accent: string }) => {
+  const { ref, active } = useViewportMotion<HTMLDivElement>();
   return (
-    <div className="w-full space-y-4 font-mono text-[10px]">
+    <div ref={ref} className="w-full space-y-4 font-mono text-[10px]">
       <div className="flex items-stretch gap-2 h-14">
         <div
           className="flex-1 rounded-xl flex items-center justify-center text-white font-bold shadow-lg transition-transform hover:scale-[1.02]"
@@ -568,7 +592,11 @@ export const SandwichDiagram = ({ accent }: { accent: string }) => {
           <span className="opacity-50">WAIT</span>
           <div
             className="absolute bottom-0 left-0 h-1 bg-current animate-pulse"
-            style={{ width: "100%", animationDuration: "2s" }}
+            style={{
+              width: "100%",
+              animationDuration: "2s",
+              animationPlayState: active ? "running" : "paused",
+            }}
           />
         </div>
         <div
@@ -618,41 +646,33 @@ export const MVCTerminal = ({ accent }: { accent: string }) => {
 };
 
 export const DistributedNodes = ({ accent }: { accent: string }) => {
+  const { ref, active } = useViewportMotion<HTMLDivElement>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodesRef = useRef<{ x: number; y: number; vx: number; vy: number }[]>(
-    [],
+    Array.from({ length: 12 }, (_, index) => ({
+      x: 25 + (index % 4) * 80,
+      y: 28 + Math.floor(index / 4) * 70,
+      vx: Math.sin(index * 2.4) * 0.25,
+      vy: Math.cos(index * 1.7) * 0.25,
+    })),
   );
-
-  useEffect(() => {
-    nodesRef.current = Array.from({ length: 12 }).map(() => ({
-      x: Math.random() * 300,
-      y: Math.random() * 200,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-    }));
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     let raf = 0;
-    let active = false;
-
-    const draw = () => {
-      if (!active || document.visibilityState !== "visible") {
-        raf = 0;
-        return;
-      }
-
+    let previousTime = 0;
+    const draw = (elapsed = 0) => {
       ctx.clearRect(0, 0, 300, 200);
 
       const nodes = nodesRef.current;
 
       // Update nodes positions directly (no React state updates to trigger re-renders!)
       nodes.forEach((n) => {
-        n.x = (n.x + n.vx + 300) % 300;
-        n.y = (n.y + n.vy + 200) % 200;
+        n.x = (n.x + n.vx * elapsed * 60 + 300) % 300;
+        n.y = (n.y + n.vy * elapsed * 60 + 200) % 200;
       });
 
       // Draw connections using squared distance to avoid Math.sqrt in hot path
@@ -679,39 +699,36 @@ export const DistributedNodes = ({ accent }: { accent: string }) => {
         ctx.fillStyle = accent;
         ctx.fill();
       });
-
-      raf = requestAnimationFrame(draw);
     };
-
-    const start = () => {
-      if (!raf) raf = requestAnimationFrame(draw);
+    const tick = (time: number) => {
+      raf = 0;
+      if (!active || document.visibilityState !== "visible") return;
+      if (!previousTime || time - previousTime >= 1000 / 30) {
+        const elapsed = previousTime
+          ? Math.min((time - previousTime) / 1000, 0.05)
+          : 0;
+        previousTime = time;
+        draw(elapsed);
+      }
+      raf = requestAnimationFrame(tick);
     };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        active = entry.isIntersecting;
-        if (active) start();
-        else if (raf) {
-          cancelAnimationFrame(raf);
-          raf = 0;
-        }
-      },
-      { rootMargin: "80px", threshold: 0.01 },
-    );
-
-    observer.observe(canvas);
-
+    draw();
+    if (active) raf = requestAnimationFrame(tick);
     return () => {
-      if (raf) cancelAnimationFrame(raf);
-      observer.disconnect();
+      cancelAnimationFrame(raf);
     };
-  }, [accent]);
+  }, [accent, active]);
   return (
-    <div className="relative h-44 flex items-center justify-center overflow-hidden">
+    <div
+      ref={ref}
+      data-distributed-active={active}
+      className="relative h-44 flex items-center justify-center overflow-hidden"
+    >
       <canvas
         ref={canvasRef}
         width={300}
         height={200}
+        aria-hidden="true"
         className="w-full h-full"
       />
       <div className="absolute w-20 h-20 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 flex items-center justify-center backdrop-blur-md shadow-xl z-10">
@@ -748,8 +765,13 @@ export const WCAGVisualizer = ({ accent }: { accent: string }) => {
 };
 
 export const SpotshareHeatmap = ({ accent }: { accent: string }) => {
+  const { ref, active } = useViewportMotion<HTMLDivElement>();
+  const animationPlayState = active ? "running" : "paused";
   return (
-    <div className="relative h-44 rounded-xl bg-black/5 dark:bg-[#050505] border border-black/10 dark:border-white/10 overflow-hidden flex items-center justify-center group shadow-inner">
+    <div
+      ref={ref}
+      className="relative h-44 rounded-xl bg-black/5 dark:bg-[#050505] border border-black/10 dark:border-white/10 overflow-hidden flex items-center justify-center group shadow-inner"
+    >
       <div
         className="absolute inset-0 opacity-20"
         style={{
@@ -763,18 +785,23 @@ export const SpotshareHeatmap = ({ accent }: { accent: string }) => {
           background: `conic-gradient(from 0deg, transparent 70%, ${accent}40 100%)`,
           animationDuration: "3s",
           animationTimingFunction: "linear",
+          animationPlayState,
         }}
       />
       <div className="relative z-10 w-16 h-16 rounded-full bg-page/80 backdrop-blur-xl border border-black/10 dark:border-white/20 flex items-center justify-center shadow-xl">
-        <Radar size={24} style={{ color: accent }} className="animate-pulse" />
+        <Radar
+          size={24}
+          style={{ color: accent, animationPlayState }}
+          className="animate-pulse"
+        />
       </div>
       <div
         className="absolute top-10 left-10 w-2 h-2 rounded-full animate-ping"
-        style={{ background: accent }}
+        style={{ background: accent, animationPlayState }}
       />
       <div
         className="absolute bottom-12 right-16 w-2 h-2 rounded-full animate-ping"
-        style={{ background: accent, animationDelay: "1s" }}
+        style={{ background: accent, animationDelay: "1s", animationPlayState }}
       />
     </div>
   );

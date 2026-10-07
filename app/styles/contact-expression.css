@@ -1,0 +1,92 @@
+/* Contact signatures: recognizable marks, each with its own optical weight. */
+#contact .contact-tile .contact-flip-face {
+  min-height: 186px;
+  gap: 12px;
+  border-top-color: color-mix(in srgb, var(--surface-color) 38%, var(--page));
+}
+#contact .contact-tile .contact-tile-icon {
+  width: 66px;
+  height: 66px;
+  border-color: color-mix(in srgb, var(--surface-color) 28%, var(--page));
+  background: color-mix(in srgb, var(--surface-color) 10%, var(--page));
+  box-shadow:
+    0 8px 12px -10px var(--surface-color),
+    inset 0 1px 0 #ffffff60;
+}
+#contact .contact-tile .contact-tile-icon svg {
+  width: 42px;
+  height: 42px;
+}
+#contact [data-contact-service="gmail"] .contact-tile-icon {
+  border-radius: 20px 9px 20px 9px;
+  transform: rotate(-6deg);
+}
+#contact [data-contact-service="github"] .contact-tile-icon {
+  border-radius: 50%;
+}
+#contact [data-contact-service="linkedin"] .contact-tile-icon {
+  border-radius: 14px;
+  transform: rotate(5deg);
+}
+#contact .contact-tile .contact-tile-label {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+#contact .contact-tile .contact-flip-back .contact-tile-icon {
+  width: 80px;
+  height: 80px;
+}
+#contact .contact-tile .contact-flip-back .contact-tile-icon svg {
+  width: 50px;
+  height: 50px;
+}
+@keyframes contact-mark-lift {
+  0%,
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+  40% {
+    translate: 0 -8px;
+    scale: 1.12;
+  }
+  70% {
+    translate: 0 2px;
+    scale: 0.97;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  #contact [data-contact-motion="on"]:focus-within .contact-tile-icon {
+    animation: contact-mark-lift 650ms ease-out 1;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  #contact [data-contact-motion="on"]:hover .contact-tile-icon {
+    animation: contact-mark-lift 650ms ease-out 1;
+  }
+}
+@media (max-width: 639px) {
+  #contact .contact-tile .contact-flip-face {
+    min-height: 160px;
+    gap: 10px;
+  }
+  #contact .contact-tile .contact-tile-icon {
+    width: 50px;
+    height: 50px;
+  }
+  #contact .contact-tile .contact-tile-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+  #contact .contact-tile .contact-tile-label {
+    font-size: 16px;
+  }
+  #contact .contact-tile .contact-flip-back .contact-tile-icon {
+    width: 56px;
+    height: 56px;
+  }
+  #contact .contact-tile .contact-flip-back .contact-tile-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+}

@@ -20,12 +20,12 @@ import {
   Cpu,
   ShieldCheck,
   Zap,
-  Activity,
   Server,
   Layers,
   ChevronLeft,
   CheckCircle2,
   Radar,
+  Github,
 } from "lucide-react";
 
 import { TX } from "../../data/translations";
@@ -34,10 +34,10 @@ import { PROJECTS_CONTENT, CODE_SNIPPETS } from "../../data/projects";
 import { LANG_COLORS, getTechColor } from "../../lib/constants";
 import type { Lang } from "../../types";
 import { useMagnetic } from "../../hooks/useMagnetic";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useTextScramble } from "../../hooks/useTextScramble";
 import { ProjectHero } from "./components/ProjectHero";
-import { materia } from "../../lib/materia";
+import { materia, setMateriaPalette } from "../../lib/materia";
 import { umbral } from "../../components/motion/UmbralProvider";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 import {
@@ -273,7 +273,7 @@ export default function ProjectPage() {
 
   const { lang } = useTranslations();
   const [darkMode, setDarkMode] = useState(false);
-  const userMotionEnabled = useMotionEnabled();
+  const { allowed: userMotionEnabled } = useMotionPolicy();
   const reducedMotion = usePreferredMotion();
   const motionEnabled = userMotionEnabled && !reducedMotion;
 
@@ -308,8 +308,7 @@ export default function ProjectPage() {
   const safeId = id as string;
   const theme = THEMES[safeId] ?? DEFAULT_THEME;
   useEffect(() => {
-    materia.accent = theme.helixA;
-    materia.secondary = theme.helixB;
+    setMateriaPalette(theme.helixA, theme.helixB);
     materia.composition.target = 0;
     materia.chapter.target = 3;
     materia.studio.target = 0;
@@ -523,7 +522,11 @@ export default function ProjectPage() {
         );
       });
     },
-    { scope: main, dependencies: [content, motionEnabled] },
+    {
+      scope: main,
+      dependencies: [content, motionEnabled],
+      revertOnUpdate: true,
+    },
   );
 
   // ── Helix Animation is now handled internally in Canvas-based DNAHelix ─────
@@ -568,14 +571,17 @@ export default function ProjectPage() {
               <span className="xs:hidden">{TX[lang]?.back ?? "Back"}</span>
             </span>
           </button>
-          <div className="flex items-center gap-2 font-mono text-[8px] md:text-[9px] uppercase tracking-widest px-2.5 md:px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 truncate max-w-[120px] md:max-w-none">
-            <Activity
-              size={10}
-              style={{ color: theme.accent }}
-              className="animate-pulse shrink-0"
-            />
-            <span className="truncate">{theme.label}</span>
-          </div>
+          {githubUrl && (
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-11 items-center gap-2 px-3 text-xs font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-full"
+            >
+              <Github size={16} aria-hidden="true" />
+              GitHub
+            </a>
+          )}
         </div>
       </header>
 

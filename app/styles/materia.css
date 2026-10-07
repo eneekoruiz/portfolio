@@ -190,6 +190,11 @@
 .work-surface-header {
   -webkit-tap-highlight-color: transparent;
 }
+.work-preview .project-visual {
+  height: clamp(140px, 20vw, 220px);
+  max-height: 220px;
+  aspect-ratio: auto;
+}
 .work-expand-icon {
   transform: rotate(calc(var(--accordion-progress, 0) * 135deg));
 }
@@ -217,8 +222,8 @@
   border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
   box-shadow: 0 24px 48px -24px
     color-mix(in srgb, var(--brand) 28%, transparent);
-  transform: perspective(900px) rotateX(var(--hero-tilt-x, 0deg))
-    rotateY(var(--hero-tilt-y, 0deg));
+  transform: translateY(-50%) perspective(900px)
+    rotateX(var(--hero-tilt-x, 0deg)) rotateY(var(--hero-tilt-y, 0deg));
 }
 .hero-portrait {
   aspect-ratio: 1;
@@ -264,9 +269,6 @@ html[data-umbral]::view-transition-new(project-surface) {
 }
 
 @media (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .materia-canvas > div {
-    opacity: 0.55;
-  }
   .materia-surface {
     background: color-mix(in srgb, var(--page) 94%, transparent);
   }
@@ -286,7 +288,7 @@ html[data-umbral]::view-transition-new(project-surface) {
   }
 }
 .dna-static {
-  opacity: 0.6;
+  opacity: 0.85;
 }
 .contact-flip-visual {
   transform-style: preserve-3d;
@@ -601,13 +603,6 @@ html[dir="rtl"] .hero-prism {
   top: 84px;
   width: calc(100vw - 24px);
 }
-@media (max-width: 767px) {
-  .reading-nav {
-    left: 50dvw;
-    top: calc(100dvh - 5.75rem);
-    bottom: auto;
-  }
-}
 @media (min-width: 768px) {
   [data-nav-compact="true"] .navbar-links {
     position: absolute;
@@ -625,5 +620,159 @@ html[dir="rtl"] .hero-prism {
 @media (pointer: coarse) {
   .language-panel {
     --tw-enter-scale: 1;
+  }
+}
+
+/* Decorative layers are clipped and subordinate to the reading surface. */
+.materia-canvas {
+  contain: strict;
+  opacity: 0.72 !important;
+  transition: opacity 240ms ease;
+}
+.materia-canvas[data-scene-active="false"] {
+  opacity: 0.58 !important;
+}
+.materia-canvas[data-scene-ready="false"] {
+  opacity: 0 !important;
+}
+.materia-surface {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.work-surface,
+.skill-orbit-card {
+  background-color: color-mix(in srgb, var(--page) 92%, transparent);
+}
+#about .materia-surface,
+#contact > .materia-surface,
+.materia-surface.philosophy-card {
+  background: color-mix(in srgb, var(--page) 94%, transparent);
+}
+.hero-prism {
+  background-color: color-mix(in srgb, var(--page) 70%, transparent);
+}
+.hero-portrait-frame {
+  max-height: calc(100% - 8rem);
+}
+#hero > div:first-of-type + div {
+  flex-wrap: wrap;
+}
+html {
+  overflow-x: clip;
+}
+@media (max-width: 767px) {
+  .materia-canvas {
+    opacity: 0.48 !important;
+  }
+  .glass-hud {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: color-mix(in srgb, var(--page) 97%, transparent);
+  }
+  .skill-orbit-card {
+    padding: 1.25rem;
+  }
+}
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation: none !important;
+  transition-duration: 0s !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body::after {
+  animation: none !important;
+}
+
+/* CSS owns decorative motion; only visible hosts promote a compositing layer. */
+.portfolio-marquee-track {
+  animation: portfolio-marquee var(--marquee-duration, 25s) linear infinite;
+  animation-play-state: paused;
+}
+[data-marquee-active="true"] .portfolio-marquee-track {
+  animation-play-state: running;
+  will-change: transform;
+}
+[data-marquee-active="true"]:hover .portfolio-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes portfolio-marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.floating-node {
+  cursor: grab;
+}
+.floating-node[data-dragging="true"] {
+  cursor: grabbing;
+  z-index: 10;
+}
+.floating-node-visual {
+  animation: portfolio-float var(--float-duration, 7s) ease-in-out
+    var(--float-delay, 0s) 1;
+  animation-play-state: paused;
+}
+[data-floating-active="true"] .floating-node-visual {
+  animation-play-state: running;
+}
+@keyframes portfolio-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -12px, 0);
+  }
+}
+.custom-cursor,
+.custom-cursor-visual {
+  width: 48px;
+  height: 48px;
+}
+@keyframes delayed-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-delayed-fade-in {
+  animation: delayed-fade-in 300ms both;
+}
+.custom-cursor-visual {
+  background: white;
+  border: 2px solid transparent;
+  transform: scale(0.333333);
+  transition:
+    transform 150ms ease-out,
+    background-color 150ms ease-out,
+    border-color 150ms ease-out;
+}
+[data-hovering="true"] .custom-cursor-visual {
+  transform: scale(1);
+  background: transparent;
+  border-color: white;
+}
+
+@media (max-width: 767px) {
+  .glass-hud,
+  .dark .glass-hud {
+    background: var(--page);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }

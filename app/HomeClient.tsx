@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -29,23 +29,33 @@ import { useMobileMenu } from "./hooks/useMobileMenu";
 import { useIntroPhase } from "./hooks/useIntroPhase";
 import { useDnaColors } from "./hooks/useDnaColors";
 import { useNavbarInteractions } from "./hooks/useNavbarInteractions";
-import { materia } from "./lib/materia";
+import { materia, setMateriaPalette } from "./lib/materia";
 import { useSceneJourney } from "./hooks/useSceneJourney";
-import { ReadingNav } from "./components/navigation/ReadingNav";
 
 // ── UI & Navigation ────────────────────────────────────────────────────────
-import { Preloader } from "./components/ui/Preloader";
-import { CmdModal } from "./components/ui/CmdModal";
+import { useGitHubActivity } from "./hooks/useGitHubActivity";
+const CmdModal = dynamic(
+  () => import("./components/ui/CmdModal").then((m) => m.CmdModal),
+  { ssr: false },
+);
 import { BranchMergeBtn } from "./components/ui/Buttons";
 import { Navbar } from "./components/navigation/Navbar";
 import { MobileMenu } from "./components/navigation/MobileMenu";
-import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollower";
-import { DebugHUD } from "./components/ui/DebugHUD";
+
+const DebugHUD = dynamic(
+  () => import("./components/ui/DebugHUD").then((m) => m.DebugHUD),
+  { ssr: false },
+);
 import { PortalTransition } from "./components/ui/PortalTransition";
-import { DevTuningPanel } from "./components/ui/DevTuningPanel";
+import { EntrancePreloader } from "./components/ui/EntrancePreloader";
+import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollower";
+const DevTuningPanel = dynamic(
+  () => import("./components/ui/DevTuningPanel").then((m) => m.DevTuningPanel),
+  { ssr: false },
+);
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
-import { IdentitySplash } from "./components/motion/IdentitySplash";
+
 import { Hero } from "./components/sections/Hero";
 import { About } from "./components/sections/About";
 import { Skills } from "./components/sections/Skills";
@@ -59,18 +69,9 @@ const MemoSkills = memo(Skills);
 const MemoProjects = memo(Projects);
 
 // Dynamic below-the-fold sections
-const MemoPhilosophy = dynamic(
-  () => import("./components/sections/Philosophy").then((m) => m.Philosophy),
-  { ssr: false },
-);
-const MemoContact = dynamic(
-  () => import("./components/sections/Contact").then((m) => m.Contact),
-  { ssr: false },
-);
-const MemoFooter = dynamic(
-  () => import("./components/sections/SiteFooter").then((m) => m.SiteFooter),
-  { ssr: false },
-);
+import { Philosophy as MemoPhilosophy } from "./components/sections/Philosophy";
+import { Contact as MemoContact } from "./components/sections/Contact";
+import { SiteFooter as MemoFooter } from "./components/sections/SiteFooter";
 
 // Registrar plugins GSAP
 if (typeof window !== "undefined") {
@@ -106,23 +107,19 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   const reduced = usePreferredMotion();
   const motionEnabled = useMotionEnabled();
-  const [isMobile, setIsMobile] = useState(false);
 
   // ── Extracted Hooks Integration ──
   const mounted = useProjectNavigation(t);
 
-  useEffect(() => {
-    if (!mounted) return;
-    setIsMobile(window.matchMedia("(hover: none)").matches);
-  }, [mounted]);
-
   // Intro phase state machine hook
-  const { phase, ready, onPreloaderDone, onSplashComplete } =
-    useIntroPhase(mounted);
+  const { phase, ready, onPreloaderDone } = useIntroPhase(mounted);
 
   // Modal and menu state managers
   const [cmd, setCmd] = useModalState();
   const [menu, setMenu] = useMobileMenu();
+  useEffect(() => {
+    if (cmd) setMenu(false);
+  }, [cmd, setMenu]);
 
   // Scroll controls & observer integration
   const activeSection = useActiveSection(
@@ -144,7 +141,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   useGsapOrchestration(main, ready, reduced);
 
   const greeting = useGreeting(t.times, t.greetingFn);
-  const { repos, top3, load, offline, errorMsg } = initialGitHubData;
+  const { top3 } = initialGitHubData;
+  const { repos, load, offline, errorMsg } = useGitHubActivity();
 
   // Hover intent controller: debounce entry (~50ms) and allow immediate cancel
   const hoverTimer = useRef<number | null>(null);
@@ -225,8 +223,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     hoveredProject,
   );
   useEffect(() => {
-    materia.accent = dnaColors.accent;
-    materia.secondary = dnaColors.secondary;
+    setMateriaPalette(dnaColors.accent, dnaColors.secondary);
     materia.paused = menu;
     if (hoveredProject) {
       materia.warp.target = 0.85;
@@ -240,31 +237,14 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {mounted &&
-        !ready &&
-        (phase === "loading" || phase === "splash" || phase === "checking") && (
-          <>
-            <IdentitySplash
-              lang={lang}
-              onComplete={onSplashComplete}
-              onReveal={() => {}}
-              active={phase === "splash"}
-            />
-            {(phase === "loading" || phase === "checking") && (
-              <Preloader onDone={onPreloaderDone} />
-            )}
-          </>
-        )}
-
+      {phase !== "ready" && (
+        <EntrancePreloader lang={lang} onDone={onPreloaderDone} />
+      )}
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
         ref={main}
         id="main-content"
         className="relative z-[10] pb-24 md:pb-0"
-        style={{
-          visibility: ready ? "visible" : "hidden",
-          opacity: ready ? 1 : 0,
-        }}
       >
         <Navbar
           t={t}
@@ -285,8 +265,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           phase={phase}
           lang={lang}
         />
-        <MemoSkills t={t} lang={lang} />
-        <MemoAbout t={t} />
         <MemoProjects
           t={t}
           lang={lang}
@@ -302,14 +280,12 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           onToggleProject={setExpandedIdx}
           motionEnabled={motionEnabled}
         />
+        <MemoAbout t={t} />
+        <MemoSkills t={t} lang={lang} />
         <MemoPhilosophy t={t} />
         <MemoContact t={t} lang={lang} />
         <MemoFooter t={t} />
-        {!isMobile && <ProjectPreviewFollower activeProject={hoveredProject} />}
       </main>
-      {ready && !menu && !cmd && (
-        <ReadingNav active={activeSection} t={t} lang={lang} />
-      )}
 
       {cmd && (
         <CmdModal
@@ -321,7 +297,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       )}
 
       <MobileMenu
-        menu={menu}
+        menu={menu && !cmd}
         setMenu={setMenu}
         lang={lang}
         setLang={setLang}
@@ -330,10 +306,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       />
 
       {/* 🛠️ Masterclass Utilities */}
-      <div className="hud-scanline" aria-hidden="true" />
       <div className="hud-vignette" aria-hidden="true" />
-      <DebugHUD />
+      {process.env.NODE_ENV === "development" && <DebugHUD />}
       <PortalTransition />
+      <ProjectPreviewFollower activeProject={hoveredProject} />
       {process.env.NODE_ENV === "development" && <DevTuningPanel />}
     </>
   );

@@ -36,6 +36,7 @@ export function useHeroLight(
       if (x.settled && y.settled && energy.settled) gsap.ticker.remove(tick);
     };
     const move = (event: PointerEvent) => {
+      if (!visible || document.visibilityState !== "visible") return;
       const bounds = element.getBoundingClientRect();
       x.target = (event.clientX - bounds.left) / bounds.width;
       y.target = (event.clientY - bounds.top) / bounds.height;
@@ -44,7 +45,8 @@ export function useHeroLight(
     };
     const leave = () => {
       energy.target = 0;
-      gsap.ticker.add(tick);
+      if (visible && document.visibilityState === "visible")
+        gsap.ticker.add(tick);
     };
     const orientation = (event: DeviceOrientationEvent) => {
       if (

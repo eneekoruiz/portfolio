@@ -1,0 +1,65 @@
+/* Each project gets a viewport chapter; the paused layout stays compact. */
+.work-surface[data-project-stage="active"] {
+  min-height: calc(100svh + 180px);
+}
+.work-surface[data-project-stage="active"] .work-surface-header {
+  position: sticky;
+  top: 94px;
+  min-height: calc(100svh - 144px);
+  padding-block: 24px;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  column-gap: clamp(28px, 5vw, 80px);
+}
+.work-surface[data-project-stage="active"] .work-project-title {
+  font-size: clamp(2rem, 4.4vw, 4rem);
+}
+.work-surface[data-project-stage="active"] .work-preview {
+  border: 0;
+  padding: 10px 12px 0;
+  background: transparent;
+}
+.work-surface[data-project-stage="active"] .work-preview .project-visual {
+  height: clamp(240px, 44svh, 440px);
+  max-height: 440px;
+}
+.work-surface[data-project-stage] .work-preview-object {
+  animation: none;
+  transform-origin: 50% 65%;
+  transform: perspective(1500px)
+    translate3d(
+      0,
+      calc((1 - var(--stage-enter, 0)) * 38px),
+      calc((1 - var(--stage-enter, 0)) * -100px)
+    )
+    rotateX(calc((1 - var(--stage-enter, 0)) * 12deg))
+    rotateY(calc((1 - var(--stage-enter, 0)) * -26deg))
+    scale(calc(0.86 + var(--stage-enter, 0) * 0.14));
+  opacity: calc(
+    0.7 + var(--stage-enter, 0) * 0.3 - var(--stage-leave, 0) * 0.25
+  );
+}
+@media (max-width: 767px) {
+  .work-surface[data-project-stage="active"] {
+    min-height: calc(100svh + 100px);
+  }
+  .work-surface[data-project-stage="active"] .work-surface-header {
+    top: 84px;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding-block: 14px;
+  }
+  .work-surface[data-project-stage="active"] .work-project-title {
+    font-size: clamp(1.65rem, 6vw, 2.1rem);
+  }
+  .work-surface[data-project-stage="active"] .work-preview .project-visual {
+    height: clamp(150px, 26svh, 210px);
+    max-height: 210px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .work-surface[data-project-stage] .work-preview-object {
+    transform: none;
+    opacity: 1;
+  }
+}

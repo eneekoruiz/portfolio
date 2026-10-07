@@ -20,7 +20,6 @@ const test = base.extend({
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (window.top !== window) return;
-    sessionStorage.setItem("hasSeenIntro", "true");
     localStorage.setItem("portfolio_lang", "es");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
@@ -31,13 +30,34 @@ async function home(page) {
   await page.goto("/");
   await expect(page.locator("#main-content")).toBeVisible();
   await expect(page.locator("#hero h1")).toHaveText("EnekoEnekoRuiz.Ruiz.");
-  if (
-    !(await page.evaluate(
-      () => matchMedia("(prefers-reduced-motion: reduce)").matches,
-    ))
-  ) {
+  const motionState = await page.evaluate(() => {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const touch = matchMedia(
+      "(hover: none), (pointer: coarse), (max-width: 767px)",
+    ).matches;
+    const memory = navigator.deviceMemory;
+    const lightweight = touch || (memory !== undefined && memory <= 4);
+    return { reduced, lightweight };
+  });
+  if (!motionState.reduced && !motionState.lightweight) {
+    const scene = page.locator(".materia-canvas");
+    await expect
+      .poll(
+        async () => {
+          if (await scene.locator("canvas[data-materia-renderer]").isVisible())
+            return true;
+          return (
+            (await scene.getAttribute("data-scene-degraded")) === "true" &&
+            (await scene.locator("[data-dna-static]").isVisible())
+          );
+        },
+        { message: "Ready renderer or validated adaptive static fallback" },
+      )
+      .toBe(true);
+  } else {
+    await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
     await expect(
-      page.locator(".materia-canvas canvas[data-materia-renderer]"),
+      page.locator(".materia-canvas [data-dna-static]"),
     ).toBeVisible();
   }
 }
@@ -135,7 +155,7 @@ test("project navigation keeps the document and the canvas; browser Back restore
   );
   await expect(
     page
-      .locator("#panel-ana-peluquera")
+      .locator('[data-materia-surface="ana-peluquera"]')
       .getByRole("link", { name: "Explorar proyecto" }),
   ).toBeVisible();
 });
@@ -149,12 +169,13 @@ test("Spanish and English controls update together", async ({ page }) => {
     page.locator("#hero").getByRole("link", { name: "See work" }),
   ).toBeVisible();
   const row = page.locator('[data-materia-surface="ana-peluquera"]');
+  await expect(row.locator("button[aria-expanded]")).toHaveText("Details");
   await row.locator("button[aria-expanded]").click();
   await expect(
     row.getByRole("link", { name: "Explore project" }),
   ).toBeVisible();
   await expect(
-    row.getByText("From concept to production").first(),
+    row.getByRole("tablist", { name: "From concept to production" }),
   ).toBeVisible();
 });
 
@@ -241,9 +262,15 @@ test("dark theme and animation preference keep content readable", async ({
     "eclipse",
   );
   await page.screenshot({ path: testInfo.outputPath("hero-dark.png") });
-  await page
-    .getByRole("button", { name: "Pausar animaciones", exact: true })
-    .click();
+  if ((await page.locator("html").getAttribute("data-motion")) === "on") {
+    await page
+      .getByRole("button", { name: "Pausar animaciones", exact: true })
+      .click();
+  } else {
+    await expect(
+      page.getByRole("button", { name: "Activar animaciones", exact: true }),
+    ).toBeVisible();
+  }
   await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
   await expect(page.locator("#main-content")).toBeVisible();
   const row = await openFirstProject(page);
@@ -257,6 +284,7 @@ test("first visit with reduced motion reaches readable content", async ({
 }, testInfo) => {
   const profile = testInfo.project.use;
   const context = await browser.newContext({
+    baseURL: profile.baseURL,
     viewport: profile.viewport,
     isMobile: profile.isMobile,
     hasTouch: profile.hasTouch,
@@ -267,10 +295,11 @@ test("first visit with reduced motion reaches readable content", async ({
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   try {
-    await page.goto("http://localhost:3100/");
+    await page.goto("/");
     await expect(page.locator("#main-content")).toBeVisible();
     await expect(page.locator("#hero h1")).toHaveText("EnekoEnekoRuiz.Ruiz.");
     await expect(page.locator(".materia-canvas canvas")).toHaveCount(0);
+    await expect(page.locator(".identity-splash, #preloader")).toHaveCount(0);
     expect(errors).toEqual([]);
   } finally {
     await context.close();

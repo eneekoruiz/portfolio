@@ -6,7 +6,7 @@ import { LiveStatus } from "../ui/LiveStatus";
 import { KineticText } from "../motion/KineticText";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useSpringHover } from "../../hooks/useSpringHover";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
 import type { Tx, Lang } from "../../types";
@@ -22,17 +22,41 @@ interface HeroProps {
 
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const ui = UI_COPY[lang];
-  const motion = useMotionEnabled();
+  const { enabled: motion, lightweight } = useMotionPolicy();
   const enabled = motion && !reduced && phase === "ready";
   const portraitRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const video = portraitRef.current;
     if (!video) return;
     let visible = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const update = () => {
-      if (enabled && visible && document.visibilityState === "visible")
-        void video.play().catch(() => {});
-      else video.pause();
+      if (
+        enabled &&
+        !lightweight &&
+        visible &&
+        document.visibilityState === "visible"
+      ) {
+        if (!video.getAttribute("src")) {
+          if (!timer)
+            timer = setTimeout(() => {
+              timer = undefined;
+              if (
+                !enabled ||
+                !visible ||
+                document.visibilityState !== "visible"
+              )
+                return;
+              video.src = "/memoji.webm";
+              video.load();
+              void video.play().catch(() => {});
+            }, 800);
+        } else void video.play().catch(() => {});
+      } else {
+        clearTimeout(timer);
+        timer = undefined;
+        video.pause();
+      }
     };
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -42,11 +66,12 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
     document.addEventListener("visibilitychange", update);
     update();
     return () => {
+      clearTimeout(timer);
       observer.disconnect();
       document.removeEventListener("visibilitychange", update);
       video.pause();
     };
-  }, [enabled]);
+  }, [enabled, lightweight]);
   const heroRef = useRef<HTMLElement>(null);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
@@ -54,7 +79,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   );
   const prismRef = useRef<HTMLDivElement>(null);
   useMateriaSurface(prismRef, "#0066ff", enabled, 26);
-  const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 36, heroRef);
+  const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 6);
   const scrollTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
@@ -77,7 +102,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       ref={heroRef}
       id="hero"
       aria-label="Eneko Ruiz"
-      className="materia-hero relative flex min-h-[100svh] lg:h-[100svh] lg:max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
+      className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
       <div className="hero-light" aria-hidden="true" />
       <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
@@ -86,11 +111,11 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </p>
         <LiveStatus label={t.status} />
       </div>
-      <div className="relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-6 py-4 md:py-6 lg:grid-cols-[1.4fr_0.6fr] lg:gap-0 lg:py-4">
+      <div className="hero-composition relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-6 py-4 md:py-6 lg:gap-0 lg:py-4">
         <div className="relative z-10 min-w-0">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(4.8rem,11.5vw,11.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] text-ink"
+            className="m-0 text-[clamp(4.8rem,13vw,14rem)] font-black uppercase leading-[0.75] tracking-[-0.07em] text-ink"
           >
             <KineticText
               text="Eneko"
@@ -103,19 +128,19 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               enabled={enabled}
               interactive
               delay={0.28}
-              className="mt-[0.13em] text-brand"
+              className="mt-[0.08em] text-brand block"
             />
           </h1>
-          <div className="mt-6 flex max-w-xl items-start gap-4 md:mt-8 md:gap-5">
+          <div className="hero-introduction mt-8 flex max-w-2xl items-start gap-5 md:mt-10 md:gap-6">
             <span
-              className="mt-2 h-px w-8 md:w-10 shrink-0 bg-brand"
+              className="mt-2.5 h-px w-10 md:w-16 shrink-0 bg-brand"
               aria-hidden="true"
             />
             <div>
-              <p className="text-base font-semibold text-ink md:text-xl">
+              <p className="text-base font-semibold tracking-tight text-ink md:text-lg">
                 {t.role}
               </p>
-              <p className="mt-2 md:mt-3 max-w-sm text-sm leading-relaxed text-lead">
+              <p className="mt-3 md:mt-4 max-w-md text-sm leading-relaxed text-lead md:text-base">
                 {t.tagline}
               </p>
             </div>
@@ -123,29 +148,29 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </div>
         <div
           ref={prismRef}
-          className="materia-surface hero-prism relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 lg:block overflow-hidden"
+          className="materia-surface hero-prism hero-identity-plate relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 md:block overflow-hidden"
           data-materia-surface="hero"
         >
           <div className="absolute inset-x-5 top-5 z-10 flex items-center justify-between text-[10px] font-mono tracking-[0.18em] text-lead">
             <span>ER — 01</span>
             <span aria-hidden="true">↗</span>
           </div>
-          <div className="hero-portrait-frame absolute inset-x-4 top-1/2 -translate-y-1/2 mx-auto">
+          <div className="hero-portrait-frame absolute inset-x-4 top-1/2 mx-auto">
             <video
               ref={portraitRef}
-              src="/memoji.webm"
-              autoPlay={enabled}
+              poster="/memoji-poster.webp"
+              autoPlay={false}
               loop={enabled}
               muted
               playsInline
-              preload="metadata"
+              preload="none"
               aria-hidden="true"
               className="hero-portrait block h-full w-full object-cover"
             />
           </div>
           <div className="absolute bottom-5 left-5 right-5 z-10 flex items-end justify-between border-t border-ink/15 pt-4">
             <span className="font-mono text-[10px] tracking-[0.14em] text-lead">
-              SOFTWARE / SYSTEMS
+              DONOSTIA / SOFTWARE
             </span>
           </div>
         </div>

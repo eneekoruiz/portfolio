@@ -49,9 +49,9 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
       <div
         ref={cardRef}
         data-section-reveal
-        className="materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 p-5 md:p-8 transition-colors duration-300"
+        className="contact-intro materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 transition-colors duration-300"
       >
-        <div className="grid gap-4 border-b border-ink/15 pb-6 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+        <div className="contact-intro-heading grid gap-4 border-b border-ink/15 md:grid-cols-[1.2fr_0.8fr] md:items-end">
           <p className="max-w-xl text-lg leading-relaxed tracking-tight text-lead md:text-2xl">
             {t.coP}
           </p>
@@ -64,8 +64,9 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
           </span>
         </div>
         <a
+          dir="ltr"
           href={`mailto:${EMAIL}`}
-          className="my-6 block w-fit break-all text-[clamp(1.4rem,4.4vw,4.7rem)] font-bold leading-tight tracking-[-0.06em] text-ink underline decoration-brand/40 decoration-1 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+          className="contact-email my-6 block w-fit break-all text-[clamp(1.4rem,4.4vw,4.7rem)] font-bold leading-tight tracking-[-0.06em] text-ink underline decoration-brand/40 decoration-1 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
         >
           {EMAIL}
         </a>
@@ -84,7 +85,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
         <p
           role="status"
           aria-live="polite"
-          className="mt-4 min-h-6 text-sm text-lead"
+          className="contact-copy-status text-sm text-lead"
         >
           {status === "copied"
             ? ui.copied
@@ -93,7 +94,7 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
               : ""}
         </p>
       </div>
-      <div className="mt-6 grid gap-5 md:grid-cols-3">
+      <div className="contact-tiles grid">
         <ContactTile
           label="Gmail"
           value={EMAIL}

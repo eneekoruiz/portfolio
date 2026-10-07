@@ -1,35 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import gsap from "gsap";
-import { Pause, Play } from "lucide-react";
 import { SKILLS, type SkillCategory } from "../../lib/constants";
 import type { Lang, Tx } from "../../types";
 import { SectionFrame } from "./SectionFrame";
 import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { SpringValue } from "../../lib/spring";
-import { UI_COPY } from "../../data/interface-translations";
 
 function SkillOrbit({
   category,
   label,
   motion,
-  lang,
 }: {
   category: SkillCategory;
   label: string;
   motion: boolean;
-  lang: Lang;
 }) {
   const cardRef = useRef<HTMLElement>(null);
   const orbitRef = useRef<HTMLUListElement>(null);
-  const [paused, setPaused] = useState(false);
-  const pausedRef = useRef(false);
-  useEffect(() => {
-    pausedRef.current = paused;
-    orbitRef.current?.dispatchEvent(new Event("orbit-pause"));
-  }, [paused]);
   useMateriaSurface(cardRef, category.c, motion, 32);
 
   useEffect(() => {
@@ -41,12 +31,10 @@ function SkillOrbit({
     const angle = new SpringValue(0, 110, 19);
     let visible = false,
       focused = false,
-      hovering = false,
       dragging = false;
     let pointerId = -1,
       startX = 0,
-      startAngle = 0,
-      elapsed = 0;
+      startAngle = 0;
     let lastX = 0,
       lastTime = 0,
       releaseVelocity = 0;
@@ -56,21 +44,24 @@ function SkillOrbit({
       y: new SpringValue(0, 165, 18),
       z: new SpringValue(0, 155, 19),
     }));
+    let disposed = false;
     let pointerX = 0,
       pointerY = 0,
       interacting = false;
-    let radius = 135;
+    let radius = 100;
     const resize = new ResizeObserver(([entry]) => {
-      radius = Math.min(195, Math.max(105, entry.contentRect.width * 0.34));
+      const width = entry.contentRect.width;
+      radius = Math.min(155, width * 0.32, Math.max(55, (width - 110) / 2));
       wake();
     });
     const draw = (dt = 0) => {
+      if (disposed) return true;
       let settled = true;
       for (let i = 0; i < items.length; i++) {
         const theta = (i * Math.PI * 2) / items.length + angle.value;
         const depth = (Math.cos(theta) + 1) / 2;
         const x = Math.sin(theta) * radius;
-        const y = Math.sin(theta) * 6 + pitch.value * 12;
+        const y = Math.sin(theta * 2) * 14 + pitch.value * 10;
         const dx = x - pointerX,
           dy = y - pointerY;
         const distance = Math.sqrt(dx * dx + dy * dy + 400);
@@ -101,12 +92,12 @@ function SkillOrbit({
       return settled;
     };
     const tick = (_time: number, delta: number) => {
+      if (disposed) return;
       const dt = delta / 1000;
-      const rotating = !pausedRef.current && !focused && !dragging;
+      const rotating = !focused && !dragging;
       if (rotating) {
         const advance = Math.min(dt, 0.08);
         angle.target += advance * 0.28;
-        elapsed += advance;
       }
       angle.step(dt);
       pitch.target = Math.max(-1, Math.min(1, angle.velocity * 0.15));
@@ -116,20 +107,23 @@ function SkillOrbit({
         gsap.ticker.remove(tick);
     };
     function wake() {
+      if (disposed) return;
       if (visible && document.visibilityState === "visible")
         gsap.ticker.add(tick);
-      else gsap.ticker.remove(tick);
+      else {
+        gsap.ticker.remove(tick);
+        for (const item of items) item.style.willChange = "";
+      }
     }
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (!visible) cancel();
       wake();
     });
     const enter = () => {
-      hovering = true;
       wake();
     };
     const leave = () => {
-      hovering = false;
       interacting = false;
       wake();
     };
@@ -137,7 +131,12 @@ function SkillOrbit({
       focused = true;
       wake();
     };
-    const blur = () => {
+    const blur = (event: FocusEvent) => {
+      if (
+        event.relatedTarget instanceof Node &&
+        orbit.contains(event.relatedTarget)
+      )
+        return;
       focused = false;
       wake();
     };
@@ -191,11 +190,20 @@ function SkillOrbit({
       wake();
     };
     const cancel = () => {
-      dragging = hovering = interacting = false;
+      if (disposed) return;
+      dragging = interacting = false;
       releaseVelocity = 0;
       if (pointerId >= 0 && orbit.hasPointerCapture(pointerId))
         orbit.releasePointerCapture(pointerId);
       pointerId = -1;
+      angle.snap(angle.value);
+      pitch.snap(0);
+      for (const displacement of displacements) {
+        displacement.x.snap(0);
+        displacement.y.snap(0);
+        displacement.z.snap(0);
+      }
+      draw();
       wake();
     };
     const wheel = (event: WheelEvent) => {
@@ -234,11 +242,11 @@ function SkillOrbit({
     orbit.addEventListener("lostpointercapture", release);
     orbit.addEventListener("focusin", focus);
     orbit.addEventListener("focusout", blur);
-    orbit.addEventListener("orbit-pause", wake);
     document.addEventListener("visibilitychange", wake);
     window.addEventListener("blur", cancel);
     draw();
     return () => {
+      disposed = true;
       observer.disconnect();
       resize.disconnect();
       gsap.ticker.remove(tick);
@@ -255,9 +263,10 @@ function SkillOrbit({
       orbit.removeEventListener("lostpointercapture", release);
       orbit.removeEventListener("focusin", focus);
       orbit.removeEventListener("focusout", blur);
-      orbit.removeEventListener("orbit-pause", wake);
       document.removeEventListener("visibilitychange", wake);
       window.removeEventListener("blur", cancel);
+      if (pointerId >= 0 && orbit.hasPointerCapture(pointerId))
+        orbit.releasePointerCapture(pointerId);
     };
   }, [motion, category.techs]);
 
@@ -269,33 +278,21 @@ function SkillOrbit({
       className="materia-surface skill-orbit-card relative overflow-hidden rounded-[24px] border p-5 md:p-6"
       style={{ "--surface-color": category.c } as CSSProperties}
     >
-      <header className="relative z-10 flex items-center gap-4">
+      <header className="skill-orbit-header relative z-10 flex items-center">
         <span
           className="skill-orbit-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]"
           aria-hidden="true"
         >
           <category.I size={22} />
         </span>
-        <h3 className="text-lg font-black uppercase tracking-tight text-ink md:text-xl">
+        <h3 className="font-black uppercase tracking-tight text-ink">
           {label}
         </h3>
-        {motion && (
-          <button
-            type="button"
-            onClick={() => setPaused((value) => !value)}
-            aria-pressed={paused}
-            aria-label={`${paused ? UI_COPY[lang].resume : UI_COPY[lang].pause} ${label}`}
-            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/15 text-lead focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-          >
-            {paused ? <Play size={14} /> : <Pause size={14} />}
-          </button>
-        )}
       </header>
       <ul
         ref={orbitRef}
         tabIndex={motion ? 0 : undefined}
         aria-label={label}
-        aria-describedby={`orbit-help-${category.g.replace(/\W/g, "")}`}
         className="skill-orbit mt-4 flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
       >
         {category.techs.map((tech) => (
@@ -312,39 +309,22 @@ function SkillOrbit({
           </li>
         ))}
       </ul>
-      <p
-        id={`orbit-help-${category.g.replace(/\W/g, "")}`}
-        className="relative mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-lead"
-      >
-        {motion
-          ? UI_COPY[lang].orbitHelp
-          : `${UI_COPY[lang].technologies}: ${category.techs.length}`}
-      </p>
     </article>
   );
 }
 
-export function Skills({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
+export function Skills({ t }: { t: Tx; lang?: Lang }) {
   const motion = useMotionEnabled();
   return (
-    <SectionFrame id="skills" index="01" label={t.skLb} title={t.skH}>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-7">
+    <SectionFrame id="skills" index="03" label={t.skLb} title={t.skH}>
+      <div className="skills-grid grid">
         {SKILLS.map((category, index) => (
-          <div
+          <SkillOrbit
             key={category.g}
-            className={
-              index === SKILLS.length - 1
-                ? "md:col-span-2 md:mx-auto md:w-[calc(50%-0.875rem)]"
-                : ""
-            }
-          >
-            <SkillOrbit
-              category={category}
-              label={t.skCats[index] ?? category.g}
-              motion={motion}
-              lang={lang}
-            />
-          </div>
+            category={category}
+            label={t.skCats[index] ?? category.g}
+            motion={motion}
+          />
         ))}
       </div>
     </SectionFrame>

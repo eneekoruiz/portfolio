@@ -80,9 +80,9 @@ export function SectionFrame({
       ref={ref}
       id={id}
       aria-labelledby={`${id}-heading`}
-      className={`editorial-section relative z-10 mx-auto max-w-[1440px] px-5 py-20 md:px-10 md:py-28 ${className}`}
+      className={`editorial-section relative z-10 mx-auto max-w-[1440px] px-5 py-14 md:px-10 md:py-20 ${className}`}
     >
-      <header data-section-reveal className="mb-10 md:mb-14">
+      <header data-section-reveal className="mb-7 md:mb-9">
         <div className="mb-6 flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.16em] text-lead">
           <span className="text-brand">{index}</span>
           <span className="h-px w-10 bg-ink/20" aria-hidden="true" />

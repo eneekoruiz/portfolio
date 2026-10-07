@@ -1,71 +1,53 @@
 "use client";
-
-import { useEffect, useRef } from "react";
-import Lenis from "lenis";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { materia } from "../../lib/materia";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
-import { usePreferredMotion } from "../../hooks/usePreferredMotion";
-
+/** Native scrolling: no permanent animation loop and no interception of touch input. */
 export function SmoothScroll() {
-  const tickerFnRef = useRef<((time: number) => void) | null>(null);
-  const enabled = useMotionEnabled();
-  const reduced = usePreferredMotion();
-
+  const pathname = usePathname();
   useEffect(() => {
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (reducedMotion || reduced || !enabled) return;
-
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "both",
-      smoothWheel: true,
-      wheelMultiplier: 1.05,
-      touchMultiplier: 1.6,
-      autoRaf: false,
-    });
-
-    window.__lenis = lenis;
-    lenis.on("scroll", (e: Lenis) => {
-      ScrollTrigger.update();
-      materia.velocity = e.velocity;
-      materia.scrollTime = performance.now();
-    });
-
-    tickerFnRef.current = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(tickerFnRef.current);
-    gsap.ticker.lagSmoothing(0);
-
-    // Scroll Progress Bar Logic
-    const ctx = gsap.context(() => {
-      gsap.to("#scroll-progress", {
-        scaleX: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "body",
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.3,
-        },
-      });
-    });
-
+    let frame = 0,
+      previous = scrollY,
+      time = performance.now();
+    const bar = document.getElementById("scroll-progress");
+    const update = () => {
+      frame = 0;
+      const now = performance.now();
+      materia.velocity = Math.max(
+        -40,
+        Math.min(40, ((scrollY - previous) * 16) / Math.max(16, now - time)),
+      );
+      materia.scrollTime = now;
+      previous = scrollY;
+      time = now;
+      if (bar)
+        bar.style.transform =
+          "scaleX(" +
+          Math.max(
+            0,
+            Math.min(
+              1,
+              scrollY /
+                Math.max(
+                  1,
+                  document.documentElement.scrollHeight - innerHeight,
+                ),
+            ),
+          ) +
+          ")";
+    };
+    const queue = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    update();
     return () => {
-      ctx.revert();
-      if (tickerFnRef.current) {
-        gsap.ticker.remove(tickerFnRef.current);
-        tickerFnRef.current = null;
-      }
-      lenis.destroy();
-      delete window.__lenis;
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", queue);
+      window.removeEventListener("resize", queue);
       materia.velocity = 0;
     };
-  }, [enabled, reduced]);
-
+  }, [pathname]);
   return null;
 }

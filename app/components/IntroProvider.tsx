@@ -1,24 +1,4 @@
 "use client";
-
-/**
- * ─────────────────────────────────────────────────────────────────────────────
- * INTRO PROVIDER — Phase state management for loading sequence
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * Phases: 'checking' → 'loading' → 'splash' → 'ready'
- *
- * FIX Punto 5: Now reads `hasSeenIntro` from sessionStorage on mount.
- * Previously, the `hasSeen` flag was pure React state that reset on every
- * client-side navigation, causing the full Preloader + Splash to replay
- * when returning from /work/[id]. Now, once `markSeen()` is called,
- * it persists in sessionStorage for the entire browser session.
- *
- * This also ensures that when /work/[id] sets `hasSeenIntro` in
- * sessionStorage before navigating back, IntroProvider picks it up
- * and skips straight to 'ready'.
- * ─────────────────────────────────────────────────────────────────────────────
- */
-
 import {
   createContext,
   useCallback,
@@ -26,51 +6,10 @@ import {
   useEffect,
   useMemo,
   useState,
+  type ReactNode,
 } from "react";
 
 export type IntroPhase = "checking" | "loading" | "splash" | "ready";
-
-// Lightweight WAAPI fallback polyfill for older browsers (prevents animation failures)
-if (
-  typeof window !== "undefined" &&
-  typeof Element !== "undefined" &&
-  !Element.prototype.animate
-) {
-  Element.prototype.animate = function (keyframes: any, options: any): any {
-    const el = this as HTMLElement;
-    const finalFrame = Array.isArray(keyframes)
-      ? keyframes[keyframes.length - 1]
-      : keyframes;
-
-    if (finalFrame) {
-      Object.keys(finalFrame).forEach((prop) => {
-        try {
-          const val = finalFrame[prop];
-          (el.style as any)[prop] = val;
-        } catch (e) {}
-      });
-    }
-
-    const mockAnimation = {
-      play: () => {},
-      pause: () => {},
-      cancel: () => {},
-      finish: () => {},
-      onfinish: null as any,
-    };
-
-    const duration =
-      typeof options === "number" ? options : options?.duration || 0;
-
-    setTimeout(() => {
-      if (typeof mockAnimation.onfinish === "function") {
-        mockAnimation.onfinish();
-      }
-    }, duration);
-
-    return mockAnimation;
-  };
-}
 
 interface IntroContextValue {
   phase: IntroPhase;
@@ -80,38 +19,37 @@ interface IntroContextValue {
 
 const IntroContext = createContext<IntroContextValue | null>(null);
 
-// Global variable survives client-side navigation but resets on full reload
-let hasSeenGlobal = false;
+const STORAGE_KEY = "portfolio_intro_seen_v4";
 
-export function IntroProvider({ children }: { children: React.ReactNode }) {
-  const [phase, setPhase] = useState<IntroPhase>("checking");
+function checkIsFirstVisit(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      return false;
+    if (localStorage.getItem("portfolio-motion-enabled") === "false")
+      return false;
+    return !sessionStorage.getItem(STORAGE_KEY);
+  } catch {
+    return false;
+  }
+}
+
+/** Content is readable in the server response; decoration never gates navigation. */
+export function IntroProvider({ children }: { children: ReactNode }) {
+  const [phase, setPhase] = useState<IntroPhase>("ready");
 
   useEffect(() => {
-    // Determine the initial phase on the client after hydration
-    const checkSeen = () => {
-      if (typeof window === "undefined") return false;
-      if (window.__hasSeenIntro === true) return true;
-      try {
-        return sessionStorage.getItem("hasSeenIntro") === "true";
-      } catch {
-        return false;
-      }
-    };
-
-    if (checkSeen()) {
-      setPhase("ready");
-    } else {
+    if (checkIsFirstVisit()) {
       setPhase("loading");
     }
   }, []);
 
   const markSeen = useCallback(() => {
-    if (typeof window !== "undefined") {
-      window.__hasSeenIntro = true;
-      try {
-        sessionStorage.setItem("hasSeenIntro", "true");
-      } catch (e) {}
-    }
+    try {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(STORAGE_KEY, "true");
+      }
+    } catch {}
     setPhase("ready");
   }, []);
 
@@ -126,9 +64,7 @@ export function IntroProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useIntro() {
-  const ctx = useContext(IntroContext);
-  if (!ctx) {
-    throw new Error("useIntro must be used inside IntroProvider");
-  }
-  return ctx;
+  const context = useContext(IntroContext);
+  if (!context) throw new Error("useIntro must be used inside IntroProvider");
+  return context;
 }

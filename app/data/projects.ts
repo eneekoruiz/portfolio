@@ -24,7 +24,7 @@ export const PROJECTS_CONTENT: Record<
     es: {
       title: "AG Beauty Salon",
       subtitle: "Booking Orchestration & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Desarrollador full stack",
       objective:
         "Digitalizar un negocio premium sin perder sensaciones de lujo: reserva sin fricción, control total para la propietaria y una interfaz que transmite confianza desde el primer segundo.",
       algorithmH: "Algoritmo Sandwich: Scheduling Inteligente",
@@ -33,9 +33,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Arquitectura NoSQL con sincronización atómica bidireccional, Service Accounts y Firestore para mantener calendario y reservas siempre alineados.",
-      outcomeH: "Impacto Real",
+      outcomeH: "Reservas y calendario",
       outcomeP:
-        "Facturación +30%, carga inicial < 300ms y un flujo de reserva que se siente instantáneo.",
+        "El flujo guarda cada reserva en Firestore y la registra en Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Booking Core",
       techBadges: [
         "Atomic Transactions",
@@ -47,7 +47,7 @@ export const PROJECTS_CONTENT: Record<
     en: {
       title: "AG Beauty Salon",
       subtitle: "Booking Orchestration & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Full-stack developer",
       objective:
         "Digitize a premium business without losing the luxury feel: zero-friction booking, full-owner control, and an interface that builds trust instantly.",
       algorithmH: "Sandwich Algorithm: Smart Scheduling",
@@ -56,9 +56,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Atomic bidirectional sync across Service Accounts and Firestore keeps the calendar and reservations perfectly aligned.",
-      outcomeH: "Real Impact",
+      outcomeH: "Bookings and calendar",
       outcomeP:
-        "Revenue +30%, initial load < 300ms and a booking flow that feels immediate.",
+        "The booking flow saves each reservation to Firestore and adds it to Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Booking Core",
       techBadges: [
         "Atomic Transactions",
@@ -70,7 +70,7 @@ export const PROJECTS_CONTENT: Record<
     eu: {
       title: "AG Beauty Salon",
       subtitle: "Erreserbak eta CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Full-stack garatzailea",
       objective:
         "Goi mailako negozio baten digitalizazioa. Erreserba sistema erraza eta jabearentzat kontrol osoa.",
       algorithmH: "Sandwich Algoritmoa: O(n) Optimizazioa",
@@ -79,8 +79,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "NoSQL arkitektura Firestore bidez eta Google Calendarrekin sinkronizazio atomikoa.",
-      outcomeH: "Eragin Erreala",
-      outcomeP: "Fakturazioa %30 hazi da eta karga < 300ms.",
+      outcomeH: "Erreserbak eta egutegia",
+      outcomeP:
+        "Erreserba Firestoren gordetzen da eta Google Calendar-en erregistratzen da.",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -92,7 +93,7 @@ export const PROJECTS_CONTENT: Record<
     fr: {
       title: "AG Beauty Salon",
       subtitle: "Réservations & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Développeur full-stack",
       objective:
         "Numérisation totale d'un salon de luxe. Réservation fluide et contrôle total pour la propriétaire.",
       algorithmH: "Algorithme Sandwich : Optimisation O(n)",
@@ -101,8 +102,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Architecture NoSQL avec synchronisation bidirectionnelle atomique.",
-      outcomeH: "Impact Réel",
-      outcomeP: "Chiffre d'affaires +30%, chargement < 300ms.",
+      outcomeH: "Réservations et calendrier",
+      outcomeP:
+        "Le parcours enregistre chaque réservation dans Firestore et dans Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -114,7 +116,7 @@ export const PROJECTS_CONTENT: Record<
     it: {
       title: "AG Beauty Salon",
       subtitle: "Prenotazioni & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Sviluppatore full-stack",
       objective:
         "Digitalizzazione totale. Esperienza di prenotazione fluida e gestione completa per la titolare.",
       algorithmH: "Algoritmo Sandwich: Ottimizzazione O(n)",
@@ -123,8 +125,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Architettura NoSQL con sincronizzazione atomica bidirezionale.",
-      outcomeH: "Impatto Reale",
-      outcomeP: "Fatturato +30%, caricamento < 300ms.",
+      outcomeH: "Prenotazioni e calendario",
+      outcomeP:
+        "Il flusso salva ogni prenotazione su Firestore e la registra in Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -136,7 +139,7 @@ export const PROJECTS_CONTENT: Record<
     de: {
       title: "AG Beauty Salon",
       subtitle: "Buchung & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Full-Stack-Entwickler",
       objective:
         "Vollständige Digitalisierung eines Luxus-Salons. Ziel: reibungslose Buchung und volle Kontrolle.",
       algorithmH: "Sandwich-Algorithmus: O(n) Optimierung",
@@ -145,8 +148,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "NoSQL-Architektur mit atomarer bidirektionaler Synchronisierung.",
-      outcomeH: "Echte Wirkung",
-      outcomeP: "Umsatz +30%, Ladezeit < 300ms.",
+      outcomeH: "Buchungen und Kalender",
+      outcomeP:
+        "Der Buchungsablauf speichert jede Reservierung in Firestore und in Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -158,7 +162,7 @@ export const PROJECTS_CONTENT: Record<
     pt: {
       title: "AG Beauty Salon",
       subtitle: "Reservas & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Desenvolvedor full-stack",
       objective:
         "Digitalização total. Foco em experiência de reserva fluida e controle total para o proprietário.",
       algorithmH: "Algoritmo Sandwich: Otimização O(n)",
@@ -166,8 +170,9 @@ export const PROJECTS_CONTENT: Record<
         "Divide serviços em fases para permitir reservas paralelas automaticamente.",
       supabaseH: "Firebase + Google Calendar",
       supabaseP: "Arquitetura NoSQL com sincronização bidirecional atómica.",
-      outcomeH: "Impacto Real",
-      outcomeP: "Faturação +30%, carga < 300ms.",
+      outcomeH: "Reservas e calendário",
+      outcomeP:
+        "O fluxo guarda cada reserva no Firestore e regista-a no Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -179,7 +184,7 @@ export const PROJECTS_CONTENT: Record<
     ca: {
       title: "AG Beauty Salon",
       subtitle: "Reserves & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Desenvolupador full-stack",
       objective:
         "Digitalització total d'un saló de luxe. Reserva sense fricció i control total per a la propietària.",
       algorithmH: "Algorisme Sandwich: Optimització O(n)",
@@ -187,8 +192,9 @@ export const PROJECTS_CONTENT: Record<
         "Divideix serveis en fases per alliberar forats al calendari per a reserves paral·leles.",
       supabaseH: "Firebase + Google Calendar",
       supabaseP: "Arquitectura NoSQL amb sincronització bidireccional atòmica.",
-      outcomeH: "Impacte Real",
-      outcomeP: "Facturació +30%, càrrega < 300ms.",
+      outcomeH: "Reserves i calendari",
+      outcomeP:
+        "El flux desa cada reserva a Firestore i la registra a Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -200,7 +206,7 @@ export const PROJECTS_CONTENT: Record<
     gl: {
       title: "AG Beauty Salon",
       subtitle: "Reservas & CMS",
-      role: "Full-Stack Lead Architect",
+      role: "Desenvolvedor full-stack",
       objective:
         "Dixitalización total dun salón de luxo. Reserva sen fricción e control total para a dona.",
       algorithmH: "Algoritmo Sandwich: Optimización O(n)",
@@ -208,8 +214,9 @@ export const PROJECTS_CONTENT: Record<
         "Divide servizos en fases para liberar o calendario para reservas en paralelo.",
       supabaseH: "Firebase + Google Calendar",
       supabaseP: "Arquitectura NoSQL con sincronización bidireccional atómica.",
-      outcomeH: "Impacto Real",
-      outcomeP: "Facturación +30%, carga < 300ms.",
+      outcomeH: "Reservas e calendario",
+      outcomeP:
+        "O fluxo garda cada reserva en Firestore e rexístraa en Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -221,7 +228,7 @@ export const PROJECTS_CONTENT: Record<
     ja: {
       title: "AG 美容院",
       subtitle: "予約 & CMS",
-      role: "フルスタックリードアーキテクト",
+      role: "フルスタック開発者",
       objective:
         "高級サロンの完全デジタル化。顧客にはシームレスな予約を、オーナーには完全な管理権限を。",
       algorithmH: "サンドイッチアルゴリズム: O(n) 最適化",
@@ -230,8 +237,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google カレンダー",
       supabaseP:
         "Firestore を使用した NoSQL アーキテクチャ。Google カレンダー API とのアトミックな同期。",
-      outcomeH: "実際の影響",
-      outcomeP: "収益が 30% 増加し、読み込み時間は 300 ミリ秒未満。",
+      outcomeH: "予約とカレンダー",
+      outcomeP:
+        "予約フローは各予約を Firestore に保存し、Google Calendar に登録します。",
       codeSpotlight: "useCreateBooking.ts — Firebase",
       techBadges: [
         "Atomic Transactions",
@@ -243,7 +251,7 @@ export const PROJECTS_CONTENT: Record<
     zh: {
       title: "AG 美容沙龙",
       subtitle: "预约编排与内容管理系统",
-      role: "全栈首席架构师",
+      role: "全栈开发",
       objective:
         "在不失奢华感的前提下实现高端业务数字化：无缝预约流程、为店主提供完全管理权限，以及从首秒起便传递信任的精致界面。",
       algorithmH: "三明治算法：智能调度",
@@ -252,9 +260,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + 谷歌日历",
       supabaseP:
         "通过服务账号与 Firestore 实现原子级的双向同步，确保日历和预订始终保持完美一致。",
-      outcomeH: "真实成效",
+      outcomeH: "预约与日历",
       outcomeP:
-        "营收提升 30%，首屏加载时间小于 300 毫秒，且预约操作如丝般顺滑。",
+        "预约流程会将每条预约保存到 Firestore 并添加到 Google Calendar。",
       codeSpotlight: "useCreateBooking.ts — 核心预订引擎",
       techBadges: [
         "Atomic Transactions",
@@ -266,7 +274,7 @@ export const PROJECTS_CONTENT: Record<
     ar: {
       title: "AG Beauty Salon",
       subtitle: "تنسيق الحجوزات ونظام إدارة المحتوى",
-      role: "كبير مهندسي البرمجيات متكامل الخدمات",
+      role: "مطور Full-Stack",
       objective:
         "رقمنة صالون تجميل راقٍ دون فقدان الطابع الفاخر: تجربة حجز خالية من العوائق، تحكم كامل للمالكة، وواجهة مريحة تبني الثقة فوراً.",
       algorithmH: "خوارزمية الساندوتش: جدولة ذكية",
@@ -275,9 +283,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "بنية NoSQL مع تزامن ثنائي الاتجاه من خلال حسابات الخدمة و Firestore للحفاظ على محاذاة التقويم والحجوزات بدقة.",
-      outcomeH: "الأثر الفعلي",
+      outcomeH: "الحجوزات والتقويم",
       outcomeP:
-        "زيادة الإيرادات بنسبة 30٪، وقت تحميل أولي أقل من 300 مللي ثانية، وتدفق حجز فوري للغاية.",
+        "يحفظ مسار الحجز كل حجز في Firestore ويسجّله في Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — محرك الحجوزات الأساسи",
       techBadges: [
         "Atomic Transactions",
@@ -289,7 +297,7 @@ export const PROJECTS_CONTENT: Record<
     ru: {
       title: "AG Beauty Salon",
       subtitle: "Оркестрация бронирования и CMS",
-      role: "Ведущий архитектор Full-Stack",
+      role: "Full-Stack-разработчик",
       objective:
         "Оцифровать бизнес премиум-класса без потери атмосферы роскоши: бронирование без трения, полный контроль для владельца и интерфейс, вызывающий мгновенное доверие.",
       algorithmH: "Алгоритм Sandwich: интеллектуальное планирование",
@@ -298,9 +306,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Атомарная двунаправленная синхронизация между сервисными аккаунтами и Firestore поддерживает календарь и бронирования в идеальном соответствии.",
-      outcomeH: "Реальный эффект",
+      outcomeH: "Бронирование и календарь",
       outcomeP:
-        "+30% к выручке, начальная загрузка < 300 мс и мгновенный процесс бронирования.",
+        "Система сохраняет каждую запись в Firestore и добавляет её в Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Ядро бронирования",
       techBadges: [
         "Atomic Transactions",
@@ -312,7 +320,7 @@ export const PROJECTS_CONTENT: Record<
     ko: {
       title: "AG Beauty Salon",
       subtitle: "예약 오케스트레이션 & CMS",
-      role: "풀스택 수석 아키텍트",
+      role: "풀스택 개발자",
       objective:
         "고급스러운 느낌을 유지하며 프리미엄 비즈니스를 디지털화합니다. 마찰 없는 예약, 완벽한 소유자 제어, 즉각적인 신뢰를 주는 인터페이스를 제공합니다.",
       algorithmH: "샌드위치 알고리즘: 스마트 스케줄링",
@@ -321,9 +329,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "서비스 계정과 Firestore 간의 원자적 양방향 동기화로 캘린더와 예약 현황을 완벽하게 동기화합니다.",
-      outcomeH: "실제 효과",
+      outcomeH: "예약 및 캘린더",
       outcomeP:
-        "매출 30% 증가, 초기 로딩 속도 300ms 미만, 즉각적인 예약 흐름 구현.",
+        "예약 흐름은 각 예약을 Firestore에 저장하고 Google Calendar에 등록합니다.",
       codeSpotlight: "useCreateBooking.ts — 예약 코어",
       techBadges: [
         "Atomic Transactions",
@@ -335,7 +343,7 @@ export const PROJECTS_CONTENT: Record<
     hi: {
       title: "AG Beauty Salon",
       subtitle: "बुकिंग ऑर्केस्ट्रेशन और सीएमएस",
-      role: "फुल-स्टैक लीड आर्किटेक्ट",
+      role: "फुल-स्टैक डेवलपर",
       objective:
         "लक्ज़री अनुभव को खोए बिना एक प्रीमियम व्यवसाय को डिजिटल बनाना: घर्षण-रहित बुकिंग, मालिक का पूर्ण नियंत्रण और एक ऐसा इंटरफ़ेस जो तुरंत विश्वास जगाए।",
       algorithmH: "सैंडविच एल्गोरिथम: स्मार्ट शेड्यूलिंग",
@@ -344,9 +352,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "सर्विस अकाउंट्स और फायरस्टोर में परमाणु द्वि-दिशात्मक सिंक्रناइज़ेशन कैलेंडर और बुकिंग को पूरी तरह से संरेखित रखता है।",
-      outcomeH: "वास्तविक प्रभाव",
+      outcomeH: "बुकिंग और कैलेंडर",
       outcomeP:
-        "राजस्व में 30% की वृद्धि, प्रारंभिक लोड समय 300ms से कम और बुकिंग प्रक्रिया जो तुरंत काम करती है।",
+        "बुकिंग फ्लो हर आरक्षण को Firestore में सहेजता है और Google Calendar में जोड़ता है।",
       codeSpotlight: "useCreateBooking.ts — बुकिंग कोर",
       techBadges: [
         "Atomic Transactions",
@@ -358,7 +366,7 @@ export const PROJECTS_CONTENT: Record<
     tr: {
       title: "AG Beauty Salon",
       subtitle: "Rezervasyon Orkestrasyonu & CMS",
-      role: "Full-Stack Baş Mimar",
+      role: "Full-Stack geliştirici",
       objective:
         "Lüks hissini kaybetmeden premium bir işletmeyi dijitalleştirmek: sıfır sürtünmeli rezervasyon, tam sahip kontrolü ve anında güven inşa eden bir arayüz.",
       algorithmH: "Sandviç Algoritması: Akıllı Planlama",
@@ -367,9 +375,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Servis Hesapları ve Firestore arasındaki atomik çift yönlü senkronizasyon, takvimi ve rezervasyonları mükemmel şekilde uyumlu tutar.",
-      outcomeH: "Gerçek Etki",
+      outcomeH: "Rezervasyon ve takvim",
       outcomeP:
-        "Ciro +30%, ilk yükleme < 300ms ve anında hissettiren bir rezervasyon akışı.",
+        "Rezervasyon akışı her kaydı Firestore'a kaydeder ve Google Calendar'a ekler.",
       codeSpotlight: "useCreateBooking.ts — Rezervasyon Çekirdeği",
       techBadges: [
         "Atomic Transactions",
@@ -381,7 +389,7 @@ export const PROJECTS_CONTENT: Record<
     nl: {
       title: "AG Beauty Salon",
       subtitle: "Boeking Orchestratie & CMS",
-      role: "Full-Stack Hoofdarchitect",
+      role: "Full-stackontwikkelaar",
       objective:
         "Digitaliseer een premium bedrijf zonder het luxe gevoel te verliezen: wrijvingsloos boeken, volledige controle voor de eigenaar en een interface die direct vertrouwen wekt.",
       algorithmH: "Sandwich-algoritme: Slimme Planning",
@@ -390,9 +398,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Atomische bidirectionele synchronisatie via Service Accounts en Firestore houdt de kalender en reserveringen perfect op elkaar afgestemd.",
-      outcomeH: "Echte Impact",
+      outcomeH: "Boekingen en agenda",
       outcomeP:
-        "Omzet +30%, initiële laadtijd < 300ms en een boekingsstroom die onmiddellijk aanvoelt.",
+        "De boekingsstroom slaat elke reservering op in Firestore en voegt die toe aan Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Boekingskern",
       techBadges: [
         "Atomic Transactions",
@@ -404,7 +412,7 @@ export const PROJECTS_CONTENT: Record<
     sv: {
       title: "AG Beauty Salon",
       subtitle: "Bokningsorkestrering & CMS",
-      role: "Full-Stack Chefsarkitekt",
+      role: "Fullstackutvecklare",
       objective:
         "Digitalisera en premiumverksamhet utan att förlora lyxkänslan: friktionsfri bokning, full kontroll för ägaren och ett gränssnitt som bygger förtroende direkt.",
       algorithmH: "Sandwich-algoritmen: Smart Schemaläggning",
@@ -413,9 +421,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Atomisk dubbelriktad synkronisering via servicekonton och Firestore håller kalern och bokningarna perfekt samordnade.",
-      outcomeH: "Verklig Effekt",
+      outcomeH: "Bokningar och kalender",
       outcomeP:
-        "Omsättning +30%, initial laddning < 300ms och ett bokningsflöde som känns omedelbart.",
+        "Bokningsflödet sparar varje bokning i Firestore och lägger till den i Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Bokningskärna",
       techBadges: [
         "Atomic Transactions",
@@ -427,7 +435,7 @@ export const PROJECTS_CONTENT: Record<
     pl: {
       title: "AG Beauty Salon",
       subtitle: "Orkiestracja Rezerwacji & CMS",
-      role: "Główny Architekt Full-Stack",
+      role: "Programista full-stack",
       objective:
         "Cyfryzacja biznesu premium bez utraty poczucia luksusu: bezproblemowa rezerwacja, pełna kontrola właściciela i interfejs, który błyskawicznie buduje zaufanie.",
       algorithmH: "Algorytm Sandwich: Inteligentne Planowanie",
@@ -436,9 +444,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Atomiczna dwukierunkowa synchronizacja między kontami usług a Firestore utrzymuje kalendarz i rezerwacje w doskonałej zgodności.",
-      outcomeH: "Realny Wpływ",
+      outcomeH: "Rezerwacje i kalendarz",
       outcomeP:
-        "Przychody +30%, czas ładowania początkowego < 300ms i natychmiastowy proces rezerwacji.",
+        "Proces rezerwacji zapisuje każde zgłoszenie w Firestore i dodaje je do Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Rdzeń Rezerwacji",
       techBadges: [
         "Atomic Transactions",
@@ -450,7 +458,7 @@ export const PROJECTS_CONTENT: Record<
     vi: {
       title: "AG Beauty Salon",
       subtitle: "Hệ thống Quản lý Đặt lịch & CMS",
-      role: "Kiến trúc sư trưởng Full-Stack",
+      role: "Lập trình viên full-stack",
       objective:
         "Số hóa một doanh nghiệp cao cấp mà không làm mất đi cảm giác sang trọng: quy trình đặt lịch không ma sát, chủ sở hữu toàn quyền kiểm soát và giao diện tạo dựng niềm tin ngay lập tức.",
       algorithmH: "Thuật toán Sandwich: Lập lịch Thông minh",
@@ -459,9 +467,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Firebase + Google Calendar",
       supabaseP:
         "Đồng bộ hóa hai chiều nguyên tử (atomic) giữa Service Accounts và Firestore giúp lịch trình và các lượt đặt lịch luôn khớp hoàn hảo.",
-      outcomeH: "Tác động Thực tế",
+      outcomeH: "Đặt lịch và lịch biểu",
       outcomeP:
-        "Doanh thu tăng 30%, tải trang ban đầu < 300ms và luồng đặt lịch diễn ra ngay tức thì.",
+        "Quy trình đặt lịch lưu từng lượt đặt vào Firestore và thêm vào Google Calendar.",
       codeSpotlight: "useCreateBooking.ts — Nhân đặt lịch core",
       techBadges: [
         "Atomic Transactions",
@@ -1604,9 +1612,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Diseño Inclusivo",
       supabaseP:
         "Contrastes auditados, estados visibles y respeto total por prefers-reduced-motion para una experiencia que no excluye a nadie.",
-      outcomeH: "A11Y sin Compromisos",
+      outcomeH: "Gestión del foco",
       outcomeP:
-        "Una base semántica preparada para crecer con componentes accesibles y una puntuación Lighthouse consistente.",
+        "El hook React mantiene el foco dentro del panel activo al navegar con Tab.",
       codeSpotlight: "useFocusTrap.ts — Accessibility Core",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1622,9 +1630,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Inclusive Design",
       supabaseP:
         "Audited contrast, visible states, and full respect for prefers-reduced-motion to avoid excluding anyone.",
-      outcomeH: "A11Y without Compromise",
+      outcomeH: "Keyboard focus",
       outcomeP:
-        "A semantic base ready to scale with accessible components and a consistently strong Lighthouse score.",
+        "The React hook keeps keyboard focus within the active panel while tabbing.",
       codeSpotlight: "useFocusTrap.ts — Accessibility Core",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1640,9 +1648,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Diseinu Inklusiboa",
       supabaseP:
         "Kontraste analisi erreala eta prefers-reduced-motion-erako euskarri natiboa.",
-      outcomeH: "100% Lighthouse A11Y",
+      outcomeH: "Teklatu-fokua",
       outcomeP:
-        "Pertsona guztientzako interfaze erabilgarria, salbuespenik gabe.",
+        "React hook-ak fokua panel aktiboaren barruan mantentzen du Tab erabiliz.",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1658,8 +1666,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Design Inclusif",
       supabaseP:
         "Analyse réelle du contraste et support natif de prefers-reduced-motion.",
-      outcomeH: "100% Lighthouse A11Y",
-      outcomeP: "Interface accessible à tous sans exception.",
+      outcomeH: "Gestion du focus",
+      outcomeP:
+        "Le hook React garde le focus dans le panneau actif lors de la navigation au clavier.",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1675,8 +1684,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Design Inclusivo",
       supabaseP:
         "Analisi reale del contrasto e supporto per prefers-reduced-motion.",
-      outcomeH: "100% Lighthouse A11Y",
-      outcomeP: "Interfaccia utilizzabile da chiunque senza eccezioni.",
+      outcomeH: "Gestione del focus",
+      outcomeP:
+        "L'hook React mantiene il focus nel pannello attivo durante la navigazione con Tab.",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1691,8 +1701,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Inklusives Design",
       supabaseP:
         "Echtzeit-Kontrastanalyse und Support für prefers-reduced-motion.",
-      outcomeH: "100% Lighthouse A11Y",
-      outcomeP: "Uneingeschränkt nutzbare Schnittstelle für alle.",
+      outcomeH: "Fokussteuerung",
+      outcomeP:
+        "Der React-Hook hält den Tastaturfokus beim Navigieren mit Tab im aktiven Bereich.",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1708,8 +1719,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Design Inclusivo",
       supabaseP:
         "Análise de contraste real e suporte nativo para prefers-reduced-motion.",
-      outcomeH: "100% Lighthouse A11Y",
-      outcomeP: "Interface utilizável por todos sem exceções.",
+      outcomeH: "Gestão do foco",
+      outcomeP:
+        "O hook React mantém o foco dentro do painel ativo durante a navegação com Tab.",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1724,8 +1736,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Disseny Inclusiu",
       supabaseP:
         "Anàlisi de contrast real i suport natiu per prefers-reduced-motion.",
-      outcomeH: "100% Lighthouse A11Y",
-      outcomeP: "Interfície accessible per a tothom sense excepcions.",
+      outcomeH: "Gestió del focus",
+      outcomeP:
+        "El hook de React manté el focus dins del panell actiu quan es navega amb Tab.",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1740,8 +1753,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Deseño Inclusivo",
       supabaseP:
         "Análise de contraste real e soporte nativo para prefers-reduced-motion.",
-      outcomeH: "100% Lighthouse A11Y",
-      outcomeP: "Interface utilizable por calquera persoa sen excepcións.",
+      outcomeH: "Xestión do foco",
+      outcomeP:
+        "O hook de React mantén o foco dentro do panel activo ao navegar con Tab.",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1756,8 +1770,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "インクルーシブデザイン",
       supabaseP:
         "実際のコントラスト分析と prefers-reduced-motion のネイティブサポート。",
-      outcomeH: "100% Lighthouse A11Y",
-      outcomeP: "例外なく誰でも利用できるインターフェース。",
+      outcomeH: "キーボードフォーカス",
+      outcomeP:
+        "React フックは Tab キーで移動するとき、フォーカスをアクティブなパネル内に保ちます。",
       codeSpotlight: "useFocusTrap.ts — React Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1773,9 +1788,8 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "极致包容性设计",
       supabaseP:
         "通过严格的对比度审计、可见焦点状态提示以及对 prefers-reduced-motion 的原生适配，确保人人皆可平等享用。",
-      outcomeH: "无妥协的无障碍体验",
-      outcomeP:
-        "语义化基石保障系统轻松承载无障碍组件，提供始终满分的 Lighthouse A11Y 表现。",
+      outcomeH: "键盘焦点管理",
+      outcomeP: "React Hook 会在使用 Tab 导航时将焦点保持在活动面板内。",
       codeSpotlight: "useFocusTrap.ts — 核心无障碍 Hook",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1791,9 +1805,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "التصميم الشامل للجميع",
       supabaseP:
         "عمليات تدقيق التباين، والتركيز المرئي النشط، والاحترام الكامل لإعدادات prefers-reduced-motion لتجربة لا تستثني أحداً.",
-      outcomeH: "إمكانية وصول بلا مساومات",
+      outcomeH: "إدارة التركيز",
       outcomeP:
-        "قاعدة دلالية متينة جاهزة للنمو مع مكونات سهلة الاستخدام ودرجة Lighthouse قوية وثابتة.",
+        "يحافظ React hook على التركيز داخل اللوحة النشطة أثناء التنقل باستخدام Tab.",
       codeSpotlight: "useFocusTrap.ts — إدارة التركيز الفعالة",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1809,9 +1823,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Инклюзивный дизайн",
       supabaseP:
         "Проверенная контрастность, видимые состояния и полное уважение к prefers-reduced-motion, чтобы никто не остался в стороне.",
-      outcomeH: "A11Y без компромиссов",
+      outcomeH: "Управление фокусом",
       outcomeP:
-        "Семантическая база, готовая к масштабированию с помощью доступных компонентов и стабильно высокой оценки Lighthouse.",
+        "React-хук удерживает фокус внутри активной панели при навигации клавишей Tab.",
       codeSpotlight: "useFocusTrap.ts — Ядро доступности",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1827,9 +1841,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "포용적인 디자인",
       supabaseP:
         "누구도 소외되지 않도록 검증된 대비도, 명확한 포커스 상태, prefers-reduced-motion 미디어 쿼리에 대한 완벽한 배려.",
-      outcomeH: "타협 없는 A11Y",
+      outcomeH: "키보드 포커스 관리",
       outcomeP:
-        "접근성 컴포넌트와 지속적으로 우수한 Lighthouse 접근성 점수를 기반으로 확장 가능한 시맨틱 아키텍처.",
+        "React 훅은 Tab으로 이동할 때 포커스를 활성 패널 안에 유지합니다.",
       codeSpotlight: "useFocusTrap.ts — 접근성 코어",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1845,9 +1859,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "समावेशी डिजाइन",
       supabaseP:
         "ऑडिट किया गया कंट्रास्ट, दृश्यमान स्थितियां, और prefers-reduced-motion का पूर्ण सम्मान ताकि कोई भी बाहर न छूटे।",
-      outcomeH: "बिنا किसी समझौते के A11Y",
+      outcomeH: "कीबोर्ड फ़ोकस प्रबंधन",
       outcomeP:
-        "सुलभ घटकों और लगातार मजबूत Lighthouse स्कोर के साथ स्केल करने के लिए तैयार एक सिमेंटिक आधार।",
+        "React hook, Tab से नेविगेट करते समय फ़ोकस को सक्रिय पैनल के भीतर रखता है।",
       codeSpotlight: "useFocusTrap.ts — सुलभता कोर",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1863,9 +1877,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Kapsayıcı Tasarım",
       supabaseP:
         "Hiç kimseyi dışarıda bırakmamak için denetlenmiş kontrast, görünür durumlar ve prefers-reduced-motion'a tam saygı.",
-      outcomeH: "Tavizsiz A11Y",
+      outcomeH: "Klavye odağı",
       outcomeP:
-        "Erişilebilir bileşenler ve sürekli olarak yüksek bir Lighthouse puanı ile ölçeklenmeye hazır anlamsal bir temel.",
+        "React hook'u, Tab ile gezinirken odağı etkin panel içinde tutar.",
       codeSpotlight: "useFocusTrap.ts — Erişilebilirlik Çekirdeği",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1881,9 +1895,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Inclusief Ontwerp",
       supabaseP:
         "Gecontroleerd contrast, zichtbare staten en volledig respect voor prefers-reduced-motion om uitsluiting te voorkomen.",
-      outcomeH: "A11Y zonder Compromissen",
+      outcomeH: "Toetsenbordfocus",
       outcomeP:
-        "Een semantische basis die klaar is om te schalen met toegankelijke componenten en een consistent sterke Lighthouse-score.",
+        "De React-hook houdt de toetsenbordfocus tijdens het tabben binnen het actieve paneel.",
       codeSpotlight: "useFocusTrap.ts — Toegankelijkheidskern",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1899,9 +1913,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Inkluderande Design",
       supabaseP:
         "Granskad kontrast, synliga tillstånd och full respekt för prefers-reduced-motion för att undvika att utesluta någon.",
-      outcomeH: "A11Y utan Kompromisser",
+      outcomeH: "Tangentbordsfokus",
       outcomeP:
-        "En semantisk bas redo att skalas med tillgängliga komponenter och ett konsekvent högt Lighthouse-resultat.",
+        "React-hooken håller tangentbordsfokus i den aktiva panelen vid Tab-navigering.",
       codeSpotlight: "useFocusTrap.ts — Tillgänglighetskärna",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1917,9 +1931,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Projektowanie Inkluzywne",
       supabaseP:
         "Audytowany kontrast, widoczne stany i pełne poszanowanie prefers-reduced-motion, aby nikogo nie wykluczać.",
-      outcomeH: "A11Y bez Kompromisów",
+      outcomeH: "Zarządzanie fokusem",
       outcomeP:
-        "Baza semantyczna gotowa na rozwój dzięki dostępnym komponentom i stale wysokiemu wynikowi Lighthouse.",
+        "Hook React utrzymuje fokus w aktywnym panelu podczas nawigacji klawiszem Tab.",
       codeSpotlight: "useFocusTrap.ts — Rdzeń Dostępności",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },
@@ -1935,9 +1949,9 @@ export const PROJECTS_CONTENT: Record<
       supabaseH: "Thiết kế Đa dạng Hóa",
       supabaseP:
         "Độ tương phản được kiểm tra kỹ, hiển thị rõ ràng các trạng thái, tôn trọng hoàn toàn thuộc tính prefers-reduced-motion để không bỏ lại bất cứ ai.",
-      outcomeH: "A11Y không thỏa hiệp",
+      outcomeH: "Quản lý tiêu điểm bàn phím",
       outcomeP:
-        "Nền tảng ngữ nghĩa sẵn sàng mở rộng cùng các thành phần tiếp cận và điểm số Lighthouse cao nhất quán.",
+        "Hook React giữ tiêu điểm trong bảng đang hoạt động khi điều hướng bằng phím Tab.",
       codeSpotlight: "useFocusTrap.ts — Nhân Focus Trap",
       techBadges: ["WCAG-conscious", "Focus Trap", "A11Y", "Semantic HTML"],
     },

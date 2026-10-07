@@ -243,6 +243,7 @@ export function Projects({
                   }}
                   isMobile={isMobile}
                   menu={menu}
+                  actionLabel={UI_COPY[lang]?.source || "Ver código"}
                 />
               ))}
             </div>
