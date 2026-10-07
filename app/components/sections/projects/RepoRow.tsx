@@ -12,6 +12,7 @@ interface RepoRowProps {
   lineRef: (el: HTMLDivElement | null) => void;
   isMobile: boolean;
   menu?: boolean;
+  actionLabel?: string;
 }
 
 function RepoRowComponent({
@@ -22,6 +23,7 @@ function RepoRowComponent({
   lineRef,
   isMobile,
   menu,
+  actionLabel = "Ver código",
 }: RepoRowProps) {
   const isActive = activeRepo === idx;
   const isDescriptionOpen = isActive && !menu;
@@ -171,7 +173,7 @@ function RepoRowComponent({
                       boxShadow: `0 8px 20px rgba(0,0,0,0.15)`,
                     }}
                   >
-                    Visitar Repo <ArrowUpRight size={12} />
+                    {actionLabel} <ArrowUpRight size={12} />
                   </a>
                 </div>
               </div>
@@ -218,7 +220,7 @@ function RepoRowComponent({
                   isActive ? "max-w-[120px] opacity-100" : "max-w-0 opacity-0"
                 }`}
               >
-                Visitar Repo
+                {actionLabel}
               </span>
               <ArrowUpRight
                 size={12}
@@ -239,6 +241,7 @@ export const RepoRow = memo(RepoRowComponent, (prev, next) => {
     prevActive === nextActive &&
     prev.r === next.r &&
     prev.menu === next.menu &&
-    prev.isMobile === next.isMobile
+    prev.isMobile === next.isMobile &&
+    prev.actionLabel === next.actionLabel
   );
 });

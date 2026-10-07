@@ -6,6 +6,15 @@ import gsap from "gsap";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
+let refreshFrame = 0;
+function batchScrollTriggerRefresh() {
+  if (refreshFrame || typeof window === "undefined") return;
+  refreshFrame = requestAnimationFrame(() => {
+    refreshFrame = 0;
+    ScrollTrigger.refresh();
+  });
+}
+
 /** Scroll owns the studio entrance. There is no idle ticker or wheel trapping. */
 export function useProjectStage(
   ref: RefObject<HTMLElement | null>,
@@ -46,7 +55,7 @@ export function useProjectStage(
         onRefresh: update,
       });
       update(trigger);
-      ScrollTrigger.refresh();
+      batchScrollTriggerRefresh();
     };
     const resize = () => {
       cancelAnimationFrame(frame);

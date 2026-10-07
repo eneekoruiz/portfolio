@@ -47,6 +47,7 @@ const DebugHUD = dynamic(
   { ssr: false },
 );
 import { PortalTransition } from "./components/ui/PortalTransition";
+import { EntrancePreloader } from "./components/ui/EntrancePreloader";
 import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollower";
 const DevTuningPanel = dynamic(
   () => import("./components/ui/DevTuningPanel").then((m) => m.DevTuningPanel),
@@ -111,7 +112,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const mounted = useProjectNavigation(t);
 
   // Intro phase state machine hook
-  const { phase, ready } = useIntroPhase(mounted);
+  const { phase, ready, onPreloaderDone } = useIntroPhase(mounted);
 
   // Modal and menu state managers
   const [cmd, setCmd] = useModalState();
@@ -236,6 +237,9 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
+      {phase !== "ready" && (
+        <EntrancePreloader lang={lang} onDone={onPreloaderDone} />
+      )}
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
         ref={main}
