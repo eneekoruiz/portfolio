@@ -106,14 +106,16 @@ class TectonicFissure {
     for (let i = 1; i < this.points.length; i++) {
       ctx.lineTo(this.points[i].x, this.points[i].y);
     }
-    ctx.strokeStyle = `rgba(255, 255, 255, ${this.life * 0.65})`;
-    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = `rgba(0, 220, 255, ${this.life * 0.85})`;
+    ctx.shadowColor = `rgba(0, 102, 255, 0.7)`;
+    ctx.shadowBlur = 5;
+    ctx.lineWidth = 1.3;
     ctx.stroke();
     ctx.restore();
   }
 }
 
-// ── ONDA DE CHOQUE SÍSMICA REAL (Física de Refracción y Presión Tectónica) ──
+// ── ONDA DE CHOQUE SÍSMICA REAL CON ABERRACIÓN CROMÁTICA TECTÓNICA ──
 class TrueSeismicShockfront {
   x: number;
   y: number;
@@ -128,6 +130,7 @@ class TrueSeismicShockfront {
   aspectRatioX: number;
   aspectRatioY: number;
   rotation: number;
+  chromaticOffset: number;
 
   constructor(
     x: number,
@@ -150,6 +153,7 @@ class TrueSeismicShockfront {
     this.aspectRatioX = 1.16 + (Math.random() - 0.5) * 0.08;
     this.aspectRatioY = 0.88 + (Math.random() - 0.5) * 0.06;
     this.rotation = -0.05 + (Math.random() - 0.5) * 0.04;
+    this.chromaticOffset = isMainRupture ? 9 : 5;
   }
 
   update() {
@@ -169,42 +173,84 @@ class TrueSeismicShockfront {
 
     ctx.save();
 
-    // 1. Surco de descompresión sísmica (sombra óptica de rarefacción tras el choque)
-    const troughR = Math.max(2, this.r - (this.isMainRupture ? 15 : 5));
-    drawTectonicWavefront(
-      ctx,
-      this.x,
-      this.y,
-      troughR,
-      this.seed,
-      0.04,
-      this.aspectRatioX,
-      this.aspectRatioY,
-      this.rotation,
-    );
-    ctx.strokeStyle = `rgba(0, 0, 0, ${energy * 0.35})`;
-    ctx.lineWidth = this.isMainRupture ? 14 : 5;
-    ctx.stroke();
+    // 1. Ribetes cromáticos ondulantes (refracción física con dispersión espectral)
+    const ribbons = [
+      // Surco de rarefacción / sombra de presión (base óptica)
+      {
+        color: `rgba(0, 0, 0, ${energy * 0.32})`,
+        shadow: "transparent",
+        shadowBlur: 0,
+        rDelta: -this.chromaticOffset * 1.5,
+        width: this.isMainRupture ? 14 : 5,
+        roughness: 0.035,
+        phaseOffset: 0,
+      },
+      // Banda Violeta / Aberración cromática externa
+      {
+        color: `rgba(168, 85, 247, ${energy * 0.8})`,
+        shadow: `rgba(168, 85, 247, 0.65)`,
+        shadowBlur: this.isMainRupture ? 16 : 7,
+        rDelta: this.chromaticOffset,
+        width: this.isMainRupture ? 3.2 : 1.8,
+        roughness: 0.05,
+        phaseOffset: 0.45,
+      },
+      // Onda P Azul Real / Tensión litosférica (#0066ff)
+      {
+        color: `rgba(0, 102, 255, ${energy * 0.95})`,
+        shadow: `rgba(0, 102, 255, 0.8)`,
+        shadowBlur: this.isMainRupture ? 20 : 9,
+        rDelta: 0,
+        width: this.isMainRupture ? 4.5 : 2.5,
+        roughness: 0.055,
+        phaseOffset: 0,
+      },
+      // Banda Cian Eléctrico / Ionización de alta energía
+      {
+        color: `rgba(0, 225, 255, ${energy * 0.9})`,
+        shadow: `rgba(0, 225, 255, 0.75)`,
+        shadowBlur: this.isMainRupture ? 18 : 8,
+        rDelta: -this.chromaticOffset * 0.55,
+        width: this.isMainRupture ? 3.4 : 1.8,
+        roughness: 0.06,
+        phaseOffset: -0.35,
+      },
+      // Cresta Cáustica Blanco Especular Puro (pico de compresión hiper-nítido)
+      {
+        color: `rgba(255, 255, 255, ${energy * 0.98})`,
+        shadow: `rgba(255, 255, 255, 0.95)`,
+        shadowBlur: this.isMainRupture ? 14 : 5,
+        rDelta: -this.chromaticOffset * 0.2,
+        width: this.isMainRupture ? 2.4 : 1.4,
+        roughness: 0.065,
+        phaseOffset: 0.1,
+      },
+    ];
 
-    // 2. Frente de compresión cáustico (refracción de alta presión - luz blanca pura hiper-nítida)
-    drawTectonicWavefront(
-      ctx,
-      this.x,
-      this.y,
-      this.r,
-      this.seed,
-      0.055,
-      this.aspectRatioX,
-      this.aspectRatioY,
-      this.rotation,
-    );
-    ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.95})`;
-    ctx.lineWidth = this.isMainRupture ? 2.8 : 1.5;
-    ctx.shadowColor = `rgba(255, 255, 255, 0.85)`;
-    ctx.shadowBlur = this.isMainRupture ? 12 : 5;
-    ctx.stroke();
+    ribbons.forEach((ribbon) => {
+      const rBase = this.r + ribbon.rDelta;
+      if (rBase <= 1) return;
 
-    // 3. Ondas secundarias de dispersión geológica (Rayleigh / onda S transversal)
+      drawTectonicWavefront(
+        ctx,
+        this.x,
+        this.y,
+        rBase,
+        this.seed + ribbon.phaseOffset,
+        ribbon.roughness,
+        this.aspectRatioX,
+        this.aspectRatioY,
+        this.rotation,
+      );
+
+      ctx.strokeStyle = ribbon.color;
+      ctx.lineWidth = ribbon.width;
+      ctx.shadowColor = ribbon.shadow;
+      ctx.shadowBlur = ribbon.shadowBlur;
+      ctx.stroke();
+    });
+
+    // 2. Ondas secundarias de dispersión geológica (Rayleigh / onda S en cian brillante)
     if (this.isMainRupture && this.r > 35) {
       const secondaryR = this.r - 26;
       if (secondaryR > 0) {
@@ -219,8 +265,10 @@ class TrueSeismicShockfront {
           this.aspectRatioY * 1.02,
           this.rotation + 0.04,
         );
-        ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.42})`;
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = `rgba(0, 215, 255, ${energy * 0.55})`;
+        ctx.shadowColor = `rgba(0, 215, 255, 0.5)`;
+        ctx.shadowBlur = 8;
+        ctx.lineWidth = 1.4;
         ctx.stroke();
       }
       const tertiaryR = this.r - 52;
@@ -236,21 +284,24 @@ class TrueSeismicShockfront {
           this.aspectRatioY * 0.98,
           this.rotation - 0.03,
         );
-        ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.22})`;
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = `rgba(168, 85, 247, ${energy * 0.4})`;
+        ctx.shadowColor = `rgba(168, 85, 247, 0.4)`;
+        ctx.shadowBlur = 6;
+        ctx.lineWidth = 1.0;
         ctx.stroke();
       }
     }
 
-    // 4. Epicentro de detonación tectónica (destello focal en el origen del sismo)
-    if (this.isMainRupture && this.r < 150) {
-      const coreAlpha = (1 - this.r / 150) * this.amplitude * 0.45;
-      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 130);
-      grad.addColorStop(0, `rgba(255, 255, 255, ${coreAlpha})`);
-      grad.addColorStop(0.4, `rgba(255, 255, 255, ${coreAlpha * 0.15})`);
-      grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+    // 3. Epicentro de detonación tectónica (núcleo radiante cian/azul/violeta)
+    if (this.isMainRupture && this.r < 160) {
+      const coreAlpha = (1 - this.r / 160) * this.amplitude * 0.6;
+      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 140);
+      grad.addColorStop(0, `rgba(0, 225, 255, ${coreAlpha * 0.9})`);
+      grad.addColorStop(0.35, `rgba(0, 102, 255, ${coreAlpha * 0.55})`);
+      grad.addColorStop(0.7, `rgba(168, 85, 247, ${coreAlpha * 0.25})`);
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = grad;
-      drawTectonicWavefront(ctx, this.x, this.y, 130, this.seed, 0.06);
+      drawTectonicWavefront(ctx, this.x, this.y, 140, this.seed, 0.06);
       ctx.fill();
     }
 
@@ -286,21 +337,23 @@ class TectonicLetterPulse {
 
   draw(ctx: CanvasRenderingContext2D) {
     if (this.dead || this.life <= 0) return;
-    const energy = Math.sin(this.life * Math.PI) * 0.45;
+    const energy = Math.sin(this.life * Math.PI) * 0.55;
 
     ctx.save();
-    // Surco óptico sutil
-    drawMicroFracture(ctx, this.x, this.y, Math.max(1, this.r - 3), this.seed);
-    ctx.strokeStyle = `rgba(0, 0, 0, ${energy * 0.25})`;
-    ctx.lineWidth = 1.8;
+    // 1. Halo cromático cian/azul eléctrico
+    drawMicroFracture(ctx, this.x, this.y, this.r + 2, this.seed);
+    ctx.strokeStyle = `rgba(0, 102, 255, ${energy * 0.75})`;
+    ctx.shadowColor = `rgba(0, 220, 255, 0.85)`;
+    ctx.shadowBlur = 8;
+    ctx.lineWidth = 2.2;
     ctx.stroke();
 
-    // Frente de choque blanco cáustico
+    // 2. Frente de fractura cáustico blanco
     drawMicroFracture(ctx, this.x, this.y, this.r, this.seed);
-    ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.85})`;
+    ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.95})`;
+    ctx.shadowColor = `rgba(255, 255, 255, 0.9)`;
+    ctx.shadowBlur = 5;
     ctx.lineWidth = 1.4;
-    ctx.shadowColor = `rgba(255, 255, 255, 0.7)`;
-    ctx.shadowBlur = 4;
     ctx.stroke();
     ctx.restore();
   }

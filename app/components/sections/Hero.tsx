@@ -61,24 +61,24 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       ref={heroRef}
       id="hero"
       aria-label="Eneko Ruiz"
-      className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
+      className="materia-hero relative flex h-[100svh] max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-14 pb-3 md:px-10 md:pt-18 md:pb-4"
     >
       <SeismicWaveCanvas
         stageRef={heroRef}
         charRefs={charsRef}
       />
       <div className="hero-light" aria-hidden="true" />
-      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
+      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-2.5 md:pb-3 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
           {greeting}
         </p>
         <LiveStatus label={t.status} />
       </div>
-      <div className="hero-composition relative mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center text-center py-6 md:py-8 my-auto">
+      <div className="hero-composition relative mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center text-center py-2 md:py-4 my-auto">
         <div className="relative z-10 flex flex-col items-center w-full">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(4.6rem,14vw,14.5rem)] font-black leading-[0.84] tracking-[-0.055em] select-none text-center"
+            className="m-0 text-[clamp(3.8rem,11.5vh,10.5rem)] font-black leading-[0.84] tracking-[-0.055em] select-none text-center"
           >
             <div className="block text-ink">
               <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="0">E</span>
@@ -95,21 +95,21 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               <span className="char-node inline-block will-change-transform text-brand" data-kinetic-char data-i="9">.</span>
             </div>
           </h1>
-          <div className="hero-introduction mt-6 md:mt-8 flex flex-col items-center max-w-xl text-center">
+          <div className="hero-introduction mt-4 md:mt-6 flex flex-col items-center max-w-lg text-center">
             <span
-              className="h-px w-12 bg-brand/50 mb-4"
+              className="h-px w-10 bg-brand/50 mb-3"
               aria-hidden="true"
             />
-            <p className="text-base md:text-xl font-semibold tracking-tight text-ink">
+            <p className="text-sm md:text-lg font-semibold tracking-tight text-ink">
               {t.role}
             </p>
-            <p className="mt-2 text-sm md:text-base leading-relaxed text-lead max-w-lg">
+            <p className="mt-1.5 text-xs md:text-sm leading-relaxed text-lead max-w-md">
               {t.tagline}
             </p>
           </div>
         </div>
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 md:gap-6 border-t border-ink/15 py-3 md:py-4 shrink-0">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 md:gap-6 border-t border-ink/15 py-2.5 md:py-3.5 shrink-0">
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <SignatureLink
             label={t.ctaWork}
