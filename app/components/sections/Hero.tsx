@@ -3,13 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { LiveStatus } from "../ui/LiveStatus";
-import { KineticText } from "../motion/KineticText";
-import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
-import { BrutalistHeroMotion } from "../motion/BrutalistHeroMotion";
 import { SeismicWaveCanvas } from "../motion/SeismicWaveCanvas";
 import type { Tx, Lang } from "../../types";
 import { UI_COPY } from "../../data/interface-translations";
@@ -31,8 +28,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
     "idle",
   );
-  const prismRef = useRef<HTMLDivElement>(null);
-  useMateriaSurface(prismRef, "#0066ff", enabled, 26);
   const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 6);
   const charsRef = useRef<(HTMLElement | null)[]>([]);
 
@@ -79,11 +74,11 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </p>
         <LiveStatus label={t.status} />
       </div>
-      <div className="hero-composition relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-6 py-4 md:py-6 lg:gap-0 lg:py-4">
-        <div className="relative z-10 min-w-0">
+      <div className="hero-composition relative mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center text-center py-6 md:py-8 my-auto">
+        <div className="relative z-10 flex flex-col items-center w-full">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(4.8rem,13vw,13.5rem)] font-black leading-[0.82] tracking-[-0.055em] select-none"
+            className="m-0 text-[clamp(4.6rem,14vw,14.5rem)] font-black leading-[0.84] tracking-[-0.055em] select-none text-center"
           >
             <div className="block text-ink">
               <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="0">E</span>
@@ -100,27 +95,18 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
               <span className="char-node inline-block will-change-transform text-brand" data-kinetic-char data-i="9">.</span>
             </div>
           </h1>
-          <div className="hero-introduction mt-8 flex max-w-2xl items-start gap-5 md:mt-10 md:gap-6">
+          <div className="hero-introduction mt-6 md:mt-8 flex flex-col items-center max-w-xl text-center">
             <span
-              className="mt-2.5 h-px w-10 md:w-16 shrink-0 bg-brand"
+              className="h-px w-12 bg-brand/50 mb-4"
               aria-hidden="true"
             />
-            <div>
-              <p className="text-base font-semibold tracking-tight text-ink md:text-lg">
-                {t.role}
-              </p>
-              <p className="mt-3 md:mt-4 max-w-md text-sm leading-relaxed text-lead md:text-base">
-                {t.tagline}
-              </p>
-            </div>
+            <p className="text-base md:text-xl font-semibold tracking-tight text-ink">
+              {t.role}
+            </p>
+            <p className="mt-2 text-sm md:text-base leading-relaxed text-lead max-w-lg">
+              {t.tagline}
+            </p>
           </div>
-        </div>
-        <div
-          ref={prismRef}
-          className="materia-surface hero-prism hero-identity-plate relative hidden min-h-[300px] lg:min-h-[340px] max-h-[460px] self-stretch rounded-[26px] border border-ink/15 md:block overflow-hidden shadow-2xl"
-          data-materia-surface="hero"
-        >
-          <BrutalistHeroMotion enabled={enabled} />
         </div>
       </div>
       <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 md:gap-6 border-t border-ink/15 py-3 md:py-4 shrink-0">
