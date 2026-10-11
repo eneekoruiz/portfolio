@@ -31,6 +31,17 @@ import { RepoRow } from "./projects/RepoRow";
 import { PremiumWorkRow } from "./projects/PremiumWorkRow";
 import { SkeletonRow } from "./projects/SkeletonRow";
 
+const PROJECT_NAV_NAMES: Record<string, string> = {
+  "ana-peluquera": "AG Beauty",
+  recordatorios: "Recordatorios",
+  passwordmanager: "Password Vault",
+  regla: "Ayudándonos",
+  "who-are-ya-backend": "Who Are Ya?",
+  rides24ofiziala: "Rides24",
+  "spotshare-parking": "Spotshare",
+  "pke-web": "PKE Web",
+};
+
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 interface ProjectsProps {
@@ -176,7 +187,7 @@ export function Projects({
                 >
                   <span className="font-bold text-ink/70">0{i + 1}</span>
                   <span className="hidden sm:inline font-medium uppercase tracking-wider">
-                    {p.name.replace(/[-_]/g, " ")}
+                    {PROJECT_NAV_NAMES[safeId] ?? p.name.replace(/[-_]/g, " ")}
                   </span>
                   <span
                     className={`h-1.5 w-1.5 rounded-full transition-transform duration-300 ${

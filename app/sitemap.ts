@@ -23,5 +23,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+    ...[
+      "ana-peluquera",
+      "recordatorios",
+      "passwordmanager",
+      "regla",
+      "who-are-ya-backend",
+      "rides24ofiziala",
+      "spotshare-parking",
+      "pke-web",
+    ].map((id) => ({
+      url: `${domain}/work/${id}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+    })),
   ];
 }

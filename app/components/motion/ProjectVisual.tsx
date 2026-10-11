@@ -18,26 +18,44 @@ const PLATES: Record<
     mark: "AG",
     file: "useCreateBooking.ts",
   },
-  "who-are-ya-backend": {
+  recordatorios: {
     number: "02",
+    title: "Recordatorios PWA",
+    mark: "TSK",
+    file: "taskSync.engine.ts",
+  },
+  passwordmanager: {
+    number: "03",
+    title: "Password Vault",
+    mark: "SEC",
+    file: "cryptoVault.ts",
+  },
+  regla: {
+    number: "04",
+    title: "Ayudándonos Health",
+    mark: "BIO",
+    file: "cyclePredictor.ts",
+  },
+  "who-are-ya-backend": {
+    number: "05",
     title: "Who Are Ya?",
     mark: "API",
     file: "players.controller.js",
   },
   rides24ofiziala: {
-    number: "03",
+    number: "06",
     title: "Rides24",
     mark: "24",
     file: "RideService.java",
   },
   "spotshare-parking": {
-    number: "04",
+    number: "07",
     title: "Spotshare",
     mark: "P",
     file: "parking.service.ts",
   },
   "pke-web": {
-    number: "05",
+    number: "08",
     title: "PKE Web",
     mark: "Aa",
     file: "useFocusTrap.ts",
@@ -53,7 +71,37 @@ function ProjectStudy({ id }: { id: string }) {
       fill="none"
       aria-hidden="true"
     >
-      {id === "who-are-ya-backend" ? (
+      {id === "recordatorios" ? (
+        <>
+          <path className="study-rule" d="M60 50h80v100h-80zM190 50h110v100H190z" />
+          <path className="study-route" d="M140 100h50" />
+          <circle className="study-dot" cx="165" cy="100" r="4" />
+          <rect className="study-node study-node-primary" x="75" y="70" width="50" height="24" rx="3" />
+          <text x="100" y="86" className="study-text-primary">LWW</text>
+          <text x="100" y="130">IndexedDB</text>
+          <text x="245" y="86">Postgres</text>
+          <text x="245" y="130">MCP Agent</text>
+        </>
+      ) : id === "passwordmanager" ? (
+        <>
+          <circle className="study-stop" cx="180" cy="100" r="48" />
+          <path className="study-lock" d="M172 90v-8a8 8 0 0 1 16 0v8m-18 0h20v18h-20z" />
+          <path className="study-rule" d="M50 100h82M228 100h82" />
+          <text x="90" y="90">PBKDF2</text>
+          <text x="270" y="90">AES-GCM</text>
+          <text x="180" y="165" className="study-text-primary">WebAuthn</text>
+        </>
+      ) : id === "regla" ? (
+        <>
+          <path className="study-rule study-route" d="M50 130c40-70 80-70 120 0s80 70 120 0" />
+          <circle className="study-stop" cx="110" cy="95" r="8" />
+          <circle className="study-stop" cx="230" cy="130" r="8" />
+          <path className="study-rule" d="M50 160h260" />
+          <text x="110" y="75">Ovulation</text>
+          <text x="230" y="155">Cycle Start</text>
+          <text x="180" y="185">Capacitor iOS / Android</text>
+        </>
+      ) : id === "who-are-ya-backend" ? (
         <>
           <path
             className="study-rule"

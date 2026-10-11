@@ -126,6 +126,24 @@ const THEMES: Record<
     accent: "#b026ff",
     label: "A11Y / UX_SEMANTIC",
   },
+  recordatorios: {
+    helixA: "#2563eb",
+    helixB: "#93c5fd",
+    accent: "#2563eb",
+    label: "OFFLINE-FIRST / MCP_SYNC",
+  },
+  passwordmanager: {
+    helixA: "#10b981",
+    helixB: "#6ee7b7",
+    accent: "#10b981",
+    label: "SECURITY / ZERO_KNOWLEDGE",
+  },
+  regla: {
+    helixA: "#f43f5e",
+    helixB: "#fda4af",
+    accent: "#f43f5e",
+    label: "MOBILE / CAPACITOR_JWT",
+  },
 };
 
 const DEFAULT_THEME = {
@@ -139,6 +157,18 @@ const PROJECT_SUMMARIES: Record<string, { name: string; langs: string[] }> = {
   "ana-peluquera": {
     name: "AG Beauty Salon",
     langs: ["React", "Firebase", "Node.js", "Google Calendar API"],
+  },
+  recordatorios: {
+    name: "Recordatorios PWA",
+    langs: ["React", "TypeScript", "PWA", "Zustand", "Prisma", "PostgreSQL", "MCP"],
+  },
+  passwordmanager: {
+    name: "Password Manager Vault",
+    langs: ["React", "TypeScript", "Web Crypto", "AES-GCM", "WebAuthn", "Firebase"],
+  },
+  regla: {
+    name: "Ayudándonos Health",
+    langs: ["React", "TypeScript", "Tailwind", "Node.js", "PostgreSQL", "Capacitor"],
   },
   "who-are-ya-backend": {
     name: "Who Are Ya Backend",
@@ -321,6 +351,9 @@ export default function ProjectPage() {
   const isJava = safeId === "rides24ofiziala";
   const isSpot = safeId === "spotshare-parking";
   const isA11y = safeId === "pke-web";
+  const isPWA = safeId === "recordatorios";
+  const isVault = safeId === "passwordmanager";
+  const isCycle = safeId === "regla";
 
   const projectData = PROJECTS_CONTENT[safeId as keyof typeof PROJECTS_CONTENT];
   const content = projectData
@@ -329,6 +362,9 @@ export default function ProjectPage() {
   const snippet = CODE_SNIPPETS[safeId as keyof typeof CODE_SNIPPETS];
   const LIVE_URLS: Record<string, string | null> = {
     "ana-peluquera": "https://agpeluqueria.vercel.app",
+    recordatorios: "https://recordatorios-delta.vercel.app",
+    passwordmanager: "https://passwordmanager-alpha.vercel.app",
+    regla: "https://ayudandonos.vercel.app",
     "who-are-ya-backend": "https://who-are-ya-backend.onrender.com",
     "pke-web": null,
     rides24ofiziala: null,
@@ -337,6 +373,9 @@ export default function ProjectPage() {
 
   const GITHUB_URLS: Record<string, string | null> = {
     "ana-peluquera": "https://github.com/eneekoruiz/ana-peluquera",
+    recordatorios: "https://github.com/eneekoruiz/recordatorios",
+    passwordmanager: "https://github.com/eneekoruiz/passwordmanager",
+    regla: "https://github.com/eneekoruiz/regla",
     "who-are-ya-backend": "https://github.com/eneekoruiz/who-are-ya-backend",
     "pke-web": "https://github.com/eneekoruiz/pke-web",
     rides24ofiziala: "https://github.com/eneekoruiz/rides24ofiziala",
@@ -642,13 +681,13 @@ export default function ProjectPage() {
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-24 md:mb-40 items-center">
           <div className="order-2 md:order-1">
             <GlareCard accent={theme.accent} className="p-6 md:p-10">
-              {!isBackend && !isJava && !isA11y && !isSpot && (
+              {!isBackend && !isJava && !isA11y && !isSpot && !isPWA && !isVault && !isCycle && (
                 <SandwichDiagram accent={theme.accent} />
               )}
-              {isBackend && <MVCTerminal accent={theme.accent} />}
-              {isJava && <DistributedNodes accent={theme.accent} />}
+              {(isBackend || isVault) && <MVCTerminal accent={theme.accent} />}
+              {(isJava || isPWA) && <DistributedNodes accent={theme.accent} />}
               {isA11y && <WCAGVisualizer accent={theme.accent} />}
-              {isSpot && <SpotshareHeatmap accent={theme.accent} />}
+              {(isSpot || isCycle) && <SpotshareHeatmap accent={theme.accent} />}
             </GlareCard>
           </div>
           <div className="order-1 md:order-2 space-y-4 md:space-y-6">
@@ -656,8 +695,10 @@ export default function ProjectPage() {
               className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center border border-black/10 dark:border-white/10 shadow-lg"
               style={{ background: `${theme.accent}15` }}
             >
-              {isBackend ? (
+              {isBackend || isPWA ? (
                 <Database size={18} style={{ color: theme.accent }} />
+              ) : isVault ? (
+                <ShieldCheck size={18} style={{ color: theme.accent }} />
               ) : isJava ? (
                 <Server size={18} style={{ color: theme.accent }} />
               ) : isA11y ? (

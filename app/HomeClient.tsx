@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 
 // ── Data & Types ────────────────────────────────────────────────────────────
 import type { RepoFull, ProjectCard } from "./types";
+import { getFeaturedProjects } from "./lib/github";
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { usePreferredMotion } from "./hooks/usePreferredMotion";
@@ -135,7 +136,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   useGsapOrchestration(main, ready, reduced);
 
   const greeting = useGreeting(t.times, t.greetingFn);
-  const { top3 } = initialGitHubData;
+  const featuredProjects = useMemo(
+    () => (t ? getFeaturedProjects(t) : initialGitHubData.top3),
+    [t, initialGitHubData.top3],
+  );
   const { repos, load, offline, errorMsg } = useGitHubActivity();
 
   // Hover intent controller: debounce entry (~50ms) and allow immediate cancel
@@ -213,7 +217,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     resolvedTheme,
     activeSection,
     expandedIdx,
-    top3,
+    featuredProjects,
     hoveredProject,
   );
   useEffect(() => {
@@ -265,7 +269,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
         <MemoProjects
           t={t}
           lang={lang}
-          top3={top3}
+          top3={featuredProjects}
           repos={repos}
           load={load}
           offline={offline}

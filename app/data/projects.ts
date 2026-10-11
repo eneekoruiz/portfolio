@@ -480,6 +480,243 @@ export const PROJECTS_CONTENT: Record<
     },
   },
 
+  recordatorios: {
+    es: {
+      title: "Recordatorios PWA",
+      subtitle: "Offline-First Sync & MCP Agent Server",
+      role: "Desarrollador Full Stack & Arquitecto",
+      objective:
+        "Gestor de tareas y recordatorios de alto rendimiento con arquitectura offline-first. Soporta procesamiento de tareas en lenguaje natural, sincronización en segundo plano con IndexedDB y un servidor Model Context Protocol (MCP) que permite a asistentes de IA interactuar directamente con las tareas.",
+      algorithmH: "Algoritmo de Cola de Mutaciones Offline & Reconexión",
+      algorithmP:
+        "Las mutaciones locales se persisten instantáneamente en IndexedDB con marcas de tiempo lógicas. Al reconectar la red, un motor de resolución de conflictos LWW aplica las mutaciones a PostgreSQL mediante Prisma sin bloquear la interfaz.",
+      supabaseH: "IndexedDB + Node/Express + Prisma PostgreSQL + MCP",
+      supabaseP:
+        "Pila desacoplada con frontend en React y Zustand, API REST con Express y Prisma, y un endpoint stdio/SSE MCP que expone herramientas para agentes inteligentes.",
+      outcomeH: "Productividad Instantánea y Latencia Cero",
+      outcomeP:
+        "La aplicación carga en menos de 100ms gracias a los Service Workers de la PWA, funciona al 100% sin conexión y permite delegar tareas a agentes IA.",
+      codeSpotlight: "taskSync.engine.ts — Mutation Pipeline",
+      techBadges: [
+        "Offline-First",
+        "PWA",
+        "IndexedDB",
+        "Prisma",
+        "PostgreSQL",
+        "Zustand",
+        "MCP Protocol",
+      ],
+    },
+    en: {
+      title: "Recordatorios PWA",
+      subtitle: "Offline-First Sync & MCP Agent Server",
+      role: "Full Stack Developer & Architect",
+      objective:
+        "High-performance task and reminder manager with offline-first architecture. Features natural language task parsing, background synchronization via IndexedDB, and a dedicated Model Context Protocol (MCP) server allowing AI agents to query and manipulate reminders directly.",
+      algorithmH: "Offline Mutation Queue & Reconnection Engine",
+      algorithmP:
+        "Local mutations are persisted instantaneously to IndexedDB using logical timestamps. Upon network reconnection, a Last-Write-Wins (LWW) conflict resolution engine applies the mutations to PostgreSQL via Prisma without blocking the main UI thread.",
+      supabaseH: "IndexedDB + Node/Express + Prisma PostgreSQL + MCP",
+      supabaseP:
+        "Decoupled stack with React and Zustand, Express REST API with Prisma ORM on PostgreSQL, plus an stdio/SSE MCP endpoint exposing structured tools for autonomous agents.",
+      outcomeH: "Instant Productivity and Zero UI Latency",
+      outcomeP:
+        "Loads under 100ms via PWA service workers, functions completely offline, and connects seamlessly to local AI assistants.",
+      codeSpotlight: "taskSync.engine.ts — Mutation Pipeline",
+      techBadges: [
+        "Offline-First",
+        "PWA",
+        "IndexedDB",
+        "Prisma",
+        "PostgreSQL",
+        "Zustand",
+        "MCP Protocol",
+      ],
+    },
+    eu: {
+      title: "Recordatorios PWA",
+      subtitle: "Offline-First Sinkronizazioa eta MCP Zerbitzaria",
+      role: "Full Stack Garatzailea eta Arkitektoa",
+      objective:
+        "Errendimendu handiko ataza eta oroigarri kudeatzailea, offline-first arkitekturarekin. Hizkuntza naturaleko atazen prozesamendua, IndexedDB bidezko atzeko sinkronizazioa eta IArentzako Model Context Protocol (MCP) zerbitzaria barne hartzen ditu.",
+      algorithmH: "Offline Mutazio Ilara eta Berrkonektatze Motorea",
+      algorithmP:
+        "Tokiko aldaketak IndexedDB-n berehala gordetzen dira denbora-marka logikoekin. Sarea berreskuratzean, LWW bidezko gatazka-konponketa motoreak PostgreSQL-ra transferitzen ditu Prisma bidez.",
+      supabaseH: "IndexedDB + Node/Express + Prisma PostgreSQL + MCP",
+      supabaseP:
+        "React eta Zustand frontendarekin, Express eta Prisma REST APIarekin, eta adimen artifizialerako MCP zerbitzariarekin diseinatutako arkitektura.",
+      outcomeH: "Eraginkortasun Handia eta Zero Itxarote-denbora",
+      outcomeP:
+        "100ms baino gutxiagoan kargatzen da PWA langileei esker, konexiorik gabe guztiz funtzionatzen du eta IA bidezko ataza-kudeaketa ahalbidetzen du.",
+      codeSpotlight: "taskSync.engine.ts — Mutation Pipeline",
+      techBadges: [
+        "Offline-First",
+        "PWA",
+        "IndexedDB",
+        "Prisma",
+        "PostgreSQL",
+        "Zustand",
+        "MCP Protocol",
+      ],
+    },
+  },
+
+  passwordmanager: {
+    es: {
+      title: "Password Vault",
+      subtitle: "Zero-Knowledge Cryptography & WebAuthn",
+      role: "Ingeniero de Software & Seguridad",
+      objective:
+        "Bóveda digital de credenciales con cifrado zero-knowledge en el cliente. Garantiza que ninguna contraseña o clave secreta viaje jamás en texto plano al servidor o a la base de datos, combinando autenticación biométrica y generación de códigos TOTP 2FA.",
+      algorithmH: "Cifrado Simétrico AES-GCM-256 + PBKDF2 (100.000 iteraciones)",
+      algorithmP:
+        "La clave maestra nunca se almacena: se deriva mediante PBKDF2 con sal criptográfica única y se usa para descifrar la clave de bóveda mediante AES-256-GCM con vectores de inicialización (IV) únicos por entrada.",
+      supabaseH: "Web Crypto API + WebAuthn + Firebase Sync",
+      supabaseP:
+        "Utiliza primitivas nativas de la Web Crypto API del navegador para máximo rendimiento en hardware, autenticación biométrica FaceID/TouchID mediante WebAuthn y sincronización remota de blobs cifrados en Firebase.",
+      outcomeH: "Seguridad Militar en el Navegador",
+      outcomeP:
+        "Acceso instantáneo con huella dactilar o biometría, protección absoluta contra filtraciones en servidor y soporte para códigos de doble factor en tiempo real.",
+      codeSpotlight: "cryptoVault.ts — AES-GCM Core",
+      techBadges: [
+        "Web Crypto API",
+        "AES-256-GCM",
+        "PBKDF2",
+        "WebAuthn",
+        "TOTP 2FA",
+        "Zero-Knowledge",
+      ],
+    },
+    en: {
+      title: "Password Vault",
+      subtitle: "Zero-Knowledge Cryptography & WebAuthn",
+      role: "Software & Security Engineer",
+      objective:
+        "Client-side zero-knowledge password vault. Ensures no plain-text passwords or secret keys ever leave the browser or reach the database, pairing biometric WebAuthn unlock with real-time TOTP 2FA generation.",
+      algorithmH: "AES-GCM-256 Symmetric Encryption + PBKDF2 (100,000 iterations)",
+      algorithmP:
+        "The master password is never stored: derived using PBKDF2 with unique cryptographic salt to unlock vault keys via AES-256-GCM with individual initialization vectors (IV) per record.",
+      supabaseH: "Web Crypto API + WebAuthn + Firebase Sync",
+      supabaseP:
+        "Relies on native browser Web Crypto API primitives for hardware-accelerated performance, WebAuthn biometric authentication (FaceID/TouchID), and encrypted blob syncing via Firebase.",
+      outcomeH: "Military-Grade Security in the Browser",
+      outcomeP:
+        "Biometric instant access, absolute protection against database breaches, and real-time TOTP dual-factor generation.",
+      codeSpotlight: "cryptoVault.ts — AES-GCM Core",
+      techBadges: [
+        "Web Crypto API",
+        "AES-256-GCM",
+        "PBKDF2",
+        "WebAuthn",
+        "TOTP 2FA",
+        "Zero-Knowledge",
+      ],
+    },
+    eu: {
+      title: "Password Vault",
+      subtitle: "Zero-Knowledge Kriptografia eta WebAuthn",
+      role: "Segurtasun eta Software Ingeniaria",
+      objective:
+        "Zero-knowledge bezero-kriptografiadun pasahitz kudeatzailea. Pasahitzik edo gako sekreturik zerbitzarira testu hutsean inoiz ez bidaltzea bermatzen du, WebAuthn biometrikoa eta TOTP 2FA bateratuz.",
+      algorithmH: "AES-GCM-256 Kriptografia Simetrikoa + PBKDF2",
+      algorithmP:
+        "Gako nagusia ez da inoiz gordetzen: PBKDF2 bidez sortzen da eta AES-256-GCM bidez elementu bakoitza modu seguruan enkriptatzen du sarrerako IV bektore bakar batekin.",
+      supabaseH: "Web Crypto API + WebAuthn + Firebase",
+      supabaseP:
+        "Nabigatzailearen Web Crypto API natiboak erabiltzen ditu, WebAuthn autentifikazio biometrikoa eta enkriptatutako datuen sinkronizazioa Firebase-n.",
+      outcomeH: "Segurtasun Maila Gorena Nabigatzailean",
+      outcomeP:
+        "Aztarna bidezko sarbide azkarra, zerbitzariaren filtrazioen aurkako babes osoa eta bi faktoreko kodeen kalkulu automatikoa.",
+      codeSpotlight: "cryptoVault.ts — AES-GCM Core",
+      techBadges: [
+        "Web Crypto API",
+        "AES-256-GCM",
+        "PBKDF2",
+        "WebAuthn",
+        "TOTP 2FA",
+        "Zero-Knowledge",
+      ],
+    },
+  },
+
+  regla: {
+    es: {
+      title: "Ayudándonos",
+      subtitle: "Menstrual & Wellness Mobile Platform",
+      role: "Desarrollador Full Stack & Mobile",
+      objective:
+        "Plataforma web y móvil de salud femenina y seguimiento del bienestar hormonal. Diseñada con privacidad estricta por diseño, almacenamiento local seguro, sincronización cifrada y compilación nativa en iOS y Android con Capacitor.",
+      algorithmH: "Algoritmo Estadístico de Predicción de Fases del Ciclo",
+      algorithmP:
+        "Calcula ventanas fértiles y predicciones de ciclo utilizando media móvil ponderada sobre los últimos 6 registros, descartando anomalías estadísticas para maximizar la fiabilidad.",
+      supabaseH: "Capacitor + Node.js + PostgreSQL + JWT",
+      supabaseP:
+        "Frontend responsivo en React y Tailwind empaquetado como aplicación híbrida para tiendas móviles, respaldado por backend en Node.js, autenticación sin estado JWT y base de datos relacional PostgreSQL.",
+      outcomeH: "Adopción Real y Experiencia Fluida",
+      outcomeP:
+        "En uso diario por usuarias reales, garantizando total privacidad sobre sus datos biomédicos y notificaciones puntuales.",
+      codeSpotlight: "cyclePredictor.ts — Prediction Core",
+      techBadges: [
+        "Capacitor",
+        "React",
+        "PostgreSQL",
+        "JWT",
+        "Health Tech",
+        "Tailwind CSS",
+      ],
+    },
+    en: {
+      title: "Ayudándonos",
+      subtitle: "Menstrual & Wellness Mobile Platform",
+      role: "Full Stack & Mobile Developer",
+      objective:
+        "Cross-platform women's health and hormonal wellness tracking application. Built with privacy-first principles, local-first storage, encrypted API sync, and native iOS/Android builds via Capacitor.",
+      algorithmH: "Statistical Cycle Phase & Fertility Prediction",
+      algorithmP:
+        "Computes fertile windows and period estimates using a weighted moving average over the last 6 cycles, discarding statistical outliers to maximize predictive reliability.",
+      supabaseH: "Capacitor + Node.js + PostgreSQL + JWT",
+      supabaseP:
+        "Responsive React and Tailwind interface bundled into native mobile apps with Capacitor, backed by a Node.js REST API with stateless JWT authentication and PostgreSQL.",
+      outcomeH: "Active Adoption and Fluid Experience",
+      outcomeP:
+        "In active daily use by a dedicated user base, ensuring complete privacy over health metrics with proactive cycle alerts.",
+      codeSpotlight: "cyclePredictor.ts — Prediction Core",
+      techBadges: [
+        "Capacitor",
+        "React",
+        "PostgreSQL",
+        "JWT",
+        "Health Tech",
+        "Tailwind CSS",
+      ],
+    },
+    eu: {
+      title: "Ayudándonos",
+      subtitle: "Osasuna eta Ongizate Mugikorreko Plataforma",
+      role: "Full Stack eta Mugikor Garatzailea",
+      objective:
+        "Emakumeen osasuna eta ongizatea jarraitzeko web eta mugikorretarako plataforma. Pribatutasun zorrotza, tokiko biltegiratze segurua, sinkronizazioa eta iOS zein Android-erako Capacitor bidezko aplikazioak.",
+      algorithmH: "Zikloaren Faseen eta Ugalkortasunaren Iragarpen Estatistikoa",
+      algorithmP:
+        "Zikloaren faseak eta leiho emankorrak kalkulatzen ditu azken 6 zikloen batez besteko haztatua erabiliz, akats estatistikoak baztertuz.",
+      supabaseH: "Capacitor + Node.js + PostgreSQL + JWT",
+      supabaseP:
+        "React eta Tailwind interfazea Capacitor bidez mugikorretara eramana, Node.js REST APIarekin, JWT autentifikazioarekin eta PostgreSQL datu-basearekin.",
+      outcomeH: "Erabilera Erreala eta Esperientzia Erosoa",
+      outcomeP:
+        "Erabiltzaile errealek egunero erabiltzen dute, beren osasun datuen gaineko pribatutasun osoa eta ohar puntualak bermatuz.",
+      codeSpotlight: "cyclePredictor.ts — Prediction Core",
+      techBadges: [
+        "Capacitor",
+        "React",
+        "PostgreSQL",
+        "JWT",
+        "Health Tech",
+        "Tailwind CSS",
+      ],
+    },
+  },
+
   "who-are-ya-backend": {
     es: {
       title: "Who Are Ya?",
@@ -1970,6 +2207,51 @@ export const handleBooking = async (bookingData: BookingPayload) => {
     requestBody: { summary: \`✂ \${service.name}\`, start: { dateTime: startTime.toISOString() }, end: { dateTime: phase1End.toISOString() } },
   });
   return { success: true, id: docRef.id, freeSlot: { phase1End, phase2End } };
+};`,
+
+  recordatorios: `// taskSync.engine.ts — PWA Offline-First & MCP Core
+export const syncTaskQueue = async (localQueue: TaskMutation[]) => {
+  const db = await openIndexedDB("tasks_store", 1);
+  const pending = await db.getAll("mutations");
+  for (const mutation of pending) {
+    try {
+      const res = await fetch("/api/tasks/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mutation),
+      });
+      if (res.ok) await db.delete("mutations", mutation.id);
+    } catch (err) {
+      console.warn("Offline mutation buffered for reconnect", err);
+    }
+  }
+};`,
+
+  passwordmanager: `// cryptoVault.ts — Zero-Knowledge AES-GCM & PBKDF2
+export const encryptSecret = async (plainText: string, masterKey: CryptoKey) => {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(plainText);
+  const cipherBuffer = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv, tagLength: 128 },
+    masterKey,
+    encoded
+  );
+  return {
+    cipherText: arrayBufferToBase64(cipherBuffer),
+    iv: arrayBufferToBase64(iv),
+  };
+};`,
+
+  regla: `// cyclePredictor.ts — Health Tracking & Period Prediction
+export const predictNextCycle = (history: CycleRecord[]): PredictionResult => {
+  if (history.length < 2) return defaultWindow();
+  const sorted = [...history].sort((a, b) => b.startDate - a.startDate);
+  const intervals = sorted.slice(0, 6).map((c, idx, arr) => 
+    arr[idx + 1] ? differenceInDays(c.startDate, arr[idx + 1].startDate) : null
+  ).filter(Boolean) as number[];
+  const avgLength = Math.round(intervals.reduce((a, b) => a + b, 0) / intervals.length);
+  const nextDate = addDays(sorted[0].startDate, avgLength);
+  return { nextDate, fertileStart: addDays(nextDate, -14), fertileEnd: addDays(nextDate, -9) };
 };`,
 
   "who-are-ya-backend": `// players.controller.js — MongoDB Filter Engine
