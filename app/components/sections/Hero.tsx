@@ -25,7 +25,7 @@ interface HeroProps {
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const ui = UI_COPY[lang];
   const { enabled: motion } = useMotionPolicy();
-  const enabled = motion && !reduced && phase === "ready";
+  const enabled = motion && !reduced;
   const heroRef = useRef<HTMLElement>(null);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(

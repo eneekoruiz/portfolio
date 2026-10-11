@@ -210,84 +210,117 @@ export function SeismicWaveCanvas({
 
   // SECUENCIA AUTOMÁTICA POR DEFECTO (Arranca de inmediato en cuanto se monta)
   useEffect(() => {
-    if (hasStartedRef.current) return;
-    hasStartedRef.current = true;
+    let timer: NodeJS.Timeout;
 
-    const chars = charRefs.current ?? [];
-
-    // Ocultar letras inicialmente
-    chars.forEach((c) => {
-      if (c) c.classList.remove("revealed");
-    });
-
-    // Orden desordenado y rítmico: E -> z -> k -> R -> o -> n -> i -> e -> u -> .
-    const order = [0, 8, 3, 5, 4, 1, 7, 2, 6, 9];
-    const cadence = 85;
-
-    order.forEach((charIdx, i) => {
-      setTimeout(() => {
-        const el = chars[charIdx];
-        if (!el) return;
-
-        const rect = el.getBoundingClientRect();
-        const posX = rect.left + rect.width / 2;
-        const posY = rect.top + rect.height / 2;
-
-        // Micro-pulso sutil (limpio y fino, NO molesta ni llena de líneas)
-        microPulsesRef.current.push(new LetterMicroPulse(posX, posY));
-        shakeRef.current = Math.max(shakeRef.current, 4);
-
-        // La letra emerge limpia con muelle
-        el.classList.add("revealed");
-
-        // Al completarse el nombre: ¡GRAN IMPACTO SÍSMICO CON MUCHA FUERZA!
-        if (i === order.length - 1) {
-          setTimeout(() => {
-            const firstRect = chars[0]?.getBoundingClientRect();
-            const lastRect = chars[9]?.getBoundingClientRect();
-            const cx =
-              firstRect && lastRect
-                ? (firstRect.left + lastRect.right) / 2
-                : window.innerWidth * 0.35;
-            const cy =
-              firstRect && lastRect
-                ? (firstRect.top + lastRect.bottom) / 2
-                : window.innerHeight * 0.45;
-
-            const maxExtent = Math.max(window.innerWidth, window.innerHeight) * 1.25;
-
-            // ¡Gran onda sísmica expansiva con fuerza real!
-            bigWavesRef.current.push(
-              new EpicSeismicShockwave(cx, cy, maxExtent, 1.5, 32),
-            );
-            setTimeout(() => {
-              bigWavesRef.current.push(
-                new EpicSeismicShockwave(cx, cy, maxExtent * 0.8, 1.0, 24),
-              );
-            }, 110);
-            setTimeout(() => {
-              bigWavesRef.current.push(
-                new EpicSeismicShockwave(cx, cy, maxExtent * 0.6, 0.7, 18),
-              );
-            }, 220);
-
-            // ¡HACE TEMBLAR TODO EL ESCENARIO CON FUERZA!
-            shakeRef.current = 42;
-
-            // Destello luminoso atmosférico de onda de choque
-            if (flashRef.current) {
-              flashRef.current.style.opacity = "0.22";
-              setTimeout(() => {
-                if (flashRef.current) flashRef.current.style.opacity = "0";
-              }, 120);
-            }
-
-            onComplete?.();
-          }, 240);
+    const kickoff = () => {
+      // Localizar nodos en stageRef o DOM global
+      let chars = charRefs.current ?? [];
+      if (!chars || chars.length < 10) {
+        if (stageRef.current) {
+          chars = Array.from(
+            stageRef.current.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
+          );
+        } else {
+          chars = Array.from(
+            document.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
+          );
         }
-      }, i * cadence);
-    });
-  }, [charRefs, onComplete]);
+      }
+
+      if (!chars || chars.length < 10) {
+        timer = setTimeout(kickoff, 40);
+        return;
+      }
+
+      if (hasStartedRef.current) return;
+      hasStartedRef.current = true;
+
+      // 1. Ocultar letras inicialmente
+      chars.forEach((c) => {
+        if (c) c.classList.remove("revealed");
+      });
+
+      // 2. Failsafe de seguridad: en 1.8s asegurar visibilidad total pase lo que pase
+      setTimeout(() => {
+        chars.forEach((c) => {
+          if (c) c.classList.add("revealed");
+        });
+      }, 1800);
+
+      // 3. Orden desordenado y rítmico: E -> z -> k -> R -> o -> n -> i -> e -> u -> .
+      const order = [0, 8, 3, 5, 4, 1, 7, 2, 6, 9];
+      const cadence = 85;
+
+      order.forEach((charIdx, i) => {
+        setTimeout(() => {
+          const el = chars[charIdx];
+          if (!el) return;
+
+          const rect = el.getBoundingClientRect();
+          const posX = rect.left + rect.width / 2;
+          const posY = rect.top + rect.height / 2;
+
+          microPulsesRef.current.push(new LetterMicroPulse(posX, posY));
+          shakeRef.current = Math.max(shakeRef.current, 5);
+
+          el.classList.add("revealed");
+
+          // Al completarse el nombre: ¡GRAN IMPACTO SÍSMICO CON MUCHA FUERZA!
+          if (i === order.length - 1) {
+            setTimeout(() => {
+              const firstRect = chars[0]?.getBoundingClientRect();
+              const lastRect = chars[9]?.getBoundingClientRect();
+              const cx =
+                firstRect && lastRect
+                  ? (firstRect.left + lastRect.right) / 2
+                  : window.innerWidth * 0.35;
+              const cy =
+                firstRect && lastRect
+                  ? (firstRect.top + lastRect.bottom) / 2
+                  : window.innerHeight * 0.45;
+
+              const maxExtent =
+                Math.max(window.innerWidth, window.innerHeight) * 1.35;
+
+              // ¡Gran onda sísmica expansiva con fuerza real!
+              bigWavesRef.current.push(
+                new EpicSeismicShockwave(cx, cy, maxExtent, 1.8, 34),
+              );
+              setTimeout(() => {
+                bigWavesRef.current.push(
+                  new EpicSeismicShockwave(cx, cy, maxExtent * 0.8, 1.2, 26),
+                );
+              }, 110);
+              setTimeout(() => {
+                bigWavesRef.current.push(
+                  new EpicSeismicShockwave(cx, cy, maxExtent * 0.6, 0.8, 20),
+                );
+              }, 220);
+
+              // ¡HACE TEMBLAR TODO EL ESCENARIO CON FUERZA!
+              shakeRef.current = 45;
+
+              // Destello luminoso atmosférico de onda de choque
+              if (flashRef.current) {
+                flashRef.current.style.opacity = "0.25";
+                setTimeout(() => {
+                  if (flashRef.current) flashRef.current.style.opacity = "0";
+                }, 130);
+              }
+
+              onComplete?.();
+            }, 240);
+          }
+        }, 50 + i * cadence);
+      });
+    };
+
+    kickoff();
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [stageRef, charRefs, onComplete]);
 
   return (
     <>
