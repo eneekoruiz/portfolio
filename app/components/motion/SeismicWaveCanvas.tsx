@@ -8,8 +8,112 @@ interface SeismicWaveCanvasProps {
   onComplete?: () => void;
 }
 
+// ── TRAZADO DE FRENTE DE ONDA TECTÓNICO REAL (Anisotropía de Falla, Lóbulos y Ondulaciones) ──
+// Nunca un círculo geométrico perfecto: reproduce la propagación no-lineal a través de roca y fallas
+function drawTectonicWavefront(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  baseR: number,
+  seed: number,
+  roughness = 0.05,
+  aspectRatioX = 1.18,
+  aspectRatioY = 0.88,
+  rotation = -0.05,
+) {
+  const steps = 84;
+  ctx.beginPath();
+  for (let i = 0; i <= steps; i++) {
+    const theta = (i / steps) * Math.PI * 2;
+    // Lóbulos de radiación sísmica reales (patrón focal de plano de falla tectónica)
+    const faultLobe = Math.sin(2 * theta + seed) * 0.085;
+    const shearUndulation = Math.sin(3 * theta + seed * 1.6) * 0.045;
+    const microJitter = Math.sin(11 * theta + seed * 2.7) * roughness;
+
+    const r = baseR * (1 + faultLobe + shearUndulation + microJitter);
+
+    // Proyección anisotrópica según la orientación de la falla geológica
+    const lx = Math.cos(theta) * r * aspectRatioX;
+    const ly = Math.sin(theta) * r * aspectRatioY;
+
+    // Rotación del eje de la fractura litosférica
+    const cosR = Math.cos(rotation);
+    const sinR = Math.sin(rotation);
+    const px = cx + (lx * cosR - ly * sinR);
+    const py = cy + (lx * sinR + ly * cosR);
+
+    if (i === 0) {
+      ctx.moveTo(px, py);
+    } else {
+      ctx.lineTo(px, py);
+    }
+  }
+  ctx.closePath();
+}
+
+// ── TRAZADO DE MICRO-FRACTURA LOCAL EN CADA LETRA ──
+function drawMicroFracture(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  baseR: number,
+  seed: number,
+) {
+  const steps = 28;
+  ctx.beginPath();
+  for (let i = 0; i <= steps; i++) {
+    const theta = (i / steps) * Math.PI * 2;
+    const microCrackle = Math.sin(4 * theta + seed) * 0.15 + Math.cos(7 * theta + seed * 1.5) * 0.09;
+    const r = baseR * (1 + microCrackle);
+    const px = cx + Math.cos(theta) * r * 1.12;
+    const py = cy + Math.sin(theta) * r * 0.88;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+}
+
+// ── FISURAS RADIALES DE FALLA SÍSMICA (Grietas instantáneas de alta velocidad) ──
+class TectonicFissure {
+  points: { x: number; y: number }[] = [];
+  life = 1.0;
+  dead = false;
+
+  constructor(cx: number, cy: number, angle: number, length: number) {
+    let curX = cx;
+    let curY = cy;
+    this.points.push({ x: curX, y: curY });
+    const segments = 6;
+    const segLen = length / segments;
+    for (let i = 0; i < segments; i++) {
+      const jitterAngle = angle + (Math.random() - 0.5) * 0.55;
+      curX += Math.cos(jitterAngle) * (segLen * (0.8 + Math.random() * 0.4));
+      curY += Math.sin(jitterAngle) * (segLen * (0.8 + Math.random() * 0.4));
+      this.points.push({ x: curX, y: curY });
+    }
+  }
+
+  update() {
+    this.life -= 0.045;
+    if (this.life <= 0) this.dead = true;
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    if (this.dead || this.points.length < 2) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(this.points[0].x, this.points[0].y);
+    for (let i = 1; i < this.points.length; i++) {
+      ctx.lineTo(this.points[i].x, this.points[i].y);
+    }
+    ctx.strokeStyle = `rgba(255, 255, 255, ${this.life * 0.65})`;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
 // ── ONDA DE CHOQUE SÍSMICA REAL (Física de Refracción y Presión Tectónica) ──
-// Sin colores de circo ni aros azules: onda de compresión física y refracción cáustica pura
 class TrueSeismicShockfront {
   x: number;
   y: number;
@@ -20,6 +124,10 @@ class TrueSeismicShockfront {
   life: number;
   dead: boolean;
   isMainRupture: boolean;
+  seed: number;
+  aspectRatioX: number;
+  aspectRatioY: number;
+  rotation: number;
 
   constructor(
     x: number,
@@ -38,6 +146,10 @@ class TrueSeismicShockfront {
     this.isMainRupture = isMainRupture;
     this.life = 1.0;
     this.dead = false;
+    this.seed = Math.random() * 20;
+    this.aspectRatioX = 1.16 + (Math.random() - 0.5) * 0.08;
+    this.aspectRatioY = 0.88 + (Math.random() - 0.5) * 0.06;
+    this.rotation = -0.05 + (Math.random() - 0.5) * 0.04;
   }
 
   update() {
@@ -58,16 +170,34 @@ class TrueSeismicShockfront {
     ctx.save();
 
     // 1. Surco de descompresión sísmica (sombra óptica de rarefacción tras el choque)
-    const troughR = Math.max(2, this.r - (this.isMainRupture ? 14 : 5));
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, troughR, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(0, 0, 0, ${energy * 0.32})`;
+    const troughR = Math.max(2, this.r - (this.isMainRupture ? 15 : 5));
+    drawTectonicWavefront(
+      ctx,
+      this.x,
+      this.y,
+      troughR,
+      this.seed,
+      0.04,
+      this.aspectRatioX,
+      this.aspectRatioY,
+      this.rotation,
+    );
+    ctx.strokeStyle = `rgba(0, 0, 0, ${energy * 0.35})`;
     ctx.lineWidth = this.isMainRupture ? 14 : 5;
     ctx.stroke();
 
     // 2. Frente de compresión cáustico (refracción de alta presión - luz blanca pura hiper-nítida)
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    drawTectonicWavefront(
+      ctx,
+      this.x,
+      this.y,
+      this.r,
+      this.seed,
+      0.055,
+      this.aspectRatioX,
+      this.aspectRatioY,
+      this.rotation,
+    );
     ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.95})`;
     ctx.lineWidth = this.isMainRupture ? 2.8 : 1.5;
     ctx.shadowColor = `rgba(255, 255, 255, 0.85)`;
@@ -76,19 +206,37 @@ class TrueSeismicShockfront {
 
     // 3. Ondas secundarias de dispersión geológica (Rayleigh / onda S transversal)
     if (this.isMainRupture && this.r > 35) {
-      const secondaryR = this.r - 24;
+      const secondaryR = this.r - 26;
       if (secondaryR > 0) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, secondaryR, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.4})`;
+        drawTectonicWavefront(
+          ctx,
+          this.x,
+          this.y,
+          secondaryR,
+          this.seed + 1.3,
+          0.045,
+          this.aspectRatioX * 0.98,
+          this.aspectRatioY * 1.02,
+          this.rotation + 0.04,
+        );
+        ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.42})`;
         ctx.lineWidth = 1.2;
         ctx.stroke();
       }
-      const tertiaryR = this.r - 48;
+      const tertiaryR = this.r - 52;
       if (tertiaryR > 0) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, tertiaryR, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.2})`;
+        drawTectonicWavefront(
+          ctx,
+          this.x,
+          this.y,
+          tertiaryR,
+          this.seed + 2.7,
+          0.035,
+          this.aspectRatioX * 1.02,
+          this.aspectRatioY * 0.98,
+          this.rotation - 0.03,
+        );
+        ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.22})`;
         ctx.lineWidth = 0.8;
         ctx.stroke();
       }
@@ -102,8 +250,7 @@ class TrueSeismicShockfront {
       grad.addColorStop(0.4, `rgba(255, 255, 255, ${coreAlpha * 0.15})`);
       grad.addColorStop(1, "rgba(255, 255, 255, 0)");
       ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, 130, 0, Math.PI * 2);
+      drawTectonicWavefront(ctx, this.x, this.y, 130, this.seed, 0.06);
       ctx.fill();
     }
 
@@ -119,6 +266,7 @@ class TectonicLetterPulse {
   maxR: number;
   life: number;
   dead: boolean;
+  seed: number;
 
   constructor(x: number, y: number) {
     this.x = x;
@@ -127,6 +275,7 @@ class TectonicLetterPulse {
     this.maxR = 60;
     this.life = 1.0;
     this.dead = false;
+    this.seed = Math.random() * 15;
   }
 
   update() {
@@ -141,15 +290,13 @@ class TectonicLetterPulse {
 
     ctx.save();
     // Surco óptico sutil
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, Math.max(1, this.r - 3), 0, Math.PI * 2);
+    drawMicroFracture(ctx, this.x, this.y, Math.max(1, this.r - 3), this.seed);
     ctx.strokeStyle = `rgba(0, 0, 0, ${energy * 0.25})`;
     ctx.lineWidth = 1.8;
     ctx.stroke();
 
     // Frente de choque blanco cáustico
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    drawMicroFracture(ctx, this.x, this.y, this.r, this.seed);
     ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.85})`;
     ctx.lineWidth = 1.4;
     ctx.shadowColor = `rgba(255, 255, 255, 0.7)`;
@@ -169,6 +316,7 @@ export function SeismicWaveCanvas({
   const animationRef = useRef<number | null>(null);
   const shockfrontsRef = useRef<TrueSeismicShockfront[]>([]);
   const letterPulsesRef = useRef<TectonicLetterPulse[]>([]);
+  const fissuresRef = useRef<TectonicFissure[]>([]);
   
   // Parámetros de aceleración sísmica física
   const seismicImpulseX = useRef(0);
@@ -231,7 +379,16 @@ export function SeismicWaveCanvas({
         if (p.dead) pulses.splice(i, 1);
       }
 
-      // Render ondas de choque sísmicas mayores
+      // Render fisuras radiales de falla litosférica
+      const fissures = fissuresRef.current;
+      for (let i = fissures.length - 1; i >= 0; i--) {
+        const f = fissures[i];
+        f.update();
+        f.draw(ctx);
+        if (f.dead) fissures.splice(i, 1);
+      }
+
+      // Render ondas de choque sísmicas mayores (anisotrópicas, no circulares)
       const fronts = shockfrontsRef.current;
       for (let i = fronts.length - 1; i >= 0; i--) {
         const f = fronts[i];
@@ -245,15 +402,24 @@ export function SeismicWaveCanvas({
 
     animationRef.current = requestAnimationFrame(render);
 
-    // Click interactivo: impacto sísmico con réplica
+    // Click interactivo: impacto sísmico con réplica y grietas
     const handlePointerDown = (e: PointerEvent) => {
       const target = e.target as HTMLElement | null;
       if (target?.closest("button") || target?.closest("a")) return;
 
-      // Dispara onda de compresión cáustica
+      // Dispara onda de compresión cáustica ondulante
       shockfrontsRef.current.push(
         new TrueSeismicShockfront(e.clientX, e.clientY, 650, 1.1, 28, false),
       );
+
+      // Fisuras tectónicas instantáneas
+      for (let f = 0; f < 5; f++) {
+        const angle = (f / 5) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+        const length = 45 + Math.random() * 65;
+        fissuresRef.current.push(
+          new TectonicFissure(e.clientX, e.clientY, angle, length),
+        );
+      }
 
       // Sacudida sísmica direccional instantánea
       seismicImpulseX.current = (Math.random() > 0.5 ? 1 : -1) * 14;
@@ -341,18 +507,27 @@ export function SeismicWaveCanvas({
               const cx =
                 firstRect && lastRect
                   ? (firstRect.left + lastRect.right) / 2
-                  : window.innerWidth * 0.35;
+                  : window.innerWidth * 0.5;
               const cy =
                 firstRect && lastRect
                   ? (firstRect.top + lastRect.bottom) / 2
-                  : window.innerHeight * 0.45;
+                  : window.innerHeight * 0.5;
 
               const maxExtent = Math.max(window.innerWidth, window.innerHeight) * 1.35;
 
-              // RUPTURA PRINCIPAL: Frente de choque cáustico colosal
+              // RUPTURA PRINCIPAL: Frente de choque cáustico colosal ondulante
               shockfrontsRef.current.push(
                 new TrueSeismicShockfront(cx, cy, maxExtent, 1.8, 38, true),
               );
+
+              // Fisuras de falla litosférica disparadas desde el epicentro
+              for (let f = 0; f < 8; f++) {
+                const angle = (f / 8) * Math.PI * 2 + (Math.random() - 0.5) * 0.45;
+                const length = 85 + Math.random() * 120;
+                fissuresRef.current.push(
+                  new TectonicFissure(cx, cy, angle, length),
+                );
+              }
 
               // Réplica sísmica 1 (+110ms)
               setTimeout(() => {
