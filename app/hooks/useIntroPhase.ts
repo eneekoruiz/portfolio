@@ -11,8 +11,8 @@ export function useIntroPhase(_mounted: boolean) {
   const ready = phase === "ready";
 
   const onPreloaderDone = useCallback(() => {
-    markSeen();
-  }, [markSeen]);
+    setPhase("splash");
+  }, [setPhase]);
 
   const onSplashComplete = useCallback(() => {
     setPhase("ready");

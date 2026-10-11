@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Check, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowUpRight, Check, Copy, Github, Linkedin, Mail } from "lucide-react";
 import type { Lang, Tx } from "../../types";
 import { SectionFrame } from "./SectionFrame";
 import { useSpringHover } from "../../hooks/useSpringHover";
@@ -51,50 +51,84 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
         data-section-reveal
         className="contact-intro materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 transition-colors duration-300"
       >
-        <div className="contact-intro-heading grid gap-4 border-b border-ink/15 md:grid-cols-[1.2fr_0.8fr] md:items-end">
-          <p className="max-w-xl text-lg leading-relaxed tracking-tight text-lead md:text-2xl">
+        {/* Header statement + live status indicator */}
+        <div className="contact-intro-heading flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-ink/10 pb-4">
+          <p className="max-w-xl text-base font-medium leading-relaxed tracking-tight text-ink md:text-xl">
             {t.coP}
           </p>
-          <span className="flex items-center gap-2 text-xs font-medium text-lead md:justify-end">
-            <span
-              className="h-2 w-2 rounded-full bg-emerald-600"
-              aria-hidden="true"
-            />
-            {t.status}
-          </span>
+          <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400 shrink-0 w-fit">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span>{t.status}</span>
+          </div>
         </div>
-        <a
-          dir="ltr"
-          href={`mailto:${EMAIL}`}
-          className="contact-email my-6 block w-fit break-all text-[clamp(1.4rem,4.4vw,4.7rem)] font-bold leading-tight tracking-[-0.06em] text-ink underline decoration-brand/40 decoration-1 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-        >
-          {EMAIL}
-        </a>
-        <div className="flex flex-wrap items-center gap-3">
+
+        {/* Email display and copy action */}
+        <div className="my-5 flex flex-wrap items-center justify-between gap-4">
           <a
-            ref={mailRef}
+            dir="ltr"
             href={`mailto:${EMAIL}`}
-            className="materia-button bg-ink text-page"
+            className="contact-email block break-all text-[clamp(1.5rem,3.8vw,3.2rem)] font-black leading-tight tracking-[-0.05em] text-ink hover:text-brand transition-colors decoration-brand/30 decoration-2 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
           >
-            <Mail size={16} aria-hidden="true" />
-            {ui.email}
-            <ArrowUpRight size={16} aria-hidden="true" />
+            {EMAIL}
           </a>
-          <SignatureLink label={t.ctaCv} kind="cv" />
+
+          <button
+            type="button"
+            onClick={copy}
+            aria-label={ui.copyEmail}
+            className={`materia-button border font-mono text-xs transition-all !min-h-10 !py-2 !px-4 ${
+              status === "copied"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-500 font-bold"
+                : "border-ink/20 text-ink hover:border-brand hover:text-brand"
+            }`}
+          >
+            {status === "copied" ? (
+              <>
+                <Check size={14} aria-hidden="true" />
+                <span>{ui.copied}</span>
+              </>
+            ) : (
+              <>
+                <Copy size={14} aria-hidden="true" />
+                <span>{ui.copyEmail}</span>
+              </>
+            )}
+          </button>
         </div>
-        <p
-          role="status"
-          aria-live="polite"
-          className="contact-copy-status text-sm text-lead"
-        >
-          {status === "copied"
-            ? ui.copied
-            : status === "failed"
-              ? ui.copyFailed
-              : ""}
-        </p>
+
+        {/* Action triggers + status line */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-ink/10 pt-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              ref={mailRef}
+              href={`mailto:${EMAIL}`}
+              className="materia-button bg-ink text-page !min-h-10 !py-2 !px-5"
+            >
+              <Mail size={15} aria-hidden="true" />
+              {ui.email}
+              <ArrowUpRight size={15} aria-hidden="true" />
+            </a>
+            <SignatureLink label={t.ctaCv} kind="cv" />
+          </div>
+
+          <p
+            role="status"
+            aria-live="polite"
+            className="contact-copy-status font-mono text-xs text-lead min-h-[1.25rem] flex items-center"
+          >
+            {status === "copied"
+              ? `✓ ${ui.copied}`
+              : status === "failed"
+                ? ui.copyFailed
+                : "DONOSTIA / SAN SEBASTIÁN (GMT+2)"}
+          </p>
+        </div>
       </div>
-      <div className="contact-tiles grid">
+
+      <div className="contact-tiles grid mt-4">
         <ContactTile
           label="Gmail"
           value={EMAIL}

@@ -81,7 +81,21 @@
     font-size: 9px;
     letter-spacing: 0.08em;
   }
-  .about-metric dd {
-    font-size: clamp(2.1rem, 9vw, 3rem);
+}
+@keyframes scanline {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
   }
 }
+

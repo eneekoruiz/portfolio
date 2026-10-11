@@ -97,7 +97,7 @@ function SkillOrbit({
       const rotating = !focused && !dragging;
       if (rotating) {
         const advance = Math.min(dt, 0.08);
-        angle.target += advance * 0.28;
+        angle.target += advance * 0.09;
       }
       angle.step(dt);
       pitch.target = Math.max(-1, Math.min(1, angle.velocity * 0.15));

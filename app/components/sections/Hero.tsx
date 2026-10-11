@@ -9,6 +9,8 @@ import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
+import { BrutalistHeroMotion } from "../motion/BrutalistHeroMotion";
+import { SeismicWaveCanvas } from "../motion/SeismicWaveCanvas";
 import type { Tx, Lang } from "../../types";
 import { UI_COPY } from "../../data/interface-translations";
 
@@ -22,56 +24,8 @@ interface HeroProps {
 
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const ui = UI_COPY[lang];
-  const { enabled: motion, lightweight } = useMotionPolicy();
+  const { enabled: motion } = useMotionPolicy();
   const enabled = motion && !reduced && phase === "ready";
-  const portraitRef = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const video = portraitRef.current;
-    if (!video) return;
-    let visible = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const update = () => {
-      if (
-        enabled &&
-        !lightweight &&
-        visible &&
-        document.visibilityState === "visible"
-      ) {
-        if (!video.getAttribute("src")) {
-          if (!timer)
-            timer = setTimeout(() => {
-              timer = undefined;
-              if (
-                !enabled ||
-                !visible ||
-                document.visibilityState !== "visible"
-              )
-                return;
-              video.src = "/memoji.webm";
-              video.load();
-              void video.play().catch(() => {});
-            }, 800);
-        } else void video.play().catch(() => {});
-      } else {
-        clearTimeout(timer);
-        timer = undefined;
-        video.pause();
-      }
-    };
-    const observer = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      update();
-    });
-    observer.observe(video);
-    document.addEventListener("visibilitychange", update);
-    update();
-    return () => {
-      clearTimeout(timer);
-      observer.disconnect();
-      document.removeEventListener("visibilitychange", update);
-      video.pause();
-    };
-  }, [enabled, lightweight]);
   const heroRef = useRef<HTMLElement>(null);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
@@ -80,6 +34,16 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const prismRef = useRef<HTMLDivElement>(null);
   useMateriaSurface(prismRef, "#0066ff", enabled, 26);
   const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 6);
+  const charsRef = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const elements = Array.from(
+      heroRef.current.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
+    );
+    charsRef.current = elements;
+  }, [enabled]);
+
   const scrollTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
@@ -104,6 +68,11 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       aria-label="Eneko Ruiz"
       className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
+      <SeismicWaveCanvas
+        enabled={enabled}
+        stageRef={heroRef}
+        charRefs={charsRef}
+      />
       <div className="hero-light" aria-hidden="true" />
       <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
@@ -148,31 +117,10 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </div>
         <div
           ref={prismRef}
-          className="materia-surface hero-prism hero-identity-plate relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 md:block overflow-hidden"
+          className="materia-surface hero-prism hero-identity-plate relative hidden min-h-[300px] lg:min-h-[340px] max-h-[460px] self-stretch rounded-[26px] border border-ink/15 md:block overflow-hidden shadow-2xl"
           data-materia-surface="hero"
         >
-          <div className="absolute inset-x-5 top-5 z-10 flex items-center justify-between text-[10px] font-mono tracking-[0.18em] text-lead">
-            <span>ER — 01</span>
-            <span aria-hidden="true">↗</span>
-          </div>
-          <div className="hero-portrait-frame absolute inset-x-4 top-1/2 mx-auto">
-            <video
-              ref={portraitRef}
-              poster="/memoji-poster.webp"
-              autoPlay={false}
-              loop={enabled}
-              muted
-              playsInline
-              preload="none"
-              aria-hidden="true"
-              className="hero-portrait block h-full w-full object-cover"
-            />
-          </div>
-          <div className="absolute bottom-5 left-5 right-5 z-10 flex items-end justify-between border-t border-ink/15 pt-4">
-            <span className="font-mono text-[10px] tracking-[0.14em] text-lead">
-              DONOSTIA / SOFTWARE
-            </span>
-          </div>
+          <BrutalistHeroMotion enabled={enabled} />
         </div>
       </div>
       <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 md:gap-6 border-t border-ink/15 py-3 md:py-4 shrink-0">

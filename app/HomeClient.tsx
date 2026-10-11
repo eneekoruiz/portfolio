@@ -42,17 +42,10 @@ import { BranchMergeBtn } from "./components/ui/Buttons";
 import { Navbar } from "./components/navigation/Navbar";
 import { MobileMenu } from "./components/navigation/MobileMenu";
 
-const DebugHUD = dynamic(
-  () => import("./components/ui/DebugHUD").then((m) => m.DebugHUD),
-  { ssr: false },
-);
 import { PortalTransition } from "./components/ui/PortalTransition";
 import { EntrancePreloader } from "./components/ui/EntrancePreloader";
+import { IdentitySplash } from "./components/motion/IdentitySplash";
 import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollower";
-const DevTuningPanel = dynamic(
-  () => import("./components/ui/DevTuningPanel").then((m) => m.DevTuningPanel),
-  { ssr: false },
-);
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
 
@@ -112,7 +105,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const mounted = useProjectNavigation(t);
 
   // Intro phase state machine hook
-  const { phase, ready, onPreloaderDone } = useIntroPhase(mounted);
+  const { phase, ready, onPreloaderDone, onSplashComplete } =
+    useIntroPhase(mounted);
 
   // Modal and menu state managers
   const [cmd, setCmd] = useModalState();
@@ -237,8 +231,11 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {phase !== "ready" && (
+      {phase === "loading" && (
         <EntrancePreloader lang={lang} onDone={onPreloaderDone} />
+      )}
+      {phase === "splash" && (
+        <IdentitySplash lang={lang} onComplete={onSplashComplete} />
       )}
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
@@ -307,10 +304,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
       {/* 🛠️ Masterclass Utilities */}
       <div className="hud-vignette" aria-hidden="true" />
-      {process.env.NODE_ENV === "development" && <DebugHUD />}
       <PortalTransition />
       <ProjectPreviewFollower activeProject={hoveredProject} />
-      {process.env.NODE_ENV === "development" && <DevTuningPanel />}
     </>
   );
 }

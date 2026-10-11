@@ -1,12 +1,12 @@
 /* Contact signatures: recognizable marks, each with its own optical weight. */
 #contact .contact-tile .contact-flip-face {
-  min-height: 186px;
-  gap: 12px;
+  min-height: 140px;
+  gap: 10px;
   border-top-color: color-mix(in srgb, var(--surface-color) 38%, var(--page));
 }
 #contact .contact-tile .contact-tile-icon {
-  width: 66px;
-  height: 66px;
+  width: 48px;
+  height: 48px;
   border-color: color-mix(in srgb, var(--surface-color) 28%, var(--page));
   background: color-mix(in srgb, var(--surface-color) 10%, var(--page));
   box-shadow:
@@ -14,31 +14,31 @@
     inset 0 1px 0 #ffffff60;
 }
 #contact .contact-tile .contact-tile-icon svg {
-  width: 42px;
-  height: 42px;
+  width: 26px;
+  height: 26px;
 }
 #contact [data-contact-service="gmail"] .contact-tile-icon {
-  border-radius: 20px 9px 20px 9px;
-  transform: rotate(-6deg);
+  border-radius: 14px 6px 14px 6px;
+  transform: rotate(-4deg);
 }
 #contact [data-contact-service="github"] .contact-tile-icon {
   border-radius: 50%;
 }
 #contact [data-contact-service="linkedin"] .contact-tile-icon {
-  border-radius: 14px;
-  transform: rotate(5deg);
+  border-radius: 12px;
+  transform: rotate(4deg);
 }
 #contact .contact-tile .contact-tile-label {
-  font-size: 22px;
-  letter-spacing: -0.03em;
+  font-size: 18px;
+  letter-spacing: -0.02em;
 }
 #contact .contact-tile .contact-flip-back .contact-tile-icon {
-  width: 80px;
-  height: 80px;
+  width: 52px;
+  height: 52px;
 }
 #contact .contact-tile .contact-flip-back .contact-tile-icon svg {
-  width: 50px;
-  height: 50px;
+  width: 28px;
+  height: 28px;
 }
 @keyframes contact-mark-lift {
   0%,
@@ -67,26 +67,26 @@
 }
 @media (max-width: 639px) {
   #contact .contact-tile .contact-flip-face {
-    min-height: 160px;
-    gap: 10px;
+    min-height: 124px;
+    gap: 8px;
   }
   #contact .contact-tile .contact-tile-icon {
-    width: 50px;
-    height: 50px;
+    width: 38px;
+    height: 38px;
   }
   #contact .contact-tile .contact-tile-icon svg {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
   }
   #contact .contact-tile .contact-tile-label {
-    font-size: 16px;
+    font-size: 15px;
   }
   #contact .contact-tile .contact-flip-back .contact-tile-icon {
-    width: 56px;
-    height: 56px;
+    width: 42px;
+    height: 42px;
   }
   #contact .contact-tile .contact-flip-back .contact-tile-icon svg {
-    width: 36px;
-    height: 36px;
+    width: 24px;
+    height: 24px;
   }
 }

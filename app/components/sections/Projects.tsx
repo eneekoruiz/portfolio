@@ -109,9 +109,9 @@ export function Projects({
         ref={sectionRef}
         id="work"
         aria-label={t.woLb}
-        className="py-20 md:py-32 px-5 md:px-10 max-w-[1440px] mx-auto relative z-[60]"
+        className="py-10 md:py-16 px-5 md:px-10 max-w-[1440px] mx-auto relative z-[60]"
       >
-        <div className="projects-header mb-10 md:mb-16">
+        <div className="projects-header mb-6 md:mb-10">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 md:w-10 bg-ink opacity-12" />
             <p className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-lead">
@@ -130,6 +130,64 @@ export function Projects({
             </span>
           </div>
         </div>
+
+        {/* 3D Kinetic Spatial Project Navigator */}
+        {top3.length > 0 && (
+          <div
+            className="mb-6 flex flex-wrap items-center gap-2 font-mono text-[11px] select-none"
+            role="tablist"
+            aria-label="Navegador de proyectos 3D"
+          >
+            <span className="text-[10px] uppercase tracking-widest text-lead/60 mr-2 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse" />
+              NAV_3D:
+            </span>
+            {top3.map((p, i) => {
+              const safeId = p.name.toLowerCase().replace(/[\s_]+/g, "-");
+              const isSelected = expandedIdx === i;
+              return (
+                <button
+                  key={p.n}
+                  type="button"
+                  onClick={() => {
+                    handleToggle(i);
+                    const el = document.querySelector(
+                      `[data-materia-surface="${safeId}"]`,
+                    );
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                  }}
+                  onPointerEnter={() =>
+                    onHoverProject({ name: p.name, color: "#0066ff" })
+                  }
+                  onPointerLeave={() => onHoverProject(null)}
+                  className={`group relative flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-all duration-300 ${
+                    isSelected
+                      ? "border-brand bg-brand/10 text-ink shadow-[0_0_15px_rgba(0,102,255,0.25)]"
+                      : "border-ink/10 bg-ink/[0.02] text-lead hover:border-ink/30 hover:text-ink hover:-translate-y-0.5"
+                  }`}
+                  style={{
+                    perspective: "600px",
+                    transformStyle: "preserve-3d",
+                  }}
+                >
+                  <span className="font-bold text-ink/70">0{i + 1}</span>
+                  <span className="hidden sm:inline font-medium uppercase tracking-wider">
+                    {p.name.replace(/[-_]/g, " ")}
+                  </span>
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full transition-transform duration-300 ${
+                      isSelected
+                        ? "bg-brand scale-125"
+                        : "bg-ink/20 group-hover:bg-brand"
+                    }`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         <div className="projects-list space-y-4 md:space-y-5">
           {top3.length === 0
@@ -160,7 +218,7 @@ export function Projects({
         id="github"
         data-section="github"
         aria-label={t.ghLb}
-        className="border-t border-black/7 dark:border-white/10 py-12 md:py-22 px-5 md:px-8 max-w-[1200px] mx-auto relative z-10"
+        className="border-t border-black/7 dark:border-white/10 py-8 md:py-14 px-5 md:px-8 max-w-[1200px] mx-auto relative z-10"
       >
         <div className="flex items-end justify-between pb-4 border-b border-black/7 dark:border-white/10 mb-1">
           <p className="text-[9px] font-bold tracking-[0.22em] uppercase text-lead/60">

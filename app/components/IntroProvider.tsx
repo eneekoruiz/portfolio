@@ -19,7 +19,7 @@ interface IntroContextValue {
 
 const IntroContext = createContext<IntroContextValue | null>(null);
 
-const STORAGE_KEY = "portfolio_intro_seen_v4";
+const STORAGE_KEY = "portfolio_intro_seen_v5";
 
 function checkIsFirstVisit(): boolean {
   if (typeof window === "undefined") return false;

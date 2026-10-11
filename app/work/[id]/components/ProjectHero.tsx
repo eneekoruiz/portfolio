@@ -112,12 +112,9 @@ export function ProjectHero({
   const [heroInView, setHeroInView] = useState(false);
   const [screenInView, setScreenInView] = useState(false);
 
-  // HUD scroll progress refs
+  // HUD scroll cue refs
   const scrollProgressRef = useRef<HTMLDivElement>(null);
-  const scrollTextRef = useRef<HTMLSpanElement>(null);
-  const scrollBarRef = useRef<HTMLDivElement>(null);
   const scrollHintDefaultRef = useRef<HTMLDivElement>(null);
-  const scrollHintProgressRef = useRef<HTMLDivElement>(null);
   const mobileCtaRef = useRef<HTMLButtonElement>(null);
   const sheenRef = useRef<HTMLDivElement>(null);
   const [mobilePressed, setMobilePressed] = useState(false);
@@ -278,33 +275,16 @@ export function ProjectHero({
               );
             }
 
-            // Update scroll telemetry HUD
-            const progressPercent = Math.round(self.progress * 100);
-            if (scrollTextRef.current) {
-              scrollTextRef.current.textContent = `${progressPercent}%`;
-            }
-            if (scrollBarRef.current) {
-              scrollBarRef.current.style.width = `${progressPercent}%`;
-            }
-
+            // Fade scroll cue smoothly once scrolling begins
             if (scrollProgressRef.current) {
-              if (self.progress > 0.85) {
+              if (self.progress > 0.15) {
                 scrollProgressRef.current.style.opacity = "0";
                 scrollProgressRef.current.style.pointerEvents = "none";
-              } else if (self.progress > 0.02) {
-                scrollProgressRef.current.style.opacity = "1";
-                scrollProgressRef.current.style.pointerEvents = "auto";
-                if (scrollHintDefaultRef.current)
-                  scrollHintDefaultRef.current.style.display = "none";
-                if (scrollHintProgressRef.current)
-                  scrollHintProgressRef.current.style.display = "flex";
               } else {
-                scrollProgressRef.current.style.opacity = "1";
+                scrollProgressRef.current.style.opacity = String(
+                  Math.max(0, 1 - self.progress / 0.15),
+                );
                 scrollProgressRef.current.style.pointerEvents = "auto";
-                if (scrollHintDefaultRef.current)
-                  scrollHintDefaultRef.current.style.display = "flex";
-                if (scrollHintProgressRef.current)
-                  scrollHintProgressRef.current.style.display = "none";
               }
             }
           },
@@ -618,8 +598,8 @@ export function ProjectHero({
       // Subtle entrance - only when motion enabled and not reduced-motion
       gsap.fromTo(
         scrollProgressRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, delay: 0.6, ease: "power2.out" },
       );
     },
     { dependencies: [motionEnabled] },
@@ -895,11 +875,8 @@ export function ProjectHero({
                     </div>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white animate-pulse">
-                      {s.initializing}
-                    </span>
-                    <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">
-                      {s.mounting}
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/80">
+                      {s.preparing}
                     </span>
                   </div>
                 </div>
@@ -1161,34 +1138,6 @@ export function ProjectHero({
               </p>
             </div>
 
-            {/* Layout 2: Progress telemetry during scroll */}
-            <div
-              ref={scrollHintProgressRef}
-              className="hidden flex-col items-center gap-1 w-full"
-            >
-              <div
-                className="flex items-center justify-between w-full font-mono text-[7px] uppercase tracking-[0.16em] text-white/65 font-bold"
-                role="status"
-                aria-live="polite"
-              >
-                <span>{s.initializing}</span>
-                <span ref={scrollTextRef} className="text-white">
-                  0%
-                </span>
-              </div>
-              <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden relative">
-                <div
-                  ref={scrollBarRef}
-                  className="h-full transition-all duration-100 ease-linear rounded-full"
-                  style={{
-                    width: "0%",
-                    backgroundColor: accent,
-                    boxShadow: `0 0 6px ${accent}`,
-                  }}
-                />
-              </div>
-              <span className="sr-only">{s.keepScrolling}</span>
-            </div>
           </div>
         )}
       </div>

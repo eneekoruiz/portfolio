@@ -113,7 +113,7 @@ export function PremiumWorkRow({
       data-materia-surface={safeId}
       data-expanded={isExpanded}
       data-preview-motion={enabled}
-      className="materia-surface work-surface group/work relative rounded-[20px] border border-ink/15 text-ink"
+      className="materia-surface work-surface group/work relative text-ink"
       style={{ "--surface-color": theme.color } as CSSProperties}
       onPointerEnter={() => {
         prefetch();
@@ -132,30 +132,28 @@ export function PremiumWorkRow({
           onHoverProject(null);
       }}
     >
-      <div className="work-surface-header relative z-10 grid gap-5 p-5 md:grid-cols-[1.15fr_0.85fr] md:items-center md:gap-6 md:p-6">
-        <div className="min-w-0">
-          <div className="mb-2.5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-lead">
-            <span>{String(idx + 1).padStart(2, "0")}</span>
-            <span>{TX[lang].projectTags[idx] ?? proj.tag}</span>
+      <div className="work-surface-header relative z-10 flex flex-col gap-4 p-5 md:p-6 lg:p-7">
+        {/* Top Metadata & Tech Badges */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/10 pb-3">
+          <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-lead">
+            <span className="font-bold text-ink bg-ink/5 px-2 py-0.5 rounded border border-ink/10">
+              {String(idx + 1).padStart(2, "0")}
+            </span>
+            <span className="font-semibold text-brand">
+              {TX[lang].projectTags[idx] ?? proj.tag}
+            </span>
+            <span className="text-lead/40" aria-hidden="true">/</span>
             <span>{proj.year}</span>
           </div>
-          <h3
-            data-project-title
-            className="work-project-title text-balance break-words text-[clamp(1.5rem,2.6vw,2.25rem)] font-bold capitalize leading-[1.08] tracking-[-0.045em]"
-          >
-            {content?.title ?? proj.name.replace(/[-_]/g, " ")}
-          </h3>
-          <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-lead line-clamp-2">
-            {content?.objective ?? proj.desc}
-          </p>
+
           <div
-            className="mt-3 flex flex-wrap gap-x-4 gap-y-2"
+            className="flex flex-wrap items-center gap-2"
             aria-label={copy.technologies}
           >
             {proj.langs.map((language) => (
               <span
                 key={language}
-                className="flex items-center gap-1.5 text-[11px] font-medium text-lead"
+                className="inline-flex items-center gap-1.5 rounded-md border border-ink/15 bg-ink/[0.04] px-2.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-lead transition-colors hover:text-ink hover:border-ink/30"
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full"
@@ -166,7 +164,52 @@ export function PremiumWorkRow({
               </span>
             ))}
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+        </div>
+
+        {/* Content Body: Title + Description on left, Studio Preview on right */}
+        <div className="grid gap-6 md:grid-cols-[1.3fr_0.7fr] md:items-center">
+          <div className="min-w-0 flex flex-col justify-center">
+            <h3
+              data-project-title
+              className="work-project-title text-balance break-words text-[clamp(2.4rem,4.4vw,4.2rem)] font-black capitalize leading-[0.98] tracking-[-0.05em] text-ink transition-all duration-300"
+            >
+              {content?.title ?? proj.name.replace(/[-_]/g, " ")}
+            </h3>
+            <p className="work-project-desc mt-3 max-w-xl text-sm leading-relaxed text-lead line-clamp-2 md:line-clamp-3 transition-all duration-300">
+              {content?.objective ?? proj.desc}
+            </p>
+          </div>
+
+          <a
+            href={
+              theme.hasAudit
+                ? `/work/${safeId}`
+                : `https://github.com/eneekoruiz/${proj.name}`
+            }
+            onClick={theme.hasAudit ? handleNavigate : undefined}
+            onFocus={prefetch}
+            onPointerEnter={prefetch}
+            target={theme.hasAudit ? undefined : "_blank"}
+            rel={theme.hasAudit ? undefined : "noopener noreferrer"}
+            aria-label={`${copy.preview}: ${content?.title ?? proj.name}`}
+            className="work-preview min-w-0 rounded-xl"
+          >
+            <div className="work-preview-object" aria-hidden="true">
+              <ProjectVisual id={safeId} presentation="studio" />
+            </div>
+            <span className="work-preview-caption" aria-hidden="true">
+              <span>{copy.preview}</span>
+              <span className="work-preview-open">
+                {theme.hasAudit ? copy.explore : copy.source}
+                <ArrowUpRight size={13} aria-hidden="true" />
+              </span>
+            </span>
+          </a>
+        </div>
+
+        {/* Action Command Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-3">
+          <div className="flex flex-wrap items-center gap-3">
             <a
               ref={actionRef}
               href={
@@ -179,13 +222,13 @@ export function PremiumWorkRow({
               onPointerEnter={prefetch}
               target={theme.hasAudit ? undefined : "_blank"}
               rel={theme.hasAudit ? undefined : "noopener noreferrer"}
-              className="materia-button work-project-action bg-ink text-page !min-h-11 !py-2.5 !px-5"
+              className="materia-button work-project-action bg-ink text-page !min-h-10 !py-2 !px-5"
             >
               {theme.hasAudit ? copy.explore : copy.source}
               {theme.hasAudit ? (
-                <ArrowRight size={16} aria-hidden="true" />
+                <ArrowRight size={15} aria-hidden="true" />
               ) : (
-                <ArrowUpRight size={16} aria-hidden="true" />
+                <ArrowUpRight size={15} aria-hidden="true" />
               )}
             </a>
             <button
@@ -204,54 +247,31 @@ export function PremiumWorkRow({
               }}
               aria-expanded={isExpanded}
               aria-controls={panelId}
-              className="flex min-h-11 items-center gap-2 text-xs font-medium text-lead hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+              className="materia-button border border-ink/15 text-ink hover:border-ink/30 !min-h-10 !py-2 !px-4 text-xs font-medium"
             >
               {copy.details}
               <Plus
-                className="work-expand-icon"
-                size={15}
-                strokeWidth={1.5}
+                className="work-expand-icon transition-transform duration-300"
+                size={14}
+                strokeWidth={2}
                 aria-hidden="true"
               />
             </button>
-            {theme.hasAudit && (
-              <a
-                href={`https://github.com/eneekoruiz/${proj.name}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={copy.source}
-                className="flex min-h-11 items-center gap-1.5 text-xs text-lead hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-              >
-                GitHub <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            )}
           </div>
-        </div>
-        <a
-          href={
-            theme.hasAudit
-              ? `/work/${safeId}`
-              : `https://github.com/eneekoruiz/${proj.name}`
-          }
-          onClick={theme.hasAudit ? handleNavigate : undefined}
-          onFocus={prefetch}
-          onPointerEnter={prefetch}
-          target={theme.hasAudit ? undefined : "_blank"}
-          rel={theme.hasAudit ? undefined : "noopener noreferrer"}
-          aria-label={`${copy.preview}: ${content?.title ?? proj.name}`}
-          className="work-preview min-w-0 rounded-xl"
-        >
-          <div className="work-preview-object" aria-hidden="true">
-            <ProjectVisual id={safeId} presentation="studio" />
-          </div>
-          <span className="work-preview-caption" aria-hidden="true">
-            <span>{copy.preview}</span>
-            <span className="work-preview-open">
-              {theme.hasAudit ? copy.explore : copy.source}
+
+          {theme.hasAudit && (
+            <a
+              href={`https://github.com/eneekoruiz/${proj.name}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={copy.source}
+              className="flex items-center gap-1.5 font-mono text-[11px] text-lead hover:text-ink transition-colors"
+            >
+              <span>GITHUB_SRC</span>
               <ArrowUpRight size={13} aria-hidden="true" />
-            </span>
-          </span>
-        </a>
+            </a>
+          )}
+        </div>
       </div>
       <div
         ref={bodyRef}

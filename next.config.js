@@ -27,6 +27,7 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: false,
   reactStrictMode: true,
   poweredByHeader: false,
   outputFileTracingRoot: __dirname,

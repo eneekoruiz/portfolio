@@ -32,7 +32,7 @@ function FrameBudget({
       lastRenderedFrames = renderedFrames.current,
       slowWindows = 0;
     const tick = (now: number) => {
-      if (now - last >= 1000 / 30 - 1) {
+      if (now - last >= 1000 / 60 - 1) {
         last = now;
         invalidate();
       }

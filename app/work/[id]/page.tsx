@@ -35,7 +35,6 @@ import { LANG_COLORS, getTechColor } from "../../lib/constants";
 import type { Lang } from "../../types";
 import { useMagnetic } from "../../hooks/useMagnetic";
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
-import { useTextScramble } from "../../hooks/useTextScramble";
 import { ProjectHero } from "./components/ProjectHero";
 import { materia, setMateriaPalette } from "../../lib/materia";
 import { umbral } from "../../components/motion/UmbralProvider";
@@ -358,17 +357,7 @@ export default function ProjectPage() {
     innerStrength: 0.1,
   });
 
-  // 🎯 Punto 7 — Text scramble for project title
   const titleText = content?.title ?? summary?.name ?? safeId;
-  const { text: scrambledText } = useTextScramble(titleText, {
-    trigger: "mount",
-    charSpeed: 10,
-    iterations: 2,
-    delay: 50,
-  });
-  const enteredThroughUmbral = useRef(umbral.active);
-  const scrambledTitle =
-    motionEnabled && !enteredThroughUmbral.current ? scrambledText : titleText;
 
   // Detect dark mode
   useEffect(() => {
@@ -443,13 +432,14 @@ export default function ProjectPage() {
         window.__lenis?.start?.();
       };
     } else {
-      // No overlay found (direct link or fast navigation), enable effects immediately
+      // Direct navigation: let the hero surface land before heavy background loops activate
       forceScrollReset();
-      setIsReadyToAnimate(true);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         forceScrollReset();
+        setIsReadyToAnimate(true);
         ScrollTrigger.refresh();
-      }, 40);
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -588,7 +578,7 @@ export default function ProjectPage() {
       {/* ── FAKE 3D HERO (Full-viewport parallax + zoom) ── */}
       <ProjectHero
         projectId={safeId}
-        title={scrambledTitle}
+        title={titleText}
         subtitle={content?.subtitle ?? ""}
         accent={theme.accent}
         accentBg={theme.helixA}
