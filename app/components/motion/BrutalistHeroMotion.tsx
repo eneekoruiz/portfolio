@@ -60,35 +60,14 @@ export function BrutalistHeroMotion({ enabled }: BrutalistHeroMotionProps) {
       }}
       aria-hidden="true"
     >
-      {/* Blueprint Grid & Scanline */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(0, 102, 255, 0.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 102, 255, 0.25) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
-
-      {/* Sweeping Laser Scanline */}
-      {enabled && (
-        <div
-          className="pointer-events-none absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-60 animate-[scanline_4s_linear_infinite]"
-          style={{
-            boxShadow: "0 0 12px var(--brand), 0 0 24px var(--brand)",
-          }}
-        />
-      )}
-
-      {/* Top HUD Telemetry */}
+      {/* Top Architectural Badge */}
       <div className="relative z-10 flex items-center justify-between font-mono text-[10px] tracking-[0.2em] text-lead/80">
         <div className="flex items-center gap-2">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-white font-bold">CORE_HUD // 01</span>
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" />
+          <span className="text-white font-bold tracking-widest">ER · ARCHIVE</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden sm:inline">60.0 FPS</span>
-          <span className="text-brand font-semibold">ONLINE</span>
+          <span className="text-brand font-semibold">2026</span>
         </div>
       </div>
 
@@ -178,8 +157,8 @@ export function BrutalistHeroMotion({ enabled }: BrutalistHeroMotionProps) {
               ER
             </span>
             <div className="mt-1 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.25em] text-brand font-bold">
-              <span>SYS_ARCH</span>
-              <span className="text-white/40">/</span>
+              <span>DONOSTIA</span>
+              <span className="text-white/40">·</span>
               <span>2026</span>
             </div>
             <span className="mt-1 font-mono text-[8px] tracking-[0.15em] text-lead/80">
@@ -189,17 +168,15 @@ export function BrutalistHeroMotion({ enabled }: BrutalistHeroMotionProps) {
         </div>
       </div>
 
-      {/* Bottom Technical Readout & Interactive Coordinates */}
+      {/* Bottom Technical Readout */}
       <div className="relative z-10 flex items-end justify-between border-t border-ink/10 pt-3 font-mono text-[9px] tracking-[0.14em] text-lead">
         <div>
-          <span className="text-lead/60 block">COORDINATES</span>
+          <span className="text-lead/60 block">UBICACIÓN</span>
           <span className="text-white font-medium">43.3183° N, 1.9812° W</span>
         </div>
         <div className="text-right">
-          <span className="text-lead/60 block">RETICLE_TRACK</span>
-          <span className="text-brand font-medium">
-            X:{String(coords.x).padStart(3, "0")} Y:{String(coords.y).padStart(3, "0")}
-          </span>
+          <span className="text-lead/60 block">SAN SEBASTIÁN</span>
+          <span className="text-brand font-medium">DISPONIBLE</span>
         </div>
       </div>
     </div>

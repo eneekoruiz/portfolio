@@ -28,6 +28,8 @@ function checkIsFirstVisit(): boolean {
       return false;
     if (localStorage.getItem("portfolio-motion-enabled") === "false")
       return false;
+    // En desarrollo siempre permitir ver la intro completa para testeo
+    if (process.env.NODE_ENV === "development") return true;
     return !sessionStorage.getItem(STORAGE_KEY);
   } catch {
     return false;
@@ -36,7 +38,7 @@ function checkIsFirstVisit(): boolean {
 
 /** Content is readable in the server response; decoration never gates navigation. */
 export function IntroProvider({ children }: { children: ReactNode }) {
-  const [phase, setPhase] = useState<IntroPhase>("ready");
+  const [phase, setPhase] = useState<IntroPhase>("splash");
 
   useEffect(() => {
     if (checkIsFirstVisit()) {

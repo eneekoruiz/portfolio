@@ -69,7 +69,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
     >
       <SeismicWaveCanvas
-        enabled={enabled}
         stageRef={heroRef}
         charRefs={charsRef}
       />
@@ -84,21 +83,22 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         <div className="relative z-10 min-w-0">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(4.8rem,13vw,14rem)] font-black uppercase leading-[0.75] tracking-[-0.07em] text-ink"
+            className="m-0 text-[clamp(4.8rem,13vw,13.5rem)] font-black leading-[0.82] tracking-[-0.055em] select-none"
           >
-            <KineticText
-              text="Eneko"
-              enabled={enabled}
-              interactive
-              delay={0.1}
-            />
-            <KineticText
-              text="Ruiz."
-              enabled={enabled}
-              interactive
-              delay={0.28}
-              className="mt-[0.08em] text-brand block"
-            />
+            <div className="block text-ink">
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="0">E</span>
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="1">n</span>
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="2">e</span>
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="3">k</span>
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="4">o</span>
+            </div>
+            <div className="block mt-1 text-brand">
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="5">R</span>
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="6">u</span>
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="7">i</span>
+              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="8">z</span>
+              <span className="char-node inline-block will-change-transform text-brand" data-kinetic-char data-i="9">.</span>
+            </div>
           </h1>
           <div className="hero-introduction mt-8 flex max-w-2xl items-start gap-5 md:mt-10 md:gap-6">
             <span
