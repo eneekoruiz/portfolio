@@ -477,14 +477,37 @@ export function SeismicWaveCanvas({
       // Sacudida sísmica direccional instantánea
       seismicImpulseX.current = (Math.random() > 0.5 ? 1 : -1) * 14;
       seismicImpulseY.current = -12;
+    };
+
+    // Escuchar eventos globales de impacto tectónico desde cualquier componente
+    const handleTectonicEvent = (e: Event) => {
+      const customEvent = e as CustomEvent<{ x?: number; y?: number; intensity?: number }>;
+      const x = customEvent.detail?.x ?? window.innerWidth / 2;
+      const y = customEvent.detail?.y ?? window.innerHeight / 2;
+      const intensity = customEvent.detail?.intensity ?? 1.0;
+
+      shockfrontsRef.current.push(
+        new TrueSeismicShockfront(x, y, 480 * intensity, 1.2 * intensity, 28, false),
+      );
+
+      for (let f = 0; f < 5; f++) {
+        const angle = (f / 5) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+        const length = 45 + Math.random() * 55;
+        fissuresRef.current.push(new TectonicFissure(x, y, angle, length));
+      }
+
+      seismicImpulseX.current = (Math.random() > 0.5 ? 1 : -1) * (12 * intensity);
+      seismicImpulseY.current = -9 * intensity;
       seismicDecay.current = 0.86;
     };
 
     window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("tectonic-impact", handleTectonicEvent);
 
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("tectonic-impact", handleTectonicEvent);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, []);

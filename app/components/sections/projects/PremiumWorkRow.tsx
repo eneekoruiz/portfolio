@@ -19,6 +19,7 @@ import { useUmbral } from "../../motion/UmbralProvider";
 import { ProjectVisual } from "../../motion/ProjectVisual";
 import { useProjectStage } from "../../../hooks/useProjectStage";
 import { useMotionPolicy } from "../../../hooks/useMotionEnabled";
+import { triggerTectonicImpact } from "../../../lib/tectonic";
 
 interface WorkRowProps {
   proj: ProjectCard;
@@ -88,6 +89,7 @@ export function PremiumWorkRow({
     }
   };
   const handleNavigate = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    triggerTectonicImpact(event.clientX, event.clientY, 1.2);
     if (
       event.button !== 0 ||
       event.metaKey ||
@@ -186,7 +188,13 @@ export function PremiumWorkRow({
                 ? `/work/${safeId}`
                 : `https://github.com/eneekoruiz/${proj.name}`
             }
-            onClick={theme.hasAudit ? handleNavigate : undefined}
+            onClick={(e) => {
+              if (theme.hasAudit) {
+                handleNavigate(e);
+              } else {
+                triggerTectonicImpact(e.clientX, e.clientY, 1.0);
+              }
+            }}
             onFocus={prefetch}
             onPointerEnter={prefetch}
             target={theme.hasAudit ? undefined : "_blank"}
@@ -217,7 +225,13 @@ export function PremiumWorkRow({
                   ? `/work/${safeId}`
                   : `https://github.com/eneekoruiz/${proj.name}`
               }
-              onClick={theme.hasAudit ? handleNavigate : undefined}
+              onClick={(e) => {
+                if (theme.hasAudit) {
+                  handleNavigate(e);
+                } else {
+                  triggerTectonicImpact(e.clientX, e.clientY, 1.0);
+                }
+              }}
               onFocus={prefetch}
               onPointerEnter={prefetch}
               target={theme.hasAudit ? undefined : "_blank"}
@@ -234,7 +248,8 @@ export function PremiumWorkRow({
             <button
               id={`btn-${safeId}`}
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                triggerTectonicImpact(e.clientX, e.clientY, 0.9);
                 onToggle();
                 if (!isExpanded && rowRef.current?.dataset.projectStage) {
                   requestAnimationFrame(() =>

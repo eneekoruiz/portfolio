@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { triggerPortal } from "./PortalTransition";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 import type { MouseEvent } from "react";
 
 /** Native links retain their own visual language without delaying navigation. */
@@ -28,6 +29,7 @@ export function SignatureLink({
         if (kind === "cv") router.prefetch("/curriculum");
       }}
       onClick={(event) => {
+        triggerTectonicImpact(event.clientX, event.clientY, 1.1);
         if (
           event.metaKey ||
           event.ctrlKey ||

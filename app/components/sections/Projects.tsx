@@ -24,6 +24,7 @@ import {
   saveNavState,
   clearNavState,
 } from "../../lib/navigationPersistence";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 
 // Subcomponents
 import { RepoRow } from "./projects/RepoRow";
@@ -149,7 +150,8 @@ export function Projects({
                 <button
                   key={p.n}
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    triggerTectonicImpact(e.clientX, e.clientY, 0.95);
                     handleToggle(i);
                     const el = document.querySelector(
                       `[data-materia-surface="${safeId}"]`,

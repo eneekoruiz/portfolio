@@ -652,6 +652,10 @@ html[dir="rtl"] .hero-prism {
 .materia-canvas[data-scene-ready="false"] {
   opacity: 0 !important;
 }
+.materia-canvas[data-in-hero="true"] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 .materia-surface {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;

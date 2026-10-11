@@ -112,24 +112,29 @@ export function MateriaLayer() {
   // Outside the hero the GPU sleeps; the same bounded SVG projection remains alive.
   const animateFallback = enabled && ready;
   if (!mounted || !routeHasScene) return null;
+  const inHero = pathname === "/" && heroVisible;
+
   return (
     <div
-      className="materia-canvas fixed inset-0 z-0 pointer-events-none overflow-hidden"
-      data-scene-active={heroVisible && enabled}
+      className={`materia-canvas fixed inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-700 ${
+        inHero ? "opacity-0" : "opacity-75"
+      }`}
+      data-scene-active={!inHero && enabled}
       data-scene-ready={ready}
+      data-in-hero={inHero ? "true" : "false"}
       data-scene-degraded={degraded || undefined}
       aria-hidden="true"
     >
       <GraphicsBoundary animateFallback={animateFallback}>
         {!allowed || lightweight || !sceneReady || degraded ? (
-          <StaticDNA animate={animateFallback} />
+          <StaticDNA animate={animateFallback && !inHero} />
         ) : (
           <CanvasScene
             accent={materia.accent}
             secondary={materia.secondary}
             darkMode={resolvedTheme === "dark"}
-            paused={!enabled || !ready || !heroVisible}
-            animateFallback={animateFallback}
+            paused={!enabled || !ready || inHero}
+            animateFallback={animateFallback && !inHero}
             onSlow={degrade}
           />
         )}

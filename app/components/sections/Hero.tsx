@@ -8,6 +8,7 @@ import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
 import { SeismicWaveCanvas } from "../motion/SeismicWaveCanvas";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 import type { Tx, Lang } from "../../types";
 import { UI_COPY } from "../../data/interface-translations";
 
@@ -42,6 +43,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const scrollTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
+    triggerTectonicImpact(event.clientX, event.clientY, 1.15);
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();

@@ -10,6 +10,7 @@ import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { ContactTile } from "./ContactTile";
 import { SignatureLink } from "../ui/SignatureLink";
 import { UI_COPY } from "../../data/interface-translations";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 
 const EMAIL = "eneekoruiz@gmail.com";
 
@@ -31,7 +32,9 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
     };
   }, []);
 
-  const copy = async () => {
+  const copy = async (e?: React.MouseEvent) => {
+    if (e) triggerTectonicImpact(e.clientX, e.clientY, 1.25);
+    else triggerTectonicImpact(undefined, undefined, 1.25);
     try {
       await navigator.clipboard.writeText(EMAIL);
       if (!alive.current) return;
