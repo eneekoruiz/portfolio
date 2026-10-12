@@ -69,18 +69,24 @@ export function MateriaLayer() {
       if (idle) window.cancelIdleCallback(idle);
     };
   }, [enabled, sceneReady, lightweight, degraded]);
+  const [skillsVisible, setSkillsVisible] = useState(false);
   useEffect(() => {
     const hero =
       document.getElementById("hero") ??
       document.querySelector("[data-umbral-destination]");
+    const skills = document.getElementById("skills");
     if (!hero) {
       setHeroVisible(true);
       return;
     }
-    const observer = new IntersectionObserver(([entry]) =>
-      setHeroVisible(entry.isIntersecting),
-    );
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === hero) setHeroVisible(entry.isIntersecting);
+        if (entry.target === skills) setSkillsVisible(entry.isIntersecting);
+      }
+    });
     observer.observe(hero);
+    if (skills) observer.observe(skills);
     return () => observer.disconnect();
   }, [pathname]);
   useEffect(() => {
@@ -109,32 +115,29 @@ export function MateriaLayer() {
   }, [enabled]);
   const routeHasScene = pathname === "/" || pathname.startsWith("/work/");
   const ready = pathname !== "/" || phase === "ready";
-  // Outside the hero the GPU sleeps; the same bounded SVG projection remains alive.
-  const animateFallback = enabled && ready;
+  // Outside the hero the GPU sleeps; the bounded SVG projection animates in hero and skills.
+  const animateFallback = enabled && (heroVisible || skillsVisible) && ready;
   if (!mounted || !routeHasScene) return null;
   const inHero = pathname === "/" && heroVisible;
 
   return (
     <div
-      className={`materia-canvas fixed inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-700 ${
-        inHero ? "opacity-0" : "opacity-75"
-      }`}
-      data-scene-active={!inHero && enabled}
+      className="materia-canvas fixed inset-0 z-0 pointer-events-none overflow-hidden"
+      data-scene-active={heroVisible && enabled}
       data-scene-ready={ready}
-      data-in-hero={inHero ? "true" : "false"}
       data-scene-degraded={degraded || undefined}
       aria-hidden="true"
     >
       <GraphicsBoundary animateFallback={animateFallback}>
         {!allowed || lightweight || !sceneReady || degraded ? (
-          <StaticDNA animate={animateFallback && !inHero} />
+          <StaticDNA animate={animateFallback} />
         ) : (
           <CanvasScene
             accent={materia.accent}
             secondary={materia.secondary}
             darkMode={resolvedTheme === "dark"}
-            paused={!enabled || !ready || inHero}
-            animateFallback={animateFallback && !inHero}
+            paused={!enabled || !ready || !heroVisible}
+            animateFallback={animateFallback}
             onSlow={degrade}
           />
         )}

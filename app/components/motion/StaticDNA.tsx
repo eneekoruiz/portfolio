@@ -62,8 +62,12 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
       pointerX = pointerY = 0;
     };
 
+    let lastWriteTime = 0;
     const update = (now: number) => {
       if (!active) return;
+      frame = window.requestAnimationFrame(update);
+      if (now - lastWriteTime < 54) return;
+      lastWriteTime = now;
       elapsedRef.current += Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
 
@@ -128,23 +132,18 @@ export function StaticDNA({ animate = false }: { animate?: boolean }) {
         light?.setAttribute("d", path);
         light?.setAttribute("stroke-dashoffset", lightOffset.toFixed(4));
       }
-      timer = window.setTimeout(() => {
-        frame = window.requestAnimationFrame(update);
-      }, 50);
     };
 
     const stop = () => {
       active = false;
-      window.clearTimeout(timer);
       window.cancelAnimationFrame(frame);
     };
     const start = () => {
       if (active || document.visibilityState !== "visible") return;
       active = true;
       lastTime = performance.now();
-      timer = window.setTimeout(() => {
-        frame = window.requestAnimationFrame(update);
-      }, 50);
+      lastWriteTime = 0;
+      frame = window.requestAnimationFrame(update);
     };
     const syncVisibility = () => {
       if (document.visibilityState === "visible") start();

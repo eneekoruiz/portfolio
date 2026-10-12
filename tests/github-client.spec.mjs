@@ -83,7 +83,7 @@ test("malformed-only optional data shows offline fallback and keeps projects and
   await expect(
     activity.locator('a[href="https://github.com/eneekoruiz"]').first(),
   ).toBeVisible();
-  await expect(page.locator("[data-project-title]")).toHaveCount(5);
+  await expect(page.locator("[data-project-title]")).toHaveCount(8);
   await page.locator("#contact").scrollIntoViewIfNeeded();
   await expect(
     page.locator('#contact a[href^="mailto:"]').first(),

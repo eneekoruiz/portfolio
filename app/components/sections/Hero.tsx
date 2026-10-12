@@ -7,6 +7,7 @@ import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
+import { KineticText } from "../motion/KineticText";
 import { SeismicWaveCanvas } from "../motion/SeismicWaveCanvas";
 import { triggerTectonicImpact } from "../../lib/tectonic";
 import type { Tx, Lang } from "../../types";
@@ -22,8 +23,46 @@ interface HeroProps {
 
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const ui = UI_COPY[lang];
-  const { enabled: motion } = useMotionPolicy();
+  const { enabled: motion, lightweight } = useMotionPolicy();
   const enabled = motion && !reduced;
+  const portraitRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = portraitRef.current;
+    if (!video) return;
+    let visible = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const update = () => {
+      if (
+        enabled &&
+        !lightweight &&
+        visible &&
+        document.visibilityState === "visible"
+      ) {
+        if (!video.getAttribute("src")) {
+          video.src = "/memoji.webm";
+          video.load();
+        }
+        void video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      update();
+    });
+    observer.observe(video);
+    document.addEventListener("visibilitychange", update);
+    update();
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+      video.pause();
+    };
+  }, [enabled, lightweight]);
+
   const heroRef = useRef<HTMLElement>(null);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
@@ -76,36 +115,39 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         </p>
         <LiveStatus label={t.status} />
       </div>
-      <div className="hero-composition relative mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center text-center py-2 md:py-4 my-auto">
+      <div className="hero-composition relative mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center justify-center text-center py-2 md:py-3 my-auto">
         <div className="relative z-10 flex flex-col items-center w-full">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(3.8rem,11.5vh,10.5rem)] font-black leading-[0.84] tracking-[-0.055em] select-none text-center"
+            className="m-0 text-[clamp(3.8rem,18.5vw,5.2rem)] md:text-[clamp(5.2rem,21.5vh,18.5rem)] font-black leading-[0.80] tracking-[-0.065em] select-none text-center"
           >
             <div className="block text-ink">
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="0">E</span>
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="1">n</span>
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="2">e</span>
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="3">k</span>
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="4">o</span>
+              <KineticText
+                text="Eneko"
+                enabled={enabled}
+                interactive={true}
+                className="inline-block"
+              />
             </div>
-            <div className="block mt-1 text-brand">
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="5">R</span>
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="6">u</span>
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="7">i</span>
-              <span className="char-node inline-block will-change-transform" data-kinetic-char data-i="8">z</span>
-              <span className="char-node inline-block will-change-transform text-brand" data-kinetic-char data-i="9">.</span>
+            <div className="block mt-1 md:mt-2 text-brand">
+              <KineticText
+                text="Ruiz."
+                enabled={enabled}
+                interactive={true}
+                className="inline-block"
+              />
             </div>
           </h1>
-          <div className="hero-introduction mt-4 md:mt-6 flex flex-col items-center max-w-lg text-center">
+
+          <div className="hero-introduction mt-3 md:mt-5 flex flex-col items-center text-center max-w-xl px-4">
             <span
-              className="h-px w-10 bg-brand/50 mb-3"
+              className="h-px w-10 bg-brand/50 mb-2.5"
               aria-hidden="true"
             />
             <p className="text-sm md:text-lg font-semibold tracking-tight text-ink">
               {t.role}
             </p>
-            <p className="mt-1.5 text-xs md:text-sm leading-relaxed text-lead max-w-md">
+            <p className="mt-1 text-xs md:text-sm leading-relaxed text-lead max-w-md">
               {t.tagline}
             </p>
           </div>
@@ -149,6 +191,23 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           {t.scroll}
           <ArrowDown size={14} aria-hidden="true" />
         </span>
+      </div>
+      <div
+        className="hero-portrait-frame pointer-events-none opacity-0 absolute overflow-hidden"
+        style={{ width: 1, height: 1, bottom: 0, left: 0 }}
+        aria-hidden="true"
+      >
+        <video
+          ref={portraitRef}
+          poster="/memoji-poster.webp"
+          autoPlay={false}
+          loop={enabled}
+          muted
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          style={{ width: 1, height: 1 }}
+        />
       </div>
     </section>
   );

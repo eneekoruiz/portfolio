@@ -88,7 +88,7 @@ export function PremiumWorkRow({
       router.prefetch(`/work/${safeId}`);
     }
   };
-  const handleNavigate = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleNavigate = (event: React.MouseEvent<HTMLElement>) => {
     triggerTectonicImpact(event.clientX, event.clientY, 1.2);
     if (
       event.button !== 0 ||
@@ -200,7 +200,7 @@ export function PremiumWorkRow({
             target={theme.hasAudit ? undefined : "_blank"}
             rel={theme.hasAudit ? undefined : "noopener noreferrer"}
             aria-label={`${copy.preview}: ${content?.title ?? proj.name}`}
-            className="work-preview min-w-0 rounded-xl"
+            className="work-preview min-w-0 rounded-xl text-left"
           >
             <div className="work-preview-object" aria-hidden="true">
               <ProjectVisual id={safeId} presentation="studio" />

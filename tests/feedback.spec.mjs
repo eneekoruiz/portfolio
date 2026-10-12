@@ -19,7 +19,7 @@ test("projects expose their direct action before disclosure and keep the brief c
   await page.goto("/");
   await expect(page.locator("[data-reading-nav]")).toHaveCount(0);
   const rows = page.locator("#work [data-materia-surface]");
-  await expect(rows).toHaveCount(5);
+  await expect(rows).toHaveCount(8);
   for (const row of await rows.all()) {
     await row.scrollIntoViewIfNeeded();
     const action = row.locator(".work-project-action");

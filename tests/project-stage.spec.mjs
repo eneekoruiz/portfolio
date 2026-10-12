@@ -34,7 +34,7 @@ test("each project owns a scroll stage with a visible direct action and reversib
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
   const rows = page.locator("#work [data-materia-surface]");
-  await expect(rows).toHaveCount(5);
+  await expect(rows).toHaveCount(8);
   await expect(page.locator(".skill-orbit-help")).toHaveCount(0);
   for (const row of await rows.all()) {
     await expect(row).toHaveAttribute("data-project-stage", /active|entry/);
@@ -149,7 +149,7 @@ test("scroll studio navigation and Back preserve the document and collapsed scen
   await details.click();
   await expect(row).toHaveAttribute("data-project-stage", /active|entry/);
   await page.setViewportSize({ width: page.viewportSize().width, height: 500 });
-  await expect(page.locator('[data-project-stage="entry"]')).toHaveCount(5);
+  await expect(page.locator('[data-project-stage="entry"]')).toHaveCount(8);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator("[data-project-stage]")).toHaveCount(0);
 });

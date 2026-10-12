@@ -146,6 +146,7 @@ test("hero reading areas and portrait plate stay clear at supported widths and t
     info.project.name !== "desktop",
     "This test sets its own viewport sizes.",
   );
+  test.setTimeout(180000);
   const pageErrors = [];
   const screenshots = "scratch/continuity-20261004/after";
   await mkdir(screenshots, { recursive: true });

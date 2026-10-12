@@ -20,22 +20,6 @@
   backface-visibility: hidden;
 }
 
-.char-node {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(28px) scale(0.92);
-  filter: blur(8px);
-  will-change: transform, opacity, filter;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.35s ease-out,
-              filter 0.35s ease-out;
-}
-
-.char-node.revealed {
-  opacity: 1 !important;
-  filter: blur(0px) !important;
-  transform: translateY(0) scale(1) !important;
-}
 .kinetic-type [data-glyph] {
   position: relative;
 }

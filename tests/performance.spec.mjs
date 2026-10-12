@@ -310,7 +310,7 @@ test("optional activity loads on approach and failure preserves featured work an
   await expect(
     page.locator('#github a[href="https://github.com/eneekoruiz"]').first(),
   ).toBeVisible();
-  await expect(page.locator("[data-project-title]")).toHaveCount(5);
+  await expect(page.locator("[data-project-title]")).toHaveCount(8);
   await page.locator("#contact").scrollIntoViewIfNeeded();
   await expect(
     page.locator('#contact a[href^="mailto:"]').first(),
@@ -340,7 +340,7 @@ test("content and contact survive disabled JavaScript", async ({
         .locator("body")
         .evaluate((body) => getComputedStyle(body).cursor),
     ).not.toBe("none");
-    await expect(page.locator("[data-project-title]")).toHaveCount(5);
+    await expect(page.locator("[data-project-title]")).toHaveCount(8);
     await page.locator("#contact").scrollIntoViewIfNeeded();
     await expect(
       page.locator('#contact a[href^="mailto:"]').first(),
@@ -362,6 +362,7 @@ test("project accordion, route and native back remain usable", async ({
     .locator(
       '[data-materia-surface="ana-peluquera"] a[href="/work/ana-peluquera"]',
     )
+    .first()
     .click();
   await expect(page).toHaveURL(/\/work\/ana-peluquera$/);
   await expect(

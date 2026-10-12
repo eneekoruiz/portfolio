@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Check, Copy, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowUpRight, Check, Github, Linkedin, Mail } from "lucide-react";
 import type { Lang, Tx } from "../../types";
 import { SectionFrame } from "./SectionFrame";
 import { useSpringHover } from "../../hooks/useSpringHover";
@@ -77,29 +77,6 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
           >
             {EMAIL}
           </a>
-
-          <button
-            type="button"
-            onClick={copy}
-            aria-label={ui.copyEmail}
-            className={`materia-button border font-mono text-xs transition-all !min-h-10 !py-2 !px-4 ${
-              status === "copied"
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-500 font-bold"
-                : "border-ink/20 text-ink hover:border-brand hover:text-brand"
-            }`}
-          >
-            {status === "copied" ? (
-              <>
-                <Check size={14} aria-hidden="true" />
-                <span>{ui.copied}</span>
-              </>
-            ) : (
-              <>
-                <Copy size={14} aria-hidden="true" />
-                <span>{ui.copyEmail}</span>
-              </>
-            )}
-          </button>
         </div>
 
         {/* Action triggers + status line */}
@@ -117,17 +94,22 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
             <SignatureLink label={t.ctaCv} kind="cv" />
           </div>
 
-          <p
-            role="status"
-            aria-live="polite"
-            className="contact-copy-status font-mono text-xs text-lead min-h-[1.25rem] flex items-center"
-          >
-            {status === "copied"
-              ? `✓ ${ui.copied}`
-              : status === "failed"
-                ? ui.copyFailed
-                : "DONOSTIA / SAN SEBASTIÁN (GMT+2)"}
-          </p>
+          <div className="flex items-center gap-3 font-mono text-xs text-lead min-h-[1.25rem]">
+            <p
+              role="status"
+              aria-live="polite"
+              className="contact-copy-status flex items-center"
+            >
+              {status === "copied"
+                ? ui.copied
+                : status === "failed"
+                  ? ui.copyFailed
+                  : ""}
+            </p>
+            {status === "idle" && (
+              <span className="opacity-70">DONOSTIA / SAN SEBASTIÁN (GMT+2)</span>
+            )}
+          </div>
         </div>
       </div>
 

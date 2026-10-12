@@ -102,7 +102,7 @@ export function Projects({
     return () => cancelAnimationFrame(raf);
   }, [expandedIdx]);
 
-  // 3. Bind GSAP entrance reveals and inertial scrolling (Efecto Ola)
+  // 3. Bind GSAP entrance reveals
   useProjectsAnimations({ sectionRef, load, expandedIdx, motionEnabled });
 
   const handleToggle = (idx: number) => {

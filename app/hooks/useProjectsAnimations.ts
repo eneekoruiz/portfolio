@@ -16,9 +16,11 @@ interface Props {
 export function useProjectsAnimations({
   sectionRef,
   load,
+  expandedIdx,
   motionEnabled,
 }: Props) {
   const reduced = usePreferredMotion();
+
   useEffect(() => {
     const section = sectionRef.current;
     if (
@@ -29,8 +31,8 @@ export function useProjectsAnimations({
       matchMedia("(pointer: coarse)").matches
     )
       return;
+
     const ctx = gsap.context(() => {
-      // Rows stay axis-aligned so the optical masks share exact DOM geometry.
       gsap.fromTo(
         ".work-row-anim",
         { opacity: 0, y: 24 },
@@ -51,6 +53,15 @@ export function useProjectsAnimations({
         },
       );
     }, section);
+
     return () => ctx.revert();
   }, [sectionRef, load, motionEnabled, reduced]);
+
+  // Refrescar ScrollTrigger cuando se expande/contrae una tarjeta
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 320);
+    return () => clearTimeout(timer);
+  }, [expandedIdx]);
 }

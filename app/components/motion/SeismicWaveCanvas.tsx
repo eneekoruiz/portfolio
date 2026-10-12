@@ -9,7 +9,7 @@ interface SeismicWaveCanvasProps {
 }
 
 // ── TRAZADO DE FRENTE DE ONDA TECTÓNICO REAL (Anisotropía de Falla, Lóbulos y Ondulaciones) ──
-// Nunca un círculo geométrico perfecto: reproduce la propagación no-lineal a través de roca y fallas
+// Optimizado para GPU con 36 vértices por anillo (cero sobrecarga CPU)
 function drawTectonicWavefront(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -21,22 +21,19 @@ function drawTectonicWavefront(
   aspectRatioY = 0.88,
   rotation = -0.05,
 ) {
-  const steps = 84;
+  const steps = 36;
   ctx.beginPath();
   for (let i = 0; i <= steps; i++) {
     const theta = (i / steps) * Math.PI * 2;
-    // Lóbulos de radiación sísmica reales (patrón focal de plano de falla tectónica)
     const faultLobe = Math.sin(2 * theta + seed) * 0.085;
     const shearUndulation = Math.sin(3 * theta + seed * 1.6) * 0.045;
-    const microJitter = Math.sin(11 * theta + seed * 2.7) * roughness;
+    const microJitter = Math.sin(7 * theta + seed * 2.7) * roughness;
 
     const r = baseR * (1 + faultLobe + shearUndulation + microJitter);
 
-    // Proyección anisotrópica según la orientación de la falla geológica
     const lx = Math.cos(theta) * r * aspectRatioX;
     const ly = Math.sin(theta) * r * aspectRatioY;
 
-    // Rotación del eje de la fractura litosférica
     const cosR = Math.cos(rotation);
     const sinR = Math.sin(rotation);
     const px = cx + (lx * cosR - ly * sinR);
@@ -59,63 +56,132 @@ function drawMicroFracture(
   baseR: number,
   seed: number,
 ) {
-  const steps = 28;
+  const steps = 16;
   ctx.beginPath();
   for (let i = 0; i <= steps; i++) {
     const theta = (i / steps) * Math.PI * 2;
-    const microCrackle = Math.sin(4 * theta + seed) * 0.15 + Math.cos(7 * theta + seed * 1.5) * 0.09;
+    const microCrackle = Math.sin(4 * theta + seed) * 0.12;
     const r = baseR * (1 + microCrackle);
-    const px = cx + Math.cos(theta) * r * 1.12;
-    const py = cy + Math.sin(theta) * r * 0.88;
+    const px = cx + Math.cos(theta) * r * 1.1;
+    const py = cy + Math.sin(theta) * r * 0.9;
     if (i === 0) ctx.moveTo(px, py);
     else ctx.lineTo(px, py);
   }
   ctx.closePath();
 }
 
-// ── FISURAS RADIALES DE FALLA SÍSMICA (Grietas instantáneas de alta velocidad) ──
+// ── FISURAS RADIALES DE FALLA SÍSMICA CON BIFURCACIONES Y PROPAGACIÓN PROGRESIVA ──
+interface FissureSegment {
+  p1: { x: number; y: number };
+  p2: { x: number; y: number };
+  branch?: { p1: { x: number; y: number }; p2: { x: number; y: number } }[];
+  intensity: number;
+}
+
 class TectonicFissure {
-  points: { x: number; y: number }[] = [];
+  segments: FissureSegment[] = [];
   life = 1.0;
+  progress = 0.0;
+  propagationSpeed = 0.16; // Propagación hipersónica realista (~6-8 frames)
   dead = false;
 
   constructor(cx: number, cy: number, angle: number, length: number) {
     let curX = cx;
     let curY = cy;
-    this.points.push({ x: curX, y: curY });
-    const segments = 6;
-    const segLen = length / segments;
-    for (let i = 0; i < segments; i++) {
-      const jitterAngle = angle + (Math.random() - 0.5) * 0.55;
-      curX += Math.cos(jitterAngle) * (segLen * (0.8 + Math.random() * 0.4));
-      curY += Math.sin(jitterAngle) * (segLen * (0.8 + Math.random() * 0.4));
-      this.points.push({ x: curX, y: curY });
+    const count = 8 + Math.floor(Math.random() * 5);
+    const segLen = length / count;
+
+    for (let i = 0; i < count; i++) {
+      const jitter = angle + (Math.random() - 0.5) * 0.65;
+      const nextX = curX + Math.cos(jitter) * (segLen * (0.8 + Math.random() * 0.5));
+      const nextY = curY + Math.sin(jitter) * (segLen * (0.8 + Math.random() * 0.5));
+      const intensity = 1 - (i / count) * 0.55;
+
+      const seg: FissureSegment = {
+        p1: { x: curX, y: curY },
+        p2: { x: nextX, y: nextY },
+        intensity,
+      };
+
+      // Bifurcación dendrítica: ~40% probabilidad de ramificación secundaria
+      if (i > 1 && i < count - 1 && Math.random() < 0.42) {
+        const branchAngle = jitter + (Math.random() > 0.5 ? 1 : -1) * (0.42 + Math.random() * 0.45);
+        let bCurX = nextX;
+        let bCurY = nextY;
+        const bCount = 2 + Math.floor(Math.random() * 3);
+        const bLen = segLen * 0.65;
+        seg.branch = [];
+        for (let b = 0; b < bCount; b++) {
+          const bJitter = branchAngle + (Math.random() - 0.5) * 0.45;
+          const bNextX = bCurX + Math.cos(bJitter) * bLen;
+          const bNextY = bCurY + Math.sin(bJitter) * bLen;
+          seg.branch.push({
+            p1: { x: bCurX, y: bCurY },
+            p2: { x: bNextX, y: bNextY },
+          });
+          bCurX = bNextX;
+          bCurY = bNextY;
+        }
+      }
+
+      this.segments.push(seg);
+      curX = nextX;
+      curY = nextY;
     }
   }
 
   update() {
-    this.life -= 0.045;
-    if (this.life <= 0) this.dead = true;
+    if (this.progress < 1.0) {
+      this.progress = Math.min(1.0, this.progress + this.propagationSpeed);
+    } else {
+      this.life -= 0.022; // Persistencia geológica orgánica
+      if (this.life <= 0) this.dead = true;
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    if (this.dead || this.points.length < 2) return;
+    if (this.dead || this.segments.length === 0) return;
+    const maxIndex = Math.floor(this.progress * this.segments.length);
+    if (maxIndex === 0) return;
+
     ctx.save();
+
+    // 1. Aura electromagnética cian/violeta (trazo ancho semi-transparente acelerado por GPU)
+    ctx.strokeStyle = `rgba(0, 200, 255, ${this.life * 0.55})`;
+    ctx.lineWidth = 2.2;
     ctx.beginPath();
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-    for (let i = 1; i < this.points.length; i++) {
-      ctx.lineTo(this.points[i].x, this.points[i].y);
+    for (let i = 0; i < maxIndex; i++) {
+      const seg = this.segments[i];
+      ctx.moveTo(seg.p1.x, seg.p1.y);
+      ctx.lineTo(seg.p2.x, seg.p2.y);
+      if (seg.branch && this.progress > (i / this.segments.length) + 0.1) {
+        for (const b of seg.branch) {
+          ctx.moveTo(b.p1.x, b.p1.y);
+          ctx.lineTo(b.p2.x, b.p2.y);
+        }
+      }
     }
-    ctx.strokeStyle = `rgba(0, 220, 255, ${this.life * 0.85})`;
-    ctx.shadowColor = `rgba(0, 102, 255, 0.7)`;
-    ctx.shadowBlur = 5;
-    ctx.lineWidth = 1.3;
     ctx.stroke();
+
+    // 2. Vena central hiper-fina blanco especular (falla litosférica pura)
+    ctx.strokeStyle = `rgba(255, 255, 255, ${this.life * 0.95})`;
+    ctx.lineWidth = 0.6; // Aguja afilada
+    ctx.beginPath();
+    for (let i = 0; i < maxIndex; i++) {
+      const seg = this.segments[i];
+      ctx.moveTo(seg.p1.x, seg.p1.y);
+      ctx.lineTo(seg.p2.x, seg.p2.y);
+    }
+    ctx.stroke();
+
     ctx.restore();
   }
 }
 
-// ── ONDA DE CHOQUE SÍSMICA REAL CON ABERRACIÓN CROMÁTICA TECTÓNICA ──
+// ── PALETAS Y TIPOS DE ONDA ARMÓNICA SÍSMICA (Como en la captura de resonancia multicapa) ──
+export type HarmonicPaletteType = "multi" | "cyan" | "violet" | "blue" | "slate" | "white";
+
+// ── ONDA DE CHOQUE SÍSMICA REAL CON RÉPLICAS ARMÓNICAS PROGRESIVAS ──
 class TrueSeismicShockfront {
   x: number;
   y: number;
@@ -131,6 +197,14 @@ class TrueSeismicShockfront {
   aspectRatioY: number;
   rotation: number;
   chromaticOffset: number;
+  paletteType: HarmonicPaletteType;
+
+  // Sistema de réplicas armónicas progresivas que se desprenden al viajar
+  isMaster: boolean;
+  harmonicsLeft: number;
+  totalHarmonics: number;
+  shedInterval: number;
+  lastShedR: number;
 
   constructor(
     x: number,
@@ -139,6 +213,9 @@ class TrueSeismicShockfront {
     amplitude = 1.0,
     velocity = 34,
     isMainRupture = false,
+    isMaster = false,
+    harmonicsCount = 0,
+    paletteType: HarmonicPaletteType = "multi",
   ) {
     this.x = x;
     this.y = y;
@@ -147,21 +224,68 @@ class TrueSeismicShockfront {
     this.amplitude = amplitude;
     this.velocity = velocity;
     this.isMainRupture = isMainRupture;
+    this.isMaster = isMaster;
+    this.harmonicsLeft = harmonicsCount;
+    this.totalHarmonics = harmonicsCount;
+    this.shedInterval = 44 + Math.random() * 16;
+    this.lastShedR = this.r;
+    this.paletteType = paletteType;
     this.life = 1.0;
     this.dead = false;
-    this.seed = Math.random() * 20;
-    this.aspectRatioX = 1.16 + (Math.random() - 0.5) * 0.08;
-    this.aspectRatioY = 0.88 + (Math.random() - 0.5) * 0.06;
-    this.rotation = -0.05 + (Math.random() - 0.5) * 0.04;
+    this.seed = Math.random() * 25;
+    this.aspectRatioX = 1.15 + (Math.random() - 0.5) * 0.12;
+    this.aspectRatioY = 0.88 + (Math.random() - 0.5) * 0.1;
+    this.rotation = -0.05 + (Math.random() - 0.5) * 0.08;
     this.chromaticOffset = isMainRupture ? 9 : 5;
   }
 
-  update() {
+  update(onSpawnHarmonic?: (child: TrueSeismicShockfront) => void) {
     this.r += this.velocity;
-    // Desaceleración en medio litosférico
-    this.velocity *= this.isMainRupture ? 0.982 : 0.96;
+    // Desaceleración gradual en la litosfera
+    this.velocity *= this.isMainRupture ? 0.984 : 0.966;
     this.life = 1 - this.r / this.maxR;
     if (this.life <= 0) this.dead = true;
+
+    // Desprendimiento armónico progresivo de réplicas secundarias
+    if (
+      this.isMaster &&
+      this.harmonicsLeft > 0 &&
+      this.r - this.lastShedR >= this.shedInterval &&
+      onSpawnHarmonic
+    ) {
+      this.lastShedR = this.r;
+      const paletteSequence: HarmonicPaletteType[] = [
+        "cyan",
+        "violet",
+        "blue",
+        "slate",
+        "white",
+        "cyan",
+        "violet",
+      ];
+      const cycleIndex = (this.totalHarmonics - this.harmonicsLeft) % paletteSequence.length;
+      const childPalette = paletteSequence[cycleIndex];
+      this.harmonicsLeft--;
+
+      // Spawn réplica armónica concéntrica detrás del frente principal
+      const child = new TrueSeismicShockfront(
+        this.x,
+        this.y,
+        this.maxR * (0.86 + Math.random() * 0.18),
+        this.amplitude * (0.82 + Math.random() * 0.15),
+        this.velocity * (0.86 + Math.random() * 0.12),
+        false,
+        false, // Las réplicas secundarias no generan más réplicas
+        0,
+        childPalette,
+      );
+      child.r = Math.max(6, this.r - 14);
+      child.seed = this.seed + (this.totalHarmonics - this.harmonicsLeft) * 3.7;
+      child.aspectRatioX = this.aspectRatioX + (Math.random() - 0.5) * 0.06;
+      child.aspectRatioY = this.aspectRatioY + (Math.random() - 0.5) * 0.06;
+      child.rotation = this.rotation + (Math.random() - 0.5) * 0.08;
+      onSpawnHarmonic(child);
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -173,59 +297,168 @@ class TrueSeismicShockfront {
 
     ctx.save();
 
-    // 1. Ribetes cromáticos ondulantes (refracción física con dispersión espectral)
-    const ribbons = [
-      // Surco de rarefacción / sombra de presión (base óptica)
-      {
-        color: `rgba(0, 0, 0, ${energy * 0.32})`,
-        shadow: "transparent",
-        shadowBlur: 0,
-        rDelta: -this.chromaticOffset * 1.5,
-        width: this.isMainRupture ? 14 : 5,
-        roughness: 0.035,
-        phaseOffset: 0,
-      },
-      // Banda Violeta / Aberración cromática externa
-      {
-        color: `rgba(168, 85, 247, ${energy * 0.8})`,
-        shadow: `rgba(168, 85, 247, 0.65)`,
-        shadowBlur: this.isMainRupture ? 16 : 7,
-        rDelta: this.chromaticOffset,
-        width: this.isMainRupture ? 3.2 : 1.8,
-        roughness: 0.05,
-        phaseOffset: 0.45,
-      },
-      // Onda P Azul Real / Tensión litosférica (#0066ff)
-      {
-        color: `rgba(0, 102, 255, ${energy * 0.95})`,
-        shadow: `rgba(0, 102, 255, 0.8)`,
-        shadowBlur: this.isMainRupture ? 20 : 9,
-        rDelta: 0,
-        width: this.isMainRupture ? 4.5 : 2.5,
-        roughness: 0.055,
-        phaseOffset: 0,
-      },
-      // Banda Cian Eléctrico / Ionización de alta energía
-      {
-        color: `rgba(0, 225, 255, ${energy * 0.9})`,
-        shadow: `rgba(0, 225, 255, 0.75)`,
-        shadowBlur: this.isMainRupture ? 18 : 8,
-        rDelta: -this.chromaticOffset * 0.55,
-        width: this.isMainRupture ? 3.4 : 1.8,
-        roughness: 0.06,
-        phaseOffset: -0.35,
-      },
-      // Cresta Cáustica Blanco Especular Puro (pico de compresión hiper-nítido)
-      {
-        color: `rgba(255, 255, 255, ${energy * 0.98})`,
-        shadow: `rgba(255, 255, 255, 0.95)`,
-        shadowBlur: this.isMainRupture ? 14 : 5,
-        rDelta: -this.chromaticOffset * 0.2,
-        width: this.isMainRupture ? 2.4 : 1.4,
-        roughness: 0.065,
-        phaseOffset: 0.1,
-      },
-    ];
+    // ── DISTRIBUCIÓN DE CINTAS POR PALETA (Identidad multicapa de la captura acelerada por GPU) ──
+    interface RibbonConfig {
+      color: string;
+      rDelta: number;
+      width: number;
+      roughness: number;
+      phaseOffset: number;
+    }
+
+    let ribbons: RibbonConfig[] = [];
+
+    if (this.paletteType === "cyan") {
+      // Anillo cian puro ionizado con halo y cresta blanca
+      ribbons = [
+        {
+          color: `rgba(0, 225, 255, ${energy * 0.28})`,
+          rDelta: 0,
+          width: 5.5,
+          roughness: 0.065,
+          phaseOffset: 0.2,
+        },
+        {
+          color: `rgba(0, 225, 255, ${energy * 0.95})`,
+          rDelta: 0,
+          width: 2.2,
+          roughness: 0.065,
+          phaseOffset: 0.2,
+        },
+        {
+          color: `rgba(255, 255, 255, ${energy * 0.92})`,
+          rDelta: -1,
+          width: 1.0,
+          roughness: 0.07,
+          phaseOffset: 0.05,
+        },
+      ];
+    } else if (this.paletteType === "violet") {
+      // Anillo violeta / púrpura electromagnético con halo
+      ribbons = [
+        {
+          color: `rgba(168, 85, 247, ${energy * 0.28})`,
+          rDelta: 0,
+          width: 5.5,
+          roughness: 0.06,
+          phaseOffset: -0.3,
+        },
+        {
+          color: `rgba(168, 85, 247, ${energy * 0.92})`,
+          rDelta: 0,
+          width: 2.4,
+          roughness: 0.06,
+          phaseOffset: -0.3,
+        },
+        {
+          color: `rgba(216, 180, 254, ${energy * 0.88})`,
+          rDelta: -1,
+          width: 1.0,
+          roughness: 0.065,
+          phaseOffset: 0.1,
+        },
+      ];
+    } else if (this.paletteType === "blue") {
+      // Anillo azul real tectónico (#0066ff) con halo
+      ribbons = [
+        {
+          color: `rgba(0, 102, 255, ${energy * 0.3})`,
+          rDelta: 0,
+          width: 6.0,
+          roughness: 0.06,
+          phaseOffset: 0.4,
+        },
+        {
+          color: `rgba(0, 102, 255, ${energy * 0.96})`,
+          rDelta: 0,
+          width: 2.6,
+          roughness: 0.06,
+          phaseOffset: 0.4,
+        },
+        {
+          color: `rgba(147, 197, 253, ${energy * 0.88})`,
+          rDelta: -1,
+          width: 1.1,
+          roughness: 0.068,
+          phaseOffset: 0,
+        },
+      ];
+    } else if (this.paletteType === "slate") {
+      // Línea de falla litosférica oscura / grafito
+      ribbons = [
+        {
+          color: `rgba(71, 85, 105, ${energy * 0.65})`,
+          rDelta: 0,
+          width: 2.0,
+          roughness: 0.08,
+          phaseOffset: 0.5,
+        },
+        {
+          color: `rgba(148, 163, 184, ${energy * 0.5})`,
+          rDelta: 1.5,
+          width: 1.0,
+          roughness: 0.075,
+          phaseOffset: -0.2,
+        },
+      ];
+    } else if (this.paletteType === "white") {
+      // Cresta cáustica especular pura
+      ribbons = [
+        {
+          color: `rgba(0, 225, 255, ${energy * 0.28})`,
+          rDelta: 1.5,
+          width: 4.5,
+          roughness: 0.06,
+          phaseOffset: 0.3,
+        },
+        {
+          color: `rgba(255, 255, 255, ${energy * 0.98})`,
+          rDelta: 0,
+          width: 1.6,
+          roughness: 0.07,
+          phaseOffset: 0,
+        },
+      ];
+    } else {
+      // "multi": Aberración espectral completa (onda principal de ruptura)
+      ribbons = [
+        {
+          color: `rgba(0, 0, 0, ${energy * 0.3})`,
+          rDelta: -this.chromaticOffset * 1.5,
+          width: this.isMainRupture ? 8 : 4,
+          roughness: 0.035,
+          phaseOffset: 0,
+        },
+        {
+          color: `rgba(168, 85, 247, ${energy * 0.85})`,
+          rDelta: this.chromaticOffset,
+          width: this.isMainRupture ? 2.8 : 1.6,
+          roughness: 0.052,
+          phaseOffset: 0.45,
+        },
+        {
+          color: `rgba(0, 102, 255, ${energy * 0.96})`,
+          rDelta: 0,
+          width: this.isMainRupture ? 3.8 : 2.2,
+          roughness: 0.058,
+          phaseOffset: 0,
+        },
+        {
+          color: `rgba(0, 225, 255, ${energy * 0.92})`,
+          rDelta: -this.chromaticOffset * 0.55,
+          width: this.isMainRupture ? 2.8 : 1.6,
+          roughness: 0.062,
+          phaseOffset: -0.35,
+        },
+        {
+          color: `rgba(255, 255, 255, ${energy * 0.98})`,
+          rDelta: -this.chromaticOffset * 0.2,
+          width: this.isMainRupture ? 2.0 : 1.2,
+          roughness: 0.068,
+          phaseOffset: 0.1,
+        },
+      ];
+    }
 
     ribbons.forEach((ribbon) => {
       const rBase = this.r + ribbon.rDelta;
@@ -245,63 +478,18 @@ class TrueSeismicShockfront {
 
       ctx.strokeStyle = ribbon.color;
       ctx.lineWidth = ribbon.width;
-      ctx.shadowColor = ribbon.shadow;
-      ctx.shadowBlur = ribbon.shadowBlur;
       ctx.stroke();
     });
 
-    // 2. Ondas secundarias de dispersión geológica (Rayleigh / onda S en cian brillante)
-    if (this.isMainRupture && this.r > 35) {
-      const secondaryR = this.r - 26;
-      if (secondaryR > 0) {
-        drawTectonicWavefront(
-          ctx,
-          this.x,
-          this.y,
-          secondaryR,
-          this.seed + 1.3,
-          0.045,
-          this.aspectRatioX * 0.98,
-          this.aspectRatioY * 1.02,
-          this.rotation + 0.04,
-        );
-        ctx.strokeStyle = `rgba(0, 215, 255, ${energy * 0.55})`;
-        ctx.shadowColor = `rgba(0, 215, 255, 0.5)`;
-        ctx.shadowBlur = 8;
-        ctx.lineWidth = 1.4;
-        ctx.stroke();
-      }
-      const tertiaryR = this.r - 52;
-      if (tertiaryR > 0) {
-        drawTectonicWavefront(
-          ctx,
-          this.x,
-          this.y,
-          tertiaryR,
-          this.seed + 2.7,
-          0.035,
-          this.aspectRatioX * 1.02,
-          this.aspectRatioY * 0.98,
-          this.rotation - 0.03,
-        );
-        ctx.strokeStyle = `rgba(168, 85, 247, ${energy * 0.4})`;
-        ctx.shadowColor = `rgba(168, 85, 247, 0.4)`;
-        ctx.shadowBlur = 6;
-        ctx.lineWidth = 1.0;
-        ctx.stroke();
-      }
-    }
-
-    // 3. Epicentro de detonación tectónica (núcleo radiante cian/azul/violeta)
-    if (this.isMainRupture && this.r < 160) {
-      const coreAlpha = (1 - this.r / 160) * this.amplitude * 0.6;
-      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 140);
+    // Epicentro de detonación tectónica (núcleo radiante)
+    if (this.isMainRupture && this.r < 120) {
+      const coreAlpha = (1 - this.r / 120) * this.amplitude * 0.5;
+      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 100);
       grad.addColorStop(0, `rgba(0, 225, 255, ${coreAlpha * 0.9})`);
-      grad.addColorStop(0.35, `rgba(0, 102, 255, ${coreAlpha * 0.55})`);
-      grad.addColorStop(0.7, `rgba(168, 85, 247, ${coreAlpha * 0.25})`);
+      grad.addColorStop(0.4, `rgba(0, 102, 255, ${coreAlpha * 0.5})`);
       grad.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = grad;
-      drawTectonicWavefront(ctx, this.x, this.y, 140, this.seed, 0.06);
+      drawTectonicWavefront(ctx, this.x, this.y, 100, this.seed, 0.06);
       ctx.fill();
     }
 
@@ -323,7 +511,7 @@ class TectonicLetterPulse {
     this.x = x;
     this.y = y;
     this.r = 3;
-    this.maxR = 60;
+    this.maxR = 50;
     this.life = 1.0;
     this.dead = false;
     this.seed = Math.random() * 15;
@@ -343,17 +531,13 @@ class TectonicLetterPulse {
     // 1. Halo cromático cian/azul eléctrico
     drawMicroFracture(ctx, this.x, this.y, this.r + 2, this.seed);
     ctx.strokeStyle = `rgba(0, 102, 255, ${energy * 0.75})`;
-    ctx.shadowColor = `rgba(0, 220, 255, 0.85)`;
-    ctx.shadowBlur = 8;
     ctx.lineWidth = 2.2;
     ctx.stroke();
 
     // 2. Frente de fractura cáustico blanco
     drawMicroFracture(ctx, this.x, this.y, this.r, this.seed);
     ctx.strokeStyle = `rgba(255, 255, 255, ${energy * 0.95})`;
-    ctx.shadowColor = `rgba(255, 255, 255, 0.9)`;
-    ctx.shadowBlur = 5;
-    ctx.lineWidth = 1.4;
+    ctx.lineWidth = 1.2;
     ctx.stroke();
     ctx.restore();
   }
@@ -441,13 +625,23 @@ export function SeismicWaveCanvas({
         if (f.dead) fissures.splice(i, 1);
       }
 
-      // Render ondas de choque sísmicas mayores (anisotrópicas, no circulares)
+      // Render ondas de choque sísmicas mayores (anisotrópicas, con desprendimiento armónico)
       const fronts = shockfrontsRef.current;
+      const spawnedHarmonics: TrueSeismicShockfront[] = [];
       for (let i = fronts.length - 1; i >= 0; i--) {
         const f = fronts[i];
-        f.update();
+        f.update((child) => spawnedHarmonics.push(child));
         f.draw(ctx);
         if (f.dead) fronts.splice(i, 1);
+      }
+      if (spawnedHarmonics.length > 0) {
+        fronts.push(...spawnedHarmonics);
+      }
+      if (fronts.length > 5) {
+        fronts.splice(0, fronts.length - 5);
+      }
+      if (fissures.length > 6) {
+        fissures.splice(0, fissures.length - 6);
       }
 
       animationRef.current = requestAnimationFrame(render);
@@ -455,28 +649,84 @@ export function SeismicWaveCanvas({
 
     animationRef.current = requestAnimationFrame(render);
 
-    // Click interactivo: impacto sísmico con réplica y grietas
+    const lastUserActionTime = { current: Date.now() };
+
+    // ── BUCLE AMBIENTAL ARMÓNICO EN REPOSO (Ligero, elegante y con cero consumo) ──
+    const ambientInterval = setInterval(() => {
+      if (document.hidden) return;
+      if (Date.now() - lastUserActionTime.current < 3200) return;
+      if (shockfrontsRef.current.length >= 3) return;
+
+      const cx = window.innerWidth * 0.5;
+      const cy = window.innerHeight * 0.48;
+      const maxExtent = Math.max(window.innerWidth, window.innerHeight) * 1.05;
+
+      shockfrontsRef.current.push(
+        new TrueSeismicShockfront(
+          cx,
+          cy,
+          maxExtent,
+          0.65,
+          24,
+          false,
+          true, // isMaster
+          2,    // 2 réplicas armónicas suaves
+          "cyan",
+        ),
+      );
+    }, 5200);
+
+    // Click interactivo: impacto sísmico con ráfaga armónica multicapa y grietas
     const handlePointerDown = (e: PointerEvent) => {
       const target = e.target as HTMLElement | null;
       if (target?.closest("button") || target?.closest("a")) return;
+      lastUserActionTime.current = Date.now();
 
-      // Dispara onda de compresión cáustica ondulante
+      // 1. Onda P primaria maestra: 6 réplicas armónicas concéntricas desprendidas
       shockfrontsRef.current.push(
-        new TrueSeismicShockfront(e.clientX, e.clientY, 650, 1.1, 28, false),
+        new TrueSeismicShockfront(
+          e.clientX,
+          e.clientY,
+          850,
+          1.4,
+          36,
+          true, // isMainRupture
+          true, // isMaster
+          6,    // 6 réplicas armónicas progresivas
+          "multi",
+        ),
       );
 
-      // Fisuras tectónicas instantáneas
-      for (let f = 0; f < 5; f++) {
-        const angle = (f / 5) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-        const length = 45 + Math.random() * 65;
+      // 2. Ruptura de fallas radiales con bifurcación dendrítica
+      for (let f = 0; f < 6; f++) {
+        const angle = (f / 6) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+        const length = 60 + Math.random() * 80;
         fissuresRef.current.push(
           new TectonicFissure(e.clientX, e.clientY, angle, length),
         );
       }
 
-      // Sacudida sísmica direccional instantánea
-      seismicImpulseX.current = (Math.random() > 0.5 ? 1 : -1) * 14;
-      seismicImpulseY.current = -12;
+      // 3. Onda S secundaria (cizalla transversal retrasada +135ms) con 3 réplicas
+      setTimeout(() => {
+        shockfrontsRef.current.push(
+          new TrueSeismicShockfront(
+            e.clientX,
+            e.clientY,
+            580,
+            1.05,
+            24,
+            false,
+            true,
+            3,
+            "violet",
+          ),
+        );
+      }, 135);
+
+      // 4. Sacudida sísmica direccional instantánea
+      seismicImpulseX.current = (Math.random() > 0.5 ? 1 : -1) * 16;
+      seismicImpulseY.current = -14;
+      seismicDecay.current = 0.88;
     };
 
     // Escuchar eventos globales de impacto tectónico desde cualquier componente
@@ -485,26 +735,57 @@ export function SeismicWaveCanvas({
       const x = customEvent.detail?.x ?? window.innerWidth / 2;
       const y = customEvent.detail?.y ?? window.innerHeight / 2;
       const intensity = customEvent.detail?.intensity ?? 1.0;
+      lastUserActionTime.current = Date.now();
 
+      // 1. Onda P primaria maestra
       shockfrontsRef.current.push(
-        new TrueSeismicShockfront(x, y, 480 * intensity, 1.2 * intensity, 28, false),
+        new TrueSeismicShockfront(
+          x,
+          y,
+          720 * intensity,
+          1.45 * intensity,
+          36,
+          true,
+          true,
+          5,
+          "multi",
+        ),
       );
 
-      for (let f = 0; f < 5; f++) {
-        const angle = (f / 5) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-        const length = 45 + Math.random() * 55;
+      // 2. Fisuras dendríticas
+      for (let f = 0; f < 6; f++) {
+        const angle = (f / 6) * Math.PI * 2 + (Math.random() - 0.5) * 0.45;
+        const length = (55 + Math.random() * 70) * intensity;
         fissuresRef.current.push(new TectonicFissure(x, y, angle, length));
       }
 
-      seismicImpulseX.current = (Math.random() > 0.5 ? 1 : -1) * (12 * intensity);
-      seismicImpulseY.current = -9 * intensity;
-      seismicDecay.current = 0.86;
+      // 3. Onda S secundaria
+      setTimeout(() => {
+        shockfrontsRef.current.push(
+          new TrueSeismicShockfront(
+            x,
+            y,
+            480 * intensity,
+            1.0 * intensity,
+            22,
+            false,
+            true,
+            3,
+            "cyan",
+          ),
+        );
+      }, 130);
+
+      seismicImpulseX.current = (Math.random() > 0.5 ? 1 : -1) * (14 * intensity);
+      seismicImpulseY.current = -11 * intensity;
+      seismicDecay.current = 0.87;
     };
 
     window.addEventListener("pointerdown", handlePointerDown);
     window.addEventListener("tectonic-impact", handleTectonicEvent);
 
     return () => {
+      clearInterval(ambientInterval);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("pointerdown", handlePointerDown);
       window.removeEventListener("tectonic-impact", handleTectonicEvent);
@@ -591,9 +872,9 @@ export function SeismicWaveCanvas({
 
               const maxExtent = Math.max(window.innerWidth, window.innerHeight) * 1.35;
 
-              // RUPTURA PRINCIPAL: Frente de choque cáustico colosal ondulante
+              // RUPTURA PRINCIPAL: Frente de choque cáustico colosal ondulante con réplicas armónicas
               shockfrontsRef.current.push(
-                new TrueSeismicShockfront(cx, cy, maxExtent, 1.8, 38, true),
+                new TrueSeismicShockfront(cx, cy, maxExtent, 1.8, 38, true, true, 6, "multi"),
               );
 
               // Fisuras de falla litosférica disparadas desde el epicentro
