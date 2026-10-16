@@ -44,8 +44,7 @@ import { Navbar } from "./components/navigation/Navbar";
 import { MobileMenu } from "./components/navigation/MobileMenu";
 
 import { PortalTransition } from "./components/ui/PortalTransition";
-import { EntrancePreloader } from "./components/ui/EntrancePreloader";
-import { IdentitySplash } from "./components/motion/IdentitySplash";
+import { CinematicOverture } from "./components/motion/CinematicOverture";
 import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollower";
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
@@ -106,7 +105,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   const mounted = useProjectNavigation(t);
 
   // Intro phase state machine hook
-  const { phase, ready, onPreloaderDone, onSplashComplete } =
+  const { phase, ready, onOvertureComplete } =
     useIntroPhase(mounted);
 
   // Modal and menu state managers
@@ -235,11 +234,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {phase === "loading" && (
-        <EntrancePreloader lang={lang} onDone={onPreloaderDone} />
-      )}
-      {phase === "splash" && (
-        <IdentitySplash lang={lang} onComplete={onSplashComplete} />
+      {phase === "overture" && (
+        <CinematicOverture lang={lang} onComplete={onOvertureComplete} />
       )}
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main

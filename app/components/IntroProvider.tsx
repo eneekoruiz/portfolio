@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 
-export type IntroPhase = "checking" | "loading" | "splash" | "ready";
+export type IntroPhase = "checking" | "overture" | "ready";
 
 interface IntroContextValue {
   phase: IntroPhase;
@@ -38,11 +38,11 @@ function checkIsFirstVisit(): boolean {
 
 /** Content is readable in the server response; decoration never gates navigation. */
 export function IntroProvider({ children }: { children: ReactNode }) {
-  const [phase, setPhase] = useState<IntroPhase>("splash");
+  const [phase, setPhase] = useState<IntroPhase>("overture");
 
   useEffect(() => {
-    if (checkIsFirstVisit()) {
-      setPhase("loading");
+    if (!checkIsFirstVisit()) {
+      setPhase("ready");
     }
   }, []);
 
