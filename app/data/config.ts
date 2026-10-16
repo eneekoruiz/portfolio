@@ -72,6 +72,36 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     btnText: "Ver Auditoría",
     hasAudit: true,
   },
+  recordatorios: {
+    color: "#2563eb",
+    rgb: "37, 99, 235",
+    img: "radial-gradient(ellipse at 50% 120%, rgba(37,99,235,0.2) 0%, transparent 75%)",
+    gradient:
+      "radial-gradient(at 0% 0%, rgba(37,99,235,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(37,99,235,0.08) 0px, transparent 50%)",
+    progress: 4,
+    btnText: "Ver Auditoría",
+    hasAudit: true,
+  },
+  passwordmanager: {
+    color: "#10b981",
+    rgb: "16, 185, 129",
+    img: "radial-gradient(ellipse at 50% 120%, rgba(16,185,129,0.2) 0%, transparent 75%)",
+    gradient:
+      "radial-gradient(at 0% 0%, rgba(16,185,129,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(16,185,129,0.08) 0px, transparent 50%)",
+    progress: 4,
+    btnText: "Ver Auditoría",
+    hasAudit: true,
+  },
+  regla: {
+    color: "#f43f5e",
+    rgb: "244, 63, 94",
+    img: "radial-gradient(ellipse at 50% 120%, rgba(244,63,94,0.2) 0%, transparent 75%)",
+    gradient:
+      "radial-gradient(at 0% 0%, rgba(244,63,94,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(244,63,94,0.08) 0px, transparent 50%)",
+    progress: 4,
+    btnText: "Ver Auditoría",
+    hasAudit: true,
+  },
 };
 
 export const DEFAULT_THEME: ProjectTheme = {

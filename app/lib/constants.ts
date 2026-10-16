@@ -62,7 +62,7 @@ export const SKILLS: readonly SkillCategory[] = [
     rgb: "255, 45, 85",
     tint: "from-pink-500/10",
     border: "border-pink-500/20",
-    techs: ["Antigravity", "GeminiChat", "Claude", "GPT-4", "Cursor", "LLMs"],
+    techs: ["PyTorch", "LangChain", "Hugging Face", "Vector DBs", "RAG", "Embeddings"],
   },
 ] as const;
 
@@ -130,6 +130,12 @@ export const LANG_COLORS: Record<string, string> = {
   Linux: "#FCC624",
   Bash: "#4EAA25",
   "CI/CD": "#FF9500",
+  PyTorch: "#EE4C2C",
+  LangChain: "#00A67E",
+  "Hugging Face": "#FFD21E",
+  "Vector DBs": "#7928CA",
+  RAG: "#0070F3",
+  Embeddings: "#FF4081",
   Antigravity: "#ff2d55",
   GeminiChat: "#ff2d55",
   Claude: "#ff2d55",

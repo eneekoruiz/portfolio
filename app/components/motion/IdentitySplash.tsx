@@ -1,34 +1,14 @@
 "use client";
 
-/**
- * ─────────────────────────────────────────────────────────────────────────────
- * IDENTITY SPLASH — Pantalla de bienvenida con animación de caracteres
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * POSICIÓN EN EL FLUJO: phase === 'splash' (entre Preloader y contenido)
- *
- * FIXES aplicados:
- *  - z-index elevado a 9998 para estar por encima de todo excepto el cursor
- *    (9999) y el Preloader (9999). Antes podía quedar debajo del contenido
- *    si visibility:hidden no se aplicaba a tiempo.
- *  - gsap.context() con cleanup .revert() para evitar fugas de memoria
- *    en React Strict Mode (doble ejecución de useEffect en desarrollo).
- *  - Los estados iniciales de los .char se fijan con gsap.set() DENTRO
- *    del contexto, no con clases Tailwind, para garantizar consistencia
- *    aunque el componente se monte dos veces.
- *  - FIX Punto 4: onComplete ya NO se pasa al constructor del timeline.
- *    Solo se llama UNA vez, al final del timeline, mediante .add().
- *    Antes se disparaba dos veces (constructor + .add()), causando
- *    un doble setState en el padre.
- *  - Timeline fluido: las duraciones y eases están calibradas para
- *    evitar tirones entre pasos.
- * ─────────────────────────────────────────────────────────────────────────────
- */
-
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import type { Lang } from "../../types";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import {
+  createLiquidCurtain,
+  animateLiquidCurtainIn,
+  animateLiquidCurtainOut,
+} from "./LiquidCurtain";
 
 const WELCOME_TEXT: Record<Lang, string> = {
   es: "Bienvenido",
@@ -55,38 +35,29 @@ const WELCOME_TEXT: Record<Lang, string> = {
 
 interface IdentitySplashProps {
   onComplete: () => void;
-  onReveal: () => void;
   lang: Lang;
-  /** Si es false, el splash está montado pero esperando para empezar su animación */
-  active: boolean;
 }
 
-export function IdentitySplash({
-  onComplete,
-  onReveal,
-  lang,
-  active,
-}: IdentitySplashProps) {
+export function IdentitySplash({ onComplete, lang }: IdentitySplashProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const motionEnabled = useMotionEnabled();
 
-  // Stable refs to prevent stale closures in the timeline
   const onCompleteRef = useRef(onComplete);
-  const onRevealRef = useRef(onReveal);
   onCompleteRef.current = onComplete;
-  onRevealRef.current = onReveal;
 
-  // ── Spotlight Movement Animation ─────────────────────────────────────
+  const word = WELCOME_TEXT[lang] ?? "Welcome";
+
+  // Ambient spotlight drift
   useEffect(() => {
-    if (!spotlightRef.current || !active || !motionEnabled) return;
+    if (!spotlightRef.current || !motionEnabled) return;
 
     const tween = gsap.to(spotlightRef.current, {
-      x: () => gsap.utils.random(-300, 300),
-      y: () => gsap.utils.random(-300, 300),
-      duration: () => gsap.utils.random(2, 4),
+      x: () => gsap.utils.random(-250, 250),
+      y: () => gsap.utils.random(-250, 250),
+      duration: () => gsap.utils.random(2.5, 4.5),
       ease: "sine.inOut",
       repeat: -1,
       repeatRefresh: true,
@@ -95,34 +66,31 @@ export function IdentitySplash({
     return () => {
       tween.kill();
     };
-  }, [active, motionEnabled]);
+  }, [motionEnabled]);
 
-  const word = WELCOME_TEXT[lang] ?? "Welcome";
+  // Entrance & Exit animation timeline
   useEffect(() => {
     if (!textRef.current || !lineRef.current || !containerRef.current) return;
 
     if (!motionEnabled) {
-      onRevealRef.current?.();
       onCompleteRef.current?.();
       return;
     }
 
-    if (!active) {
-      const ctx = gsap.context(() => {
-        const chars = textRef.current?.querySelectorAll<HTMLElement>(".char");
-        if (chars && chars.length > 0)
-          gsap.set(chars, { yPercent: 110, opacity: 0 });
-        if (lineRef.current) gsap.set(lineRef.current, { scaleX: 0 });
-      }, containerRef.current);
-      return () => ctx.revert();
-    }
-
     const ctx = gsap.context(() => {
-      const chars = textRef.current?.querySelectorAll<HTMLElement>(".char");
+      const chars = textRef.current?.querySelectorAll<HTMLElement>(".splash-char");
 
-      // ── Timeline de entrada + salida ───────────────────────────────────
       const tl = gsap.timeline();
 
+      // Set initial states
+      if (chars && chars.length > 0) {
+        gsap.set(chars, { yPercent: 110, opacity: 0 });
+      }
+      if (lineRef.current) {
+        gsap.set(lineRef.current, { scaleX: 0 });
+      }
+
+      // 1. Line expands
       if (lineRef.current) {
         tl.to(lineRef.current, {
           scaleX: 1,
@@ -131,6 +99,7 @@ export function IdentitySplash({
         });
       }
 
+      // 2. Characters stagger up
       if (chars && chars.length > 0) {
         tl.to(
           chars,
@@ -138,30 +107,20 @@ export function IdentitySplash({
             yPercent: 0,
             opacity: 1,
             stagger: 0.025,
-            duration: 0.48,
+            duration: 0.45,
             ease: "power3.out",
           },
           "-=0.15",
         );
       }
 
-      if (lineRef.current) {
-        tl.to(
-          lineRef.current,
-          {
-            scaleX: 0,
-            duration: 0.3,
-            ease: "power3.in",
-          },
-          "-=0.40",
-        );
-      }
+      // 3. Brief plateau to appreciate
+      tl.to({}, { duration: 0.4 });
 
-      tl.to({}, { duration: 0.35 });
-
+      // 4. Characters rise and exit
       if (chars && chars.length > 0) {
         tl.to(chars, {
-          yPercent: -120,
+          yPercent: -110,
           opacity: 0,
           stagger: 0.02,
           duration: 0.3,
@@ -169,74 +128,84 @@ export function IdentitySplash({
         });
       }
 
+      // 5. Liquid Curtain Drop (Morphing SVG)
       tl.add(() => {
-        onRevealRef.current?.();
-      }, "-=0.1");
-
-      if (containerRef.current) {
-        tl.to(
-          containerRef.current,
-          {
-            yPercent: -100,
-            duration: 0.65,
-            ease: "power3.out",
+        const svg = createLiquidCurtain({
+          color: "#0066ff",
+          baseColor: "#002266",
+          direction: "down",
+        });
+        document.body.appendChild(svg);
+        animateLiquidCurtainIn(svg, {
+          duration: 0.45,
+          onMidway: () => {
+            if (containerRef.current) {
+              containerRef.current.style.display = "none";
+            }
           },
-          "<",
-        );
-      }
-
-      tl.add(() => {
-        onCompleteRef.current?.();
+          onComplete: () => {
+            animateLiquidCurtainOut(svg, {
+              duration: 0.42,
+              onComplete: () => {
+                onCompleteRef.current?.();
+              },
+            });
+          },
+        });
       });
-    }, containerRef.current || undefined);
+    }, containerRef.current);
 
     return () => ctx.revert();
-  }, [active, motionEnabled]); // Re-ejecutar cuando active pase a true
+  }, [motionEnabled]);
+
+  const handleSkip = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCompleteRef.current?.();
+  };
 
   return (
     <div
       ref={containerRef}
-      // z-[9998]: por encima de contenido
-      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center overflow-hidden"
-      aria-hidden="true"
+      role="status"
+      aria-label="Presentación Eneko Ruiz"
+      onClick={handleSkip}
+      className="fixed inset-0 z-[9998] bg-page text-ink flex flex-col items-center justify-center overflow-hidden cursor-pointer select-none"
     >
-      {/* ── Grid Background (Linear) ── */}
+      {/* Background architectural grid */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(var(--line) 1px, transparent 1px),
             linear-gradient(90deg, var(--line) 1px, transparent 1px)
           `,
-          backgroundSize: "40px 40px",
+          backgroundSize: "48px 48px",
         }}
         aria-hidden="true"
       />
 
-      {/* ── Moving Spotlight (Blue Flashlight) ── */}
+      {/* Atmospheric ambient spotlight */}
       <div
         ref={spotlightRef}
         className="absolute pointer-events-none z-0"
         aria-hidden="true"
         style={{
-          width: "500px",
-          height: "500px",
+          width: "520px",
+          height: "520px",
           background:
-            "radial-gradient(circle, rgba(0,163,255,0.12) 0%, transparent 75%)",
-          filter: "blur(70px)",
+            "radial-gradient(circle, rgba(0, 102, 255, 0.14) 0%, transparent 70%)",
+          filter: "blur(75px)",
         }}
       />
 
       <div className="flex flex-col items-center relative z-10">
-        {/*
-          Máscara de overflow: las letras "nacen" subiendo desde abajo
-        */}
-        <div className="overflow-hidden pb-2 mb-8">
+        {/* Kinetic word mask */}
+        <div className="overflow-hidden pb-2 mb-6">
           <div ref={textRef} className="flex">
             {word.split("").map((char: string, i: number) => (
               <span
                 key={i}
-                className="char font-black text-[clamp(4rem,10vw,8.5rem)] tracking-[-0.05em] leading-none inline-block gpu-accelerated translate-y-[110%] opacity-0"
+                className="splash-char font-black text-[clamp(3.8rem,9.5vw,8.5rem)] tracking-[-0.05em] leading-none inline-block will-change-transform"
               >
                 {char === " " ? "\u00A0" : char}
               </span>
@@ -244,18 +213,26 @@ export function IdentitySplash({
           </div>
         </div>
 
-        {/* Línea animada + nombre */}
-        <div className="flex items-center gap-6">
+        {/* Center brand line + signature */}
+        <div className="flex items-center gap-5">
           <div className="h-[1px] w-12 bg-ink/10 rounded-full overflow-hidden">
             <div
               ref={lineRef}
               className="h-full w-full bg-brand origin-center scale-x-0"
             />
           </div>
-          <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-ink/40 font-bold">
+          <span className="font-mono text-[10px] tracking-[0.35em] uppercase text-lead font-bold">
             Eneko Ruiz
           </span>
+          <div className="h-[1px] w-12 bg-ink/10 rounded-full overflow-hidden">
+            <div className="h-full w-full bg-brand origin-center" />
+          </div>
         </div>
+      </div>
+
+      {/* Skip indicator at bottom */}
+      <div className="absolute bottom-8 font-mono text-[9px] uppercase tracking-[0.2em] text-lead/50">
+        [ CLICK / ESC TO SKIP ]
       </div>
     </div>
   );

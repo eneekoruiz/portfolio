@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { LiveStatus } from "../ui/LiveStatus";
-import { KineticText } from "../motion/KineticText";
-import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { useSpringHover } from "../../hooks/useSpringHover";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
+import { KineticText } from "../motion/KineticText";
+import { SeismicWaveCanvas } from "../motion/SeismicWaveCanvas";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 import type { Tx, Lang } from "../../types";
 import { UI_COPY } from "../../data/interface-translations";
 
@@ -22,17 +23,30 @@ interface HeroProps {
 
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const ui = UI_COPY[lang];
-  const motion = useMotionEnabled();
-  const enabled = motion && !reduced && phase === "ready";
+  const { enabled: motion, lightweight } = useMotionPolicy();
+  const enabled = motion && !reduced;
   const portraitRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
     const video = portraitRef.current;
     if (!video) return;
     let visible = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const update = () => {
-      if (enabled && visible && document.visibilityState === "visible")
+      if (
+        enabled &&
+        !lightweight &&
+        visible &&
+        document.visibilityState === "visible"
+      ) {
+        if (!video.getAttribute("src")) {
+          video.src = "/memoji.webm";
+          video.load();
+        }
         void video.play().catch(() => {});
-      else video.pause();
+      } else {
+        video.pause();
+      }
     };
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -42,22 +56,33 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
     document.addEventListener("visibilitychange", update);
     update();
     return () => {
+      clearTimeout(timer);
       observer.disconnect();
       document.removeEventListener("visibilitychange", update);
       video.pause();
     };
-  }, [enabled]);
+  }, [enabled, lightweight]);
+
   const heroRef = useRef<HTMLElement>(null);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
     "idle",
   );
-  const prismRef = useRef<HTMLDivElement>(null);
-  useMateriaSurface(prismRef, "#0066ff", enabled, 26);
-  const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 36, heroRef);
+  const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 6);
+  const charsRef = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const elements = Array.from(
+      heroRef.current.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
+    );
+    charsRef.current = elements;
+  }, [enabled]);
+
   const scrollTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
+    triggerTectonicImpact(event.clientX, event.clientY, 1.15);
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
@@ -77,80 +102,58 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       ref={heroRef}
       id="hero"
       aria-label="Eneko Ruiz"
-      className="materia-hero relative flex min-h-[100svh] lg:h-[100svh] lg:max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-20 pb-4 md:px-10 md:pt-24 md:pb-6"
+      className="materia-hero relative flex h-[100svh] max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-14 pb-3 md:px-10 md:pt-18 md:pb-4"
     >
+      <SeismicWaveCanvas
+        stageRef={heroRef}
+        charRefs={charsRef}
+      />
       <div className="hero-light" aria-hidden="true" />
-      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-3 md:pb-4 shrink-0">
+      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-2.5 md:pb-3 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
           {greeting}
         </p>
         <LiveStatus label={t.status} />
       </div>
-      <div className="relative mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-6 py-4 md:py-6 lg:grid-cols-[1.4fr_0.6fr] lg:gap-0 lg:py-4">
-        <div className="relative z-10 min-w-0">
+      <div className="hero-composition relative mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center justify-center text-center py-2 md:py-3 my-auto">
+        <div className="relative z-10 flex flex-col items-center w-full">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(4.8rem,11.5vw,11.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] text-ink"
+            className="m-0 text-[clamp(3.8rem,18.5vw,5.2rem)] md:text-[clamp(5.2rem,21.5vh,18.5rem)] font-black leading-[0.80] tracking-[-0.065em] select-none text-center"
           >
-            <KineticText
-              text="Eneko"
-              enabled={enabled}
-              interactive
-              delay={0.1}
-            />
-            <KineticText
-              text="Ruiz."
-              enabled={enabled}
-              interactive
-              delay={0.28}
-              className="mt-[0.13em] text-brand"
-            />
-          </h1>
-          <div className="mt-6 flex max-w-xl items-start gap-4 md:mt-8 md:gap-5">
-            <span
-              className="mt-2 h-px w-8 md:w-10 shrink-0 bg-brand"
-              aria-hidden="true"
-            />
-            <div>
-              <p className="text-base font-semibold text-ink md:text-xl">
-                {t.role}
-              </p>
-              <p className="mt-2 md:mt-3 max-w-sm text-sm leading-relaxed text-lead">
-                {t.tagline}
-              </p>
+            <div className="block text-ink">
+              <KineticText
+                text="Eneko"
+                enabled={enabled}
+                interactive={true}
+                className="inline-block"
+              />
             </div>
-          </div>
-        </div>
-        <div
-          ref={prismRef}
-          className="materia-surface hero-prism relative hidden min-h-[280px] lg:min-h-[300px] max-h-[440px] self-stretch rounded-[26px] border border-ink/15 lg:block overflow-hidden"
-          data-materia-surface="hero"
-        >
-          <div className="absolute inset-x-5 top-5 z-10 flex items-center justify-between text-[10px] font-mono tracking-[0.18em] text-lead">
-            <span>ER — 01</span>
-            <span aria-hidden="true">↗</span>
-          </div>
-          <div className="hero-portrait-frame absolute inset-x-4 top-1/2 -translate-y-1/2 mx-auto">
-            <video
-              ref={portraitRef}
-              src="/memoji.webm"
-              autoPlay={enabled}
-              loop={enabled}
-              muted
-              playsInline
-              preload="metadata"
+            <div className="block mt-1 md:mt-2 text-brand">
+              <KineticText
+                text="Ruiz."
+                enabled={enabled}
+                interactive={true}
+                className="inline-block"
+              />
+            </div>
+          </h1>
+
+          <div className="hero-introduction mt-3 md:mt-5 flex flex-col items-center text-center max-w-xl px-4">
+            <span
+              className="h-px w-10 bg-brand/50 mb-2.5"
               aria-hidden="true"
-              className="hero-portrait block h-full w-full object-cover"
             />
-          </div>
-          <div className="absolute bottom-5 left-5 right-5 z-10 flex items-end justify-between border-t border-ink/15 pt-4">
-            <span className="font-mono text-[10px] tracking-[0.14em] text-lead">
-              SOFTWARE / SYSTEMS
-            </span>
+            <p className="text-sm md:text-lg font-semibold tracking-tight text-ink">
+              {t.role}
+            </p>
+            <p className="mt-1 text-xs md:text-sm leading-relaxed text-lead max-w-md">
+              {t.tagline}
+            </p>
           </div>
         </div>
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 md:gap-6 border-t border-ink/15 py-3 md:py-4 shrink-0">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 md:gap-6 border-t border-ink/15 py-2.5 md:py-3.5 shrink-0">
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <SignatureLink
             label={t.ctaWork}
@@ -188,6 +191,23 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           {t.scroll}
           <ArrowDown size={14} aria-hidden="true" />
         </span>
+      </div>
+      <div
+        className="hero-portrait-frame pointer-events-none opacity-0 absolute overflow-hidden"
+        style={{ width: 1, height: 1, bottom: 0, left: 0 }}
+        aria-hidden="true"
+      >
+        <video
+          ref={portraitRef}
+          poster="/memoji-poster.webp"
+          autoPlay={false}
+          loop={enabled}
+          muted
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          style={{ width: 1, height: 1 }}
+        />
       </div>
     </section>
   );

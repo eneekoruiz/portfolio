@@ -1,6 +1,6 @@
 # Eneko Ruiz | Software Engineer
 
-Personal portfolio built with Next.js, React, TypeScript, GSAP, and Lenis.
+Personal portfolio built with Next.js, React, TypeScript, GSAP, and Three.js.
 
 ## What is here
 
@@ -11,7 +11,7 @@ Personal portfolio built with Next.js, React, TypeScript, GSAP, and Lenis.
 
 ## Notes
 
-- The site uses a server-side GitHub API route for portfolio content.
+- Featured projects render immediately from local content. Optional GitHub activity loads through a server-side API when its section approaches the viewport.
 - Motion is kept minimal so the content stays readable.
 - Accessibility and reduced-motion support are part of the design.
 
@@ -27,7 +27,23 @@ npm run build
 
 The site uses the Next.js App Router. Page sections and shared components render the portfolio content, while a server-side GitHub API route retrieves repository data without exposing credentials to the browser.
 
-GSAP and Lenis are isolated to client-side presentation code. Metadata and core content remain available through the server-rendered route, including when motion is reduced or JavaScript enhancements are unavailable.
+Native scrolling schedules presentation updates only when needed. A shared motion policy respects reduced motion, data saving, device capabilities, and tab visibility. Touch and modest devices start with static decoration; desktop WebGL is loaded lazily, capped at 30 frames per second, and paused outside the project hero. Skills start as readable chips and require explicit activation to orbit. Embedded demos load only when the visitor enters the studio and unload when it closes.
+
+Metadata, featured work, and contact links remain available through the server-rendered route, including when JavaScript enhancements are unavailable.
+
+## Validation
+
+```bash
+npm ci
+npm run typecheck
+npm run build
+npm run lint
+npm run test:motion
+npx playwright test --config playwright.performance.config.mjs
+npm run test:e2e
+```
+
+The performance configuration covers 1440×900 desktop, 768×1024 tablet, and 375×667 mobile. It verifies deferred requests, offscreen pausing, cursor fallback, reduced motion, navigation, JavaScript-disabled content, and all 20 supported languages. It also captures the editorial sections in both themes and checks heading overflow, RTL, keyboard-operated project panels, and browser/asset errors. Browser measurements are local diagnostics, not field Core Web Vitals.
 
 ## Links
 

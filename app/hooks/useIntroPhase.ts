@@ -10,11 +10,7 @@ export function useIntroPhase(_mounted: boolean) {
   // after hydration; reading it here leaves server visibility attributes stale.
   const ready = phase === "ready";
 
-  const onPreloaderDone = useCallback(() => {
-    setPhase("splash");
-  }, [setPhase]);
-
-  const onSplashComplete = useCallback(() => {
+  const onOvertureComplete = useCallback(() => {
     setPhase("ready");
     markSeen();
   }, [setPhase, markSeen]);
@@ -22,7 +18,6 @@ export function useIntroPhase(_mounted: boolean) {
   return {
     phase,
     ready,
-    onPreloaderDone,
-    onSplashComplete,
+    onOvertureComplete,
   };
 }

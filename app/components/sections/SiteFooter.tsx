@@ -54,7 +54,6 @@ export function SiteFooter({ t }: { t: Tx }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t.footerSrc}
-          data-h
           className="no-underline text-lead transition-colors duration-200 hover:text-brand"
           onClick={handleClick}
         >

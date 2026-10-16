@@ -45,6 +45,11 @@ export function KineticText({
     let releaseAt = -1;
     let releaseFrom = 0;
     let previousVelocity = 0;
+    let hasLightCoordinates = false;
+    const wake = () => {
+      if (visible && document.visibilityState === "visible")
+        gsap.ticker.add(tick);
+    };
     const tick = (time: number, delta: number) => {
       if (!visible) return;
       const velocity = Math.max(-1, Math.min(1, materia.velocity / 32));
@@ -68,12 +73,14 @@ export function KineticText({
           "--type-light",
           String(light.step(delta / 1000)),
         );
-        if (light.settled && light.value === 0) {
-          for (const char of characters) {
-            char.style.removeProperty("--glyph-light-x");
-            char.style.removeProperty("--glyph-light-y");
-          }
+      }
+      // A pointer may enter and leave before the spring advances a frame.
+      if (hasLightCoordinates && light.settled && light.value === 0) {
+        for (const char of characters) {
+          char.style.removeProperty("--glyph-light-x");
+          char.style.removeProperty("--glyph-light-y");
         }
+        hasLightCoordinates = false;
       }
       const changing =
         !tension.settled ||
@@ -92,12 +99,16 @@ export function KineticText({
         element.style.transform = `perspective(1100px) rotateX(${rx}deg) rotateY(${ry}deg) skew(${value * -5}deg,${value * 2}deg) scale3d(${1 + Math.abs(value) * 0.035},${1 - Math.abs(value) * 0.045},1)`;
         element.style.willChange = changing ? "transform" : "";
       }
+      let settled = true;
       for (let i = 0; i < letters.length; i++) {
         const letter = letters[i];
-        if (time - enteredAt < delay + i * (interactive ? 0.055 : 0.014))
+        if (time - enteredAt < delay + i * (interactive ? 0.025 : 0.01)) {
+          settled = false;
           continue;
+        }
         const wave = waves[i];
         if (letter.target === 1 && letter.settled && wave.settled) continue;
+        settled = false;
         letter.target = 1;
         const progress = letter.step(delta / 1000);
         const lift = wave.step(delta / 1000);
@@ -109,8 +120,16 @@ export function KineticText({
         characters[i].style.willChange =
           letter.settled && wave.settled ? "" : "transform, opacity";
       }
+      if (
+        settled &&
+        !changing &&
+        light.settled &&
+        Math.abs(materia.velocity) < 0.01
+      )
+        gsap.ticker.remove(tick);
     };
     const move = (event: PointerEvent) => {
+      wake();
       if (!interactive || event.pointerType === "touch") return;
       const bounds = element.getBoundingClientRect();
       const x = (event.clientX - bounds.left) / Math.max(1, bounds.width);
@@ -129,16 +148,19 @@ export function KineticText({
           `${event.clientY - rectangles[i].top}px`,
         );
       });
+      hasLightCoordinates = true;
       for (let i = 0; i < waves.length; i++) {
         const distance = x - (i + 0.5) / waves.length;
         waves[i].target = Math.exp(-distance * distance * 32);
       }
     };
     const leave = () => {
+      wake();
       tiltX.target = tiltY.target = 0;
       light.target = 0;
       for (const wave of waves) wave.target = 0;
     };
+    window.addEventListener("scroll", wake, { passive: true });
     element.addEventListener("pointermove", move);
     element.addEventListener("pointerleave", leave);
     element.addEventListener("pointercancel", leave);
@@ -161,6 +183,7 @@ export function KineticText({
     observer.observe(element);
     return () => {
       observer.disconnect();
+      window.removeEventListener("scroll", wake);
       element.removeEventListener("pointermove", move);
       element.removeEventListener("pointerleave", leave);
       element.removeEventListener("pointercancel", leave);

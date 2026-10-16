@@ -19,6 +19,9 @@ export function useDnaColors(
       rides24ofiziala: "#e69400",
       "spotshare-parking": "#00d4e8",
       "pke-web": "#9b1fff",
+      recordatorios: "#2563eb",
+      passwordmanager: "#10b981",
+      regla: "#f43f5e",
     };
 
     // 1. Immediate priority: Hovered project in Selected Works

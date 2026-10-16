@@ -1,9 +1,35 @@
 import { test, expect } from "@playwright/test";
 
+test.afterEach(async ({ page }, info) => {
+  if (info.status === info.expectedStatus) return;
+  await info.attach("orbit-cleanup-state", {
+    body: JSON.stringify(
+      await page
+        .locator("[data-skill-card]")
+        .first()
+        .evaluate((card) => ({
+          motion: document.documentElement.dataset.motion,
+          active: card
+            .querySelector(".skill-orbit")
+            ?.getAttribute("data-orbit-active"),
+          pills: [...card.querySelectorAll("[data-orbit-pill]")].map(
+            (pill) => ({
+              text: pill.textContent,
+              hasStyle: pill.hasAttribute("style"),
+              style: pill.getAttribute("style"),
+              css: pill.style.cssText,
+              html: pill.outerHTML,
+            }),
+          ),
+        })),
+    ),
+    contentType: "application/json",
+  });
+});
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (window.top !== window) return;
-    sessionStorage.setItem("hasSeenIntro", "true");
     localStorage.setItem("portfolio_lang", "es");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
@@ -27,29 +53,54 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("technology cards keep moving pills, pause without jumping and support drag", async ({
+test("technology orbits auto-run under shared motion control and release styles when paused", async ({
   page,
 }, info) => {
+  test.skip(
+    info.project.name !== "desktop",
+    "Orbit motion is desktop-only by default",
+  );
+  await page.addInitScript(() => {
+    window.__orbitResizeDeliveries = [];
+    const NativeResizeObserver = window.ResizeObserver;
+    window.ResizeObserver = class extends NativeResizeObserver {
+      constructor(callback) {
+        super((entries, observer) => {
+          const orbit = entries.find((entry) =>
+            entry.target.matches(".skill-orbit"),
+          );
+          if (orbit)
+            window.__orbitResizeDeliveries.push({
+              target: orbit.target,
+              deliver: () => callback(entries, observer),
+            });
+          callback(entries, observer);
+        });
+      }
+    };
+    localStorage.setItem("portfolio-motion-enabled", "true");
+    Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
+    Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
+  });
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();
   await card.scrollIntoViewIfNeeded();
-  const orbit = card.locator("[data-orbit-active]");
+  const orbit = card.locator(".skill-orbit");
+  const motionToggle = page.locator("[data-motion-toggle]");
+  await expect(motionToggle).toHaveAttribute("aria-pressed", "true");
+  await expect(card.getByRole("button")).toHaveCount(0);
+  await orbit.scrollIntoViewIfNeeded();
+  await expect(orbit).toHaveAttribute("data-orbit-active", "true");
   await expect(orbit).toBeVisible();
+  // Expanding the card can put the orbit below the viewport. Offscreen motion
+  // intentionally pauses, so observe it before asserting rotation.
+  await orbit.scrollIntoViewIfNeeded();
+  await expect(orbit).toBeInViewport();
   const pill = orbit.locator("[data-orbit-pill]").first();
   const initial = await pill.getAttribute("style");
   await expect.poll(() => pill.getAttribute("style")).not.toBe(initial);
-  await card.getByRole("button", { name: "Pausar Backend" }).click();
-  await expect(
-    card.getByRole("button", { name: "Reanudar Backend" }),
-  ).toHaveAttribute("aria-pressed", "true");
-  await expect
-    .poll(async () => {
-      const first = await pill.getAttribute("style");
-      await page.waitForTimeout(120);
-      return (await pill.getAttribute("style")) === first;
-    })
-    .toBe(true);
-  const paused = await pill.getAttribute("style");
+  await orbit.focus();
+  const beforeDrag = await pill.getAttribute("style");
   const box = await orbit.boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
@@ -57,18 +108,42 @@ test("technology cards keep moving pills, pause without jumping and support drag
     steps: 8,
   });
   await page.mouse.up();
-  await expect.poll(() => pill.getAttribute("style")).not.toBe(paused);
+  await expect.poll(() => pill.getAttribute("style")).not.toBe(beforeDrag);
+  await motionToggle.click();
+  await expect(motionToggle).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("[data-orbit-active]")).toHaveCount(0);
+  // A queued notification from the retired observer must not restart the orbit.
+  const delivered = await card.locator(".skill-orbit").evaluate((orbit) => {
+    const notifications = window.__orbitResizeDeliveries.filter(
+      (notification) => notification.target === orbit,
+    );
+    for (const notification of notifications) notification.deliver();
+    return notifications.length;
+  });
+  expect(delivered).toBeGreaterThan(0);
+  await page.waitForTimeout(250);
+  for (const chip of await card.locator("[data-orbit-pill]").all()) {
+    await expect(chip).toBeVisible();
+    await expect
+      .poll(() => chip.evaluate((element) => element.style.cssText))
+      .toBe("");
+    await expect(chip).toHaveCSS("transform", "none");
+    await expect(chip).toHaveCSS("opacity", "1");
+  }
+  await motionToggle.click();
+  await expect(motionToggle).toHaveAttribute("aria-pressed", "true");
+  await expect(orbit).toHaveAttribute("data-orbit-active", "true");
   await page.screenshot({ path: info.outputPath("technology-orbits.png") });
 });
 
-test("hero unveils on touch and pointer letters recover after interrupted hover", async ({
+test("hero is static by default on touch and pointer letters recover after interrupted hover", async ({
   page,
 }, info) => {
   await page.goto("/");
-  await expect
-    .poll(() => page.evaluate(() => window.__kineticMotionSeen))
-    .toBe(true);
   if (info.project.name === "desktop") {
+    await expect
+      .poll(() => page.evaluate(() => window.__kineticMotionSeen))
+      .toBe(true);
     const letter = page.locator("#hero [data-kinetic-char]").first();
     await expect
       .poll(() => letter.evaluate((el) => el.style.willChange))
@@ -78,19 +153,46 @@ test("hero unveils on touch and pointer letters recover after interrupted hover"
     await expect.poll(() => letter.getAttribute("style")).not.toBe(resting);
     await page.mouse.move(3, 3);
     await expect.poll(() => letter.getAttribute("style")).toBe(resting);
+    // Enter and leave synchronously to cover the zero-frame interruption.
+    const wroteLight = await page.evaluate(() => {
+      const word = document.querySelector("#hero [data-kinetic-interactive]");
+      const bounds = word.getBoundingClientRect();
+      word.dispatchEvent(
+        new PointerEvent("pointermove", {
+          pointerType: "mouse",
+          clientX: bounds.left + bounds.width / 2,
+          clientY: bounds.top + bounds.height / 2,
+        }),
+      );
+      const wrote = !!word
+        .querySelector("[data-kinetic-char]")
+        .style.getPropertyValue("--glyph-light-x");
+      word.dispatchEvent(
+        new PointerEvent("pointerleave", { pointerType: "mouse" }),
+      );
+      return wrote;
+    });
+    expect(wroteLight).toBe(true);
+    await expect.poll(() => letter.getAttribute("style")).toBe(resting);
+  } else {
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
+    await expect(page.locator("#hero h1")).toBeVisible();
+    await expect(page.locator("[data-dna-static]")).toBeVisible();
+    await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
+    expect(await page.evaluate(() => window.__kineticMotionSeen)).toBe(false);
   }
   await page.screenshot({ path: info.outputPath("hero-identity.png") });
 });
 
-test("lite mode retains rendered DNA and reduced motion retains a static silhouette", async ({
+test("lite mode and reduced motion retain a static silhouette", async ({
   page,
 }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/?lite=1");
-  await expect(
-    page.locator('canvas[data-materia-renderer="direct"]'),
-  ).toBeVisible();
+  await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
+  await expect(page.locator("[data-dna-static]")).toBeVisible();
+  await page.goto("/");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
   await expect(page.locator("[data-dna-static]")).toBeVisible();
@@ -102,7 +204,7 @@ test("lite mode retains rendered DNA and reduced motion retains a static silhoue
   expect(errors).toEqual([]);
 });
 
-test("project opens into a reversible 3D studio scroll journey", async ({
+test("project opens into a reversible desktop studio or readable static mobile studio", async ({
   page,
 }, info) => {
   const errors = [];
@@ -117,6 +219,22 @@ test("project opens into a reversible 3D studio scroll journey", async ({
   await row.getByRole("link", { name: "Explorar proyecto" }).click();
   await expect(page).toHaveURL(/\/work\/ana-peluquera/);
   await expect(page.locator("html")).not.toHaveAttribute("data-umbral");
+  if (info.project.name !== "desktop") {
+    await expect(page.locator('[data-studio-screen="cinematic"]')).toHaveCount(
+      0,
+    );
+    await expect(page.locator("[data-project-atmosphere]")).toHaveCount(0);
+    await expect(page.locator("canvas[data-materia-renderer]")).toHaveCount(0);
+    const staticScreen = page.locator('[data-studio-screen="static"]');
+    await staticScreen.scrollIntoViewIfNeeded();
+    await expect(staticScreen).toBeVisible();
+    await expect(
+      staticScreen.getByRole("link", { name: "Abrir en otra pestaña" }),
+    ).toBeVisible();
+    await page.screenshot({ path: info.outputPath("studio-static.png") });
+    expect(errors).toEqual([]);
+    return;
+  }
   const screen = page.locator('[data-studio-screen="cinematic"]');
   await expect(screen).toHaveCount(1);
   await expect(page.locator("[data-project-atmosphere]")).toHaveCount(1);
@@ -137,9 +255,7 @@ test("project opens into a reversible 3D studio scroll journey", async ({
     )
     .toBeGreaterThan(0.7);
   await expect(
-    screen
-      .getByText("Entrar al Estudio", { exact: true })
-      .filter({ visible: true }),
+    screen.locator('[data-studio-external-preview] [data-preview-kind="capture"]'),
   ).toBeVisible();
   await expect(
     screen.getByRole("link", { name: "Abrir en otra pestaña" }),
@@ -156,7 +272,7 @@ test("project opens into a reversible 3D studio scroll journey", async ({
   expect(errors).toEqual([]);
 });
 
-test("restored philosophy navigation, particles and contact card springs", async ({
+test("philosophy navigation and contact remain usable without ambient particles", async ({
   page,
 }, info) => {
   await page.goto("/");
@@ -164,7 +280,7 @@ test("restored philosophy navigation, particles and contact card springs", async
   const values = page.locator("#values");
   await values.scrollIntoViewIfNeeded();
   await expect(values.locator("[data-bento-visual]")).toHaveCount(6);
-  await expect(page.locator("[data-network-particles]")).toHaveCount(2);
+  await expect(page.locator("[data-network-particles]")).toHaveCount(0);
   await page.screenshot({ path: info.outputPath("philosophy-bento.png") });
   const copy = page.getByRole("button", { name: "Copiar correo", exact: true });
   await copy.scrollIntoViewIfNeeded();

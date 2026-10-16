@@ -28,6 +28,16 @@ export const materia = {
   tiltY: new SpringValue(0, 100, 20),
 };
 
+/** Keep WebGL and the inexpensive SVG projection on the same two-strand palette. */
+export function setMateriaPalette(accent: string, secondary: string) {
+  materia.accent = accent;
+  materia.secondary = secondary;
+  if (typeof document !== "undefined") {
+    document.documentElement.style.setProperty("--dna-accent", accent);
+    document.documentElement.style.setProperty("--dna-secondary", secondary);
+  }
+}
+
 export function tickMateria(deltaMs: number) {
   const dt = Math.min(deltaMs / 1000, 2);
   materia.warp.step(dt);

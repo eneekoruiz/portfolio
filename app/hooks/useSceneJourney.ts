@@ -3,7 +3,7 @@
 import { useEffect, type RefObject } from "react";
 import { materia } from "../lib/materia";
 
-const CHAPTERS = ["hero", "skills", "about", "work", "values", "contact"];
+const CHAPTERS = ["hero", "work", "about", "skills", "values", "contact"];
 const COMPOSITIONS = [1, -0.65, 0.75, -0.55, 0.55, 0.1];
 
 /** Cache layout on resize; scrolling changes only the shared spring targets. */

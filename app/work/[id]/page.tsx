@@ -20,12 +20,12 @@ import {
   Cpu,
   ShieldCheck,
   Zap,
-  Activity,
   Server,
   Layers,
   ChevronLeft,
   CheckCircle2,
   Radar,
+  Github,
 } from "lucide-react";
 
 import { TX } from "../../data/translations";
@@ -34,10 +34,9 @@ import { PROJECTS_CONTENT, CODE_SNIPPETS } from "../../data/projects";
 import { LANG_COLORS, getTechColor } from "../../lib/constants";
 import type { Lang } from "../../types";
 import { useMagnetic } from "../../hooks/useMagnetic";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
-import { useTextScramble } from "../../hooks/useTextScramble";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { ProjectHero } from "./components/ProjectHero";
-import { materia } from "../../lib/materia";
+import { materia, setMateriaPalette } from "../../lib/materia";
 import { umbral } from "../../components/motion/UmbralProvider";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 import {
@@ -127,6 +126,24 @@ const THEMES: Record<
     accent: "#b026ff",
     label: "A11Y / UX_SEMANTIC",
   },
+  recordatorios: {
+    helixA: "#2563eb",
+    helixB: "#93c5fd",
+    accent: "#2563eb",
+    label: "OFFLINE-FIRST / MCP_SYNC",
+  },
+  passwordmanager: {
+    helixA: "#10b981",
+    helixB: "#6ee7b7",
+    accent: "#10b981",
+    label: "SECURITY / ZERO_KNOWLEDGE",
+  },
+  regla: {
+    helixA: "#f43f5e",
+    helixB: "#fda4af",
+    accent: "#f43f5e",
+    label: "MOBILE / CAPACITOR_JWT",
+  },
 };
 
 const DEFAULT_THEME = {
@@ -140,6 +157,18 @@ const PROJECT_SUMMARIES: Record<string, { name: string; langs: string[] }> = {
   "ana-peluquera": {
     name: "AG Beauty Salon",
     langs: ["React", "Firebase", "Node.js", "Google Calendar API"],
+  },
+  recordatorios: {
+    name: "Recordatorios PWA",
+    langs: ["React", "TypeScript", "PWA", "Zustand", "Prisma", "PostgreSQL", "MCP"],
+  },
+  passwordmanager: {
+    name: "Password Manager Vault",
+    langs: ["React", "TypeScript", "Web Crypto", "AES-GCM", "WebAuthn", "Firebase"],
+  },
+  regla: {
+    name: "Ayudándonos Health",
+    langs: ["React", "TypeScript", "Tailwind", "Node.js", "PostgreSQL", "Capacitor"],
   },
   "who-are-ya-backend": {
     name: "Who Are Ya Backend",
@@ -273,7 +302,7 @@ export default function ProjectPage() {
 
   const { lang } = useTranslations();
   const [darkMode, setDarkMode] = useState(false);
-  const userMotionEnabled = useMotionEnabled();
+  const { allowed: userMotionEnabled } = useMotionPolicy();
   const reducedMotion = usePreferredMotion();
   const motionEnabled = userMotionEnabled && !reducedMotion;
 
@@ -308,8 +337,7 @@ export default function ProjectPage() {
   const safeId = id as string;
   const theme = THEMES[safeId] ?? DEFAULT_THEME;
   useEffect(() => {
-    materia.accent = theme.helixA;
-    materia.secondary = theme.helixB;
+    setMateriaPalette(theme.helixA, theme.helixB);
     materia.composition.target = 0;
     materia.chapter.target = 3;
     materia.studio.target = 0;
@@ -323,6 +351,9 @@ export default function ProjectPage() {
   const isJava = safeId === "rides24ofiziala";
   const isSpot = safeId === "spotshare-parking";
   const isA11y = safeId === "pke-web";
+  const isPWA = safeId === "recordatorios";
+  const isVault = safeId === "passwordmanager";
+  const isCycle = safeId === "regla";
 
   const projectData = PROJECTS_CONTENT[safeId as keyof typeof PROJECTS_CONTENT];
   const content = projectData
@@ -331,6 +362,9 @@ export default function ProjectPage() {
   const snippet = CODE_SNIPPETS[safeId as keyof typeof CODE_SNIPPETS];
   const LIVE_URLS: Record<string, string | null> = {
     "ana-peluquera": "https://agpeluqueria.vercel.app",
+    recordatorios: "https://recordatorios-delta.vercel.app",
+    passwordmanager: "https://passwordmanager-alpha.vercel.app",
+    regla: "https://ayudandonos.vercel.app",
     "who-are-ya-backend": "https://who-are-ya-backend.onrender.com",
     "pke-web": null,
     rides24ofiziala: null,
@@ -339,6 +373,9 @@ export default function ProjectPage() {
 
   const GITHUB_URLS: Record<string, string | null> = {
     "ana-peluquera": "https://github.com/eneekoruiz/ana-peluquera",
+    recordatorios: "https://github.com/eneekoruiz/recordatorios",
+    passwordmanager: "https://github.com/eneekoruiz/passwordmanager",
+    regla: "https://github.com/eneekoruiz/regla",
     "who-are-ya-backend": "https://github.com/eneekoruiz/who-are-ya-backend",
     "pke-web": "https://github.com/eneekoruiz/pke-web",
     rides24ofiziala: "https://github.com/eneekoruiz/rides24ofiziala",
@@ -359,17 +396,7 @@ export default function ProjectPage() {
     innerStrength: 0.1,
   });
 
-  // 🎯 Punto 7 — Text scramble for project title
   const titleText = content?.title ?? summary?.name ?? safeId;
-  const { text: scrambledText } = useTextScramble(titleText, {
-    trigger: "mount",
-    charSpeed: 10,
-    iterations: 2,
-    delay: 50,
-  });
-  const enteredThroughUmbral = useRef(umbral.active);
-  const scrambledTitle =
-    motionEnabled && !enteredThroughUmbral.current ? scrambledText : titleText;
 
   // Detect dark mode
   useEffect(() => {
@@ -444,13 +471,14 @@ export default function ProjectPage() {
         window.__lenis?.start?.();
       };
     } else {
-      // No overlay found (direct link or fast navigation), enable effects immediately
+      // Direct navigation: let the hero surface land before heavy background loops activate
       forceScrollReset();
-      setIsReadyToAnimate(true);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         forceScrollReset();
+        setIsReadyToAnimate(true);
         ScrollTrigger.refresh();
-      }, 40);
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -523,7 +551,11 @@ export default function ProjectPage() {
         );
       });
     },
-    { scope: main, dependencies: [content, motionEnabled] },
+    {
+      scope: main,
+      dependencies: [content, motionEnabled],
+      revertOnUpdate: true,
+    },
   );
 
   // ── Helix Animation is now handled internally in Canvas-based DNAHelix ─────
@@ -568,21 +600,24 @@ export default function ProjectPage() {
               <span className="xs:hidden">{TX[lang]?.back ?? "Back"}</span>
             </span>
           </button>
-          <div className="flex items-center gap-2 font-mono text-[8px] md:text-[9px] uppercase tracking-widest px-2.5 md:px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 truncate max-w-[120px] md:max-w-none">
-            <Activity
-              size={10}
-              style={{ color: theme.accent }}
-              className="animate-pulse shrink-0"
-            />
-            <span className="truncate">{theme.label}</span>
-          </div>
+          {githubUrl && (
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-11 items-center gap-2 px-3 text-xs font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-full"
+            >
+              <Github size={16} aria-hidden="true" />
+              GitHub
+            </a>
+          )}
         </div>
       </header>
 
       {/* ── FAKE 3D HERO (Full-viewport parallax + zoom) ── */}
       <ProjectHero
         projectId={safeId}
-        title={scrambledTitle}
+        title={titleText}
         subtitle={content?.subtitle ?? ""}
         accent={theme.accent}
         accentBg={theme.helixA}
@@ -646,13 +681,13 @@ export default function ProjectPage() {
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-24 md:mb-40 items-center">
           <div className="order-2 md:order-1">
             <GlareCard accent={theme.accent} className="p-6 md:p-10">
-              {!isBackend && !isJava && !isA11y && !isSpot && (
+              {!isBackend && !isJava && !isA11y && !isSpot && !isPWA && !isVault && !isCycle && (
                 <SandwichDiagram accent={theme.accent} />
               )}
-              {isBackend && <MVCTerminal accent={theme.accent} />}
-              {isJava && <DistributedNodes accent={theme.accent} />}
+              {(isBackend || isVault) && <MVCTerminal accent={theme.accent} />}
+              {(isJava || isPWA) && <DistributedNodes accent={theme.accent} />}
               {isA11y && <WCAGVisualizer accent={theme.accent} />}
-              {isSpot && <SpotshareHeatmap accent={theme.accent} />}
+              {(isSpot || isCycle) && <SpotshareHeatmap accent={theme.accent} />}
             </GlareCard>
           </div>
           <div className="order-1 md:order-2 space-y-4 md:space-y-6">
@@ -660,8 +695,10 @@ export default function ProjectPage() {
               className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center border border-black/10 dark:border-white/10 shadow-lg"
               style={{ background: `${theme.accent}15` }}
             >
-              {isBackend ? (
+              {isBackend || isPWA ? (
                 <Database size={18} style={{ color: theme.accent }} />
+              ) : isVault ? (
+                <ShieldCheck size={18} style={{ color: theme.accent }} />
               ) : isJava ? (
                 <Server size={18} style={{ color: theme.accent }} />
               ) : isA11y ? (

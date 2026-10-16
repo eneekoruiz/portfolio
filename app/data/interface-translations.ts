@@ -38,6 +38,7 @@ export interface InterfaceCopy {
   technologies: string;
   orbitHelp: string;
   preview: string;
+  details: string;
   cvUnavailable: string;
   cvFallback: string;
 }
@@ -82,6 +83,7 @@ export const UI_COPY = {
     technologies: "Tecnologías",
     orbitHelp: "Arrastra para explorar · rueda o flechas ← →",
     preview: "Vista del proyecto",
+    details: "Detalles",
     cvUnavailable: "No se pudo mostrar el currículum",
     cvFallback:
       "Puedes abrir el currículum en una pestaña nueva con el botón de arriba.",
@@ -123,6 +125,7 @@ export const UI_COPY = {
     technologies: "Technologies",
     orbitHelp: "Drag to explore · wheel or arrow keys ← →",
     preview: "Project preview",
+    details: "Details",
     cvUnavailable: "The résumé could not be displayed",
     cvFallback: "Use the button above to open the résumé in a new tab.",
     previewUnavailable: "Preview not available yet",
@@ -168,6 +171,7 @@ export const UI_COPY = {
     technologies: "Teknologiak",
     orbitHelp: "Arrastatu arakatzeko · gurpila edo geziak ← →",
     preview: "Proiektuaren aurrebista",
+    details: "Xehetasunak",
     cvUnavailable: "Ezin izan da curriculuma erakutsi",
     cvFallback:
       "Erabili goiko botoia curriculuma fitxa berri batean irekitzeko.",
@@ -214,6 +218,7 @@ export const UI_COPY = {
     technologies: "Technologies",
     orbitHelp: "Faites glisser pour explorer · molette ou flèches ← →",
     preview: "Aperçu du projet",
+    details: "Détails",
     cvUnavailable: "Le CV n’a pas pu être affiché",
     cvFallback:
       "Utilisez le bouton ci-dessus pour ouvrir le CV dans un nouvel onglet.",
@@ -255,6 +260,7 @@ export const UI_COPY = {
     technologies: "Tecnologie",
     orbitHelp: "Trascina per esplorare · rotellina o frecce ← →",
     preview: "Anteprima del progetto",
+    details: "Dettagli",
     cvUnavailable: "Impossibile visualizzare il curriculum",
     cvFallback:
       "Usa il pulsante qui sopra per aprire il curriculum in una nuova scheda.",
@@ -302,6 +308,7 @@ export const UI_COPY = {
     technologies: "Technologien",
     orbitHelp: "Zum Erkunden ziehen · Mausrad oder Pfeiltasten ← →",
     preview: "Projektvorschau",
+    details: "Details",
     cvUnavailable: "Der Lebenslauf konnte nicht angezeigt werden",
     cvFallback:
       "Öffnen Sie den Lebenslauf über die Schaltfläche oben in einem neuen Tab.",
@@ -348,6 +355,7 @@ export const UI_COPY = {
     technologies: "Tecnologias",
     orbitHelp: "Arraste para explorar · roda ou setas ← →",
     preview: "Pré-visualização do projeto",
+    details: "Detalhes",
     cvUnavailable: "Não foi possível apresentar o currículo",
     cvFallback: "Use o botão acima para abrir o currículo num novo separador.",
     previewUnavailable: "Pré-visualização ainda indisponível",
@@ -393,6 +401,7 @@ export const UI_COPY = {
     technologies: "Tecnologies",
     orbitHelp: "Arrossega per explorar · roda o fletxes ← →",
     preview: "Vista prèvia del projecte",
+    details: "Detalls",
     cvUnavailable: "No s’ha pogut mostrar el currículum",
     cvFallback:
       "Fes servir el botó de dalt per obrir el currículum en una pestanya nova.",
@@ -439,6 +448,7 @@ export const UI_COPY = {
     technologies: "Tecnoloxías",
     orbitHelp: "Arrastra para explorar · roda ou frechas ← →",
     preview: "Vista previa do proxecto",
+    details: "Detalles",
     cvUnavailable: "Non se puido mostrar o currículo",
     cvFallback:
       "Usa o botón de arriba para abrir o currículo nunha lapela nova.",
@@ -481,6 +491,7 @@ export const UI_COPY = {
     technologies: "技術",
     orbitHelp: "ドラッグして探索 · ホイールまたは矢印キー ← →",
     preview: "プロジェクトのプレビュー",
+    details: "詳細",
     cvUnavailable: "履歴書を表示できませんでした",
     cvFallback: "上のボタンから履歴書を新しいタブで開けます。",
     previewUnavailable: "プレビューは現在準備中です",
@@ -521,6 +532,7 @@ export const UI_COPY = {
     technologies: "技术",
     orbitHelp: "拖动探索 · 滚轮或方向键 ← →",
     preview: "项目预览",
+    details: "详情",
     cvUnavailable: "无法显示简历",
     cvFallback: "请使用上方按钮在新标签页中打开简历。",
     previewUnavailable: "暂无预览",
@@ -561,6 +573,7 @@ export const UI_COPY = {
     technologies: "التقنيات",
     orbitHelp: "اسحب للاستكشاف · عجلة الفأرة أو مفاتيح الأسهم ← →",
     preview: "معاينة المشروع",
+    details: "التفاصيل",
     cvUnavailable: "تعذر عرض السيرة الذاتية",
     cvFallback: "استخدم الزر أعلاه لفتح السيرة الذاتية في علامة تبويب جديدة.",
     previewUnavailable: "المعاينة غير متاحة حاليًا",
@@ -606,6 +619,7 @@ export const UI_COPY = {
     technologies: "Технологии",
     orbitHelp: "Перетаскивайте для просмотра · колёсико или стрелки ← →",
     preview: "Предпросмотр проекта",
+    details: "Подробности",
     cvUnavailable: "Не удалось отобразить резюме",
     cvFallback: "Нажмите кнопку выше, чтобы открыть резюме в новой вкладке.",
     previewUnavailable: "Предпросмотр пока недоступен",
@@ -646,6 +660,7 @@ export const UI_COPY = {
     technologies: "기술",
     orbitHelp: "드래그로 탐색 · 휠 또는 방향키 ← →",
     preview: "프로젝트 미리보기",
+    details: "자세히",
     cvUnavailable: "이력서를 표시할 수 없습니다",
     cvFallback: "위 버튼을 눌러 새 탭에서 이력서를 열어 주세요.",
     previewUnavailable: "미리보기는 아직 제공되지 않습니다",
@@ -686,6 +701,7 @@ export const UI_COPY = {
     technologies: "तकनीकें",
     orbitHelp: "देखने के लिए खींचें · व्हील या तीर कुंजियाँ ← →",
     preview: "प्रोजेक्ट का पूर्वावलोकन",
+    details: "विवरण",
     cvUnavailable: "रिज़्यूमे प्रदर्शित नहीं हो सका",
     cvFallback: "ऊपर दिए गए बटन से रिज़्यूमे नए टैब में खोलें।",
     previewUnavailable: "पूर्वावलोकन अभी उपलब्ध नहीं है",
@@ -726,6 +742,7 @@ export const UI_COPY = {
     technologies: "Teknolojiler",
     orbitHelp: "Keşfetmek için sürükleyin · tekerlek veya ok tuşları ← →",
     preview: "Proje önizlemesi",
+    details: "Ayrıntılar",
     cvUnavailable: "Özgeçmiş görüntülenemedi",
     cvFallback:
       "Özgeçmişi yeni sekmede açmak için yukarıdaki düğmeyi kullanın.",
@@ -767,6 +784,7 @@ export const UI_COPY = {
     technologies: "Technologieën",
     orbitHelp: "Sleep om te verkennen · muiswiel of pijltjestoetsen ← →",
     preview: "Projectvoorbeeld",
+    details: "Details",
     cvUnavailable: "Het cv kon niet worden weergegeven",
     cvFallback:
       "Gebruik de knop hierboven om het cv in een nieuw tabblad te openen.",
@@ -814,6 +832,7 @@ export const UI_COPY = {
     technologies: "Tekniker",
     orbitHelp: "Dra för att utforska · mushjul eller piltangenter ← →",
     preview: "Förhandsvisning av projektet",
+    details: "Detaljer",
     cvUnavailable: "Det gick inte att visa CV:t",
     cvFallback: "Använd knappen ovan för att öppna CV:t i en ny flik.",
     previewUnavailable: "Förhandsvisning saknas för tillfället",
@@ -860,6 +879,7 @@ export const UI_COPY = {
     technologies: "Technologie",
     orbitHelp: "Przeciągnij, aby przeglądać · kółko lub strzałki ← →",
     preview: "Podgląd projektu",
+    details: "Szczegóły",
     cvUnavailable: "Nie udało się wyświetlić CV",
     cvFallback: "Użyj przycisku powyżej, aby otworzyć CV w nowej karcie.",
     previewUnavailable: "Podgląd nie jest jeszcze dostępny",
@@ -900,6 +920,7 @@ export const UI_COPY = {
     technologies: "Công nghệ",
     orbitHelp: "Kéo để khám phá · con lăn hoặc phím mũi tên ← →",
     preview: "Xem trước dự án",
+    details: "Chi tiết",
     cvUnavailable: "Không thể hiển thị CV",
     cvFallback: "Dùng nút phía trên để mở CV trong thẻ mới.",
     previewUnavailable: "Chưa có bản xem trước",
