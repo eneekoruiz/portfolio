@@ -91,26 +91,14 @@ export function MateriaLayer() {
   }, [pathname]);
   useEffect(() => {
     if (!enabled) return;
-    let until = 0;
     const tick = (_time: number, delta: number) => {
-      tickMateria(delta);
-      if (performance.now() > until) gsap.ticker.remove(tick);
+      if (document.visibilityState === "visible") {
+        tickMateria(delta);
+      }
     };
-    const wake = () => {
-      until = performance.now() + 1800;
-      gsap.ticker.add(tick);
-    };
-    window.addEventListener("pointermove", wake, { passive: true });
-    window.addEventListener("scroll", wake, { passive: true });
-    window.addEventListener("focusin", wake);
-    window.addEventListener("pointerout", wake, { passive: true });
-    wake();
+    gsap.ticker.add(tick);
     return () => {
       gsap.ticker.remove(tick);
-      window.removeEventListener("pointermove", wake);
-      window.removeEventListener("scroll", wake);
-      window.removeEventListener("focusin", wake);
-      window.removeEventListener("pointerout", wake);
     };
   }, [enabled]);
   const routeHasScene = pathname === "/" || pathname.startsWith("/work/");

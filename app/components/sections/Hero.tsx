@@ -102,14 +102,14 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       ref={heroRef}
       id="hero"
       aria-label="Eneko Ruiz"
-      className="materia-hero relative flex h-[100svh] max-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-14 pb-3 md:px-10 md:pt-18 md:pb-4"
+      className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-24 pb-8 md:px-10 md:pt-28 md:pb-12"
     >
       <SeismicWaveCanvas
         stageRef={heroRef}
         charRefs={charsRef}
       />
       <div className="hero-light" aria-hidden="true" />
-      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/15 pb-2.5 md:pb-3 shrink-0">
+      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/10 pb-3 md:pb-4 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
           {greeting}
         </p>
@@ -119,7 +119,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
         <div className="relative z-10 flex flex-col items-center w-full">
           <h1
             dir="ltr"
-            className="m-0 text-[clamp(3.8rem,18.5vw,5.2rem)] md:text-[clamp(5.2rem,21.5vh,18.5rem)] font-black leading-[0.80] tracking-[-0.065em] select-none text-center"
+            className="m-0 text-[clamp(3.8rem,18.5vw,5.2rem)] md:text-[clamp(5.2rem,21.5vh,18.5rem)] font-black leading-[0.80] tracking-[-0.035em] select-none text-center [overflow-wrap:anywhere] min-w-0"
           >
             <div className="block text-ink">
               <KineticText
@@ -209,6 +209,10 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           style={{ width: 1, height: 1 }}
         />
       </div>
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-page via-page/80 to-transparent z-20 backdrop-blur-[2px]"
+        aria-hidden="true"
+      />
     </section>
   );
 }

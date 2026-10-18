@@ -10,11 +10,11 @@ type MotionSnapshot = {
   lightweight: boolean;
 };
 const serverSnapshot: MotionSnapshot = {
-  allowed: false,
-  enabled: false,
-  reduced: true,
+  allowed: true,
+  enabled: true,
+  reduced: false,
   visible: true,
-  lightweight: true,
+  lightweight: false,
 };
 let snapshot = serverSnapshot;
 const listeners = new Set<() => void>();
@@ -55,10 +55,7 @@ export function subscribeMotion(listener: () => void) {
       const reducedMotion = reduced.matches && !explicitOptIn;
       const allowed =
         !reducedMotion &&
-        (preference ??
-          (!touch.matches &&
-            !nav.connection?.saveData &&
-            window.__LITE !== true));
+        (preference ?? (window.__LITE !== true && !nav.connection?.saveData));
       const enabled = visible && allowed && !isBodyScrollLocked();
       document.documentElement.dataset.motion = enabled ? "on" : "off";
       if (

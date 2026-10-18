@@ -6,7 +6,7 @@
 :root {
   --page: #f5f5f7;
   --ink: #1d1d1f;
-  --lead: #6e6e73;
+  --lead: #545459;
   --brand: #0066ff;
   --brand-rgb: 0, 102, 255;
   --line: rgba(0, 0, 0, 0.07);
@@ -18,13 +18,13 @@
 .dark {
   --page: #000000;
   --ink: #ffffff;
-  --lead: #888888;
+  --lead: #94949e;
   --brand: #0066ff;
   --brand-rgb: 0, 102, 255;
   --line: rgba(255, 255, 255, 0.08);
 }
 
-/* ── 2. BASE RESET ── */
+/* ── 2. BASE RESET & BROWSER SURFACES ── */
 *,
 *::before,
 *::after {
@@ -32,16 +32,17 @@
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
-
-/* Optimize Tailwind transitions globally for maximum smoothness */
-/* Base animations and transitions are handled via specific utility classes or component-level CSS to avoid global side-effects. */
 
 html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  caret-color: var(--brand);
+  text-underline-offset: 0.25em;
 }
 
 body {
@@ -49,13 +50,25 @@ body {
   background: var(--page);
   color: var(--ink);
   overflow-x: clip;
-  /* Optimized transitions: faster for responsiveness, cubic-bezier for organic feel */
   transition:
     background 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     border-color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  /* Prevent layout shifts and ensure smooth animations */
   will-change: auto;
+}
+
+/* Accessible focus ring system across all interactive controls */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* Tabular figures for telemetry, metrics, and timestamps */
+.tabular-nums,
+[data-metric-visual],
+[data-stat],
+time {
+  font-variant-numeric: tabular-nums;
 }
 
 ::-webkit-scrollbar {
@@ -834,7 +847,7 @@ html {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
-/* ── 21. VIEW TRANSITIONS (Eclipse Theme) ── */
+/* ── 21. VIEW TRANSITIONS (Circular Expansion) ── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -847,20 +860,6 @@ html {
 
 ::view-transition-new(root) {
   z-index: 2147483647;
-}
-
-/* Custom clip-path animation for the "Eclipse" effect */
-@keyframes eclipse-in {
-  from {
-    clip-path: circle(0% at var(--x) var(--y));
-  }
-  to {
-    clip-path: circle(150% at var(--x) var(--y));
-  }
-}
-
-[data-transition="eclipse"]::view-transition-new(root) {
-  animation: eclipse-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 /* -- BINARY STREAM BUTTON ANIMATIONS -- */
 @keyframes btnStream {
@@ -1082,9 +1081,22 @@ html {
   will-change: transform, opacity;
 }
 
+/* Tactile micro-press feedback for interactive buttons (ui-ux-pro-max & make-interfaces-feel-better) */
+button:active:not(:disabled),
+a[role="button"]:active,
+.materia-button:active {
+  transform: scale(0.985);
+  transition: transform 0.08s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .portal-scan-field,
   .preloader-signal-mask {
     opacity: 0.12 !important;
+  }
+  .cursor-shake-pulse,
+  .grain-overlay,
+  .border-beam::after {
+    animation: none !important;
   }
 }

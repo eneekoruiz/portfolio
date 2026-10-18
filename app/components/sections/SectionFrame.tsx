@@ -90,7 +90,7 @@ export function SectionFrame({
         </div>
         <h2
           id={`${id}-heading`}
-          className="max-w-5xl text-balance text-[clamp(2.25rem,5.6vw,5.5rem)] font-black leading-[0.98] tracking-[-0.06em] text-ink"
+          className="max-w-5xl text-balance text-[clamp(2.25rem,5.6vw,5.5rem)] font-black leading-[0.98] tracking-[-0.035em] text-ink [overflow-wrap:anywhere] min-w-0"
         >
           <KineticText text={title} enabled={motion} wrap />
         </h2>
