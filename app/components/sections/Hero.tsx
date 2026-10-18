@@ -209,10 +209,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           style={{ width: 1, height: 1 }}
         />
       </div>
-      <div
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-page via-page/80 to-transparent z-20 backdrop-blur-[2px]"
-        aria-hidden="true"
-      />
     </section>
   );
 }
