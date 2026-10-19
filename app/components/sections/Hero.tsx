@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { LiveStatus } from "../ui/LiveStatus";
 import { useSpringHover } from "../../hooks/useSpringHover";
@@ -8,7 +8,7 @@ import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
 import { SignatureLink } from "../ui/SignatureLink";
 import { KineticText } from "../motion/KineticText";
-import { SeismicWaveCanvas } from "../motion/SeismicWaveCanvas";
+import { SandField } from "../motion/SandField";
 import { triggerTectonicImpact } from "../../lib/tectonic";
 import type { Tx, Lang } from "../../types";
 import { UI_COPY } from "../../data/interface-translations";
@@ -31,15 +31,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
     "idle",
   );
   const contactRef = useSpringHover<HTMLAnchorElement>(enabled, 6);
-  const charsRef = useRef<(HTMLElement | null)[]>([]);
-
-  useEffect(() => {
-    if (!heroRef.current) return;
-    const elements = Array.from(
-      heroRef.current.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
-    );
-    charsRef.current = elements;
-  }, [enabled]);
 
   const scrollTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
@@ -66,10 +57,7 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       aria-label="Eneko Ruiz"
       className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-24 pb-8 md:px-10 md:pt-28 md:pb-12"
     >
-      <SeismicWaveCanvas
-        stageRef={heroRef}
-        charRefs={charsRef}
-      />
+      <SandField stageRef={heroRef} enabled={enabled} />
       <div className="hero-light" aria-hidden="true" />
       <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/10 pb-3 md:pb-4 shrink-0">
         <p className="text-xs font-medium tracking-wide text-lead">
