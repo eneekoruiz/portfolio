@@ -91,7 +91,7 @@ export function useGsapOrchestration(
             opacity: 1,
             y: 0,
             duration: 0.28,
-            ease: "back.out(1.15)",
+            ease: "expo.out",
             stagger: 0.025,
           });
         }
@@ -101,7 +101,7 @@ export function useGsapOrchestration(
             {
               yPercent: 0,
               duration: 0.45,
-              ease: "back.out(1.2)",
+              ease: "expo.out",
               stagger: 0.035,
             },
             hasNel ? "-=0.22" : undefined,
@@ -114,7 +114,7 @@ export function useGsapOrchestration(
               opacity: 1,
               y: 0,
               duration: 0.35,
-              ease: "back.out(1.15)",
+              ease: "expo.out",
               stagger: 0.03,
             },
             hasNel || hasHln ? "-=0.32" : undefined,
@@ -123,7 +123,7 @@ export function useGsapOrchestration(
         if (hasMemoji) {
           tl.to(
             ".memoji",
-            { opacity: 1, x: 0, duration: 0.55, ease: "back.out(1.2)" },
+            { opacity: 1, x: 0, duration: 0.55, ease: "expo.out" },
             hasNel || hasHln || hasHfd ? "-=0.4" : undefined,
           );
         }

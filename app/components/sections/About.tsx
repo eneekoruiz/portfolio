@@ -29,7 +29,7 @@ function MetricCard({
 }: MetricCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDListElement>(null);
-  useMateriaSurface(ref, "#0066ff", motion, 20);
+  useMateriaSurface(ref, "#1f4bff", motion, 20);
   useSpringTilt(ref, visualRef, motion);
 
   return (

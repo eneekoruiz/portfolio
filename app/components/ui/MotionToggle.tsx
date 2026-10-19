@@ -83,7 +83,7 @@ export function MotionToggle() {
         <Pause
           size={15}
           strokeWidth={2.5}
-          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`absolute transition-all duration-500 ease-[var(--ease-reveal)] ${
             enabled
               ? "opacity-100 translate-y-0 rotate-0 scale-100 text-emerald-500 dark:text-emerald-400"
               : "opacity-0 -translate-y-8 rotate-45 scale-50"
@@ -99,7 +99,7 @@ export function MotionToggle() {
         <Play
           size={15}
           strokeWidth={2.5}
-          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`absolute transition-all duration-500 ease-[var(--ease-reveal)] ${
             enabled
               ? "opacity-0 translate-y-8 -rotate-45 scale-50"
               : "opacity-100 translate-y-0 rotate-0 scale-100 text-neutral-500 dark:text-neutral-400"

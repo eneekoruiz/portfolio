@@ -126,7 +126,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   useScrollRestoration(ready);
   useReturnTransition(ready);
   useLenisSetup();
-  useSceneJourney(main, ready && motionEnabled && !reduced);
+  useSceneJourney(main, ready, motionEnabled && !reduced);
 
   // Reveal effects
   useScrollReveal(ready);

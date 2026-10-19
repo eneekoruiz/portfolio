@@ -23,46 +23,8 @@ interface HeroProps {
 
 export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
   const ui = UI_COPY[lang];
-  const { enabled: motion, lightweight } = useMotionPolicy();
+  const { enabled: motion } = useMotionPolicy();
   const enabled = motion && !reduced;
-  const portraitRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const video = portraitRef.current;
-    if (!video) return;
-    let visible = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const update = () => {
-      if (
-        enabled &&
-        !lightweight &&
-        visible &&
-        document.visibilityState === "visible"
-      ) {
-        if (!video.getAttribute("src")) {
-          video.src = "/memoji.webm";
-          video.load();
-        }
-        void video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
-    };
-    const observer = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      update();
-    });
-    observer.observe(video);
-    document.addEventListener("visibilitychange", update);
-    update();
-    return () => {
-      clearTimeout(timer);
-      observer.disconnect();
-      document.removeEventListener("visibilitychange", update);
-      video.pause();
-    };
-  }, [enabled, lightweight]);
-
   const heroRef = useRef<HTMLElement>(null);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
@@ -191,23 +153,6 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           {t.scroll}
           <ArrowDown size={14} aria-hidden="true" />
         </span>
-      </div>
-      <div
-        className="hero-portrait-frame pointer-events-none opacity-0 absolute overflow-hidden"
-        style={{ width: 1, height: 1, bottom: 0, left: 0 }}
-        aria-hidden="true"
-      >
-        <video
-          ref={portraitRef}
-          poster="/memoji-poster.webp"
-          autoPlay={false}
-          loop={enabled}
-          muted
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          style={{ width: 1, height: 1 }}
-        />
       </div>
     </section>
   );

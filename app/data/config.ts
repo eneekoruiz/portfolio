@@ -23,7 +23,7 @@ export interface ProjectTheme {
 
 export const PROJ_THEMES: Record<string, ProjectTheme> = {
   "ana-peluquera": {
-    color: "#ff2d78",
+    color: "#d95b7c",
     rgb: "255, 45, 120",
     img: "radial-gradient(ellipse at 50% 120%, rgba(255,45,120,0.2) 0%, transparent 75%)",
     gradient:
@@ -33,7 +33,7 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     hasAudit: true,
   },
   "who-are-ya-backend": {
-    color: "#00c940",
+    color: "#3da54b",
     rgb: "0, 201, 64",
     img: "radial-gradient(ellipse at 50% 120%, rgba(0,201,64,0.2) 0%, transparent 75%)",
     gradient:
@@ -43,7 +43,7 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     hasAudit: true,
   },
   rides24ofiziala: {
-    color: "#e69400",
+    color: "#bf7b0e",
     rgb: "230, 148, 0",
     img: "radial-gradient(ellipse at 50% 120%, rgba(230,148,0,0.2) 0%, transparent 75%)",
     gradient:
@@ -53,7 +53,7 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     hasAudit: true,
   },
   "spotshare-parking": {
-    color: "#00d4e8",
+    color: "#1a9eac",
     rgb: "0, 212, 232",
     img: "radial-gradient(ellipse at 50% 120%, rgba(0,212,232,0.2) 0%, transparent 75%)",
     gradient:
@@ -63,7 +63,7 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     hasAudit: false,
   },
   "pke-web": {
-    color: "#9b1fff",
+    color: "#9f71dc",
     rgb: "155, 31, 255",
     img: "radial-gradient(ellipse at 50% 120%, rgba(155,31,255,0.2) 0%, transparent 75%)",
     gradient:
@@ -73,7 +73,7 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     hasAudit: true,
   },
   recordatorios: {
-    color: "#2563eb",
+    color: "#5688ec",
     rgb: "37, 99, 235",
     img: "radial-gradient(ellipse at 50% 120%, rgba(37,99,235,0.2) 0%, transparent 75%)",
     gradient:
@@ -83,7 +83,7 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     hasAudit: true,
   },
   passwordmanager: {
-    color: "#10b981",
+    color: "#16a573",
     rgb: "16, 185, 129",
     img: "radial-gradient(ellipse at 50% 120%, rgba(16,185,129,0.2) 0%, transparent 75%)",
     gradient:
@@ -93,7 +93,7 @@ export const PROJ_THEMES: Record<string, ProjectTheme> = {
     hasAudit: true,
   },
   regla: {
-    color: "#f43f5e",
+    color: "#dc5c69",
     rgb: "244, 63, 94",
     img: "radial-gradient(ellipse at 50% 120%, rgba(244,63,94,0.2) 0%, transparent 75%)",
     gradient:

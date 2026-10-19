@@ -30,6 +30,41 @@ const WELCOME_WORDS: Record<Lang, string> = {
   vi: "Chào mừng",
 };
 
+const SKIP_LABELS: Record<Lang, string> = {
+  es: "Saltar",
+  en: "Skip",
+  eu: "Saltatu",
+  fr: "Passer",
+  it: "Salta",
+  de: "Überspringen",
+  pt: "Pular",
+  ca: "Omet",
+  gl: "Omitir",
+  ja: "スキップ",
+  zh: "跳过",
+  ar: "تخطي",
+  ru: "Пропустить",
+  ko: "건너뛰기",
+  hi: "छोड़ें",
+  tr: "Geç",
+  nl: "Overslaan",
+  sv: "Hoppa över",
+  pl: "Pomiń",
+  vi: "Bỏ qua",
+};
+
+// Joined scripts lose their shaping when split into spans, so they reveal as one word.
+const WHOLE_WORD_LANGS = new Set<Lang>(["ar", "hi"]);
+
+function revealUnits(word: string, lang: Lang): string[] {
+  if (WHOLE_WORD_LANGS.has(lang)) return [word];
+  if (typeof Intl.Segmenter !== "function") return Array.from(word);
+  return Array.from(
+    new Intl.Segmenter(lang, { granularity: "grapheme" }).segment(word),
+    (part) => part.segment,
+  );
+}
+
 interface CinematicOvertureProps {
   lang: Lang;
   onComplete: () => void;
@@ -64,6 +99,7 @@ export function CinematicOverture({ lang, onComplete }: CinematicOvertureProps) 
   onCompleteRef.current = onComplete;
 
   const word = WELCOME_WORDS[lang] ?? "Welcome";
+  const skipLabel = SKIP_LABELS[lang] ?? "Skip";
 
   /* ── Skip / finish handler ─────────────────────────────────── */
   const finish = useCallback(() => {
@@ -269,8 +305,10 @@ export function CinematicOverture({ lang, onComplete }: CinematicOvertureProps) 
        ════════════════════════════════════════════════════════════ */
 
     // Light flood — page color expands from center
-    tl.to(flood, {
+    // Starts dim so light mode fades up from grey instead of flashing white over black.
+    tl.fromTo(flood, { scale: 0, opacity: 0.35 }, {
       scale: 1,
+      opacity: 1,
       duration: 1.0,
       ease: "expo.out",
     }, 4.8);
@@ -324,7 +362,7 @@ export function CinematicOverture({ lang, onComplete }: CinematicOvertureProps) 
       ref={containerRef}
       role="status"
       aria-live="polite"
-      aria-label="Cargando experiencia"
+      aria-label={`${word} · Eneko Ruiz`}
       onClick={finish}
       className="cinematic-overture fixed inset-0 z-[9990] flex items-center justify-center overflow-hidden select-none cursor-pointer"
       style={{ background: "#000000" }}
@@ -364,8 +402,8 @@ export function CinematicOverture({ lang, onComplete }: CinematicOvertureProps) 
       {/* Center stage */}
       <div className="relative z-10 flex flex-col items-center">
         {/* Welcome word — each character individually animated */}
-        <div ref={wordRef} className="flex" aria-hidden="true">
-          {word.split("").map((char, i) => (
+        <div ref={wordRef} className="flex" aria-hidden="true" dir="auto">
+          {revealUnits(word, lang).map((char, i) => (
             <span key={i} className="overture-char">
               {char === " " ? "\u00A0" : char}
             </span>
@@ -391,9 +429,9 @@ export function CinematicOverture({ lang, onComplete }: CinematicOvertureProps) 
           finish();
         }}
         className="overture-skip"
-        aria-label="Saltar introducción"
+        aria-label={skipLabel}
       >
-        [ ESC / CLICK TO SKIP ]
+        [ ESC · {skipLabel} ]
       </button>
     </div>
   );

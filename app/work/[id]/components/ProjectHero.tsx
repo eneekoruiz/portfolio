@@ -477,7 +477,7 @@ export function ProjectHero({
       tl.fromTo(
         ".studio-bar",
         { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "back.out(1.7)" },
+        { y: 0, opacity: 1, duration: 0.6, ease: "expo.out" },
       );
     } else {
       // On exit, ScrollTrigger refresh will re-apply the animated state

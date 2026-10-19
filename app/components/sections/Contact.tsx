@@ -13,6 +13,25 @@ import { UI_COPY } from "../../data/interface-translations";
 import { triggerTectonicImpact } from "../../lib/tectonic";
 
 const EMAIL = "eneekoruiz@gmail.com";
+const LOCAL_TIME_REFRESH_MS = 30_000;
+
+/** Rendered after mount: server and client clocks differ, and the offset changes with DST. */
+function useLocalTime(lang: Lang) {
+  const [time, setTime] = useState("");
+  useEffect(() => {
+    const format = new Intl.DateTimeFormat(lang, {
+      timeZone: "Europe/Madrid",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "shortOffset",
+    });
+    const tick = () => setTime(format.format(new Date()));
+    tick();
+    const id = setInterval(tick, LOCAL_TIME_REFRESH_MS);
+    return () => clearInterval(id);
+  }, [lang]);
+  return time;
+}
 
 export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
@@ -20,9 +39,10 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const alive = useRef(true);
   const motion = useMotionEnabled();
   const cardRef = useRef<HTMLDivElement>(null);
-  useMateriaSurface(cardRef, "#0066ff", motion, 28);
+  useMateriaSurface(cardRef, "#1f4bff", motion, 28);
   const mailRef = useSpringHover<HTMLAnchorElement>(motion);
   const ui = UI_COPY[lang];
+  const localTime = useLocalTime(lang);
 
   useEffect(() => {
     alive.current = true;
@@ -107,7 +127,10 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
                   : ""}
             </p>
             {status === "idle" && (
-              <span className="opacity-70">DONOSTIA / SAN SEBASTIÁN (GMT+2)</span>
+              <span className="opacity-70">
+                DONOSTIA / SAN SEBASTIÁN
+                {localTime && <time className="ml-2">{localTime}</time>}
+              </span>
             )}
           </div>
         </div>

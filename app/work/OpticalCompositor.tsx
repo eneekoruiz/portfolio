@@ -175,7 +175,7 @@ export function OpticalCompositor({
   useEffect(() => {
     if (!resources) return;
     resources.material.uniforms.uPaper.value.set(
-      darkMode ? "#080b12" : "#f5f5f7",
+      darkMode ? "#0b0d10" : "#f2efe8",
     );
     resources.material.uniforms.uDark.value = darkMode ? 1 : 0;
   }, [resources, darkMode]);

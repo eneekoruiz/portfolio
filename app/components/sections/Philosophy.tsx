@@ -16,7 +16,7 @@ interface BentoCardProps {
 function BentoCard({ item, index, motion }: BentoCardProps) {
   const ref = useRef<HTMLElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
-  useMateriaSurface(ref, "#0066ff", motion, 24);
+  useMateriaSurface(ref, "#1f4bff", motion, 24);
   useSpringTilt(ref, visualRef, motion);
   const { icon: Icon, t: title, d: description } = item;
 

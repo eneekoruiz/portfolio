@@ -97,9 +97,9 @@ const THEMES: Record<
   }
 > = {
   "ana-peluquera": {
-    helixA: "#ff2d78",
+    helixA: "#d95b7c",
     helixB: "#ff9fcd",
-    accent: "#ff2d78",
+    accent: "#d95b7c",
     label: "FRONTEND / UX_ENGINE",
   },
   "who-are-ya-backend": {
@@ -127,21 +127,21 @@ const THEMES: Record<
     label: "A11Y / UX_SEMANTIC",
   },
   recordatorios: {
-    helixA: "#2563eb",
+    helixA: "#5688ec",
     helixB: "#93c5fd",
-    accent: "#2563eb",
+    accent: "#5688ec",
     label: "OFFLINE-FIRST / MCP_SYNC",
   },
   passwordmanager: {
-    helixA: "#10b981",
+    helixA: "#16a573",
     helixB: "#6ee7b7",
-    accent: "#10b981",
+    accent: "#16a573",
     label: "SECURITY / ZERO_KNOWLEDGE",
   },
   regla: {
-    helixA: "#f43f5e",
+    helixA: "#dc5c69",
     helixB: "#fda4af",
-    accent: "#f43f5e",
+    accent: "#dc5c69",
     label: "MOBILE / CAPACITOR_JWT",
   },
 };

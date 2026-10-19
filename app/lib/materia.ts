@@ -17,7 +17,7 @@ export const materia = {
   surfaces: new Set<OpticalSurface>(),
   velocity: 0,
   scrollTime: 0,
-  accent: "#0066ff",
+  accent: "#1f4bff",
   secondary: "#8aa8dc",
   paused: false,
   warp: new SpringValue(0, 110, 20),

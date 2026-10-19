@@ -362,14 +362,14 @@ class TrueSeismicShockfront {
       // Anillo azul real tectónico (#0066ff) con halo
       ribbons = [
         {
-          color: `rgba(0, 102, 255, ${energy * 0.3})`,
+          color: `rgba(31, 75, 255, ${energy * 0.3})`,
           rDelta: 0,
           width: 6.0,
           roughness: 0.06,
           phaseOffset: 0.4,
         },
         {
-          color: `rgba(0, 102, 255, ${energy * 0.96})`,
+          color: `rgba(31, 75, 255, ${energy * 0.96})`,
           rDelta: 0,
           width: 2.6,
           roughness: 0.06,
@@ -437,7 +437,7 @@ class TrueSeismicShockfront {
           phaseOffset: 0.45,
         },
         {
-          color: `rgba(0, 102, 255, ${energy * 0.96})`,
+          color: `rgba(31, 75, 255, ${energy * 0.96})`,
           rDelta: 0,
           width: this.isMainRupture ? 3.8 : 2.2,
           roughness: 0.058,
@@ -486,7 +486,7 @@ class TrueSeismicShockfront {
       const coreAlpha = (1 - this.r / 120) * this.amplitude * 0.5;
       const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 100);
       grad.addColorStop(0, `rgba(0, 225, 255, ${coreAlpha * 0.9})`);
-      grad.addColorStop(0.4, `rgba(0, 102, 255, ${coreAlpha * 0.5})`);
+      grad.addColorStop(0.4, `rgba(31, 75, 255, ${coreAlpha * 0.5})`);
       grad.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = grad;
       drawTectonicWavefront(ctx, this.x, this.y, 100, this.seed, 0.06);
@@ -530,7 +530,7 @@ class TectonicLetterPulse {
     ctx.save();
     // 1. Halo cromático cian/azul eléctrico
     drawMicroFracture(ctx, this.x, this.y, this.r + 2, this.seed);
-    ctx.strokeStyle = `rgba(0, 102, 255, ${energy * 0.75})`;
+    ctx.strokeStyle = `rgba(31, 75, 255, ${energy * 0.75})`;
     ctx.lineWidth = 2.2;
     ctx.stroke();
 

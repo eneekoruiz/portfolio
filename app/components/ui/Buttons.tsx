@@ -81,7 +81,7 @@ export function WorkScrollBtn({ label }: { label: string }) {
       style={{ ["--aura-color" as any]: "rgba(var(--brand-rgb), 0.22)" }}
       className={[
         "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full btn-aura",
-        "font-bold text-[14px] tracking-[-0.2px] transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]",
+        "font-bold text-[14px] tracking-[-0.2px] transition-all duration-300 ease-[var(--ease-reveal)]",
         state === "done"
           ? "bg-[#34c759] text-white scale-[1.02] shadow-[0_8px_28px_rgba(52,199,89,.35)]"
           : state === "animating"
@@ -231,7 +231,7 @@ export function BinaryStreamBtn({
       className={[
         "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full btn-aura",
         "font-bold text-[14px] tracking-[-0.2px] overflow-hidden",
-        "transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]",
+        "transition-all duration-300 ease-[var(--ease-reveal)]",
         state === "done"
           ? "bg-[#34c759] text-white scale-[1.02]"
           : state === "animating"
@@ -365,7 +365,7 @@ export function BranchMergeBtn({
       className={[
         "relative inline-flex items-center gap-2 px-[1.85rem] py-[.85rem] rounded-full btn-aura",
         "font-bold text-[13px] tracking-[-0.2px]",
-        "transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]",
+        "transition-all duration-300 ease-[var(--ease-reveal)]",
         state === "done"
           ? "bg-[#34c759] text-white scale-[1.02]"
           : "bg-ink text-page shadow-[0_8px_28px_rgba(0,0,0,.2)] hover:bg-black hover:text-white hover:scale-[1.02] hover:shadow-[0_12px_40px_rgba(0,0,0,.3)]",
