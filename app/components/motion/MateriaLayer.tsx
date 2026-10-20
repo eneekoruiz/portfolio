@@ -11,7 +11,6 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import gsap from "gsap";
-import { useIntro } from "../IntroProvider";
 
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { materia, tickMateria } from "../../lib/materia";
@@ -42,7 +41,6 @@ class GraphicsBoundary extends Component<
 export function MateriaLayer() {
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
-  const { phase } = useIntro();
 
   const { allowed, enabled, lightweight } = useMotionPolicy();
   const [sceneReady, setSceneReady] = useState(false);
@@ -69,12 +67,10 @@ export function MateriaLayer() {
       if (idle) window.cancelIdleCallback(idle);
     };
   }, [enabled, sceneReady, lightweight, degraded]);
-  const [skillsVisible, setSkillsVisible] = useState(false);
   useEffect(() => {
     const hero =
       document.getElementById("hero") ??
       document.querySelector("[data-umbral-destination]");
-    const skills = document.getElementById("skills");
     if (!hero) {
       setHeroVisible(true);
       return;
@@ -82,11 +78,9 @@ export function MateriaLayer() {
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.target === hero) setHeroVisible(entry.isIntersecting);
-        if (entry.target === skills) setSkillsVisible(entry.isIntersecting);
       }
     });
     observer.observe(hero);
-    if (skills) observer.observe(skills);
     return () => observer.disconnect();
   }, [pathname]);
   useEffect(() => {
@@ -101,18 +95,16 @@ export function MateriaLayer() {
       gsap.ticker.remove(tick);
     };
   }, [enabled]);
-  const routeHasScene = pathname === "/" || pathname.startsWith("/work/");
-  const ready = pathname !== "/" || phase === "ready";
-  // Outside the hero the GPU sleeps; the bounded SVG projection animates in hero and skills.
-  const animateFallback = enabled && (heroVisible || skillsVisible) && ready;
+  // The helix belongs to case studies; on the home page the sand field owns the opening shot.
+  const routeHasScene = pathname.startsWith("/work/");
+  // Outside the hero the GPU sleeps; the bounded SVG projection animates only in the hero.
+  const animateFallback = enabled && heroVisible;
   if (!mounted || !routeHasScene) return null;
-  const inHero = pathname === "/" && heroVisible;
 
   return (
     <div
       className="materia-canvas fixed inset-0 z-0 pointer-events-none overflow-hidden"
       data-scene-active={heroVisible && enabled}
-      data-scene-ready={ready}
       data-scene-degraded={degraded || undefined}
       aria-hidden="true"
     >
@@ -124,7 +116,7 @@ export function MateriaLayer() {
             accent={materia.accent}
             secondary={materia.secondary}
             darkMode={resolvedTheme === "dark"}
-            paused={!enabled || !ready || !heroVisible}
+            paused={!enabled || !heroVisible}
             animateFallback={animateFallback}
             onSlow={degrade}
           />
