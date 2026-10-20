@@ -50,9 +50,9 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.5) 30%,
-    rgba(255, 255, 255, 0.7) 50%,
-    rgba(255, 255, 255, 0.5) 70%,
+    color-mix(in srgb, var(--ink) 50%, transparent) 30%,
+    color-mix(in srgb, var(--ink) 70%, transparent) 50%,
+    color-mix(in srgb, var(--ink) 50%, transparent) 70%,
     transparent 100%
   );
   z-index: 10;
@@ -69,7 +69,7 @@
   font-size: 9px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.2);
+  color: color-mix(in srgb, var(--ink) 20%, transparent);
   white-space: nowrap;
   z-index: 11;
   opacity: 0;
@@ -91,7 +91,7 @@
   font-size: clamp(3.2rem, 8vw, 7rem);
   line-height: 0.9;
   letter-spacing: -0.04em;
-  color: #ffffff;
+  color: var(--ink);
   clip-path: inset(100% 0 0 0);
   will-change: clip-path, opacity, transform, filter;
 }
@@ -103,7 +103,7 @@
   font-weight: 700;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
+  color: color-mix(in srgb, var(--ink) 85%, transparent);
   clip-path: inset(0 50% 0 50%);
   will-change: clip-path, opacity;
 }
@@ -114,7 +114,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.35) 50%,
+    color-mix(in srgb, var(--ink) 35%, transparent) 50%,
     transparent 100%
   );
   will-change: width, opacity;
@@ -147,7 +147,7 @@
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.35);
+  color: color-mix(in srgb, var(--ink) 35%, transparent);
   z-index: 20;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -155,7 +155,7 @@
 }
 
 .overture-skip:hover {
-  color: rgba(255, 255, 255, 0.6);
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
 }
 
 .overture-skip:focus-visible {

@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import type { Lang } from "../../types";
 import { lockBodyScroll } from "../../lib/body-scroll-lock";
-import { useMotionEnabled } from "../../hooks/useMotionEnabled";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 
 /* ── Welcome lexicon ─────────────────────────────────────────── */
 const WELCOME_WORDS: Record<Lang, string> = {
@@ -93,7 +93,9 @@ export function CinematicOverture({ lang, onComplete }: CinematicOvertureProps) 
   const skipRef = useRef<HTMLButtonElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const finishedRef = useRef(false);
-  const motionEnabled = useMotionEnabled();
+  // `allowed`, not `enabled`: the overture locks body scroll, which flips `enabled`
+  // off and would make the overture cancel itself on its first frame.
+  const motionEnabled = useMotionPolicy().allowed;
 
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
@@ -365,7 +367,7 @@ export function CinematicOverture({ lang, onComplete }: CinematicOvertureProps) 
       aria-label={`${word} · Eneko Ruiz`}
       onClick={finish}
       className="cinematic-overture fixed inset-0 z-[9990] flex items-center justify-center overflow-hidden select-none cursor-pointer"
-      style={{ background: "#000000" }}
+      style={{ background: "var(--page)" }}
     >
       {/* Film grain overlay */}
       <div ref={grainRef} className="overture-grain" aria-hidden="true" />
