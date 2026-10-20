@@ -74,65 +74,45 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
         data-section-reveal
         className="contact-intro materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 transition-colors duration-300"
       >
-        {/* Header statement + live status indicator */}
-        <div className="contact-intro-heading flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-ink/10 pb-4">
-          <p className="max-w-xl text-base font-medium leading-relaxed tracking-tight text-ink md:text-xl">
-            {t.coP}
-          </p>
-          <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400 shrink-0 w-fit">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </span>
-            <span>{t.status}</span>
-          </div>
-        </div>
+        {/* The offer is the invitation; presence and one clear action follow. */}
+        <p className="contact-offer max-w-4xl text-balance text-[clamp(1.6rem,3.6vw,3rem)] font-black leading-[1.06] tracking-[-0.035em] text-ink">
+          {t.coP}
+        </p>
 
-        {/* Email display and copy action */}
-        <div className="my-5 flex flex-wrap items-center justify-between gap-4">
+        <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-lead">
+          <span className="inline-flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400">
+            <span className="contact-pulse h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
+            {t.status}
+          </span>
+          <span aria-hidden="true">·</span>
+          <span>
+            Donostia
+            {localTime && <time className="ml-2 tabular-nums">{localTime}</time>}
+          </span>
+        </p>
+
+        <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-ink/10 pt-5">
           <a
-            dir="ltr"
+            ref={mailRef}
             href={`mailto:${EMAIL}`}
-            className="contact-email block break-all text-[clamp(1.5rem,3.8vw,3.2rem)] font-black leading-tight tracking-[-0.05em] text-ink hover:text-brand transition-colors decoration-brand/30 decoration-2 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+            className="materia-button contact-primary !min-h-12 !px-6"
           >
-            {EMAIL}
+            <Mail size={16} aria-hidden="true" />
+            {ui.email}
+            <ArrowUpRight size={16} aria-hidden="true" />
           </a>
-        </div>
-
-        {/* Action triggers + status line */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-ink/10 pt-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <a
-              ref={mailRef}
-              href={`mailto:${EMAIL}`}
-              className="materia-button bg-ink text-page !min-h-10 !py-2 !px-5"
-            >
-              <Mail size={15} aria-hidden="true" />
-              {ui.email}
-              <ArrowUpRight size={15} aria-hidden="true" />
-            </a>
-            <SignatureLink label={t.ctaCv} kind="cv" />
-          </div>
-
-          <div className="flex items-center gap-3 font-mono text-xs text-lead min-h-[1.25rem]">
-            <p
-              role="status"
-              aria-live="polite"
-              className="contact-copy-status flex items-center"
-            >
-              {status === "copied"
-                ? ui.copied
-                : status === "failed"
-                  ? ui.copyFailed
-                  : ""}
-            </p>
-            {status === "idle" && (
-              <span className="opacity-70">
-                DONOSTIA / SAN SEBASTIÁN
-                {localTime && <time className="ml-2">{localTime}</time>}
-              </span>
-            )}
-          </div>
+          <SignatureLink label={t.ctaCv} kind="cv" />
+          <p
+            role="status"
+            aria-live="polite"
+            className="contact-copy-status font-mono text-xs text-lead"
+          >
+            {status === "copied"
+              ? ui.copied
+              : status === "failed"
+                ? ui.copyFailed
+                : ""}
+          </p>
         </div>
       </div>
 

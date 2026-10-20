@@ -90,3 +90,30 @@
     height: 24px;
   }
 }
+
+/* The contact climax uses the ember end of the chapter arc. */
+.contact-primary {
+  background: var(--ember);
+  color: #111317; /* 5.6:1 on ember; white is only 3.3:1 */
+  box-shadow: 0 14px 34px -14px color-mix(in srgb, var(--ember) 70%, transparent);
+}
+.contact-primary:hover {
+  background: color-mix(in srgb, var(--ember) 88%, var(--ink));
+}
+.contact-pulse {
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  animation: contact-pulse 2.4s var(--ease-drift) infinite;
+}
+@keyframes contact-pulse {
+  70% {
+    box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-pulse {
+    animation: none;
+  }
+}
