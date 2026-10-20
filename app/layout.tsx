@@ -6,7 +6,7 @@ import "./styles/materia.css";
 import "./styles/editorial.css";
 import "./styles/compact-sections.css";
 import "./styles/project-preview.css";
-import "./styles/project-stage.css";
+import "./styles/project-reel.css";
 import "./styles/contact-expression.css";
 import "./styles/overture.css";
 import { IntroProvider } from "./components/IntroProvider";

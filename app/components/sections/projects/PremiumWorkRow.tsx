@@ -17,8 +17,6 @@ import { usePreferredMotion } from "../../../hooks/usePreferredMotion";
 import { useProjectTension } from "../../../hooks/useProjectTension";
 import { useUmbral } from "../../motion/UmbralProvider";
 import { ProjectVisual } from "../../motion/ProjectVisual";
-import { useProjectStage } from "../../../hooks/useProjectStage";
-import { useMotionPolicy } from "../../../hooks/useMotionEnabled";
 import { triggerTectonicImpact } from "../../../lib/tectonic";
 
 interface WorkRowProps {
@@ -48,7 +46,6 @@ export function PremiumWorkRow({
   const navigate = useUmbral();
   const reduced = usePreferredMotion();
   const enabled = motionEnabled && !reduced && !menu;
-  const { allowed } = useMotionPolicy();
   const rowRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -79,7 +76,6 @@ export function PremiumWorkRow({
   const actionRef = useSpringHover<HTMLAnchorElement>(enabled);
   useMateriaSurface(rowRef, theme.color, enabled);
   useProjectTension(rowRef, enabled, isExpanded, idx);
-  useProjectStage(rowRef, allowed && !reduced && !menu && !isExpanded, lang);
   useSpringAccordion(bodyRef, contentRef, isExpanded, enabled, skipAnimation);
   const prefetch = () => {
     // Hover/focus signals navigation intent even when decorative motion is off.
@@ -149,7 +145,7 @@ export function PremiumWorkRow({
           </div>
 
           <div
-            className="flex flex-wrap items-center gap-2"
+            className="work-tech flex flex-wrap items-center gap-2"
             aria-label={copy.technologies}
           >
             {proj.langs.map((language) => (
@@ -169,17 +165,29 @@ export function PremiumWorkRow({
         </div>
 
         {/* Content Body: Title + Description on left, Studio Preview on right */}
-        <div className="grid gap-6 md:grid-cols-[1.3fr_0.7fr] md:items-center">
-          <div className="min-w-0 flex flex-col justify-center">
+        <div className="work-story grid gap-5 md:grid-cols-[1.25fr_0.75fr] md:items-center">
+          <div className="work-copy min-w-0 flex flex-col justify-center">
             <h3
               data-project-title
               className="work-project-title text-balance break-words text-[clamp(2.4rem,4.4vw,4.2rem)] font-black capitalize leading-[0.98] tracking-[-0.05em] text-ink transition-all duration-300"
             >
               {content?.title ?? proj.name.replace(/[-_]/g, " ")}
             </h3>
+            {content?.subtitle && (
+              <p className="work-subtitle mt-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-lead">
+                {content.subtitle}
+              </p>
+            )}
             <p className="work-project-desc mt-3 max-w-xl text-sm leading-relaxed text-lead line-clamp-2 md:line-clamp-3 transition-all duration-300">
               {content?.objective ?? proj.desc}
             </p>
+            {content?.algorithmH && (
+              <p className="work-hook mt-4 flex max-w-xl items-start gap-2.5 border-l-2 pl-3 text-sm font-semibold leading-snug text-ink"
+                style={{ borderColor: theme.color }}
+              >
+                {content.algorithmH}
+              </p>
+            )}
           </div>
 
           <a
@@ -251,14 +259,6 @@ export function PremiumWorkRow({
               onClick={(e) => {
                 triggerTectonicImpact(e.clientX, e.clientY, 0.9);
                 onToggle();
-                if (!isExpanded && rowRef.current?.dataset.projectStage) {
-                  requestAnimationFrame(() =>
-                    bodyRef.current?.scrollIntoView({
-                      block: "nearest",
-                      behavior: "smooth",
-                    }),
-                  );
-                }
               }}
               aria-expanded={isExpanded}
               aria-controls={panelId}

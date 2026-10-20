@@ -537,7 +537,7 @@ html {
   background: radial-gradient(
     circle at center,
     transparent 45%,
-    color-mix(in oklab, var(--chapter) 14%, rgba(17, 19, 23, 0.14)) 100%
+    color-mix(in oklab, var(--chapter) 10%, rgba(17, 19, 23, 0.07)) 100%
   );
   mix-blend-mode: multiply;
 }

@@ -63,7 +63,7 @@ float vnoise(vec2 p) {
 float field(vec2 p, float warp, float rough, out float wave) {
   // Aeolian ripples: sharp crest, long gentle back, combed by a slow warp.
   float phase = fract(dot(p, vec2(0.016, 0.006)) + warp * 3.0);
-  float h = (smoothstep(0.0, 0.78, phase) - smoothstep(0.78, 1.0, phase)) * 0.8
+  float h = (smoothstep(0.0, 0.78, phase) - smoothstep(0.78, 1.0, phase)) * 0.5
           + (rough - 0.5) * 0.18;
   wave = 0.0;
   for (int i = 0; i < ${MAX_IMPACTS}; i++) {
@@ -215,8 +215,8 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
       const dark = document.documentElement.classList.contains("dark");
       gl.uniform3fv(uBase, readHex("--page", dark ? [0.04, 0.05, 0.06] : [0.95, 0.94, 0.91]));
       gl.uniform3fv(uAccent, readHex("--brand", [0.12, 0.29, 1]));
-      gl.uniform3fv(uTone, dark ? [0.85, 0.9, 1] : [1, 0.93, 0.82]);
-      gl.uniform1f(uStrength, dark ? 0.1 : 0.17);
+      gl.uniform3fv(uTone, dark ? [0.85, 0.9, 1] : [0.82, 0.9, 1.08]);
+      gl.uniform1f(uStrength, dark ? 0.08 : 0.1);
       gl.uniform1f(uGrain, dark ? 0.045 : 0.075);
       gl.uniform1f(uSpark, dark ? 0.22 : 0.08);
     };
