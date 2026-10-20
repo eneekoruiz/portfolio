@@ -244,7 +244,7 @@ export default function CurriculumPage() {
                 href="https://eneko-ruiz-curriculum.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(0,102,255,0.2)]"
+                className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(var(--brand-rgb),0.2)]"
               >
                 {t.openDirect}
               </a>

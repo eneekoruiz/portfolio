@@ -215,7 +215,7 @@ export function BinaryStreamBtn({
     ghost:
       "bg-transparent text-lead border border-lead/20 hover:border-brand hover:text-brand hover:bg-brand/5 shadow-none",
     light:
-      "bg-brand text-white shadow-[0_10px_32px_rgba(0,102,255,.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,102,255,.45)]",
+      "bg-brand text-white shadow-[0_10px_32px_rgba(var(--brand-rgb),.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(var(--brand-rgb),.45)]",
   };
 
   const baseIdle = variantClasses[variant];
