@@ -10,8 +10,28 @@ import { useMateriaSurface } from "../../hooks/useMateriaSurface";
 import { ContactTile } from "./ContactTile";
 import { SignatureLink } from "../ui/SignatureLink";
 import { UI_COPY } from "../../data/interface-translations";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 
 const EMAIL = "eneekoruiz@gmail.com";
+const LOCAL_TIME_REFRESH_MS = 30_000;
+
+/** Rendered after mount: server and client clocks differ, and the offset changes with DST. */
+function useLocalTime(lang: Lang) {
+  const [time, setTime] = useState("");
+  useEffect(() => {
+    const format = new Intl.DateTimeFormat(lang, {
+      timeZone: "Europe/Madrid",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "shortOffset",
+    });
+    const tick = () => setTime(format.format(new Date()));
+    tick();
+    const id = setInterval(tick, LOCAL_TIME_REFRESH_MS);
+    return () => clearInterval(id);
+  }, [lang]);
+  return time;
+}
 
 export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
@@ -19,9 +39,10 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
   const alive = useRef(true);
   const motion = useMotionEnabled();
   const cardRef = useRef<HTMLDivElement>(null);
-  useMateriaSurface(cardRef, "#0066ff", motion, 28);
+  useMateriaSurface(cardRef, "#1f4bff", motion, 28);
   const mailRef = useSpringHover<HTMLAnchorElement>(motion);
   const ui = UI_COPY[lang];
+  const localTime = useLocalTime(lang);
 
   useEffect(() => {
     alive.current = true;
@@ -31,7 +52,9 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
     };
   }, []);
 
-  const copy = async () => {
+  const copy = async (e?: React.MouseEvent) => {
+    if (e) triggerTectonicImpact(e.clientX, e.clientY, 1.25);
+    else triggerTectonicImpact(undefined, undefined, 1.25);
     try {
       await navigator.clipboard.writeText(EMAIL);
       if (!alive.current) return;
@@ -49,51 +72,51 @@ export function Contact({ t, lang = "es" }: { t: Tx; lang?: Lang }) {
       <div
         ref={cardRef}
         data-section-reveal
-        className="materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 p-5 md:p-8 transition-colors duration-300"
+        className="contact-intro materia-surface relative overflow-hidden rounded-[24px] border border-ink/15 transition-colors duration-300"
       >
-        <div className="grid gap-4 border-b border-ink/15 pb-6 md:grid-cols-[1.2fr_0.8fr] md:items-end">
-          <p className="max-w-xl text-lg leading-relaxed tracking-tight text-lead md:text-2xl">
-            {t.coP}
-          </p>
-          <span className="flex items-center gap-2 text-xs font-medium text-lead md:justify-end">
-            <span
-              className="h-2 w-2 rounded-full bg-emerald-600"
-              aria-hidden="true"
-            />
+        {/* The offer is the invitation; presence and one clear action follow. */}
+        <p className="contact-offer max-w-4xl text-balance text-[clamp(1.6rem,3.6vw,3rem)] font-black leading-[1.06] tracking-[-0.035em] text-ink">
+          {t.coP}
+        </p>
+
+        <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-lead">
+          <span className="inline-flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400">
+            <span className="contact-pulse h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
             {t.status}
           </span>
-        </div>
-        <a
-          href={`mailto:${EMAIL}`}
-          className="my-6 block w-fit break-all text-[clamp(1.4rem,4.4vw,4.7rem)] font-bold leading-tight tracking-[-0.06em] text-ink underline decoration-brand/40 decoration-1 underline-offset-8 focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-        >
-          {EMAIL}
-        </a>
-        <div className="flex flex-wrap items-center gap-3">
+          <span aria-hidden="true">·</span>
+          <span>
+            Donostia
+            {localTime && <time className="ml-2 tabular-nums">{localTime}</time>}
+          </span>
+        </p>
+
+        <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-ink/10 pt-5">
           <a
             ref={mailRef}
             href={`mailto:${EMAIL}`}
-            className="materia-button bg-ink text-page"
+            className="materia-button contact-primary !min-h-12 !px-6"
           >
             <Mail size={16} aria-hidden="true" />
             {ui.email}
             <ArrowUpRight size={16} aria-hidden="true" />
           </a>
           <SignatureLink label={t.ctaCv} kind="cv" />
+          <p
+            role="status"
+            aria-live="polite"
+            className="contact-copy-status font-mono text-xs text-lead"
+          >
+            {status === "copied"
+              ? ui.copied
+              : status === "failed"
+                ? ui.copyFailed
+                : ""}
+          </p>
         </div>
-        <p
-          role="status"
-          aria-live="polite"
-          className="mt-4 min-h-6 text-sm text-lead"
-        >
-          {status === "copied"
-            ? ui.copied
-            : status === "failed"
-              ? ui.copyFailed
-              : ""}
-        </p>
       </div>
-      <div className="mt-6 grid gap-5 md:grid-cols-3">
+
+      <div className="contact-tiles grid mt-4">
         <ContactTile
           label="Gmail"
           value={EMAIL}

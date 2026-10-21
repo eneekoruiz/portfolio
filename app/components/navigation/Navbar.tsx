@@ -113,10 +113,10 @@ export function Navbar({
             className="nav-ind absolute top-0 left-0 h-9 bg-black/5 dark:bg-white/10 rounded-full opacity-0"
             aria-hidden="true"
           />
-          {t.menu.map((link: string, i: number) => (
+          {[0, 2, 3, 1, 4, 5].map((i) => (
             <NavItem
-              key={link}
-              link={link}
+              key={t.hrefs[i]}
+              link={t.menu[i]}
               href={t.hrefs[i]}
               onEnter={onNavEnter}
             />
@@ -132,9 +132,10 @@ export function Navbar({
           <MotionToggle />
           <button
             onClick={() => setCmd(true)}
+            data-command-trigger
             aria-label={UI_COPY[lang].search}
             title={`${UI_COPY[lang].search} (⌘K)`}
-            className="p-2 border border-black/10 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="w-9 h-9 flex items-center justify-center border border-black/10 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <Search size={14} />
           </button>
@@ -142,7 +143,7 @@ export function Navbar({
             ref={menuRef}
             onClick={() => setMenu(true)}
             aria-label={UI_COPY[lang].openMenu}
-            className="navbar-menu-trigger md:hidden p-2 border border-black/10 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-center"
+            className="navbar-menu-trigger md:hidden w-9 h-9 flex items-center justify-center border border-black/10 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <MenuIcon size={16} />
           </button>

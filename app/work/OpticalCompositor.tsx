@@ -10,7 +10,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { materia } from "../lib/materia";
 import { DNAHelix3D } from "./DNAHelix3D";
 
-const MAX_SURFACES = 8;
+const MAX_SURFACES = 6;
 const vertexShader = `
   varying vec2 vUv;
   void main() {
@@ -175,7 +175,7 @@ export function OpticalCompositor({
   useEffect(() => {
     if (!resources) return;
     resources.material.uniforms.uPaper.value.set(
-      darkMode ? "#080b12" : "#f5f5f7",
+      darkMode ? "#0b0d10" : "#f2efe8",
     );
     resources.material.uniforms.uDark.value = darkMode ? 1 : 0;
   }, [resources, darkMode]);

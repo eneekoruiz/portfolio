@@ -17,7 +17,7 @@ export const materia = {
   surfaces: new Set<OpticalSurface>(),
   velocity: 0,
   scrollTime: 0,
-  accent: "#0066ff",
+  accent: "#1f4bff",
   secondary: "#8aa8dc",
   paused: false,
   warp: new SpringValue(0, 110, 20),
@@ -27,6 +27,16 @@ export const materia = {
   tiltX: new SpringValue(0, 100, 20),
   tiltY: new SpringValue(0, 100, 20),
 };
+
+/** Keep WebGL and the inexpensive SVG projection on the same two-strand palette. */
+export function setMateriaPalette(accent: string, secondary: string) {
+  materia.accent = accent;
+  materia.secondary = secondary;
+  if (typeof document !== "undefined") {
+    document.documentElement.style.setProperty("--dna-accent", accent);
+    document.documentElement.style.setProperty("--dna-secondary", secondary);
+  }
+}
 
 export function tickMateria(deltaMs: number) {
   const dt = Math.min(deltaMs / 1000, 2);

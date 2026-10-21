@@ -1,27 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * GitHub API Route - Hardened Error Handling & Security Audit Ready
- * Provides generic, professional error messages without leaking upstream details.
- */
-
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GITHUB_API_TOKEN;
 const GITHUB_USER = "eneekoruiz";
-const CACHE_TTL = 3600; // 1 hour
-
+const CACHE_TTL = 3600;
+const REQUEST_BUDGET_MS = 7000;
 const ALLOWED_SORT = ["updated", "pushed", "created", "full_name"] as const;
 const ALLOWED_DIRECTION = ["asc", "desc"] as const;
-
 type SortOption = (typeof ALLOWED_SORT)[number];
 type DirectionOption = (typeof ALLOWED_DIRECTION)[number];
-
 const ERRORS = {
   INVALID_PARAMS: "Invalid request parameters",
   RATE_LIMIT: "GitHub rate limit reached",
   FETCH_FAILED: "Unable to fetch repositories",
-  INTERNAL: "Internal Server Error",
 } as const;
-
 interface GitHubRepo {
   id: number;
   name: string;
@@ -34,153 +25,252 @@ interface GitHubRepo {
   stargazers_count: number;
   forks_count: number;
   updated_at: string;
+  pushed_at: string;
+  size: number;
   all_languages?: string[];
   [key: string]: unknown;
 }
-
 interface ValidatedParams {
   sort: SortOption;
   direction: DirectionOption;
   perPage: number;
 }
-
 export const revalidate = 3600;
 
-/**
- * Validates and parses query parameters cleanly.
- */
 function parseRequestParams(urlStr: string): ValidatedParams | null {
-  try {
-    const { searchParams } = new URL(urlStr);
-
-    const sortParam = searchParams.get("sort") ?? "updated";
-    if (!ALLOWED_SORT.includes(sortParam as SortOption)) {
-      return null;
-    }
-
-    const directionParam = searchParams.get("direction") ?? "desc";
-    if (!ALLOWED_DIRECTION.includes(directionParam as DirectionOption)) {
-      return null;
-    }
-
-    const perPageParam = searchParams.get("per_page") ?? "30";
-    const parsed = Number.parseInt(perPageParam, 10);
-    if (
-      !Number.isInteger(parsed) ||
-      !Number.isFinite(parsed) ||
-      parsed < 1 ||
-      parsed > 100
-    ) {
-      return null;
-    }
-
-    return {
-      sort: sortParam as SortOption,
-      direction: directionParam as DirectionOption,
-      perPage: parsed,
-    };
-  } catch {
-    return null;
-  }
+  const { searchParams } = new URL(urlStr);
+  const sort = ALLOWED_SORT.find(
+    (value) => value === (searchParams.get("sort") ?? "updated"),
+  );
+  const direction = ALLOWED_DIRECTION.find(
+    (value) => value === (searchParams.get("direction") ?? "desc"),
+  );
+  const value = searchParams.get("per_page") ?? "30";
+  if (!sort || !direction || !/^\d{1,3}$/.test(value)) return null;
+  const perPage = Number(value);
+  return perPage >= 1 && perPage <= 100 ? { sort, direction, perPage } : null;
 }
-
-/**
- * Enriches a repository with its language details.
- */
+function parseRepository(value: unknown): GitHubRepo | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  if (
+    !Number.isSafeInteger(row.id) ||
+    Number(row.id) <= 0 ||
+    typeof row.name !== "string" ||
+    !/^[\w.-]{1,100}$/.test(row.name) ||
+    row.name === "." ||
+    row.name === ".." ||
+    typeof row.fork !== "boolean" ||
+    !(row.description === null || typeof row.description === "string") ||
+    !(row.language === null || typeof row.language === "string") ||
+    typeof row.pushed_at !== "string" ||
+    !Number.isFinite(Date.parse(row.pushed_at)) ||
+    !Number.isSafeInteger(row.size) ||
+    Number(row.size) < 0 ||
+    !Number.isSafeInteger(row.stargazers_count) ||
+    Number(row.stargazers_count) < 0
+  )
+    return null;
+  const htmlUrl = `https://github.com/${GITHUB_USER}/${encodeURIComponent(row.name)}`;
+  if (
+    typeof row.html_url !== "string" ||
+    row.html_url.toLowerCase() !== htmlUrl.toLowerCase()
+  )
+    return null;
+  return {
+    ...row,
+    id: Number(row.id),
+    name: row.name,
+    full_name: `${GITHUB_USER}/${row.name}`,
+    html_url: htmlUrl,
+    fork: row.fork,
+    description:
+      typeof row.description === "string"
+        ? row.description.slice(0, 1024)
+        : null,
+    language:
+      typeof row.language === "string" ? row.language.slice(0, 64) : null,
+    pushed_at: row.pushed_at,
+    updated_at:
+      typeof row.updated_at === "string" &&
+      Number.isFinite(Date.parse(row.updated_at))
+        ? row.updated_at
+        : row.pushed_at,
+    size: Number(row.size),
+    stargazers_count: Number(row.stargazers_count),
+    forks_count:
+      Number.isSafeInteger(row.forks_count) && Number(row.forks_count) >= 0
+        ? Number(row.forks_count)
+        : 0,
+    // Never forward server credentials to a URL supplied by upstream data.
+    languages_url: `https://api.github.com/repos/${GITHUB_USER}/${encodeURIComponent(row.name)}/languages`,
+  };
+}
+function errorResponse(message: string, status: number, retryAfter?: string) {
+  return NextResponse.json(
+    { error: message },
+    {
+      status,
+      headers: {
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        ...(retryAfter ? { "Retry-After": retryAfter } : {}),
+      },
+    },
+  );
+}
+function retryDelay(headers: Headers): string {
+  const retry = headers.get("Retry-After");
+  let delay: number | undefined;
+  if (retry && /^\d+$/.test(retry)) delay = Number(retry);
+  else if (retry && Number.isFinite(Date.parse(retry)))
+    delay = (Date.parse(retry) - Date.now()) / 1000;
+  const reset = headers.get("X-RateLimit-Reset");
+  if (delay === undefined && reset && /^\d+$/.test(reset))
+    delay = Number(reset) - Date.now() / 1000;
+  return String(Math.min(86400, Math.max(1, Math.ceil(delay ?? 3600))));
+}
 async function enrichRepoLanguages(
   repo: GitHubRepo,
   headers: HeadersInit,
+  budget: AbortSignal,
 ): Promise<GitHubRepo> {
+  const fallback = {
+    ...repo,
+    all_languages: repo.language ? [repo.language] : [],
+  };
+  if (budget.aborted) return fallback;
   try {
-    const langRes = await fetch(repo.languages_url, {
+    const response = await fetch(repo.languages_url, {
       headers,
       next: { revalidate: CACHE_TTL },
+      signal: AbortSignal.any([budget, AbortSignal.timeout(3000)]),
     });
-    if (langRes.ok) {
-      const langData: Record<string, number> = await langRes.json();
-      return { ...repo, all_languages: Object.keys(langData) };
-    }
-  } catch (e) {
-    console.error(`Enrichment failed for repo ${repo.id}:`, e);
+    if (!response.ok) return fallback;
+    const data: unknown = await response.json();
+    if (!data || typeof data !== "object" || Array.isArray(data))
+      return fallback;
+    const languages = Object.entries(data)
+      .filter(
+        (entry): entry is [string, number] =>
+          entry[0].length > 0 &&
+          entry[0].length <= 64 &&
+          typeof entry[1] === "number" &&
+          Number.isFinite(entry[1]) &&
+          entry[1] >= 0,
+      )
+      .sort(
+        ([languageA, bytesA], [languageB, bytesB]) =>
+          bytesB - bytesA ||
+          (languageA < languageB ? -1 : languageA > languageB ? 1 : 0),
+      )
+      .slice(0, 30)
+      .map(([language]) => language);
+    return {
+      ...repo,
+      all_languages: languages.length ? languages : fallback.all_languages,
+    };
+  } catch {
+    // Language details are optional; the repository and primary language survive.
+    return fallback;
   }
-  return { ...repo, all_languages: repo.language ? [repo.language] : [] };
 }
-
+async function enrichRepositories(
+  repos: GitHubRepo[],
+  headers: HeadersInit,
+  budget: AbortSignal,
+) {
+  const selected = repos.filter((repo) => !repo.fork).slice(0, 8);
+  const enriched = new Map<number, GitHubRepo>();
+  let nextIndex = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(3, selected.length) }, async () => {
+      while (nextIndex < selected.length) {
+        const repo = selected[nextIndex++];
+        enriched.set(repo.id, await enrichRepoLanguages(repo, headers, budget));
+      }
+    }),
+  );
+  return repos.map((repo) => enriched.get(repo.id) ?? repo);
+}
 export async function GET(request: NextRequest) {
   const validated = parseRequestParams(request.url);
-  if (!validated) {
-    return NextResponse.json({ error: ERRORS.INVALID_PARAMS }, { status: 400 });
-  }
-
+  if (!validated) return errorResponse(ERRORS.INVALID_PARAMS, 400);
   const { sort, direction, perPage } = validated;
-
-  const cleanParams = new URLSearchParams({
+  const summary = request.nextUrl.searchParams.get("summary") === "1";
+  const parameters = new URLSearchParams({
     sort,
     direction,
-    per_page: perPage.toString(),
+    per_page: String(perPage),
     type: "owner",
   });
-
-  const endpoint = `https://api.github.com/users/${GITHUB_USER}/repos?${cleanParams.toString()}`;
-  const requestHeaders: HeadersInit = {
+  const headers: HeadersInit = {
     Accept: "application/vnd.github+json",
     "User-Agent": "Eneko-Portfolio-Backend",
   };
-
-  if (GITHUB_TOKEN) {
-    requestHeaders.Authorization = `Bearer ${GITHUB_TOKEN}`;
-  }
-
+  if (GITHUB_TOKEN) headers.Authorization = `Bearer ${GITHUB_TOKEN}`;
+  const budget = AbortSignal.any([
+    request.signal,
+    AbortSignal.timeout(REQUEST_BUDGET_MS),
+  ]);
   try {
-    const res = await fetch(endpoint, {
-      headers: requestHeaders,
-      next: { revalidate: CACHE_TTL },
-    });
-
-    // Handle Rate Limiting (403/429)
-    if (res.status === 403 || res.status === 429) {
-      const resetTime = res.headers.get("X-RateLimit-Reset");
-      console.warn(`GitHub Rate Limit hit. Reset at: ${resetTime}`);
-
-      return NextResponse.json(
-        { error: ERRORS.RATE_LIMIT },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": resetTime ?? "3600",
-            "Cache-Control": "no-store",
-          },
-        },
-      );
-    }
-
-    // Generic Upstream Error Handling
-    if (!res.ok) {
-      console.error(`Upstream GitHub Error: ${res.status} ${res.statusText}`);
-      return NextResponse.json(
-        { error: ERRORS.FETCH_FAILED },
-        {
-          status: res.status === 404 ? 404 : 502,
-          headers: { "Cache-Control": "no-store" },
-        },
-      );
-    }
-
-    const repos: GitHubRepo[] = await res.json();
-
-    // Parallel Enrichment (Hardened)
-    const enrichedRepos = await Promise.all(
-      repos
-        .filter((r) => !r.fork)
-        .slice(0, 8)
-        .map((repo) => enrichRepoLanguages(repo, requestHeaders)),
+    const response = await fetch(
+      `https://api.github.com/users/${GITHUB_USER}/repos?${parameters}`,
+      {
+        headers,
+        next: { revalidate: CACHE_TTL },
+        signal: AbortSignal.any([budget, AbortSignal.timeout(4500)]),
+      },
     );
-
-    const finalData = repos.map((r) => {
-      const enriched = enrichedRepos.find((er) => er.id === r.id);
-      return enriched ?? r;
-    });
-
+    const rateLimited =
+      response.status === 429 ||
+      (response.status === 403 &&
+        (response.headers.get("X-RateLimit-Remaining") === "0" ||
+          response.headers.has("Retry-After")));
+    if (rateLimited)
+      return errorResponse(
+        ERRORS.RATE_LIMIT,
+        429,
+        retryDelay(response.headers),
+      );
+    if (!response.ok) {
+      console.warn(
+        "GitHub repository request failed with status",
+        response.status,
+      );
+      return errorResponse(
+        ERRORS.FETCH_FAILED,
+        response.status === 404 ? 404 : 502,
+      );
+    }
+    const data: unknown = await response.json();
+    if (!Array.isArray(data)) return errorResponse(ERRORS.FETCH_FAILED, 502);
+    const seen = new Set<number>();
+    const repos = data
+      .slice(0, perPage)
+      .map(parseRepository)
+      .filter((repo): repo is GitHubRepo => repo !== null)
+      .filter((repo) => {
+        if (seen.has(repo.id)) return false;
+        seen.add(repo.id);
+        return true;
+      });
+    if (data.length > 0 && repos.length === 0)
+      return errorResponse(ERRORS.FETCH_FAILED, 502);
+    const finalData = summary
+      ? repos.map((repo) => ({
+          id: repo.id,
+          name: repo.name,
+          description: repo.description,
+          html_url: repo.html_url,
+          language: repo.language,
+          pushed_at: repo.pushed_at,
+          fork: repo.fork,
+          size: repo.size,
+          stargazers_count: repo.stargazers_count,
+          languages_url: repo.languages_url,
+        }))
+      : await enrichRepositories(repos, headers, budget);
     return NextResponse.json(finalData, {
       status: 200,
       headers: {
@@ -188,10 +278,8 @@ export async function GET(request: NextRequest) {
         "X-Content-Type-Options": "nosniff",
       },
     });
-  } catch (err) {
-    const logMsg = err instanceof Error ? err.message : "Unknown error";
-    console.error("Critical GitHub Route Failure:", logMsg);
-
-    return NextResponse.json({ error: ERRORS.INTERNAL }, { status: 500 });
+  } catch {
+    console.warn("GitHub repository request unavailable");
+    return errorResponse(ERRORS.FETCH_FAILED, 502);
   }
 }

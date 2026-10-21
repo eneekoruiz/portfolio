@@ -1,0 +1,151 @@
+/* Selected works reel. Every card is one screen tall at most; opening the
+   details never grows the card, the title and preview contract instead. */
+.projects-reel {
+  display: flex;
+  gap: clamp(14px, 2.4vw, 32px);
+}
+.projects-reel-item {
+  display: flex;
+  flex: 0 0 min(86vw, 1080px);
+  height: min(calc(100svh - 9rem), 680px);
+  min-width: 0;
+  min-height: 0;
+}
+.projects-reel-item > .work-surface {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.projects-reel-item .work-surface-header {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.projects-reel-item .work-story {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.projects-reel-item .work-preview .project-visual {
+  height: clamp(110px, 30svh, 300px);
+  max-height: 300px;
+}
+.projects-reel-item [data-project-body] {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Pinned: the section is a scroll runway; the stage sticks for its whole length. */
+.projects-reel-section[data-reel="pinned"] {
+  height: calc(100svh + var(--reel-distance, 0px));
+  max-width: none;
+  padding: 0;
+}
+.projects-reel-section[data-reel="pinned"] .projects-reel-stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: clamp(5.5rem, 11svh, 7rem) 1.25rem 1.25rem;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .projects-reel-section[data-reel="pinned"] .projects-reel-stage {
+    padding-inline: 2.5rem;
+  }
+}
+.projects-reel-section[data-reel="pinned"] .projects-reel-viewport {
+  flex: 1;
+  min-height: 0;
+}
+.projects-reel-section[data-reel="pinned"] .projects-reel {
+  height: 100%;
+  will-change: transform;
+}
+.projects-reel-section[data-reel="pinned"] .projects-reel-item {
+  height: 100%;
+}
+
+/* Snap (touch or motion off): native horizontal scroll, one card per stop. */
+.projects-reel-section[data-reel="snap"] .projects-reel {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1.25rem;
+  margin-inline: -1.25rem;
+  padding: 4px 1.25rem 8px;
+  scrollbar-width: none;
+}
+.projects-reel-section[data-reel="snap"] .projects-reel::-webkit-scrollbar {
+  display: none;
+}
+.projects-reel-section[data-reel="snap"] .projects-reel-item {
+  scroll-snap-align: start;
+}
+
+.projects-reel-progress {
+  height: 2px;
+  margin-top: 1rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+}
+.projects-reel-progress > div {
+  height: 100%;
+  background: var(--chapter, var(--brand));
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* Open details: same footprint, the story makes room. */
+.projects-reel-item [data-expanded="true"] .work-hook {
+  display: none;
+}
+@media (max-width: 767px) {
+  .projects-reel-item {
+    flex-basis: calc(100vw - 2.5rem);
+    height: min(calc(100svh - 10.5rem), 620px);
+  }
+  .projects-reel-item [data-expanded="true"] .work-preview {
+    display: none;
+  }
+}
+@media (max-height: 640px) {
+  .projects-reel-item .work-hook {
+    display: none;
+  }
+}
+
+/* Phones: the preview is the only elastic element, so text never clips. */
+@media (max-width: 767px) {
+  .projects-reel-item .work-story {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .projects-reel-item .work-copy {
+    flex: 0 0 auto;
+  }
+  .projects-reel-item .work-preview {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .projects-reel-item .work-preview .project-visual {
+    height: 100%;
+    max-height: none;
+  }
+  .projects-reel-item .work-tech {
+    flex-wrap: nowrap;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, black 80%, transparent);
+  }
+  .projects-reel-item [data-expanded="true"] .work-subtitle {
+    display: none;
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { Play, Pause } from "lucide-react";
 import { useSound } from "../../hooks/useSound";
 import { useTranslations } from "../../hooks/useTranslations";
@@ -11,19 +12,12 @@ export function MotionToggle() {
   const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { playClick } = useSound();
   const [mounted, setMounted] = useState(false);
-  const [enabled, setEnabled] = useState(true);
+  const { allowed: enabled } = useMotionPolicy();
   const [isAnimating, setIsAnimating] = useState(false);
   const button = useSpringHover<HTMLButtonElement>(enabled, 8);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined") {
-      try {
-        setEnabled(
-          localStorage.getItem("portfolio-motion-enabled") !== "false",
-        );
-      } catch {}
-    }
     return () => {
       if (pulseTimer.current) clearTimeout(pulseTimer.current);
     };
@@ -31,7 +25,7 @@ export function MotionToggle() {
 
   const handleToggle = () => {
     const nextState = !enabled;
-    setEnabled(nextState);
+
     playClick();
 
     if (typeof window !== "undefined") {
@@ -40,7 +34,7 @@ export function MotionToggle() {
       } catch {}
       window.dispatchEvent(
         new CustomEvent("portfolio-motion-changed", {
-          detail: { enabled: nextState },
+          detail: { enabled: nextState, userInitiated: true },
         }),
       );
     }
@@ -66,7 +60,7 @@ export function MotionToggle() {
       ref={button}
       data-motion-toggle
       onClick={handleToggle}
-      aria-pressed={!enabled}
+      aria-pressed={enabled}
       aria-label={enabled ? ui.motionPause : ui.motionResume}
       title={enabled ? ui.motionPause : ui.motionResume}
       className="group relative flex items-center justify-center w-9 h-9 rounded-xl bg-white/60 dark:bg-white/[0.06] border border-black/5 dark:border-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-110 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-brand overflow-hidden"
@@ -89,7 +83,7 @@ export function MotionToggle() {
         <Pause
           size={15}
           strokeWidth={2.5}
-          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`absolute transition-all duration-500 ease-[var(--ease-reveal)] ${
             enabled
               ? "opacity-100 translate-y-0 rotate-0 scale-100 text-emerald-500 dark:text-emerald-400"
               : "opacity-0 -translate-y-8 rotate-45 scale-50"
@@ -105,7 +99,7 @@ export function MotionToggle() {
         <Play
           size={15}
           strokeWidth={2.5}
-          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`absolute transition-all duration-500 ease-[var(--ease-reveal)] ${
             enabled
               ? "opacity-0 translate-y-8 -rotate-45 scale-50"
               : "opacity-100 translate-y-0 rotate-0 scale-100 text-neutral-500 dark:text-neutral-400"

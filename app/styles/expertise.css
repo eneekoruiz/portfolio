@@ -1,0 +1,194 @@
+.expertise-section {
+  position: relative;
+  z-index: 20;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: clamp(4rem, 7vw, 7rem) 2.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  color: var(--ink);
+  background: var(--page);
+}
+
+.expertise-kicker {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--lead);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.expertise-index {
+  color: var(--brand);
+}
+.expertise-kicker-rule {
+  width: 2.5rem;
+  height: 1px;
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+.expertise-introduction {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.34fr);
+  align-items: end;
+  gap: 4rem;
+  margin-top: 2rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+.expertise-introduction h2 {
+  max-width: 15ch;
+  font-size: clamp(2.5rem, 5.3vw, 5rem);
+  font-weight: 900;
+  line-height: 0.99;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.expertise-intro-copy {
+  max-width: 30ch;
+  padding-bottom: 0.3rem;
+  color: var(--lead);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.expertise-studies {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr));
+  border-block: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.expertise-study {
+  min-width: 0;
+  padding: 1.25rem 1.75rem 2rem;
+}
+.expertise-study:first-child {
+  padding-inline-start: 0;
+}
+.expertise-study:last-child {
+  padding-inline-end: 0;
+}
+.expertise-study + .expertise-study {
+  border-inline-start: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+}
+.expertise-study-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.625rem;
+  color: var(--lead);
+  letter-spacing: 0.12em;
+}
+.expertise-study-mark {
+  font-size: 1rem;
+  color: var(--brand);
+}
+.expertise-study-visual {
+  display: flex;
+  align-items: center;
+  height: clamp(14rem, 20vw, 18rem);
+  margin-block: 0.5rem 0.75rem;
+}
+.expertise-diagram {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.expertise-grid {
+  stroke: color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.expertise-rule {
+  stroke: color-mix(in srgb, var(--ink) 30%, transparent);
+}
+.expertise-accent {
+  stroke: var(--brand);
+}
+.expertise-accent-fill {
+  fill: var(--brand);
+}
+.expertise-paper-fill {
+  fill: var(--page);
+}
+.expertise-paper-stroke {
+  stroke: var(--page);
+}
+.expertise-study-copy h3 {
+  margin-bottom: 0.85rem;
+  font-size: clamp(1.125rem, 1.7vw, 1.5rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.expertise-study-copy p {
+  max-width: 36ch;
+  color: var(--lead);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+@media (max-width: 1023px) {
+  .expertise-introduction {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  .expertise-introduction h2 {
+    max-width: 20ch;
+  }
+  .expertise-intro-copy {
+    max-width: 48ch;
+  }
+  .expertise-study {
+    padding-inline: 1rem;
+  }
+  .expertise-study-visual {
+    height: 10rem;
+  }
+}
+@media (max-width: 639px) {
+  .expertise-section {
+    padding-inline: 1.25rem;
+  }
+  .expertise-introduction {
+    margin-top: 1.5rem;
+  }
+  .expertise-introduction h2 {
+    font-size: clamp(2.4rem, 10vw, 3.5rem);
+  }
+  .expertise-intro-copy {
+    font-size: 0.875rem;
+  }
+  .expertise-studies {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .expertise-study,
+  .expertise-study:first-child,
+  .expertise-study:last-child {
+    padding: 1.25rem 0 1.75rem;
+  }
+  .expertise-study + .expertise-study {
+    border-inline-start: 0;
+    border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  }
+  .expertise-study-visual {
+    max-width: 23rem;
+    height: clamp(13rem, 52vw, 17rem);
+    margin-block: 0.5rem 1rem;
+  }
+  .expertise-study-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.15rem;
+  }
+  .expertise-study-copy h3 {
+    font-size: 1.5rem;
+  }
+  .expertise-study-copy p {
+    max-width: 45ch;
+  }
+}

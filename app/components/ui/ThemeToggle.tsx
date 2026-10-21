@@ -26,50 +26,72 @@ export function ThemeToggle() {
     };
   }, []);
 
-  const handleToggle = (e: React.MouseEvent) => {
+  const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     active.current?.skipTransition();
     const next = resolvedTheme === "dark" ? "light" : "dark";
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.detail ? e.clientX : rect.left + rect.width / 2;
-    const y = e.detail ? e.clientY : rect.top + rect.height / 2;
-
     playClick();
 
-    if (!motion || !document.startViewTransition) {
+    if (
+      typeof document === "undefined" ||
+      !("startViewTransition" in document) ||
+      !motion
+    ) {
       setTheme(next);
       return;
     }
 
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX || rect.left + rect.width / 2;
+    const y = e.clientY || rect.top + rect.height / 2;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    );
+
     setIsAnimating(true);
-    document.documentElement.style.setProperty("--x", `${x}px`);
-    document.documentElement.style.setProperty("--y", `${y}px`);
-    document.documentElement.setAttribute("data-transition", "eclipse");
 
     try {
-      const transition = document.startViewTransition(() => {
-        flushSync(() => setTheme(next));
+      const transition = (document as unknown as {
+        startViewTransition: (cb: () => void) => ViewTransition;
+      }).startViewTransition(() => {
+        flushSync(() => {
+          setTheme(next);
+        });
       });
+
       active.current = transition;
-      transition.ready?.catch(() => {});
-      transition.updateCallbackDone?.catch(() => {});
+
+      transition.ready
+        .then(() => {
+          const clipPath = [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`,
+          ];
+
+          document.documentElement.animate(
+            {
+              clipPath,
+            },
+            {
+              duration: 650,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            },
+          );
+        })
+        .catch(() => {});
+
       const finish = () => {
         if (active.current === transition) {
           active.current = null;
           setIsAnimating(false);
         }
-        document.documentElement.removeAttribute("data-transition");
       };
-      const fallbackTimer = setTimeout(finish, 750);
-      transition.finished
-        .catch(() => {})
-        .finally(() => {
-          clearTimeout(fallbackTimer);
-          finish();
-        });
+
+      transition.finished.catch(() => {}).finally(finish);
     } catch {
       setTheme(next);
       setIsAnimating(false);
-      document.documentElement.removeAttribute("data-transition");
     }
   };
 
@@ -107,7 +129,7 @@ export function ThemeToggle() {
         <Sun
           size={16}
           strokeWidth={2.5}
-          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`absolute transition-all duration-500 ease-[var(--ease-reveal)] ${
             isDark
               ? "opacity-0 -translate-y-8 rotate-45 scale-50"
               : "opacity-100 translate-y-0 rotate-0 scale-100 text-amber-500"
@@ -123,7 +145,7 @@ export function ThemeToggle() {
         <Moon
           size={15}
           strokeWidth={2.5}
-          className={`absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          className={`absolute transition-all duration-500 ease-[var(--ease-reveal)] ${
             isDark
               ? "opacity-100 translate-y-0 rotate-0 scale-100 text-blue-400"
               : "opacity-0 translate-y-8 -rotate-45 scale-50"

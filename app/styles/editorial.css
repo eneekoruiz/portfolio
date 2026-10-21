@@ -1,0 +1,59 @@
+/* Fit the existing hero and readable metric cards across viewport sizes. */
+.hero-composition {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.about-metric {
+  min-height: 150px;
+}
+.about-metric dt {
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.about-metric dd {
+  font-family: "Materia Sans", var(--font-sans);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.about-metric [data-metric-copy] dd {
+  font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+}
+@media (min-width: 768px) {
+  .hero-introduction {
+    max-width: 36rem;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .about-metric {
+    padding: 1.5rem;
+  }
+}
+@media (max-width: 479px) {
+  .about-metric {
+    padding: 1.25rem;
+  }
+  .about-metric dt {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+}
+@keyframes scanline {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+

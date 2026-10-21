@@ -3,8 +3,8 @@
 /**
  * PROJECTS SECTION — Selected Works & GitHub Activity
  * ─────────────────────────────────────────────────────────────────────────────
- * Renders the expandable project accordion and GitHub activity list.
- * Includes scroll-based skew inertia and responsive layout handling.
+ * Selected works run as a horizontal reel: vertical scroll pins the section and
+ * pans through every card, then resumes. Reduced motion gets native scroll-snap.
  */
 
 import { useRef, useEffect, useState } from "react";
@@ -24,13 +24,29 @@ import {
   saveNavState,
   clearNavState,
 } from "../../lib/navigationPersistence";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 
 // Subcomponents
 import { RepoRow } from "./projects/RepoRow";
 import { PremiumWorkRow } from "./projects/PremiumWorkRow";
 import { SkeletonRow } from "./projects/SkeletonRow";
 
-if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
+const PROJECT_NAV_NAMES: Record<string, string> = {
+  "ana-peluquera": "AG Beauty",
+  recordatorios: "Recordatorios",
+  passwordmanager: "Password Vault",
+  regla: "Ayudándonos",
+  "who-are-ya-backend": "Who Are Ya?",
+  rides24ofiziala: "Rides24",
+  "spotshare-parking": "Spotshare",
+  "pke-web": "PKE Web",
+};
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+  // Mobile URL-bar show/hide must not re-measure the pinned reel mid-scroll.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+}
 
 interface ProjectsProps {
   t: Tx;
@@ -66,10 +82,16 @@ export function Projects({
   const [activeRepo, setActiveRepo] = useState<number | null>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const counterRef = useRef<HTMLSpanElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   // 1. Mobile view detection
   const isMobile = useMobile();
   const reduced = usePreferredMotion();
+  // The reel is driven by the visitor's own scroll, so only the OS reduced-motion preference opts out.
+  const pinned = !reduced;
+  const count = top3.length;
 
   // 2. Navigation persistence handling on mount / return
   const isReturning = useRef(false);
@@ -90,7 +112,83 @@ export function Projects({
     return () => cancelAnimationFrame(raf);
   }, [expandedIdx]);
 
-  // 3. Bind GSAP entrance reveals and inertial scrolling (Efecto Ola)
+  // Counter and progress are written to the DOM: re-rendering every card per scroll frame is wasteful.
+  useEffect(() => {
+    const section = sectionRef.current;
+    const track = trackRef.current;
+    if (!section || !track || count === 0) return;
+    const show = (progress: number) => {
+      const index = Math.min(count - 1, Math.round(progress * (count - 1)));
+      if (counterRef.current)
+        counterRef.current.textContent = String(index + 1).padStart(2, "0");
+      if (progressRef.current)
+        progressRef.current.style.transform = `scaleX(${progress})`;
+    };
+    if (!pinned) {
+      let frame = 0;
+      const onScroll = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          const max = track.scrollWidth - track.clientWidth;
+          show(max > 0 ? track.scrollLeft / max : 0);
+        });
+      };
+      show(0);
+      track.addEventListener("scroll", onScroll, { passive: true });
+      return () => {
+        cancelAnimationFrame(frame);
+        track.removeEventListener("scroll", onScroll);
+      };
+    }
+    // CSS sticky holds the stage (compositor, no pin jump); the section height is the scroll runway.
+    const distance = () =>
+      Math.max(0, track.scrollWidth - track.parentElement!.clientWidth);
+    const setRunway = () =>
+      section.style.setProperty("--reel-distance", `${distance()}px`);
+    setRunway();
+    const ctx = gsap.context(() => {
+      gsap.to(track, {
+        x: () => -distance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+          invalidateOnRefresh: true,
+          onRefreshInit: setRunway,
+          // Never rest between two cards: settle on the nearest one.
+          snap:
+            count > 1
+              ? {
+                  // Exact card offsets: equal fractions drift off the cards when gaps exist.
+                  snapTo: (value: number) => {
+                    const max = distance() || 1;
+                    const first = (track.firstElementChild as HTMLElement).offsetLeft;
+                    const stops = Array.from(track.children, (el) =>
+                      Math.min(1, ((el as HTMLElement).offsetLeft - first) / max),
+                    );
+                    return stops.reduce((best, stop) =>
+                      Math.abs(stop - value) < Math.abs(best - value) ? stop : best,
+                    );
+                  },
+                  duration: { min: 0.25, max: 0.6 },
+                  delay: 0.06,
+                  ease: "power2.inOut",
+                }
+              : undefined,
+          onUpdate: (self) => show(self.progress),
+        },
+      });
+    }, section);
+    return () => {
+      ctx.revert();
+      section.style.removeProperty("--reel-distance");
+    };
+  }, [pinned, count]);
+
+  // 3. Bind GSAP entrance reveals
   useProjectsAnimations({ sectionRef, load, expandedIdx, motionEnabled });
 
   const handleToggle = (idx: number) => {
@@ -109,9 +207,11 @@ export function Projects({
         ref={sectionRef}
         id="work"
         aria-label={t.woLb}
-        className="py-20 md:py-32 px-5 md:px-10 max-w-[1440px] mx-auto relative z-[60]"
+        data-reel={pinned ? "pinned" : "snap"}
+        className="projects-reel-section relative z-[60] mx-auto max-w-[1440px] px-5 py-10 md:px-10 md:py-16"
       >
-        <div className="projects-header mb-10 md:mb-16">
+        <div className="projects-reel-stage">
+        <div className="projects-header mb-5 md:mb-8">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[1px] w-8 md:w-10 bg-ink opacity-12" />
             <p className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-lead">
@@ -125,21 +225,29 @@ export function Projects({
             >
               <KineticText text={t.woH} enabled={motionEnabled && !reduced} />
             </h2>
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-lead mb-1">
-              {UI_COPY[lang].workHint} ↓
+            <span className="mb-1 flex items-center gap-4 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-lead">
+              <span className="tabular-nums" aria-hidden="true">
+                <span ref={counterRef} className="text-brand">01</span>
+                <span className="opacity-40"> / </span>
+                {String(Math.max(count, 1)).padStart(2, "0")}
+              </span>
+              <span className="text-[10px]">{UI_COPY[lang].workHint} →</span>
             </span>
           </div>
         </div>
 
-        <div className="projects-list space-y-4 md:space-y-5">
+
+
+        <div className="projects-reel-viewport">
+        <div ref={trackRef} className="projects-list projects-reel">
           {top3.length === 0
             ? [0, 1, 2, 3, 4].map((i) => (
-                <div key={i} className="work-row-anim">
+                <div key={i} className="work-row-anim projects-reel-item">
                   <SkeletonRow idx={i} />
                 </div>
               ))
             : top3.map((p, i) => (
-                <div key={p.n} className="work-row-anim">
+                <div key={p.n} className="work-row-anim projects-reel-item">
                   <PremiumWorkRow
                     lang={lang}
                     proj={p}
@@ -154,13 +262,18 @@ export function Projects({
                 </div>
               ))}
         </div>
+        </div>
+        <div className="projects-reel-progress" aria-hidden="true">
+          <div ref={progressRef} />
+        </div>
+        </div>
       </section>
 
       <section
         id="github"
         data-section="github"
         aria-label={t.ghLb}
-        className="border-t border-black/7 dark:border-white/10 py-12 md:py-22 px-5 md:px-8 max-w-[1200px] mx-auto relative z-10"
+        className="border-t border-black/7 dark:border-white/10 py-8 md:py-14 px-5 md:px-8 max-w-[1200px] mx-auto relative z-10"
       >
         <div className="flex items-end justify-between pb-4 border-b border-black/7 dark:border-white/10 mb-1">
           <p className="text-[9px] font-bold tracking-[0.22em] uppercase text-lead/60">
@@ -243,6 +356,7 @@ export function Projects({
                   }}
                   isMobile={isMobile}
                   menu={menu}
+                  actionLabel={UI_COPY[lang]?.source || "Ver código"}
                 />
               ))}
             </div>

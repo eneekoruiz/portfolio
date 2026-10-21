@@ -4,27 +4,33 @@
 
 /* ── 1. DESIGN TOKENS & FLUID TYPE ── */
 :root {
-  --page: #f5f5f7;
-  --ink: #1d1d1f;
-  --lead: #6e6e73;
-  --brand: #0066ff;
-  --brand-rgb: 0, 102, 255;
-  --line: rgba(0, 0, 0, 0.07);
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --page: #f2efe8;
+  --ink: #111317;
+  --lead: #55565c;
+  --brand: #1f4bff;
+  --brand-rgb: 31, 75, 255;
+  --ember: #ff4d1a;
+  --chapter: var(--brand);
+  --line: rgba(17, 19, 23, 0.08);
+  --font-sans: "Materia Sans", system-ui, -apple-system, sans-serif;
+  --ease-cut: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-drift: cubic-bezier(0.45, 0, 0.55, 1);
   --fs-xl: clamp(3.5rem, 12vw, 9rem);
   --fs-lg: clamp(2.5rem, 8vw, 5rem);
 }
 
 .dark {
-  --page: #000000;
-  --ink: #ffffff;
-  --lead: #888888;
-  --brand: #0066ff;
-  --brand-rgb: 0, 102, 255;
-  --line: rgba(255, 255, 255, 0.08);
+  --page: #0b0d10;
+  --ink: #ece8df;
+  --lead: #9a9aa3;
+  --brand: #6f8cff;
+  --brand-rgb: 111, 140, 255;
+  --ember: #ff6a3d;
+  --line: rgba(236, 232, 223, 0.08);
 }
 
-/* ── 2. BASE RESET ── */
+/* ── 2. BASE RESET & BROWSER SURFACES ── */
 *,
 *::before,
 *::after {
@@ -32,30 +38,43 @@
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
-
-/* Optimize Tailwind transitions globally for maximum smoothness */
-/* Base animations and transitions are handled via specific utility classes or component-level CSS to avoid global side-effects. */
 
 html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  caret-color: var(--brand);
+  text-underline-offset: 0.25em;
 }
 
 body {
   font-family: var(--font-sans);
   background: var(--page);
   color: var(--ink);
-  overflow-x: hidden;
-  /* Optimized transitions: faster for responsiveness, cubic-bezier for organic feel */
+  overflow-x: clip;
   transition:
     background 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     border-color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  /* Prevent layout shifts and ensure smooth animations */
   will-change: auto;
+}
+
+/* Accessible focus ring system across all interactive controls */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* Tabular figures for telemetry, metrics, and timestamps */
+.tabular-nums,
+[data-metric-visual],
+[data-stat],
+time {
+  font-variant-numeric: tabular-nums;
 }
 
 ::-webkit-scrollbar {
@@ -88,7 +107,7 @@ body {
 }
 
 /* ── 3. CUSTOM CURSOR ── */
-@media (hover: hover) and (pointer: fine) {
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
   .has-custom-cursor,
   .has-custom-cursor body,
   .has-custom-cursor a,
@@ -146,7 +165,7 @@ html.reveal-cursor .cur-ring {
   animation: cursorPulse 0.25s ease-out infinite;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .cur-dot,
   .cur-ring {
     display: none !important;
@@ -158,7 +177,8 @@ html.reveal-cursor .cur-ring {
 
 /* SOTD Grade Polish */
 #scroll-progress {
-  box-shadow: 0 0 12px var(--brand);
+  background: var(--chapter);
+  box-shadow: 0 0 12px var(--chapter);
 }
 
 .glass-premium {
@@ -301,15 +321,13 @@ html.reveal-cursor .cur-ring {
 body::after {
   content: "";
   position: fixed;
-  inset: -50%;
-  width: 200%;
-  height: 200%;
+  inset: 0;
   z-index: 9990;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   opacity: 0.035;
   mix-blend-mode: overlay;
-  animation: grain 4s steps(10) infinite;
+  background-size: 256px 256px;
 }
 
 /* FIX #10: Disable grain on mobile for performance */
@@ -459,7 +477,7 @@ html {
   }
 }
 .branch-icon-pop {
-  animation: pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: pop 0.25s var(--ease-reveal);
 }
 @keyframes pop {
   0% {
@@ -518,8 +536,8 @@ html {
   pointer-events: none;
   background: radial-gradient(
     circle at center,
-    transparent 40%,
-    rgba(0, 0, 0, 0.1) 100%
+    transparent 45%,
+    color-mix(in oklab, var(--chapter) 10%, rgba(17, 19, 23, 0.07)) 100%
   );
   mix-blend-mode: multiply;
 }
@@ -527,7 +545,7 @@ html {
   background: radial-gradient(
     circle at center,
     transparent 40%,
-    rgba(0, 0, 0, 0.3) 100%
+    color-mix(in oklab, var(--chapter) 18%, rgba(0, 0, 0, 0.42)) 100%
   );
 }
 
@@ -796,6 +814,11 @@ html {
   animation: cmd-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.cmd-option:hover,
+.cmd-option-active {
+  background-color: color-mix(in srgb, var(--brand) 7%, transparent);
+}
+
 @keyframes cmd-fade-in {
   from {
     opacity: 0;
@@ -812,7 +835,7 @@ html {
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  animation: cmd-pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: cmd-pop-in 0.25s var(--ease-reveal);
   overflow: hidden;
 }
 
@@ -831,7 +854,7 @@ html {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
-/* ── 21. VIEW TRANSITIONS (Eclipse Theme) ── */
+/* ── 21. VIEW TRANSITIONS (Circular Expansion) ── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -844,20 +867,6 @@ html {
 
 ::view-transition-new(root) {
   z-index: 2147483647;
-}
-
-/* Custom clip-path animation for the "Eclipse" effect */
-@keyframes eclipse-in {
-  from {
-    clip-path: circle(0% at var(--x) var(--y));
-  }
-  to {
-    clip-path: circle(150% at var(--x) var(--y));
-  }
-}
-
-[data-transition="eclipse"]::view-transition-new(root) {
-  animation: eclipse-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 /* -- BINARY STREAM BUTTON ANIMATIONS -- */
 @keyframes btnStream {
@@ -904,7 +913,7 @@ html {
   position: relative;
   width: 100%;
   height: 100%;
-  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.8s var(--ease-reveal);
   transform-style: preserve-3d;
 }
 @media (hover: hover) {
@@ -924,12 +933,6 @@ html {
   top: 0;
   left: 0;
   transform: rotateY(180deg);
-}
-
-/* ── 24. AWWWARDS LIQUID SCROLL DISTORTION ── */
-.liquid-distort-scroll {
-  filter: url(#liquid-distort-filter);
-  will-change: filter, transform;
 }
 
 /* ── 25. PREMIUM SCROLL HINT ANIMATION ── */
@@ -971,7 +974,7 @@ html {
   pointer-events: none;
   background: radial-gradient(
     circle at 50% 0%,
-    rgba(0, 102, 255, 0.22),
+    rgba(var(--brand-rgb), 0.22),
     transparent 58%
   );
   opacity: 0;
@@ -981,7 +984,7 @@ html {
 @media (hover: hover) and (pointer: fine) {
   .contact-card:hover {
     transform: translate3d(0, -8px, 0) rotateX(3deg) rotateY(-3deg);
-    filter: drop-shadow(0 18px 34px rgba(0, 102, 255, 0.2));
+    filter: drop-shadow(0 18px 34px rgba(var(--brand-rgb), 0.2));
   }
   .contact-card:hover::before {
     opacity: 1;
@@ -1079,9 +1082,22 @@ html {
   will-change: transform, opacity;
 }
 
+/* Tactile micro-press feedback for interactive buttons (ui-ux-pro-max & make-interfaces-feel-better) */
+button:active:not(:disabled),
+a[role="button"]:active,
+.materia-button:active {
+  transform: scale(0.985);
+  transition: transform 0.08s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .portal-scan-field,
   .preloader-signal-mask {
     opacity: 0.12 !important;
+  }
+  .cursor-shake-pulse,
+  .grain-overlay,
+  .border-beam::after {
+    animation: none !important;
   }
 }

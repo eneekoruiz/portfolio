@@ -30,37 +30,47 @@ export function ContactTile({
   const contents = (
     <span
       ref={visual}
-      className="contact-flip-visual relative block min-h-56"
+      className="contact-flip-visual relative block min-h-[145px] sm:min-h-[160px]"
       data-contact-flip
     >
-      <span className="contact-flip-face relative flex min-h-56 flex-col items-start gap-4 rounded-[28px] border p-6">
-        <Icon size={28} aria-hidden="true" style={{ color }} />
-        <span className="text-xl font-bold text-ink">{label}</span>
-        <span className="break-all font-mono text-xs text-lead">{value}</span>
-        <span className="mt-auto flex items-center gap-3 text-xs font-bold text-ink">
+      <span className="contact-flip-face relative flex min-h-[145px] sm:min-h-[160px] flex-col items-start gap-2.5 rounded-[22px] border p-4 sm:p-5">
+        <span className="contact-tile-icon" aria-hidden="true">
+          <Icon size={24} style={{ color }} />
+        </span>
+        <span className="contact-tile-label text-lg sm:text-xl font-bold text-ink">
+          {label}
+        </span>
+        <span className="contact-tile-value break-all font-mono text-[11px] text-lead">
+          {value}
+        </span>
+        <span className="contact-tile-action mt-auto flex items-center gap-2 text-xs font-bold text-ink">
           {action}
-          <ArrowUpRight size={14} aria-hidden="true" />
+          <ArrowUpRight size={13} aria-hidden="true" />
         </span>
       </span>
       <span
         aria-hidden="true"
-        className="contact-flip-face contact-flip-back absolute inset-0 flex flex-col items-center justify-center gap-5 rounded-[28px] border p-6"
+        className="contact-flip-face contact-flip-back absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[22px] border p-4 sm:p-5"
       >
-        <Icon size={42} style={{ color }} />
-        <span className="text-base font-bold text-ink">{action}</span>
-        <span className="break-all text-center font-mono text-xs text-lead">
+        <span className="contact-tile-icon">
+          <Icon size={30} style={{ color }} />
+        </span>
+        <span className="text-sm sm:text-base font-bold text-ink">{action}</span>
+        <span className="break-all text-center font-mono text-[10px] sm:text-xs text-lead">
           {value}
         </span>
       </span>
     </span>
   );
   const className =
-    "block h-full w-full rounded-[28px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand";
+    "block h-full w-full rounded-[22px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand";
   return (
     <div
       ref={host}
       data-section-reveal
-      className="materia-surface relative rounded-[28px]"
+      data-contact-motion={motion ? "on" : "off"}
+      data-contact-service={label.toLowerCase()}
+      className="contact-tile materia-surface relative rounded-[22px]"
       style={{ "--surface-color": color } as CSSProperties}
     >
       {href ? (

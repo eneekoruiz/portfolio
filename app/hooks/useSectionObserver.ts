@@ -57,8 +57,8 @@ export function useSectionObserver(
       if (id === "github") id = "work";
       if (meta)
         meta.content = document.documentElement.classList.contains("dark")
-          ? "#080b12"
-          : "#f5f5f7";
+          ? "#0b0d10"
+          : "#f2efe8";
       if (current === id) return;
       current = id;
       const link = links.find((item) => item.getAttribute("href") === "#" + id);

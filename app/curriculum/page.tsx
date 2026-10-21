@@ -244,7 +244,7 @@ export default function CurriculumPage() {
                 href="https://eneko-ruiz-curriculum.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(0,102,255,0.2)]"
+                className="px-8 py-4 rounded-full bg-brand text-white font-bold text-sm uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_20px_40px_rgba(var(--brand-rgb),0.2)]"
               >
                 {t.openDirect}
               </a>
@@ -263,17 +263,6 @@ export default function CurriculumPage() {
           <ChevronLeft size={20} />
         </button>
       </div>
-
-      <style>{`
-        @keyframes delayed-fade-in {
-          0% { opacity: 0; transform: translateY(10px); }
-          80% { opacity: 0; }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-delayed-fade-in {
-          animation: delayed-fade-in 4s forwards;
-        }
-      `}</style>
     </div>
   );
 }

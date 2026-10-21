@@ -4,7 +4,6 @@ import gsap from "gsap";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
 import { SpringValue } from "../../lib/spring";
 import { ProjectVisual } from "./ProjectVisual";
-import { useTranslations } from "../../hooks/useTranslations";
 
 type Preview = { name: string; color: string };
 export function ProjectPreviewFollower({
@@ -13,7 +12,6 @@ export function ProjectPreviewFollower({
   activeProject: Preview | null;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { t } = useTranslations();
   const wakeRef = useRef<() => void>(() => {});
   const [project, setProject] = useState(activeProject);
   const enabled = useMotionEnabled();
@@ -33,7 +31,8 @@ export function ProjectPreviewFollower({
       const progress = pose.reveal.step(dt);
       element.style.transform = `translate3d(${pose.x.step(dt)}px,${pose.y.step(dt)}px,0) rotate(${pose.angle.step(dt)}deg) scale(${0.8 + progress * 0.2})`;
       element.style.opacity = String(Math.max(0, Math.min(1, progress)));
-      element.style.visibility = progress > 0.001 ? "visible" : "hidden";
+      element.style.visibility =
+        positioned && progress > 0.001 ? "visible" : "hidden";
       if (
         pose.x.settled &&
         pose.y.settled &&
@@ -50,8 +49,8 @@ export function ProjectPreviewFollower({
     };
     wakeRef.current = wake;
     const move = (event: PointerEvent) => {
-      const x = Math.max(12, Math.min(innerWidth - 252, event.clientX - 120));
-      const y = Math.max(85, Math.min(innerHeight - 176, event.clientY - 200));
+      const x = Math.max(12, Math.min(innerWidth - 208, event.clientX + 24));
+      const y = Math.max(85, Math.min(innerHeight - 144, event.clientY - 148));
       if (!positioned) {
         pose.x.snap(x);
         pose.y.snap(y);
@@ -91,46 +90,23 @@ export function ProjectPreviewFollower({
       ref={ref}
       id="project-preview-follower"
       aria-hidden="true"
-      className="pointer-events-none fixed left-0 top-0 z-[80] h-40 w-60 overflow-hidden rounded-2xl border border-white/25 bg-neutral-950 p-5 text-white shadow-2xl"
+      className="pointer-events-none fixed left-0 top-0 z-[80] h-[132px] w-[196px] overflow-hidden rounded-xl border border-ink/20 bg-page text-ink shadow-xl"
       style={{ opacity: 0, visibility: "hidden" }}
     >
-      <svg
-        viewBox="0 0 240 160"
-        className="absolute inset-0 h-full w-full"
-        fill="none"
-        style={{ color: project?.color }}
-      >
-        <circle
-          cx="180"
-          cy="80"
-          r="64"
-          stroke="currentColor"
-          strokeWidth="0.8"
-        />
-        <ellipse cx="180" cy="80" rx="28" ry="64" stroke="currentColor" />
-        <path
-          d="M116 80h128M126 47h108M126 113h108"
-          stroke="currentColor"
-          strokeOpacity="0.5"
-        />
-      </svg>
       {project && (
         <ProjectVisual
           id={project.name.toLowerCase().replace(/[\s_]+/g, "-")}
           className="project-follower-visual"
         />
       )}
-      <div className="relative flex h-full flex-col justify-between">
-        <span
-          className="font-mono text-[9px] uppercase tracking-widest"
-          style={{ color: project?.color }}
-        >
-          Eneko Ruiz / {t.woLb}
-        </span>
-        <span className="max-w-44 text-xl font-black capitalize leading-tight">
+      <div className="project-follower-caption absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-page/95 px-3 py-2">
+        <span className="truncate text-[11px] font-semibold capitalize">
           {project?.name === "ana-peluquera"
             ? "AG Beauty Salon"
             : project?.name.replace(/[-_]/g, " ")}
+        </span>
+        <span className="text-sm" style={{ color: project?.color }}>
+          ↗
         </span>
       </div>
     </div>

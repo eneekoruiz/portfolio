@@ -3,12 +3,19 @@ import { headers } from "next/headers";
 import { SkipLink } from "./components/ui/SkipLink";
 import "./styles/globals.css";
 import "./styles/materia.css";
+import "./styles/editorial.css";
+import "./styles/compact-sections.css";
+import "./styles/project-preview.css";
+import "./styles/project-reel.css";
+import "./styles/contact-expression.css";
+import "./styles/overture.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";
-import { InfallibleCursor } from "./components/motion/InfallibleCursor";
+
 import { MateriaLayer } from "./components/motion/MateriaLayer";
 import { UmbralProvider } from "./components/motion/UmbralProvider";
+import { CustomCursor } from "./components/ui/CustomCursor";
 import { baseMetadata, jsonLd } from "./lib/metadata";
 
 export const metadata = baseMetadata;
@@ -24,8 +31,15 @@ export default async function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#f5f5f7" />
+        <meta name="theme-color" content="#f2efe8" />
         <meta name="color-scheme" content="light dark" />
+        <link
+          rel="preload"
+          href="/fonts/roboto-flex-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <link
           rel="preconnect"
           href="https://eneko-ruiz-curriculum.vercel.app"
@@ -67,13 +81,14 @@ export default async function RootLayout({
         {/* Elite Graceful Degradation for JS-disabled clients */}
         <noscript>
           <style
+            nonce={nonce}
             dangerouslySetInnerHTML={{
               __html: `
                 #main-content {
                   visibility: visible !important;
                   opacity: 1 !important;
                 }
-                .preloader-container, .splash-container, .identity-splash, #preloader, #splash {
+                .preloader-container, .splash-container, .identity-splash, #preloader, #splash, .cinematic-overture {
                   display: none !important;
                 }
                 .title-char, .word-inner, .about-reveal, .animate-char {
@@ -91,40 +106,16 @@ export default async function RootLayout({
           id="scroll-progress"
           className="fixed top-0 left-0 w-full h-[2px] bg-brand origin-left z-[9999] scale-x-0"
         />
-        {/* Hidden global SVG filter for velocity-based liquid distortion */}
-        <svg
-          className="hidden"
-          aria-hidden="true"
-          style={{ position: "absolute", width: 0, height: 0 }}
-        >
-          <defs>
-            <filter id="liquid-distort-filter">
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency="0.02 0.08"
-                numOctaves="1"
-                result="noise"
-              />
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="noise"
-                scale="0"
-                xChannelSelector="R"
-                yChannelSelector="G"
-                id="liquid-displacement-map"
-              />
-            </filter>
-          </defs>
-        </svg>
         <ClientThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem={true}
           nonce={nonce}
         >
+          <CustomCursor />
           <SmoothScroll />
           <EasterEgg />
-          <InfallibleCursor />
+
           <IntroProvider>
             <MateriaLayer />
             <UmbralProvider>{children}</UmbralProvider>

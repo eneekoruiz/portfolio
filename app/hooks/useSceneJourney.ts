@@ -3,19 +3,33 @@
 import { useEffect, type RefObject } from "react";
 import { materia } from "../lib/materia";
 
-const CHAPTERS = ["hero", "skills", "about", "work", "values", "contact"];
+const CHAPTERS = ["hero", "work", "about", "skills", "values", "contact"];
 const COMPOSITIONS = [1, -0.65, 0.75, -0.55, 0.55, 0.1];
+// Colour arc: cold sea at the opening, warm earth in the middle, ember at the close.
+const TINTS = [
+  "var(--brand)",
+  "var(--brand)",
+  "#6b7a8f",
+  "#8a6f5a",
+  "var(--lead)",
+  "var(--ember)",
+];
+const TINT_STEPS = 20;
 
 /** Cache layout on resize; scrolling changes only the shared spring targets. */
 export function useSceneJourney(
   ref: RefObject<HTMLElement | null>,
-  enabled: boolean,
+  ready: boolean,
+  motion: boolean,
 ) {
   useEffect(() => {
-    if (!enabled || !ref.current) return;
+    // The colour arc is not motion, so it runs even when motion is off.
+    if (!ready || !ref.current) return;
     let anchors: number[] = [];
     let frame = 0;
     let needsMeasure = true;
+    let lastTint = "";
+    const root = document.documentElement;
     const update = () => {
       frame = 0;
       if (needsMeasure) {
@@ -38,10 +52,19 @@ export function useSceneJourney(
           ? Math.max(0, Math.min(1, (cursor - anchors[index]) / length))
           : 0;
       const blend = t * t * (3 - 2 * t);
-      materia.chapter.target = index + blend;
-      materia.composition.target =
-        COMPOSITIONS[index] +
-        (COMPOSITIONS[next] - COMPOSITIONS[index]) * blend;
+      if (motion) {
+        materia.chapter.target = index + blend;
+        materia.composition.target =
+          COMPOSITIONS[index] +
+          (COMPOSITIONS[next] - COMPOSITIONS[index]) * blend;
+      }
+      // Quantised so the root custom property (full style recalc) changes ~20 times per chapter, not every frame.
+      const mix = Math.round((1 - blend) * TINT_STEPS) * (100 / TINT_STEPS);
+      const tint = `color-mix(in oklab, ${TINTS[index]} ${mix}%, ${TINTS[next]})`;
+      if (tint !== lastTint) {
+        lastTint = tint;
+        root.style.setProperty("--chapter", tint);
+      }
     };
     const queue = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -54,13 +77,14 @@ export function useSceneJourney(
     observer.observe(ref.current);
     window.addEventListener("scroll", queue, { passive: true });
     window.addEventListener("resize", measure);
-    materia.studio.target = 0;
+    if (motion) materia.studio.target = 0;
     update();
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener("scroll", queue);
       window.removeEventListener("resize", measure);
+      root.style.removeProperty("--chapter");
     };
-  }, [enabled, ref]);
+  }, [ready, motion, ref]);
 }

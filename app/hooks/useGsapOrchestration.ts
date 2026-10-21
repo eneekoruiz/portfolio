@@ -16,8 +16,6 @@ export function useGsapOrchestration(
   // Preset entrance properties to avoid layout shifts on first render
   useLayoutEffect(() => {
     if (!ready || motionPaused) return;
-    if (document.querySelectorAll(".n-el").length > 0)
-      gsap.set(".n-el", { opacity: 0, y: -14 });
     if (document.querySelectorAll(".h-ln").length > 0)
       gsap.set(".h-ln", { yPercent: 115 });
     if (document.querySelectorAll(".h-fd").length > 0)
@@ -82,7 +80,7 @@ export function useGsapOrchestration(
 
       // Dynamic intro stagger timeline
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      const hasNel = document.querySelectorAll(".n-el").length > 0;
+      const hasNel = false;
       const hasHln = document.querySelectorAll(".h-ln").length > 0;
       const hasHfd = document.querySelectorAll(".h-fd").length > 0;
       const hasMemoji = document.querySelectorAll(".memoji").length > 0;
@@ -93,7 +91,7 @@ export function useGsapOrchestration(
             opacity: 1,
             y: 0,
             duration: 0.28,
-            ease: "back.out(1.15)",
+            ease: "expo.out",
             stagger: 0.025,
           });
         }
@@ -103,7 +101,7 @@ export function useGsapOrchestration(
             {
               yPercent: 0,
               duration: 0.45,
-              ease: "back.out(1.2)",
+              ease: "expo.out",
               stagger: 0.035,
             },
             hasNel ? "-=0.22" : undefined,
@@ -116,7 +114,7 @@ export function useGsapOrchestration(
               opacity: 1,
               y: 0,
               duration: 0.35,
-              ease: "back.out(1.15)",
+              ease: "expo.out",
               stagger: 0.03,
             },
             hasNel || hasHln ? "-=0.32" : undefined,
@@ -125,12 +123,16 @@ export function useGsapOrchestration(
         if (hasMemoji) {
           tl.to(
             ".memoji",
-            { opacity: 1, x: 0, duration: 0.55, ease: "back.out(1.2)" },
+            { opacity: 1, x: 0, duration: 0.55, ease: "expo.out" },
             hasNel || hasHln || hasHfd ? "-=0.4" : undefined,
           );
         }
       }
     },
-    { scope: mainRef, dependencies: [ready, motionPaused] },
+    {
+      scope: mainRef,
+      dependencies: [ready, motionPaused],
+      revertOnUpdate: true,
+    },
   );
 }

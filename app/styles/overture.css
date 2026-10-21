@@ -1,0 +1,164 @@
+/* ── Cinematic Overture ──────────────────────────────────────────
+   Film-grade opening sequence styles.
+   Grain, bloom, and atmospheric layers for the portfolio prologue.
+   ────────────────────────────────────────────────────────────── */
+
+/* Film grain — pure CSS noise via SVG data URI (no external assets) */
+.overture-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  will-change: opacity;
+}
+
+/* Volumetric light bloom */
+.overture-bloom {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.3);
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--brand-rgb), 0.08) 0%,
+    rgba(var(--brand-rgb), 0.03) 35%,
+    transparent 70%
+  );
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+/* Horizon line — the first sign of life */
+.overture-horizon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ink) 50%, transparent) 30%,
+    color-mix(in srgb, var(--ink) 70%, transparent) 50%,
+    color-mix(in srgb, var(--ink) 50%, transparent) 70%,
+    transparent 100%
+  );
+  z-index: 10;
+  will-change: width, opacity;
+  opacity: 0;
+}
+
+/* Coordinate text flanking the horizon */
+.overture-coord {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 20%, transparent);
+  white-space: nowrap;
+  z-index: 11;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.overture-coord--left {
+  right: calc(50% + 80px);
+}
+
+.overture-coord--right {
+  left: calc(50% + 80px);
+}
+
+/* Welcome word characters — clip-path reveal */
+.overture-char {
+  display: inline-block;
+  font-weight: 900;
+  font-size: clamp(3.2rem, 8vw, 7rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  clip-path: inset(100% 0 0 0);
+  will-change: clip-path, opacity, transform, filter;
+}
+
+/* Author signature — mask wipe from center */
+.overture-author {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 85%, transparent);
+  clip-path: inset(0 50% 0 50%);
+  will-change: clip-path, opacity;
+}
+
+/* Flanking title lines */
+.overture-title-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ink) 35%, transparent) 50%,
+    transparent 100%
+  );
+  will-change: width, opacity;
+  width: 0;
+  opacity: 0;
+}
+
+/* Light flood — radial expansion for the page color transfer */
+.overture-flood {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 300vmax;
+  height: 300vmax;
+  border-radius: 50%;
+  background: var(--page);
+  pointer-events: none;
+  z-index: 2;
+  will-change: transform;
+}
+
+/* Skip hint */
+.overture-skip {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: color-mix(in srgb, var(--ink) 35%, transparent);
+  z-index: 20;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.overture-skip:hover {
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+}
+
+.overture-skip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
+}

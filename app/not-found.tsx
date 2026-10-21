@@ -11,7 +11,7 @@ export default function NotFound() {
       style={{ cursor: "auto" }}
     >
       <div className="max-w-[420px] w-full text-center">
-        <div className="bento-glow rounded-3xl shadow-rest border border-black/10 dark:border-white/10 bg-gradient-to-br from-white/90 to-white/65 dark:from-white/[0.04] dark:to-white/[0.02] p-14 flex flex-col items-center gap-6 backdrop-blur-xl">
+        <div className="rounded-3xl border border-black/15 dark:border-white/15 bg-page/90 p-14 flex flex-col items-center gap-6 shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
           <p className="font-black text-[clamp(4rem,15vw,6rem)] leading-none tracking-[-4px] text-ink">
             404
           </p>

@@ -3,9 +3,10 @@ import { test, expect } from "@playwright/test";
 test("404 retains its magnetic return link and native home navigation", async ({
   page,
 }, info) => {
-  await page.addInitScript(() =>
-    sessionStorage.setItem("hasSeenIntro", "true"),
-  );
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
+    Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
+  });
   const response = await page.goto("/visual-continuity-not-found");
   expect(response.status()).toBe(404);
   const link = page.getByRole("link", { name: "Volver al inicio" });
