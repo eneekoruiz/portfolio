@@ -104,11 +104,12 @@ export function useHeroCinematic(
     // the hiding CSS; clearing them here would blink everything out for a frame.
     tl.to(ui, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out", stagger: 0.07 }, 2.75);
 
-    // Input in the first instants is usually leftover wheel inertia from the
-    // previous page, not a request to skip.
+    // Wheel input in the first instants is usually leftover inertia from the
+    // previous page, not a request to skip; keys and clicks always skip.
     const armedAt = performance.now() + 450;
     const skip = (event: Event) => {
-      if (performance.now() < armedAt) return;
+      const scrolling = event.type === "wheel" || event.type === "touchmove";
+      if (scrolling && performance.now() < armedAt) return;
       if (event instanceof KeyboardEvent && ["Tab", "Shift", "Alt", "Control", "Meta"].includes(event.key))
         return;
       if (event instanceof WheelEvent && Math.abs(event.deltaY) + Math.abs(event.deltaX) < 4) return;

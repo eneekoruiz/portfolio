@@ -106,6 +106,9 @@ test("contact magnet, letter lighting and project depth recover after interrupti
   page,
 }, info) => {
   await page.goto("/");
+  // The opening plays on every load; the name only reacts once it is over.
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#hero")).not.toHaveAttribute("data-cinematic", "");
   const contact = page.locator("[data-magnetic-contact]");
   if (
     !(await page.evaluate(
@@ -158,7 +161,10 @@ test("contact magnet, letter lighting and project depth recover after interrupti
   await title.hover({ position: { x: 15, y: 20 } });
   await expect
     .poll(() =>
-      row.evaluate((el) => Number(el.style.getPropertyValue("--work-energy"))),
+      // Written on the glint that paints it, not on the whole card.
+      row
+        .locator(".project-visual-glint")
+        .evaluate((el) => Number(el.style.getPropertyValue("--work-energy"))),
     )
     .toBeGreaterThan(0.8);
   await row.dispatchEvent("pointercancel", { pointerType: "mouse" });
