@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
+import { sandCrack } from "../../lib/tectonic";
 
 /**
  * SandField — the hero floor is a sand bed lit at a grazing angle.
@@ -14,8 +15,6 @@ const LIFE_S = 6;
 const RENDER_SCALE = 0.75;
 const AMBIENT_MS = 14_000;
 const IDLE_BEFORE_AMBIENT_MS = 5_000;
-const LETTER_CADENCE_MS = 85;
-const LETTER_ORDER = [0, 8, 3, 5, 4, 1, 7, 2, 6, 9];
 
 const VERTEX = `
 attribute vec2 aPos;
@@ -39,6 +38,9 @@ uniform vec3 uAccent;
 uniform float uStrength;
 uniform float uGrain;
 uniform float uSpark;
+uniform vec4 uCrack; // centre x, y (px), half length (px), open 0..1
+uniform float uGlow;
+uniform vec3 uEmber;
 
 const float LIFE = ${LIFE_S.toFixed(1)};
 const float SPEED = 950.0;
@@ -88,6 +90,26 @@ float field(vec2 p, float warp, float rough, out float wave) {
   return h;
 }
 
+// Distance-based breach in the sand. depth: 0 at the lip, 1 on the centreline.
+float breach(vec2 p, out float lip, out float depth) {
+  lip = 0.0;
+  depth = 0.0;
+  if (uCrack.w <= 0.001) return 0.0;
+  vec2 q = p - uCrack.xy;
+  float along = abs(q.x) / uCrack.z;
+  float reach = 1.0 - smoothstep(uCrack.w * 1.1 - 0.12, uCrack.w * 1.1, along);
+  if (reach <= 0.0) return 0.0;
+  float centre = (vnoise(vec2(q.x * 0.016, 3.1)) - 0.5) * 54.0
+               + (vnoise(vec2(q.x * 0.075, 7.7)) - 0.5) * 12.0;
+  float width = uCrack.w * 24.0 * pow(max(0.0, 1.0 - along), 0.6) * reach
+              + (vnoise(vec2(q.x * 0.22, 1.3)) - 0.5) * 3.0 * uCrack.w;
+  float d = abs(q.y - centre);
+  float inside = 1.0 - smoothstep(width - 1.0, width + 1.0, d);
+  lip = exp(-pow((d - width - 7.0) / 7.0, 2.0)) * reach * uCrack.w;
+  depth = clamp(1.0 - d / max(width, 0.001), 0.0, 1.0) * inside;
+  return inside;
+}
+
 void main() {
   vec2 px = gl_FragCoord.xy;
   vec2 p = vec2(px.x, uRes.y * uDpr - px.y) / uDpr;
@@ -97,6 +119,12 @@ void main() {
   float rough = vnoise(p * 0.045);
   float wave;
   float h = field(p, warp, rough, wave);
+  float lip;
+  float depth;
+  float inside = breach(p, lip, depth);
+  // Raised, crumbling lips catch the light; grains near the rim keep moving.
+  h += lip * (1.6 + rough);
+  wave += lip * 0.7;
   // Slopes from screen derivatives: one field evaluation per pixel instead of three.
   vec2 slope = vec2(dFdx(h), -dFdy(h)) * uDpr;
   vec3 n = normalize(vec3(-slope * 6.0, 1.0));
@@ -114,6 +142,10 @@ void main() {
   vec3 col = uBase + uTone * (shade * uStrength + (grain - dark) * uGrain) * edge;
   col += uAccent * min(wave, 1.0) * 0.025 * edge;
   col += spark * uSpark * edge;
+  // Inside the breach: deep shadow, lit from below by ember light.
+  vec3 abyss = mix(uBase * 0.12, uEmber * (0.35 + 0.65 * depth), uGlow * depth);
+  col = mix(col, abyss, inside);
+  col += uEmber * lip * uGlow * 0.18;
   gl_FragColor = vec4(col, 1.0);
 }
 `;
@@ -197,6 +229,9 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
     const uStrength = u("uStrength");
     const uGrain = u("uGrain");
     const uSpark = u("uSpark");
+    const uCrack = u("uCrack");
+    const uGlow = u("uGlow");
+    const uEmber = u("uEmber");
 
     // x, y (CSS px in the stage), start time (s), amplitude. Ring buffer.
     const impacts = new Float32Array(MAX_IMPACTS * 4);
@@ -219,6 +254,7 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
       gl.uniform1f(uStrength, dark ? 0.08 : 0.1);
       gl.uniform1f(uGrain, dark ? 0.045 : 0.075);
       gl.uniform1f(uSpark, dark ? 0.22 : 0.08);
+      gl.uniform3fv(uEmber, readHex("--ember", [1, 0.3, 0.1]));
     };
 
     const alive = (t: number) => {
@@ -235,6 +271,14 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
       const t = now();
       gl.uniform1f(uTime, t);
       gl.uniform4fv(uImpacts, impacts);
+      gl.uniform4f(
+        uCrack,
+        sandCrack.x * width,
+        sandCrack.y * height,
+        sandCrack.length * width,
+        sandCrack.open,
+      );
+      gl.uniform1f(uGlow, sandCrack.glow);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       if (enabled && visible && !document.hidden && alive(t))
         frame = requestAnimationFrame(draw);
@@ -311,26 +355,12 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
     visibilityObserver.observe(stage);
     stage.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("tectonic-impact", onTectonic);
+    window.addEventListener("sand-wake", wake);
     document.addEventListener("visibilitychange", wake);
     canvas.addEventListener("webglcontextlost", onLost);
 
     let ambient: ReturnType<typeof setInterval> | undefined;
     if (enabled) {
-      // Opening: each letter drops onto the sand, then the full name lands.
-      const chars = Array.from(
-        stage.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
-      );
-      LETTER_ORDER.forEach((index, step) => {
-        timers.push(
-          setTimeout(() => {
-            const rect = chars[index]?.getBoundingClientRect();
-            if (rect)
-              impactAtClient(rect.left + rect.width / 2, rect.bottom, 0.35);
-            if (step === LETTER_ORDER.length - 1)
-              timers.push(setTimeout(() => impact(width / 2, height * 0.48, 1.6), 220));
-          }, 50 + step * LETTER_CADENCE_MS),
-        );
-      });
       ambient = setInterval(() => {
         if (!visible || document.hidden) return;
         if (Date.now() - lastUserAction < IDLE_BEFORE_AMBIENT_MS) return;
@@ -347,6 +377,7 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
       visibilityObserver.disconnect();
       stage.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("tectonic-impact", onTectonic);
+      window.removeEventListener("sand-wake", wake);
       document.removeEventListener("visibilitychange", wake);
       canvas.removeEventListener("webglcontextlost", onLost);
       gl.deleteBuffer(buffer);

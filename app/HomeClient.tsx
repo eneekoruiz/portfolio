@@ -44,7 +44,6 @@ import { Navbar } from "./components/navigation/Navbar";
 import { MobileMenu } from "./components/navigation/MobileMenu";
 
 import { PortalTransition } from "./components/ui/PortalTransition";
-import { CinematicOverture } from "./components/motion/CinematicOverture";
 import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollower";
 
 // ── Motion & Sections ──────────────────────────────────────────────────────
@@ -234,9 +233,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
-      {phase === "overture" && (
-        <CinematicOverture lang={lang} onComplete={onOvertureComplete} />
-      )}
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
         ref={main}
@@ -261,6 +257,7 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           reduced={reduced}
           phase={phase}
           lang={lang}
+          onIntroComplete={onOvertureComplete}
         />
         <MemoProjects
           t={t}

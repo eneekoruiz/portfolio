@@ -774,3 +774,20 @@ body::after {
     -webkit-backdrop-filter: none;
   }
 }
+
+/* Hero cinematic: hidden from the first paint until the opening shot runs.
+   The failsafe reveals everything if the script never takes over. */
+#hero[data-cinematic] h1 [data-kinetic-char],
+#hero[data-cinematic] [data-cine-ui] {
+  opacity: 0;
+  animation: cine-failsafe 0.4s ease 9s forwards;
+}
+#hero [data-cine-welcome] {
+  opacity: 0;
+  letter-spacing: 0.12em;
+}
+@keyframes cine-failsafe {
+  to {
+    opacity: 1;
+  }
+}
