@@ -13,6 +13,7 @@ export function KineticText({
   interactive = false,
   delay = 0,
   wrap = false,
+  entrance = true,
 }: {
   text: string;
   enabled: boolean;
@@ -20,6 +21,8 @@ export function KineticText({
   interactive?: boolean;
   delay?: number;
   wrap?: boolean;
+  /** False when another sequence already revealed the letters. */
+  entrance?: boolean;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -33,7 +36,9 @@ export function KineticText({
     const characters = Array.from(
       element.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
     );
-    const letters = characters.map(() => new SpringValue(0, 135, 17));
+    const letters = characters.map(
+      () => new SpringValue(entrance ? 0 : 1, 135, 17),
+    );
     const waves = characters.map(() => new SpringValue(0, 170, 18));
     const tiltX = new SpringValue(0, 130, 20);
     const tiltY = new SpringValue(0, 130, 20);
@@ -169,9 +174,8 @@ export function KineticText({
       if (visible) {
         if (enteredAt < 0) {
           enteredAt = gsap.ticker.time;
-          for (const char of characters) {
-            char.style.opacity = "0";
-          }
+          if (entrance)
+            for (const char of characters) char.style.opacity = "0";
         }
         gsap.ticker.add(tick);
       } else {
@@ -194,7 +198,7 @@ export function KineticText({
       element.style.removeProperty("--type-light");
       for (const char of characters) char.removeAttribute("style");
     };
-  }, [text, enabled, interactive, delay, wrap]);
+  }, [text, enabled, interactive, delay, wrap, entrance]);
   return (
     <span
       ref={ref}

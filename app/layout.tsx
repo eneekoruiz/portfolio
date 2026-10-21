@@ -8,7 +8,6 @@ import "./styles/compact-sections.css";
 import "./styles/project-preview.css";
 import "./styles/project-reel.css";
 import "./styles/contact-expression.css";
-import "./styles/overture.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";
@@ -91,6 +90,7 @@ export default async function RootLayout({
                 .preloader-container, .splash-container, .identity-splash, #preloader, #splash, .cinematic-overture {
                   display: none !important;
                 }
+                #hero [data-kinetic-char], #hero [data-cine-ui],
                 .title-char, .word-inner, .about-reveal, .animate-char {
                   opacity: 1 !important;
                   transform: none !important;

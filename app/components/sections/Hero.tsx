@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { LiveStatus } from "../ui/LiveStatus";
 import { useSpringHover } from "../../hooks/useSpringHover";
@@ -12,6 +12,8 @@ import { SandField } from "../motion/SandField";
 import { triggerTectonicImpact } from "../../lib/tectonic";
 import type { Tx, Lang } from "../../types";
 import { UI_COPY } from "../../data/interface-translations";
+import { WELCOME_WORDS } from "../../data/welcome";
+import { useHeroCinematic } from "../../hooks/useHeroCinematic";
 
 interface HeroProps {
   t: Tx;
@@ -19,13 +21,28 @@ interface HeroProps {
   reduced: boolean;
   phase: string;
   lang?: Lang;
+  onIntroComplete: () => void;
 }
 
-export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
+export function Hero({
+  t,
+  greeting,
+  reduced,
+  phase,
+  lang = "es",
+  onIntroComplete,
+}: HeroProps) {
   const ui = UI_COPY[lang];
-  const { enabled: motion } = useMotionPolicy();
+  const { enabled: motion, allowed } = useMotionPolicy();
   const enabled = motion && !reduced;
   const heroRef = useRef<HTMLElement>(null);
+  const intro = phase === "overture";
+  const playCinematic = intro && allowed && !reduced;
+  useHeroCinematic(heroRef, playCinematic, onIntroComplete);
+  // Without motion there is nothing to play: reveal the hero straight away.
+  useEffect(() => {
+    if (intro && !playCinematic) onIntroComplete();
+  }, [intro, playCinematic, onIntroComplete]);
   const enableSensor = useHeroLight(heroRef, enabled);
   const [sensor, setSensor] = useState<"idle" | "enabled" | "unavailable">(
     "idle",
@@ -55,11 +72,24 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
       ref={heroRef}
       id="hero"
       aria-label="Eneko Ruiz"
+      data-cinematic={intro ? "" : undefined}
       className="materia-hero relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pt-24 pb-8 md:px-10 md:pt-28 md:pb-12"
     >
       <SandField stageRef={heroRef} enabled={enabled} />
       <div className="hero-light" aria-hidden="true" />
-      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/10 pb-3 md:pb-4 shrink-0">
+      {intro && (
+        <p
+          data-cine-welcome
+          aria-hidden="true"
+          className="hero-welcome pointer-events-none absolute inset-x-0 top-1/2 z-20 text-center text-[clamp(1.4rem,4vw,2.6rem)] font-semibold uppercase text-ink"
+        >
+          {WELCOME_WORDS[lang] ?? WELCOME_WORDS.en}
+        </p>
+      )}
+      <div
+        data-cine-ui
+        className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/10 pb-3 md:pb-4 shrink-0"
+      >
         <p className="text-xs font-medium tracking-wide text-lead">
           {greeting}
         </p>
@@ -74,7 +104,8 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
             <div className="block text-ink">
               <KineticText
                 text="Eneko"
-                enabled={enabled}
+                enabled={enabled && !intro}
+                entrance={false}
                 interactive={true}
                 className="inline-block"
               />
@@ -82,14 +113,15 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
             <div className="block mt-1 md:mt-2 text-brand">
               <KineticText
                 text="Ruiz."
-                enabled={enabled}
+                enabled={enabled && !intro}
+                entrance={false}
                 interactive={true}
                 className="inline-block"
               />
             </div>
           </h1>
 
-          <div className="hero-introduction mt-3 md:mt-5 flex flex-col items-center text-center max-w-xl px-4">
+          <div data-cine-ui className="hero-introduction mt-3 md:mt-5 flex flex-col items-center text-center max-w-xl px-4">
             <span
               className="h-px w-10 bg-brand/50 mb-2.5"
               aria-hidden="true"
@@ -103,7 +135,10 @@ export function Hero({ t, greeting, reduced, phase, lang = "es" }: HeroProps) {
           </div>
         </div>
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 md:gap-6 border-t border-ink/15 py-2.5 md:py-3.5 shrink-0">
+      <div
+        data-cine-ui
+        className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 md:gap-6 border-t border-ink/15 py-2.5 md:py-3.5 shrink-0"
+      >
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <SignatureLink
             label={t.ctaWork}
