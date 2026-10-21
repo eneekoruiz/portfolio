@@ -49,7 +49,7 @@ export const DNAHelix = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const initial =
-      localStorage.getItem("portfolio-motion-enabled") !== "false";
+      sessionStorage.getItem("portfolio-motion-enabled") !== "false";
     motionEnabledRef.current = initial;
 
     const handleMotionChange = (e: Event) => {

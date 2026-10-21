@@ -172,7 +172,7 @@ test.describe("background work behind a dialog", () => {
               pending.delete(id);
             };
           }
-          localStorage.setItem("portfolio-motion-enabled", "true");
+          sessionStorage.setItem("portfolio-motion-enabled", "true");
           Object.defineProperty(navigator, "hardwareConcurrency", {
             get: () => 16,
           });
