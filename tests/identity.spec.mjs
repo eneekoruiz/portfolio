@@ -78,7 +78,7 @@ test("technology orbits auto-run under shared motion control and release styles 
         });
       }
     };
-    localStorage.setItem("portfolio-motion-enabled", "true");
+    sessionStorage.setItem("portfolio-motion-enabled", "true");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
   });

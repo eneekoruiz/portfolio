@@ -30,7 +30,8 @@ export function MotionToggle() {
 
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("portfolio-motion-enabled", String(nextState));
+        // Per visit: a pause must not leave the site frozen on every later visit.
+        sessionStorage.setItem("portfolio-motion-enabled", String(nextState));
       } catch {}
       window.dispatchEvent(
         new CustomEvent("portfolio-motion-changed", {

@@ -24,9 +24,11 @@ const STORAGE_KEY = "portfolio_intro_seen_v5";
 function checkIsFirstVisit(): boolean {
   if (typeof window === "undefined") return false;
   try {
+    // ?intro=1 replays the opening on demand.
+    if (new URLSearchParams(location.search).get("intro") === "1") return true;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
       return false;
-    if (localStorage.getItem("portfolio-motion-enabled") === "false")
+    if (sessionStorage.getItem("portfolio-motion-enabled") === "false")
       return false;
     // En desarrollo siempre permitir ver la intro completa para testeo
     if (process.env.NODE_ENV === "development") return true;

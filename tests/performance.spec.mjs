@@ -90,7 +90,7 @@ test("lightweight and reduced motion never allocate a WebGL canvas or fetch hidd
   });
   // A stored opt-in must not override the operating system accessibility preference.
   await page.addInitScript(() =>
-    localStorage.setItem("portfolio-motion-enabled", "true"),
+    sessionStorage.setItem("portfolio-motion-enabled", "true"),
   );
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
@@ -120,8 +120,8 @@ for (const profile of ["lite", "one-gigabyte", "save-data", "reduced-motion"]) {
     if (profile === "reduced-motion")
       await page.emulateMedia({ reducedMotion: "reduce" });
     await page.addInitScript((profile) => {
-      if (localStorage.getItem("portfolio-motion-enabled") === null)
-        localStorage.setItem("portfolio-motion-enabled", "false");
+      if (sessionStorage.getItem("portfolio-motion-enabled") === null)
+        sessionStorage.setItem("portfolio-motion-enabled", "false");
       if (profile === "lite") localStorage.setItem("lite", "1");
       if (profile === "one-gigabyte")
         Object.defineProperty(navigator, "deviceMemory", {
@@ -167,7 +167,7 @@ for (const profile of ["lite", "one-gigabyte", "save-data", "reduced-motion"]) {
       await page.reload();
       expect(
         await page.evaluate(() =>
-          localStorage.getItem("portfolio-motion-enabled"),
+          sessionStorage.getItem("portfolio-motion-enabled"),
         ),
       ).toBe("true");
       await expect(dna).toHaveAttribute("data-dna-animated", "false");
@@ -180,7 +180,7 @@ test("paused project navigation keeps one document and Back restores the expande
   page,
 }) => {
   await page.addInitScript(() =>
-    localStorage.setItem("portfolio-motion-enabled", "false"),
+    sessionStorage.setItem("portfolio-motion-enabled", "false"),
   );
   await page.goto("/");
   const row = page.locator('[data-materia-surface="ana-peluquera"]');

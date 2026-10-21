@@ -36,7 +36,9 @@ export function subscribeMotion(listener: () => void) {
     let explicitOptIn = false;
     const readPreference = () => {
       try {
-        const value = localStorage.getItem("portfolio-motion-enabled");
+        // Older builds persisted the pause forever in localStorage; drop it.
+        localStorage.removeItem("portfolio-motion-enabled");
+        const value = sessionStorage.getItem("portfolio-motion-enabled");
         preference = value === null ? null : value === "true";
       } catch {
         preference = null;
