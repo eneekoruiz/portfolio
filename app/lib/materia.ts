@@ -36,20 +36,44 @@ export function setMateriaPalette(accent: string, secondary: string) {
     document.documentElement.style.setProperty("--dna-accent", accent);
     document.documentElement.style.setProperty("--dna-secondary", secondary);
   }
+  // Palette changes come with new targets from the same caller.
+  wakeMateria();
 }
 
+const shared = [
+  materia.warp,
+  materia.composition,
+  materia.chapter,
+  materia.studio,
+  materia.tiltX,
+  materia.tiltY,
+];
+
+let waker: (() => void) | null = null;
+/** The ticker sleeps once everything settles; whoever moves a target wakes it. */
+export function wakeMateria() {
+  waker?.();
+}
+export function onMateriaWake(wake: (() => void) | null) {
+  waker = wake;
+}
+
+/** Advances every spring; returns false once nothing is moving any more. */
 export function tickMateria(deltaMs: number) {
   const dt = Math.min(deltaMs / 1000, 2);
+  let busy = false;
   materia.warp.step(dt);
   materia.composition.step(dt);
   materia.chapter.step(dt);
   materia.studio.step(dt);
   materia.tiltX.step(dt);
   materia.tiltY.step(dt);
+  for (const spring of shared) if (!spring.settled) busy = true;
   if (performance.now() - materia.scrollTime > 100) {
     materia.velocity *= Math.exp(-dt * 16);
     if (Math.abs(materia.velocity) < 0.01) materia.velocity = 0;
   }
+  if (materia.velocity !== 0) busy = true;
   for (const surface of materia.surfaces) {
     if (!surface.visible) continue;
     if (
@@ -65,6 +89,7 @@ export function tickMateria(deltaMs: number) {
     surface.y.step(dt);
     surface.tangentX.step(dt);
     surface.tangentY.step(dt);
+    busy = true;
     const style = surface.element.style;
     style.setProperty(
       "--surface-energy",
@@ -73,4 +98,5 @@ export function tickMateria(deltaMs: number) {
     style.setProperty("--surface-x", `${surface.x.value * 100}%`);
     style.setProperty("--surface-y", `${surface.y.value * 100}%`);
   }
+  return busy;
 }

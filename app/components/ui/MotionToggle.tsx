@@ -29,9 +29,7 @@ export function MotionToggle() {
     playClick();
 
     if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("portfolio-motion-enabled", String(nextState));
-      } catch {}
+      // Not persisted: a reload always starts with motion on.
       window.dispatchEvent(
         new CustomEvent("portfolio-motion-changed", {
           detail: { enabled: nextState, userInitiated: true },

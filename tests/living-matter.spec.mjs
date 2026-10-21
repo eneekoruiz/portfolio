@@ -27,7 +27,7 @@ test("automatic technology orbits support keyboard and wheel, pause offscreen, a
     "Orbit interaction coverage uses a fine pointer",
   );
   await page.addInitScript(() =>
-    localStorage.setItem("portfolio-motion-enabled", "true"),
+    sessionStorage.setItem("portfolio-motion-enabled", "true"),
   );
   await page.goto("/");
   const card = page.locator("[data-skill-card]").first();

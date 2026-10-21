@@ -20,6 +20,12 @@ export function useProjectTension(
     const panels = Array.from(
       host.querySelectorAll<HTMLElement>("[data-work-panel]"),
     );
+    // Custom properties inherit: written on the card they restyle every node of
+    // its code preview each frame. Only the frame and the glint read them.
+    const frame = visual?.querySelector<HTMLElement>(".project-visual-frame") ?? null;
+    const glint = visual?.querySelector<HTMLElement>(".project-visual-glint") ?? null;
+    let lastEnergy = "";
+    let lastDepth = "";
     const wave = new SpringValue(0, 105 - Math.min(index, 4) * 9, 18);
     const x = new SpringValue(0, 130, 20),
       y = new SpringValue(0, 130, 20);
@@ -41,12 +47,20 @@ export function useProjectTension(
         title.style.transform = `perspective(900px) translate3d(${px * 5}px,${flow * -7}px,${glow * 12}px) rotateX(${flow * 6 - py * 3}deg) rotateY(${px * 5}deg) skewY(${flow * 0.8}deg)`;
         title.style.willChange = moving ? "transform" : "";
       }
-      host.style.setProperty("--work-turn", `${flow * 18 + px * 12}deg`);
-      host.style.setProperty("--work-energy", String(glow));
+      const energyValue = glow.toFixed(3);
+      if (glint && energyValue !== lastEnergy) {
+        lastEnergy = energyValue;
+        glint.style.setProperty("--work-energy", energyValue);
+      }
       if (visual) {
         visual.style.transform = `perspective(1000px) translate3d(${px * -5}px,${py * -5}px,${glow * 14}px) rotateX(${py * -5 + flow * 2}deg) rotateY(${px * 7}deg)`;
-        visual.style.setProperty("--preview-depth", `${glow * 12}px`);
         visual.style.willChange = moving ? "transform" : "";
+        const depth = `${(glow * 12).toFixed(2)}px`;
+        if (depth !== lastDepth) {
+          lastDepth = depth;
+          frame?.style.setProperty("--preview-depth", depth);
+          glint?.style.setProperty("--preview-depth", depth);
+        }
       }
       let complete = true;
       reveal.forEach((spring, i) => {
@@ -119,9 +133,9 @@ export function useProjectTension(
       host.removeEventListener("project-tension-update", wake);
       window.removeEventListener("scroll", wake);
       document.removeEventListener("visibilitychange", wake);
-      host.style.removeProperty("--work-turn");
-      host.style.removeProperty("--work-energy");
-      visual?.style.removeProperty("--preview-depth");
+      glint?.style.removeProperty("--work-energy");
+      frame?.style.removeProperty("--preview-depth");
+      glint?.style.removeProperty("--preview-depth");
       for (const element of [title, visual, ...panels]) {
         if (element) element.style.transform = element.style.willChange = "";
       }

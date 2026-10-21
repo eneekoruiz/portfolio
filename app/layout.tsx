@@ -56,13 +56,9 @@ export default async function RootLayout({
               (function() {
                 try {
                   var q = new URLSearchParams(location.search);
-                  if (q.get('lite') === '1') {
-                    window.__LITE = true;
-                    localStorage.setItem('lite', '1');
-                    document.documentElement.setAttribute('data-lite', '1');
-                    return;
-                  }
-                  if (localStorage.getItem('lite') === '1') {
+                  localStorage.removeItem('lite');
+                  if (q.get('lite') === '1') sessionStorage.setItem('lite', '1');
+                  if (sessionStorage.getItem('lite') === '1') {
                     window.__LITE = true;
                     document.documentElement.setAttribute('data-lite', '1');
                     return;

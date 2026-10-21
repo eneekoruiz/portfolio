@@ -23,11 +23,11 @@ export function triggerTectonicImpact(
 }
 
 /**
- * The breach the hero cinematic opens in the sand. Fractions of the stage size;
- * `open` 0..1 drives width and propagation, `glow` the ember light inside it.
- * Mutated by GSAP; call wakeSand() after each change so the field redraws.
+ * The split the hero cinematic opens in the sand. Fractions of the stage size;
+ * `open` 0..1 drives width and propagation, `pour` the grains sliding down its
+ * walls. Mutated by GSAP; call wakeSand() after each change so the field redraws.
  */
-export const sandCrack = { x: 0.5, y: 0.5, length: 0.46, open: 0, glow: 0 };
+export const sandCrack = { x: 0.5, y: 0.5, length: 0.46, open: 0, pour: 0 };
 
 export function wakeSand() {
   if (typeof window !== "undefined")

@@ -282,7 +282,7 @@ export function PremiumWorkRow({
               aria-label={copy.source}
               className="flex items-center gap-1.5 font-mono text-[11px] text-lead hover:text-ink transition-colors"
             >
-              <span>GITHUB_SRC</span>
+              <span>GitHub</span>
               <ArrowUpRight size={13} aria-hidden="true" />
             </a>
           )}

@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     window.__LITE = true;
-    localStorage.setItem("portfolio-motion-enabled", "false");
+    sessionStorage.setItem("portfolio-motion-enabled", "false");
     localStorage.setItem("portfolio_lang", "es");
   });
   await page.route("**/api/github/repos?**", (route) =>
