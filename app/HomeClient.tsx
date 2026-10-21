@@ -13,7 +13,6 @@ import { getFeaturedProjects } from "./lib/github";
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { usePreferredMotion } from "./hooks/usePreferredMotion";
 import { useMotionEnabled } from "./hooks/useMotionEnabled";
-import { useGreeting } from "./hooks/useGreeting";
 import { useTheme } from "next-themes";
 import { useTranslations } from "./hooks/useTranslations";
 import { useScrollReveal } from "./hooks/useScrollReveal";
@@ -133,7 +132,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   // GSAP visuals & entry stagger sequences
   useGsapOrchestration(main, ready, reduced);
 
-  const greeting = useGreeting(t.times, t.greetingFn);
   const featuredProjects = useMemo(
     () => (t ? getFeaturedProjects(t) : initialGitHubData.top3),
     [t, initialGitHubData.top3],
@@ -253,7 +251,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
         <MemoHero
           t={t}
-          greeting={greeting}
           reduced={reduced}
           phase={phase}
           lang={lang}

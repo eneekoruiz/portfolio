@@ -128,9 +128,9 @@ test("cinematic studio stays clear through scroll progress and reverses into the
 
   await page.addInitScript(() => {
     window.__LITE = true;
-    localStorage.setItem("lite", "1");
+    sessionStorage.setItem("lite", "1");
     localStorage.setItem("portfolio_lang", "es");
-    localStorage.setItem("portfolio-motion-enabled", "true");
+    sessionStorage.setItem("portfolio-motion-enabled", "true");
   });
 
   for (const viewport of viewports) {

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
-import { LiveStatus } from "../ui/LiveStatus";
+import { ArrowUpRight } from "lucide-react";
 import { useSpringHover } from "../../hooks/useSpringHover";
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { useHeroLight } from "../../hooks/useHeroLight";
@@ -17,7 +16,6 @@ import { useHeroCinematic } from "../../hooks/useHeroCinematic";
 
 interface HeroProps {
   t: Tx;
-  greeting: string;
   reduced: boolean;
   phase: string;
   lang?: Lang;
@@ -26,7 +24,6 @@ interface HeroProps {
 
 export function Hero({
   t,
-  greeting,
   reduced,
   phase,
   lang = "es",
@@ -86,15 +83,6 @@ export function Hero({
           {WELCOME_WORDS[lang] ?? WELCOME_WORDS.en}
         </p>
       )}
-      <div
-        data-cine-ui
-        className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 border-b border-ink/10 pb-3 md:pb-4 shrink-0"
-      >
-        <p className="text-xs font-medium tracking-wide text-lead">
-          {greeting}
-        </p>
-        <LiveStatus label={t.status} />
-      </div>
       <div className="hero-composition relative mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center justify-center text-center py-2 md:py-3 my-auto">
         <div className="relative z-10 flex flex-col items-center w-full">
           <h1
@@ -137,7 +125,7 @@ export function Hero({
       </div>
       <div
         data-cine-ui
-        className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 md:gap-6 border-t border-ink/15 py-2.5 md:py-3.5 shrink-0"
+        className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-center gap-3 md:gap-6 border-t border-ink/15 py-2.5 md:py-3.5 shrink-0"
       >
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
           <SignatureLink
@@ -172,10 +160,6 @@ export function Hero({
             </button>
           )}
         </div>
-        <span className="hidden items-center gap-4 font-mono text-[10px] uppercase tracking-[0.18em] text-lead md:flex">
-          {t.scroll}
-          <ArrowDown size={14} aria-hidden="true" />
-        </span>
       </div>
     </section>
   );

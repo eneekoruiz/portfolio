@@ -700,7 +700,7 @@ export const TX: Record<Lang, Tx> = {
       "IA y Agentes LLM",
     ],
     woLb: "Proyectos",
-    woH: "Selected Works.",
+    woH: "Mis proyectos.",
     projectWhoDesc:
       "Backend de un juego de adivinar futbolistas con Node.js, Express y MongoDB.",
     projectRidesDesc:
@@ -768,7 +768,7 @@ export const TX: Record<Lang, Tx> = {
       "AI & LLM Agents",
     ],
     woLb: "Projects",
-    woH: "Selected Works.",
+    woH: "My projects.",
     projectWhoDesc:
       "Backend server for a football player guessing game built with Node.js, Express, and MongoDB.",
     projectRidesDesc:
@@ -843,7 +843,7 @@ export const TX: Record<Lang, Tx> = {
       "AI eta Agente LLM",
     ],
     woLb: "Proiektuak",
-    woH: "Hautatutako lanak.",
+    woH: "Nire proiektuak.",
     projectWhoDesc:
       "Futbolariak asmatzeko joko baten backend zerbitzaria, Node.js, Express eta MongoDBrekin eraikia.",
     projectRidesDesc:
@@ -911,7 +911,7 @@ export const TX: Record<Lang, Tx> = {
       "IA & Agents LLM",
     ],
     woLb: "Projets",
-    woH: "Travaux sélectionnés.",
+    woH: "Mes projets.",
     projectWhoDesc:
       "Serveur backend pour un jeu de football (Node.js, Express, MongoDB).",
     projectRidesDesc:
@@ -979,7 +979,7 @@ export const TX: Record<Lang, Tx> = {
       "IA e Agenti LLM",
     ],
     woLb: "Progetti",
-    woH: "Lavori selezionati.",
+    woH: "I miei progetti.",
     projectWhoDesc:
       "Server backend per gioco di calcio (Node.js, Express, MongoDB).",
     projectRidesDesc:
@@ -1046,7 +1046,7 @@ export const TX: Record<Lang, Tx> = {
       "KI & LLM Agenten",
     ],
     woLb: "Projekte",
-    woH: "Ausgewählte Arbeiten.",
+    woH: "Meine Projekte.",
     projectWhoDesc:
       "Backend-Server für Fußball-Ratespiel (Node.js, Express, MongoDB).",
     projectRidesDesc: "Java-Mitfahrplattform mit 3-Schicht-Architektur.",
@@ -1112,7 +1112,7 @@ export const TX: Record<Lang, Tx> = {
       "IA e Agentes LLM",
     ],
     woLb: "Projetos",
-    woH: "Trabalhos selecionados.",
+    woH: "Meus projetos.",
     projectWhoDesc:
       "Servidor backend para jogo de futebol (Node.js, Express, MongoDB).",
     projectRidesDesc: "Plataforma ride-sharing Java com arquitetura 3-tier.",
@@ -1177,7 +1177,7 @@ export const TX: Record<Lang, Tx> = {
       "IA i models de llenguatge",
     ],
     woLb: "Projectes",
-    woH: "Treballs seleccionats.",
+    woH: "Els meus projectes.",
     projectWhoDesc:
       "Servidor backend per a joc de futbol (Node.js, Express, MongoDB).",
     projectRidesDesc:
@@ -1251,7 +1251,7 @@ export const TX: Record<Lang, Tx> = {
       "IA e modelos de linguaxe",
     ],
     woLb: "Proxectos",
-    woH: "Traballos seleccionados.",
+    woH: "Os meus proxectos.",
     projectWhoDesc:
       "Servidor backend para xogo de fútbol (Node.js, Express, MongoDB).",
     projectRidesDesc: "Plataforma ride-sharing Java con arquitectura 3-tier.",
@@ -1323,7 +1323,7 @@ export const TX: Record<Lang, Tx> = {
       "AI・大規模言語モデル",
     ],
     woLb: "プロジェクト",
-    woH: "厳選した作品。",
+    woH: "私のプロジェクト。",
     projectWhoDesc:
       "Node.js、Express、MongoDBで構築されたサッカー選手推測ゲームのバックエンドサーバー。",
     projectRidesDesc:
@@ -1389,7 +1389,7 @@ export const TX: Record<Lang, Tx> = {
       "人工智能与LLM代理",
     ],
     woLb: "项目作品",
-    woH: "精选代表作。",
+    woH: "我的项目。",
     projectWhoDesc:
       "基于 Node.js, Express 和 MongoDB 构建的足球运动员竞猜游戏后端服务。",
     projectRidesDesc:
@@ -1455,7 +1455,7 @@ export const TX: Record<Lang, Tx> = {
       "الذكاء الاصطناعي ووكلاء LLM",
     ],
     woLb: "المشاريع",
-    woH: "أعمال مختارة.",
+    woH: "مشاريعي.",
     projectWhoDesc:
       "خادم خلفي للعبة تخمين لاعبي كرة القدم تم بناؤه باستخدام Node.js و Express و MongoDB.",
     projectRidesDesc:
@@ -1523,7 +1523,7 @@ export const TX: Record<Lang, Tx> = {
       "ИИ и LLM агенты",
     ],
     woLb: "Проекты",
-    woH: "Selected Works.",
+    woH: "Мои проекты.",
     projectWhoDesc:
       "Бэкенд игры-угадайки футболистов на Node.js, Express и MongoDB.",
     projectRidesDesc:
@@ -1590,7 +1590,7 @@ export const TX: Record<Lang, Tx> = {
       "AI 및 LLM 에이전트",
     ],
     woLb: "프로젝트",
-    woH: "Selected Works.",
+    woH: "내 프로젝트.",
     projectWhoDesc:
       "Node.js, Express 및 MongoDB로 구축된 축구 선수 맞추기 게임 백엔드.",
     projectRidesDesc:
@@ -1658,7 +1658,7 @@ export const TX: Record<Lang, Tx> = {
       "AI और LLM एजेंट",
     ],
     woLb: "परियोजनाएं",
-    woH: "Selected Works.",
+    woH: "मेरी परियोजनाएं।",
     projectWhoDesc:
       "Node.js, Express और MongoDB के साथ फुटबॉल खिलाड़ी का अनुमान लगाने वाले खेल का बैकएंड.",
     projectRidesDesc:
@@ -1733,7 +1733,7 @@ export const TX: Record<Lang, Tx> = {
       "Yapay Zeka ve LLM Ajanları",
     ],
     woLb: "Projeler",
-    woH: "Selected Works.",
+    woH: "Projelerim.",
     projectWhoDesc:
       "Node.js, Express ve MongoDB ile geliştirilmiş futbolcu tahmin oyunu backend sistemi.",
     projectRidesDesc:
@@ -1801,7 +1801,7 @@ export const TX: Record<Lang, Tx> = {
       "AI & LLM Agenten",
     ],
     woLb: "Projecten",
-    woH: "Selected Works.",
+    woH: "Mijn projecten.",
     projectWhoDesc:
       "Backend van een voetbalspeler-raadspel met Node.js, Express en MongoDB.",
     projectRidesDesc:
@@ -1869,7 +1869,7 @@ export const TX: Record<Lang, Tx> = {
       "AI & LLM-agenter",
     ],
     woLb: "Projekt",
-    woH: "Selected Works.",
+    woH: "Mina projekt.",
     projectWhoDesc:
       "Backend för fotbollsgissningsspel byggt med Node.js, Express och MongoDB.",
     projectRidesDesc:
@@ -1944,7 +1944,7 @@ export const TX: Record<Lang, Tx> = {
       "AI i Agenci LLM",
     ],
     woLb: "Projekty",
-    woH: "Selected Works.",
+    woH: "Moje projekty.",
     projectWhoDesc:
       "Backend gry w zgadywanie piłkarzy zbudowany w Node.js, Express i MongoDB.",
     projectRidesDesc:
@@ -2019,7 +2019,7 @@ export const TX: Record<Lang, Tx> = {
       "AI & LLM Agent",
     ],
     woLb: "Dự án",
-    woH: "Selected Works.",
+    woH: "Dự án của tôi.",
     projectWhoDesc:
       "Backend của trò chơi đoán cầu thủ bóng đá với Node.js, Express và MongoDB.",
     projectRidesDesc:

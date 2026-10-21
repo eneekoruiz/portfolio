@@ -15,6 +15,7 @@ import { Flip } from "gsap/Flip";
 import {
   materia,
   setMateriaPalette,
+  wakeMateria,
   type OpticalSurface,
 } from "../../lib/materia";
 import { SpringValue } from "../../lib/spring";
@@ -149,6 +150,7 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         destinationVisual?.style.removeProperty("view-transition-name");
         materia.surfaces.delete(optical);
         materia.warp.target = 0;
+        wakeMateria();
         umbral.active = false;
         journeyRef.current = null;
         delete document.documentElement.dataset.umbral;

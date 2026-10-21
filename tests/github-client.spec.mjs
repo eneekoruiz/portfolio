@@ -62,7 +62,7 @@ test("malformed optional data preserves valid activity and deduplicates language
   await expect(activity.getByText("TypeScript", { exact: true })).toHaveCount(
     1,
   );
-  await expect(activity.getByText("1_repos", { exact: true })).toBeVisible();
+  await expect(activity.getByText("1 repos", { exact: true })).toBeVisible();
   expect(calls).toBe(1);
   expect(errors).toEqual([]);
   expect(keyWarnings).toEqual([]);

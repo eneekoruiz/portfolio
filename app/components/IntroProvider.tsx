@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { clearNavState } from "../lib/navigationPersistence";
 
 export type IntroPhase = "checking" | "overture" | "ready";
 
@@ -19,18 +20,25 @@ interface IntroContextValue {
 
 const IntroContext = createContext<IntroContextValue | null>(null);
 
-const STORAGE_KEY = "portfolio_intro_seen_v5";
-
-function checkIsFirstVisit(): boolean {
+// The opening shot plays on every full load of the home page (it is short and
+// any input skips it). Client-side returns keep the provider mounted, so it
+// never replays when coming back from a case study.
+function shouldPlayIntro(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-      return false;
-    if (localStorage.getItem("portfolio-motion-enabled") === "false")
-      return false;
-    // En desarrollo siempre permitir ver la intro completa para testeo
-    if (process.env.NODE_ENV === "development") return true;
-    return !sessionStorage.getItem(STORAGE_KEY);
+    if (location.pathname !== "/" || location.hash) return false;
+    const entry = performance.getEntriesByType("navigation")[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    // Back from a case study restores the reel position instead.
+    if (entry?.type === "back_forward") return false;
+    // A fresh load or a reload starts at the top: a stale saved position used
+    // to drop the page mid-way and play the opening off-screen.
+    clearNavState();
+    history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+    window.__lenis?.scrollTo(0, { immediate: true, force: true });
+    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   } catch {
     return false;
   }
@@ -41,19 +49,12 @@ export function IntroProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<IntroPhase>("overture");
 
   useEffect(() => {
-    if (!checkIsFirstVisit()) {
+    if (!shouldPlayIntro()) {
       setPhase("ready");
     }
   }, []);
 
-  const markSeen = useCallback(() => {
-    try {
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem(STORAGE_KEY, "true");
-      }
-    } catch {}
-    setPhase("ready");
-  }, []);
+  const markSeen = useCallback(() => setPhase("ready"), []);
 
   const value = useMemo(
     () => ({ phase, setPhase, markSeen }),

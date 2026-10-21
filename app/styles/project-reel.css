@@ -1,8 +1,18 @@
 /* Selected works reel. Every card is one screen tall at most; opening the
-   details never grows the card, the title and preview contract instead. */
+   details never grows the card, the title and preview contract instead.
+   The track is the horizontal scroller in every mode. */
 .projects-reel {
   display: flex;
   gap: clamp(14px, 2.4vw, 32px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--reel-gutter);
+  margin-inline: calc(var(--reel-gutter) * -1);
+  padding: 4px var(--reel-gutter) 8px;
+  scrollbar-width: none;
+}
+.projects-reel::-webkit-scrollbar {
+  display: none;
 }
 .projects-reel-item {
   display: flex;
@@ -10,6 +20,13 @@
   height: min(calc(100svh - 9rem), 680px);
   min-width: 0;
   min-height: 0;
+  scroll-snap-align: start;
+}
+/* The reel slides over the flat page colour: a backdrop blur would be
+   recomputed on every frame of travel for no visible difference. */
+.projects-reel-item > .materia-surface {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .projects-reel-item > .work-surface {
   display: flex;
@@ -23,9 +40,15 @@
   flex: 1 1 auto;
   min-height: 0;
 }
+/* The story gives way before the action bar: text is clipped, never overlapped. */
 .projects-reel-item .work-story {
   flex: 1 1 auto;
   min-height: 0;
+  overflow: hidden;
+}
+.projects-reel-item .work-copy {
+  min-height: 0;
+  overflow: hidden;
 }
 .projects-reel-item .work-preview .project-visual {
   height: clamp(110px, 30svh, 300px);
@@ -38,11 +61,23 @@
   overscroll-behavior: contain;
 }
 
-/* Pinned: the section is a scroll runway; the stage sticks for its whole length. */
-.projects-reel-section[data-reel="pinned"] {
-  height: calc(100svh + var(--reel-distance, 0px));
-  max-width: none;
-  padding: 0;
+.projects-reel-section {
+  --reel-gutter: 1.25rem;
+}
+@media (min-width: 768px) {
+  .projects-reel-section {
+    --reel-gutter: 2.5rem;
+  }
+}
+.projects-reel-stage {
+  padding-inline: var(--reel-gutter);
+}
+
+/* Pinned: the runway is as tall as the scroll spent on the held cards; the
+   stage sticks for its length and lets go after the last one. The title above
+   scrolls away once instead of riding along with every card. */
+.projects-reel-section[data-reel="pinned"] .projects-reel-runway {
+  height: calc(100svh + var(--reel-runway, 0px));
 }
 .projects-reel-section[data-reel="pinned"] .projects-reel-stage {
   position: sticky;
@@ -50,42 +85,69 @@
   display: flex;
   flex-direction: column;
   height: 100svh;
-  max-width: 1440px;
-  margin-inline: auto;
-  padding: clamp(5.5rem, 11svh, 7rem) 1.25rem 1.25rem;
+  padding-top: clamp(5rem, 10svh, 6.5rem);
+  padding-bottom: 1rem;
   overflow: hidden;
 }
-@media (min-width: 768px) {
-  .projects-reel-section[data-reel="pinned"] .projects-reel-stage {
-    padding-inline: 2.5rem;
-  }
-}
-.projects-reel-section[data-reel="pinned"] .projects-reel-viewport {
+.projects-reel-section[data-reel="pinned"] .projects-reel {
   flex: 1;
   min-height: 0;
-}
-.projects-reel-section[data-reel="pinned"] .projects-reel {
-  height: 100%;
-  will-change: transform;
 }
 .projects-reel-section[data-reel="pinned"] .projects-reel-item {
   height: 100%;
 }
-
-/* Snap (touch or motion off): native horizontal scroll, one card per stop. */
-.projects-reel-section[data-reel="snap"] .projects-reel {
-  overflow-x: auto;
+/* Held: the page scroll drives the reel, so the track ignores its own gestures. */
+.projects-reel[data-free="false"] {
+  overflow-x: hidden;
+}
+.projects-reel[data-free="true"] {
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: 1.25rem;
-  margin-inline: -1.25rem;
-  padding: 4px 1.25rem 8px;
-  scrollbar-width: none;
 }
-.projects-reel-section[data-reel="snap"] .projects-reel::-webkit-scrollbar {
-  display: none;
+
+.projects-header {
+  padding-bottom: clamp(1rem, 3svh, 2rem);
 }
-.projects-reel-section[data-reel="snap"] .projects-reel-item {
-  scroll-snap-align: start;
+
+.projects-reel-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+.projects-reel-footer .projects-reel-progress {
+  flex: 1;
+  margin-top: 0;
+}
+.projects-reel-arrow {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  color: var(--ink);
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.projects-reel-arrow:hover {
+  border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+}
+.projects-reel-arrow:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.projects-reel[data-at-start="true"] ~ .projects-reel-footer [data-reel-prev],
+.projects-reel[data-at-end="true"] ~ .projects-reel-footer [data-reel-next] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+/* Once released with cards left, the next arrow says so without words. */
+.projects-reel[data-free="true"][data-at-end="false"] ~ .projects-reel-footer [data-reel-next] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--page);
 }
 
 .projects-reel-progress {

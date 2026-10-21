@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
-import { materia } from "../lib/materia";
+import { materia, wakeMateria } from "../lib/materia";
 
 const CHAPTERS = ["hero", "work", "about", "skills", "values", "contact"];
 const COMPOSITIONS = [1, -0.65, 0.75, -0.55, 0.55, 0.1];
@@ -29,7 +29,10 @@ export function useSceneJourney(
     let frame = 0;
     let needsMeasure = true;
     let lastTint = "";
-    const root = document.documentElement;
+    // Only the few elements that paint the chapter colour get it. Setting it on
+    // the root used to restyle the whole document on every step of the scroll.
+    const CONSUMERS = "#scroll-progress, .hud-vignette, .projects-reel-progress";
+    let consumers: HTMLElement[] = [];
     const update = () => {
       frame = 0;
       if (needsMeasure) {
@@ -39,6 +42,7 @@ export function useSceneJourney(
             ? section.getBoundingClientRect().top + window.scrollY
             : Infinity;
         });
+        consumers = Array.from(document.querySelectorAll<HTMLElement>(CONSUMERS));
         needsMeasure = false;
       }
       const cursor = window.scrollY + window.innerHeight * 0.2;
@@ -58,12 +62,12 @@ export function useSceneJourney(
           COMPOSITIONS[index] +
           (COMPOSITIONS[next] - COMPOSITIONS[index]) * blend;
       }
-      // Quantised so the root custom property (full style recalc) changes ~20 times per chapter, not every frame.
+      // Quantised so the colour changes ~20 times per chapter, not every frame.
       const mix = Math.round((1 - blend) * TINT_STEPS) * (100 / TINT_STEPS);
       const tint = `color-mix(in oklab, ${TINTS[index]} ${mix}%, ${TINTS[next]})`;
       if (tint !== lastTint) {
         lastTint = tint;
-        root.style.setProperty("--chapter", tint);
+        for (const element of consumers) element.style.setProperty("--chapter", tint);
       }
     };
     const queue = () => {
@@ -79,12 +83,13 @@ export function useSceneJourney(
     window.addEventListener("resize", measure);
     if (motion) materia.studio.target = 0;
     update();
+    wakeMateria();
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener("scroll", queue);
       window.removeEventListener("resize", measure);
-      root.style.removeProperty("--chapter");
+      for (const element of consumers) element.style.removeProperty("--chapter");
     };
   }, [ready, motion, ref]);
 }

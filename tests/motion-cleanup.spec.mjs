@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }, info) => {
   );
   await page.addInitScript(() => {
     localStorage.setItem("portfolio_lang", "es");
-    localStorage.setItem("portfolio-motion-enabled", "true");
+    sessionStorage.setItem("portfolio-motion-enabled", "true");
     Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 16 });
     Object.defineProperty(navigator, "deviceMemory", { get: () => 8 });
   });
