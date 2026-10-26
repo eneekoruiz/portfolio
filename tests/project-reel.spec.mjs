@@ -108,7 +108,7 @@ test("every card is one glance: it fits the screen and its text never runs under
     expect(card.links).toBe(1);
     expect(card.actionInside).toBe(true);
   }
-  await expect(page.locator("button[aria-expanded]")).toHaveCount(0);
+  await expect(page.locator(".work-card button")).toHaveCount(0);
 });
 
 test("motion and the opening are on by default, even with stale stored state", async ({
