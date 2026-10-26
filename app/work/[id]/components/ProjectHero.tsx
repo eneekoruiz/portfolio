@@ -36,7 +36,7 @@ import {
 import { useMotionPolicy } from "../../../hooks/useMotionEnabled";
 import type { Lang } from "../../../types";
 import { STUDIO_TX } from "../../../data/studio-translations";
-import { materia } from "../../../lib/materia";
+import { materia, wakeMateria } from "../../../lib/materia";
 import { UI_COPY } from "../../../data/interface-translations";
 import { TX } from "../../../data/translations";
 import { ProjectVisual } from "../../../components/motion/ProjectVisual";
@@ -454,6 +454,7 @@ export function ProjectHero({
         window.removeEventListener("mousemove", onMove);
         idleTweenRef.current = null;
         materia.studio.target = 0;
+        wakeMateria();
       };
     },
     {

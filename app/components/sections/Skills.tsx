@@ -316,7 +316,7 @@ function SkillOrbit({
 export function Skills({ t }: { t: Tx; lang?: Lang }) {
   const motion = useMotionEnabled();
   return (
-    <SectionFrame id="skills" index="03" label={t.skLb} title={t.skH}>
+    <SectionFrame id="skills" title={t.skH}>
       <div className="skills-grid grid">
         {SKILLS.map((category, index) => (
           <SkillOrbit

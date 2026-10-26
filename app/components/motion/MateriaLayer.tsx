@@ -13,7 +13,7 @@ import { useTheme } from "next-themes";
 import gsap from "gsap";
 
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
-import { materia, tickMateria } from "../../lib/materia";
+import { materia, onMateriaWake, tickMateria } from "../../lib/materia";
 import { StaticDNA } from "./StaticDNA";
 
 const CanvasScene = dynamic(
@@ -83,15 +83,36 @@ export function MateriaLayer() {
     observer.observe(hero);
     return () => observer.disconnect();
   }, [pathname]);
+  // The springs only tick while something moves: an idle page keeps no
+  // animation loop alive. Input wakes it, with a short grace period so
+  // targets set a moment later (debounced hovers, effects) are not missed.
   useEffect(() => {
     if (!enabled) return;
+    let running = false;
+    let awakeUntil = 0;
     const tick = (_time: number, delta: number) => {
-      if (document.visibilityState === "visible") {
-        tickMateria(delta);
+      if (document.visibilityState !== "visible") return;
+      const busy = tickMateria(delta);
+      if (!busy && performance.now() > awakeUntil) {
+        gsap.ticker.remove(tick);
+        running = false;
       }
     };
-    gsap.ticker.add(tick);
+    const wake = () => {
+      awakeUntil = performance.now() + 400;
+      if (running) return;
+      running = true;
+      gsap.ticker.add(tick);
+    };
+    const events = ["scroll", "pointermove", "pointerdown", "keydown", "resize", "focusin"];
+    for (const type of events)
+      window.addEventListener(type, wake, { passive: true, capture: true });
+    onMateriaWake(wake);
+    wake();
     return () => {
+      for (const type of events)
+        window.removeEventListener(type, wake, { capture: true });
+      onMateriaWake(null);
       gsap.ticker.remove(tick);
     };
   }, [enabled]);

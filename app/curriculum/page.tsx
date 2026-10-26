@@ -20,7 +20,6 @@ export default function CurriculumPage() {
   const { t, ui } = useTranslations();
   const router = useRouter();
   const { theme, resolvedTheme } = useTheme();
-  const [iframeHeight, setIframeHeight] = useState("100%");
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
@@ -39,13 +38,16 @@ export default function CurriculumPage() {
         }
       }
       if (e.data.type === "set-cv-height") {
-        setIframeHeight(`${e.data.height}px`);
         setLoading(false);
         setHasError(false);
         setShowFallback(false);
       }
     };
     window.addEventListener("message", handleMessage);
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "request-cv-ready" },
+      "https://eneko-ruiz-curriculum.vercel.app",
+    );
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
@@ -171,6 +173,7 @@ export default function CurriculumPage() {
             href="https://eneko-ruiz-curriculum.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={t.openDirect}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-page text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
           >
             <ExternalLink size={14} />
@@ -210,7 +213,7 @@ export default function CurriculumPage() {
             ref={iframeRef}
             src="https://eneko-ruiz-curriculum.vercel.app"
             title={`Eneko Ruiz · ${t.ctaCv}`}
-            style={{ height: iframeHeight }}
+            style={{ height: "100%" }}
             className={`w-full border-none transition-all duration-1000 ${loading ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
             allow="web-share; clipboard-write"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"

@@ -6,6 +6,7 @@ import { Server, Radar, CheckCircle2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useViewportMotion } from "../hooks/useViewportMotion";
 import { useMotionPolicy } from "../hooks/useMotionEnabled";
+import { getMotionSnapshot } from "../lib/motion-store";
 
 const getAdaptivePixelRatio = () => Math.min(window.devicePixelRatio || 1, 1.5);
 
@@ -48,9 +49,7 @@ export const DNAHelix = ({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const initial =
-      sessionStorage.getItem("portfolio-motion-enabled") !== "false";
-    motionEnabledRef.current = initial;
+    motionEnabledRef.current = getMotionSnapshot().allowed;
 
     const handleMotionChange = (e: Event) => {
       const customEvent = e as CustomEvent;

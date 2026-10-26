@@ -29,10 +29,7 @@ export function MotionToggle() {
     playClick();
 
     if (typeof window !== "undefined") {
-      try {
-        // Per visit: a pause must not leave the site frozen on every later visit.
-        sessionStorage.setItem("portfolio-motion-enabled", String(nextState));
-      } catch {}
+      // Not persisted: a reload always starts with motion on.
       window.dispatchEvent(
         new CustomEvent("portfolio-motion-changed", {
           detail: { enabled: nextState, userInitiated: true },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -13,7 +13,6 @@ import { getFeaturedProjects } from "./lib/github";
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { usePreferredMotion } from "./hooks/usePreferredMotion";
 import { useMotionEnabled } from "./hooks/useMotionEnabled";
-import { useGreeting } from "./hooks/useGreeting";
 import { useTheme } from "next-themes";
 import { useTranslations } from "./hooks/useTranslations";
 import { useScrollReveal } from "./hooks/useScrollReveal";
@@ -49,6 +48,7 @@ import { ProjectPreviewFollower } from "./components/motion/ProjectPreviewFollow
 // ── Motion & Sections ──────────────────────────────────────────────────────
 
 import { Hero } from "./components/sections/Hero";
+import { Overture } from "./components/motion/Overture";
 import { About } from "./components/sections/About";
 import { Skills } from "./components/sections/Skills";
 import { Projects } from "./components/sections/Projects";
@@ -96,6 +96,15 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
     color: string;
   } | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  // The overture outlives the intro phase by the time its hole takes to clear.
+  const [overtureCleared, setOvertureCleared] = useState(false);
+  const clearOverture = useCallback(() => setOvertureCleared(true), []);
+  const [overtureBlasted, setOvertureBlasted] = useState(false);
+  useEffect(() => {
+    const onBlast = () => setOvertureBlasted(true);
+    window.addEventListener("overture-impact", onBlast);
+    return () => window.removeEventListener("overture-impact", onBlast);
+  }, []);
 
   const reduced = usePreferredMotion();
   const motionEnabled = useMotionEnabled();
@@ -133,7 +142,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
   // GSAP visuals & entry stagger sequences
   useGsapOrchestration(main, ready, reduced);
 
-  const greeting = useGreeting(t.times, t.greetingFn);
   const featuredProjects = useMemo(
     () => (t ? getFeaturedProjects(t) : initialGitHubData.top3),
     [t, initialGitHubData.top3],
@@ -233,6 +241,10 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
   return (
     <>
+      {/* Without an intro to play (reduced motion, a return) it never mounts past hydration. */}
+      {!overtureCleared && (phase === "overture" || overtureBlasted) && (
+        <Overture lang={lang} onCleared={clearOverture} />
+      )}
       {/* 🚀 Main Content — Middle Layer (Occludes DNA when sections have backgrounds) */}
       <main
         ref={main}
@@ -253,10 +265,8 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
 
         <MemoHero
           t={t}
-          greeting={greeting}
           reduced={reduced}
           phase={phase}
-          lang={lang}
           onIntroComplete={onOvertureComplete}
         />
         <MemoProjects
@@ -270,8 +280,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
           BranchMergeBtn={BranchMergeBtn}
           onHoverProject={handleHoverProject}
           menu={menu}
-          expandedIdx={expandedIdx}
-          onToggleProject={setExpandedIdx}
           motionEnabled={motionEnabled}
         />
         <MemoAbout t={t} />
@@ -300,7 +308,6 @@ export default function HomeClient({ initialGitHubData }: HomeClientProps) {
       />
 
       {/* 🛠️ Masterclass Utilities */}
-      <div className="hud-vignette" aria-hidden="true" />
       <PortalTransition />
       <ProjectPreviewFollower activeProject={hoveredProject} />
     </>

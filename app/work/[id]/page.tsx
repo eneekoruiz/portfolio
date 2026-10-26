@@ -36,7 +36,7 @@ import type { Lang } from "../../types";
 import { useMagnetic } from "../../hooks/useMagnetic";
 import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { ProjectHero } from "./components/ProjectHero";
-import { materia, setMateriaPalette } from "../../lib/materia";
+import { materia, setMateriaPalette, wakeMateria } from "../../lib/materia";
 import { umbral } from "../../components/motion/UmbralProvider";
 import { usePreferredMotion } from "../../hooks/usePreferredMotion";
 import {
@@ -343,6 +343,7 @@ export default function ProjectPage() {
     materia.studio.target = 0;
     return () => {
       materia.studio.target = 0;
+      wakeMateria();
     };
   }, [theme]);
   const summary = PROJECT_SUMMARIES[safeId];
