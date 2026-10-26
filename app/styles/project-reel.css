@@ -28,37 +28,127 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-.projects-reel-item > .work-surface {
-  display: flex;
+
+/* A card: the copy and the preview, side by side; stacked on phones. */
+.work-card {
+  position: relative;
+  display: grid;
   flex: 1;
-  flex-direction: column;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(1.25rem, 3vw, 3rem);
+  align-items: center;
   min-width: 0;
   min-height: 0;
+  padding: clamp(1.25rem, 3vw, 2.75rem);
   overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: 20px;
 }
-.projects-reel-item .work-surface-header {
-  flex: 1 1 auto;
+.work-card-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.6rem, 1.6svh, 1rem);
+  min-width: 0;
+}
+.work-card-title {
+  margin: 0;
+  max-width: 100%;
+  font-family: "Materia Sans", var(--font-sans);
+  /* Sized so the longest single word ("Recordatorios") fits its column. */
+  font-size: clamp(1.9rem, min(3.7vw, 7svh), 4.2rem);
+  font-weight: 900;
+  font-variation-settings: "wdth" 80, "wght" 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  hyphens: manual;
+}
+.work-card-pitch {
+  margin: 0;
+  max-width: 30ch;
+  font-size: clamp(1.02rem, 1.4vw, 1.3rem);
+  font-weight: 550;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.work-card-tech {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--lead);
+}
+.work-card-action {
+  margin-top: clamp(0.25rem, 1.2svh, 0.9rem);
+  background: var(--ink);
+  color: var(--page);
+  pointer-events: none;
+}
+.work-card:hover .work-card-action {
+  background: var(--surface-color);
+  color: #fff;
+}
+.work-card-visual {
+  min-width: 0;
   min-height: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
 }
-/* The story gives way before the action bar: text is clipped, never overlapped. */
-.projects-reel-item .work-story {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
+/* The preview fills its half: no inner plate, no frame around the frame. */
+.work-card.work-surface .work-preview {
+  padding: 0;
+  background: none;
+  border: 0;
 }
-.projects-reel-item .work-copy {
-  min-height: 0;
-  overflow: hidden;
+.work-card .work-preview-object {
+  width: 100%;
+  padding: 0;
 }
-.projects-reel-item .work-preview .project-visual {
-  height: clamp(110px, 30svh, 300px);
-  max-height: 300px;
+.work-card .work-preview-object::before {
+  display: none;
 }
-.projects-reel-item [data-project-body] {
-  flex: 0 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+.work-card.work-surface .work-preview .project-visual {
+  width: 100%;
+  height: clamp(180px, 50svh, 480px);
+  max-height: none;
+}
+/* The card is one link; the button above is only its label. */
+.work-card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+}
+.work-card-link:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -4px;
+}
+/* Stacked only on portrait screens; sideways phones keep two columns. */
+@media (max-aspect-ratio: 3/4) {
+  .work-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .work-card-visual {
+    order: -1;
+    align-items: stretch;
+  }
+  .work-card .work-preview-object {
+    flex: 1;
+  }
+  .work-card .work-preview-object {
+    height: 100%;
+  }
+  .work-card.work-surface .work-preview .project-visual {
+    height: 100%;
+    min-height: 120px;
+  }
+  .work-card-title {
+    font-size: clamp(1.9rem, 8.5vw, 2.8rem);
+  }
 }
 
 .projects-reel-section {
@@ -105,6 +195,7 @@
 }
 
 .projects-header {
+  padding-top: clamp(5.25rem, 12svh, 7.5rem);
   padding-bottom: clamp(1rem, 3svh, 2rem);
 }
 
@@ -164,50 +255,33 @@
   transform-origin: left;
 }
 
-/* Open details: same footprint, the story makes room. */
-.projects-reel-item [data-expanded="true"] .work-hook {
-  display: none;
-}
-@media (max-width: 767px) {
-  .projects-reel-item {
-    flex-basis: calc(100vw - 2.5rem);
-    height: min(calc(100svh - 10.5rem), 620px);
-  }
-  .projects-reel-item [data-expanded="true"] .work-preview {
-    display: none;
-  }
-}
-@media (max-height: 640px) {
-  .projects-reel-item .work-hook {
-    display: none;
-  }
-}
 
-/* Phones: the preview is the only elastic element, so text never clips. */
-@media (max-width: 767px) {
-  .projects-reel-item .work-story {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+@media (max-height: 500px) {
+  .projects-reel-section[data-reel="pinned"] .projects-reel-stage {
+    padding-top: 4.25rem;
+    padding-bottom: 0.5rem;
   }
-  .projects-reel-item .work-copy {
-    flex: 0 0 auto;
+  .projects-reel-footer {
+    margin-top: 0.4rem;
   }
-  .projects-reel-item .work-preview {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow: hidden;
+  .work-card {
+    padding: 0.9rem 1.1rem;
+    gap: 1rem;
   }
-  .projects-reel-item .work-preview .project-visual {
-    height: 100%;
-    max-height: none;
+  .work-card-copy {
+    gap: 0.35rem;
   }
-  .projects-reel-item .work-tech {
-    flex-wrap: nowrap;
-    overflow: hidden;
-    mask-image: linear-gradient(90deg, black 80%, transparent);
+  .work-card-title {
+    font-size: clamp(1.3rem, 8svh, 2rem);
   }
-  .projects-reel-item [data-expanded="true"] .work-subtitle {
+  .work-card-pitch {
+    font-size: 0.92rem;
+  }
+  .work-card-tech {
     display: none;
+  }
+  .work-card-action {
+    min-height: 38px;
+    margin-top: 0.2rem;
   }
 }

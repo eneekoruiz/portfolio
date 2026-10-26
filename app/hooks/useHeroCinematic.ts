@@ -4,12 +4,17 @@ import { useEffect, type RefObject } from "react";
 import gsap from "gsap";
 import { sandCrack, triggerTectonicImpact, wakeSand } from "../lib/tectonic";
 
-const TREMOR_HITS = 7;
+/** Amplitude of the opening blast: the strongest front the sand can carry. */
+export const BLAST = 4;
+// If the overture never reports its impact, the hero still arrives.
+const FAILSAFE_MS = 9000;
 
 /**
- * Opening shot, played on the hero itself: welcome card, tremor, the sand
- * splits open and the name rises out of the split, then the interface.
- * Any key, click, wheel or touch skips to the final frame.
+ * Second half of the opening, played on the hero itself. The overture ends in
+ * an implosion and dispatches `overture-impact`; from that point one impact
+ * drives everything: the front travels through the sand and through the name
+ * (ShockType listens to the same event), the frame takes a single dry jolt, a
+ * short split scars the epicentre and the interface lands once the wave passed.
  */
 export function useHeroCinematic(
   heroRef: RefObject<HTMLElement | null>,
@@ -19,114 +24,83 @@ export function useHeroCinematic(
   useEffect(() => {
     const hero = heroRef.current;
     if (!run || !hero) return;
-    const title = hero.querySelector<HTMLElement>("h1");
-    const lines = hero.querySelectorAll<HTMLElement>("h1 > div");
-    const ui = hero.querySelectorAll<HTMLElement>("[data-cine-ui]");
-    const welcome = hero.querySelector<HTMLElement>("[data-cine-welcome]");
-    if (!title || lines.length < 2) {
-      onDone();
-      return;
-    }
-    const upper = lines[0].querySelectorAll<HTMLElement>("[data-kinetic-char]");
-    const lower = lines[1].querySelectorAll<HTMLElement>("[data-kinetic-char]");
-    const chars = [...upper, ...lower];
-
-    // The split runs between the two lines of the name.
-    const heroBox = hero.getBoundingClientRect();
-    const titleBox = title.getBoundingClientRect();
-    const splitY = titleBox.top + titleBox.height * 0.52 - heroBox.top;
-    sandCrack.x = 0.5;
-    sandCrack.y = splitY / heroBox.height;
-    sandCrack.open = 0;
-    sandCrack.pour = 0;
-    // Clip edges, in % of the title box, that sit on the split line.
-    const seam = ((splitY + heroBox.top - titleBox.top) / titleBox.height) * 100;
-    const centre = () => {
-      const box = hero.getBoundingClientRect();
-      return [box.left + box.width * sandCrack.x, box.top + box.height * sandCrack.y] as const;
-    };
-
+    const root = document.documentElement;
+    root.dataset.intro = "play";
+    const ui = [
+      ...document.querySelectorAll<HTMLElement>("[data-site-nav]"),
+      ...hero.querySelectorAll<HTMLElement>("[data-cine-ui]"),
+    ];
     let finished = false;
+    let tl: gsap.core.Timeline | null = null;
     const finish = () => {
       if (finished) return;
       finished = true;
       onDone();
     };
 
-    const tl = gsap.timeline({ onComplete: finish, onUpdate: wakeSand });
-    tl.set(upper, { opacity: 0, yPercent: 70 })
-      .set(lower, { opacity: 0, yPercent: -70 })
-      .set(title, { clipPath: `inset(${seam}% -10% ${100 - seam}% -10%)` })
-      .set(ui, { opacity: 0, y: 10 })
-      // The card sits on the split line so it can fall into it.
-      .set(welcome, { top: `${sandCrack.y * 100}%`, yPercent: -50, opacity: 0, y: 8, letterSpacing: "0.35em" });
-
-    // 1 · Stillness: the welcome card settles on calm sand.
-    tl.to(welcome, { opacity: 1, y: 0, letterSpacing: "0.12em", duration: 0.8, ease: "power3.out" }, 0.1);
-
-    // 2 · Tremor: grains jump and the card loses its footing.
-    tl.add(() => {
-      for (let i = 0; i < TREMOR_HITS; i++)
-        gsap.delayedCall(i * 0.1, () => {
-          const [x, y] = centre();
-          triggerTectonicImpact(
-            x + (Math.random() - 0.5) * heroBox.width * 0.5,
-            y + (Math.random() - 0.5) * 90,
-            0.22 + Math.random() * 0.15,
-          );
-        });
-    }, 0.9);
-    tl.to(hero, { x: 2, y: -1.5, duration: 0.05, repeat: 11, yoyo: true, ease: "none" }, 0.9)
-      .set(hero, { x: 0, y: 0 }, 1.5);
-
-    // 3 · The sand splits from the centre outwards; the card drops into it.
-    tl.to(sandCrack, { open: 0.55, duration: 0.7, ease: "expo.out" }, 1.35)
-      .to(sandCrack, { pour: 1, duration: 0.4, ease: "power1.out" }, 1.4)
-      .to(welcome, { opacity: 0, y: 22, scaleY: 0.6, filter: "blur(4px)", duration: 0.4, ease: "power3.in" }, 1.4);
-
-    // 4 · The split widens and the name rises out of it: the first line climbs
-    // up from the seam, the second drops down from it.
-    tl.to(sandCrack, { open: 1, duration: 0.9, ease: "power3.out" }, 1.85)
-      .to(title, { clipPath: "inset(-10% -10% -10% -10%)", duration: 1.1, ease: "expo.out" }, 1.9)
-      .to(upper, { opacity: 1, yPercent: 0, duration: 0.9, ease: "expo.out", stagger: 0.05 }, 1.9)
-      .to(lower, { opacity: 1, yPercent: 0, duration: 0.9, ease: "expo.out", stagger: 0.05 }, 1.98);
-
-    // 5 · Impact, then the sand slides back in and fills the split.
-    tl.add(() => {
-      const [x, y] = centre();
-      triggerTectonicImpact(x, y, 1.6);
-    }, 2.6)
-      .to(sandCrack, { open: 0, duration: 1.7, ease: "power2.inOut" }, 2.8)
-      .to(sandCrack, { pour: 0, duration: 1.7, ease: "power2.in" }, 2.8);
-
-    // 6 · The interface arrives once the ground is quiet.
-    // Inline styles are cleared in the cleanup, after the phase change removes
-    // the hiding CSS; clearing them here would blink everything out for a frame.
-    tl.to(ui, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out", stagger: 0.07 }, 2.75);
-
-    // Wheel input in the first instants is usually leftover inertia from the
-    // previous page, not a request to skip; keys and clicks always skip.
-    const armedAt = performance.now() + 450;
-    const skip = (event: Event) => {
-      const scrolling = event.type === "wheel" || event.type === "touchmove";
-      if (scrolling && performance.now() < armedAt) return;
-      if (event instanceof KeyboardEvent && ["Tab", "Shift", "Alt", "Control", "Meta"].includes(event.key))
-        return;
-      if (event instanceof WheelEvent && Math.abs(event.deltaY) + Math.abs(event.deltaX) < 4) return;
-      tl.progress(1);
+    const blast = (x: number, y: number) => {
+      if (tl) return;
+      const box = hero.getBoundingClientRect();
+      sandCrack.x = (x - box.left) / box.width;
+      sandCrack.y = (y - box.top) / box.height;
+      sandCrack.length = Math.min(0.16, 240 / box.width);
       sandCrack.open = 0;
       sandCrack.pour = 0;
-      wakeSand();
+      tl = gsap.timeline({ onComplete: finish, onUpdate: wakeSand });
+      tl.set(ui, { opacity: 0, y: 14 });
+      // The impact: sand and type take the same front.
+      tl.add(() => triggerTectonicImpact(x, y, BLAST), 0);
+      // One dry jolt, not a long tremor.
+      tl.to(hero, {
+        keyframes: [
+          { x: -7, y: 3, duration: 0.05 },
+          { x: 5, y: -2, duration: 0.06 },
+          { x: -2, y: 1, duration: 0.07 },
+          { x: 0, y: 0, duration: 0.1 },
+        ],
+        ease: "power2.out",
+      }, 0);
+      // The epicentre scars: a short split that the sand fills back in.
+      tl.to(sandCrack, { open: 0.7, duration: 0.18, ease: "expo.out" }, 0)
+        .to(sandCrack, { pour: 1, duration: 0.25 }, 0.05)
+        .to(sandCrack, { open: 0, pour: 0, duration: 2.2, ease: "power2.inOut" }, 0.6);
+      // The interface lands once the front has crossed the screen.
+      tl.to(ui, {
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        ease: "expo.out",
+        stagger: 0.06,
+      }, 0.5);
+      // Release the page before the scar has fully healed.
+      tl.add(finish, 1.5);
     };
-    const skipEvents = ["keydown", "pointerdown", "wheel", "touchmove"] as const;
+
+    const onImpact = (event: Event) => {
+      const { x, y } = (event as CustomEvent<{ x: number; y: number }>).detail;
+      blast(x, y);
+    };
+    window.addEventListener("overture-impact", onImpact);
+    const failsafe = window.setTimeout(() => {
+      blast(innerWidth / 2, innerHeight / 2);
+    }, FAILSAFE_MS);
+
+    const skip = (event: Event) => {
+      if (!tl) return;
+      if (event instanceof KeyboardEvent && ["Tab", "Shift", "Alt", "Control", "Meta"].includes(event.key))
+        return;
+      tl.progress(1);
+    };
+    const skipEvents = ["keydown", "pointerdown"] as const;
     for (const type of skipEvents) window.addEventListener(type, skip, { passive: true });
 
     return () => {
+      window.removeEventListener("overture-impact", onImpact);
+      window.clearTimeout(failsafe);
       for (const type of skipEvents) window.removeEventListener(type, skip);
-      tl.kill();
-      gsap.set([chars, ui, title, welcome, hero], {
-        clearProps: "transform,opacity,filter,letterSpacing,clipPath",
-      });
+      tl?.kill();
+      gsap.set([...ui, hero], { clearProps: "transform,opacity" });
+      delete root.dataset.intro;
       sandCrack.open = 0;
       sandCrack.pour = 0;
       wakeSand();

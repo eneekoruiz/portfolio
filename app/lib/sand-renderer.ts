@@ -8,6 +8,14 @@
  */
 
 export const MAX_IMPACTS = 8;
+const SPEED = 950;
+const DRAG = 1.15;
+
+/** Radius (CSS px) of an impact's front after t seconds; mirrors the shader. */
+export function frontRadius(t: number, amplitude: number) {
+  const power = Math.min(amplitude, 4);
+  return (SPEED * (0.7 + 0.3 * power) * (1 - Math.exp(-DRAG * Math.max(t, 0)))) / DRAG;
+}
 const LIFE_S = 6;
 // Sand grains read as coarse anyway; a fixed sub-1x scale keeps fill cost flat on retina and 4K.
 const RENDER_SCALE = 0.75;
@@ -38,8 +46,8 @@ uniform vec4 uCrack; // centre x, y (px), half length (px), open 0..1
 uniform float uPour; // 0..1 grains still sliding down the walls
 
 const float LIFE = ${LIFE_S.toFixed(1)};
-const float SPEED = 950.0;
-const float DRAG = 1.15;
+const float SPEED = ${SPEED.toFixed(1)};
+const float DRAG = ${DRAG.toFixed(2)};
 const float WIDTH = 22.0;
 
 float hash(vec2 p) {
@@ -57,22 +65,29 @@ float vnoise(vec2 p) {
 }
 
 // Height of the sand bed at p (CSS px, y down). wave = local wavefront energy.
-float field(vec2 p, float warp, float rough, out float wave) {
+float field(vec2 p, float warp, float rough, out float wave, out float blast) {
   // Aeolian ripples: sharp crest, long gentle back, combed by a slow warp.
   float phase = fract(dot(p, vec2(0.016, 0.006)) + warp * 3.0);
   float h = (smoothstep(0.0, 0.78, phase) - smoothstep(0.78, 1.0, phase)) * 0.5
           + (rough - 0.5) * 0.18;
   wave = 0.0;
+  blast = 0.0;
   for (int i = 0; i < ${MAX_IMPACTS}; i++) {
     vec4 im = uImpacts[i];
     float t = uTime - im.z;
     if (im.w <= 0.0 || t < 0.0 || t > LIFE) continue;
     float k = im.w * (1.0 - smoothstep(LIFE - 1.5, LIFE, t));
     float r = length(p - im.xy);
-    float R = SPEED * (1.0 - exp(-DRAG * t)) / DRAG;
+    // Stronger impacts travel further and carry a wider front.
+    float power = min(im.w, 4.0);
+    float R = SPEED * (0.7 + 0.3 * power) * (1.0 - exp(-DRAG * t)) / DRAG;
     float d = r - R;
+    float w = WIDTH * (0.8 + 0.25 * power);
     // Ragged front: grains do not move as a fluid.
-    float front = exp(-d * d / (2.0 * WIDTH * WIDTH)) * exp(-1.4 * t) * (0.55 + rough * 0.9);
+    float front = exp(-d * d / (2.0 * w * w)) * exp(-1.4 * t) * (0.55 + rough * 0.9);
+    // A blast also lifts dust on the front and leaves a shadowed trough behind it.
+    float trough = exp(-pow((d + w * 3.2) / (w * 2.0), 2.0)) * exp(-1.1 * t);
+    blast += (front * 1.2 - trough * 0.6) * max(im.w - 1.5, 0.0);
     // Fine concentric ridges the grains settle into behind the front.
     float ridges = (1.0 - smoothstep(R - 60.0, R, r)) * sin(r * 0.21)
                  * exp(-r / 380.0) * 0.22 * exp(-0.5 * t);
@@ -120,7 +135,8 @@ void main() {
   float warp = vnoise(p * 0.0025) + vnoise(p * 0.011) * 0.25;
   float rough = vnoise(p * 0.045);
   float wave;
-  float h = field(p, warp, rough, wave);
+  float blast;
+  float h = field(p, warp, rough, wave, blast);
   float lip;
   float side;
   float depth;
@@ -147,6 +163,8 @@ void main() {
   vec3 col = uBase + uTone * (shade * uStrength + (grain - dark) * uGrain) * edge;
   col += uAccent * min(wave, 1.0) * 0.025 * edge;
   col += spark * uSpark * edge;
+  // The blast front reads as light on the sand, its wake as shade.
+  col += vec3(1.0, 0.97, 0.92) * clamp(blast, -0.6, 1.4) * 0.07;
   // Inside the split it is the same sand in its own shadow: the lower wall
   // faces the light, the upper one and the floor fall away into shade.
   float wall = smoothstep(-1.0, 1.0, side);

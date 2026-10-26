@@ -9,14 +9,12 @@ if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 interface Props {
   sectionRef: RefObject<HTMLElement | null>;
   load: boolean;
-  expandedIdx: number | null;
   motionEnabled: boolean;
 }
 
 export function useProjectsAnimations({
   sectionRef,
   load,
-  expandedIdx,
   motionEnabled,
 }: Props) {
   const reduced = usePreferredMotion();
@@ -57,11 +55,4 @@ export function useProjectsAnimations({
     return () => ctx.revert();
   }, [sectionRef, load, motionEnabled, reduced]);
 
-  // Refrescar ScrollTrigger cuando se expande/contrae una tarjeta
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 320);
-    return () => clearTimeout(timer);
-  }, [expandedIdx]);
 }

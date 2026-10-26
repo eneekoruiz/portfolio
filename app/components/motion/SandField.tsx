@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { sandCrack } from "../../lib/tectonic";
+import { sandCrack, triggerTectonicImpact } from "../../lib/tectonic";
 import {
   createSandRenderer,
   type SandMessage,
@@ -162,7 +162,8 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
     const onPointerDown = (e: PointerEvent) => {
       // Links and buttons dispatch their own tectonic impact.
       if ((e.target as HTMLElement | null)?.closest("a, button")) return;
-      impactAtClient(e.clientX, e.clientY, 1.3);
+      // Through the shared event, so the type on the stage takes the front too.
+      triggerTectonicImpact(e.clientX, e.clientY, 1.3);
     };
     const onTectonic = (e: Event) => {
       const { x, y, intensity = 1 } =

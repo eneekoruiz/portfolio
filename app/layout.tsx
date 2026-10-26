@@ -4,10 +4,10 @@ import { SkipLink } from "./components/ui/SkipLink";
 import "./styles/globals.css";
 import "./styles/materia.css";
 import "./styles/editorial.css";
-import "./styles/compact-sections.css";
 import "./styles/project-preview.css";
 import "./styles/project-reel.css";
-import "./styles/contact-expression.css";
+import "./styles/brutal.css";
+import "./styles/stack-cards.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";
@@ -83,7 +83,7 @@ export default async function RootLayout({
                   visibility: visible !important;
                   opacity: 1 !important;
                 }
-                .preloader-container, .splash-container, .identity-splash, #preloader, #splash, .cinematic-overture {
+                .preloader-container, .splash-container, .identity-splash, #preloader, #splash, .cinematic-overture, .overture {
                   display: none !important;
                 }
                 #hero [data-kinetic-char], #hero [data-cine-ui],

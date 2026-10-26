@@ -31,7 +31,7 @@ export function useSceneJourney(
     let lastTint = "";
     // Only the few elements that paint the chapter colour get it. Setting it on
     // the root used to restyle the whole document on every step of the scroll.
-    const CONSUMERS = "#scroll-progress, .hud-vignette, .projects-reel-progress";
+    const CONSUMERS = "#scroll-progress, .projects-reel-progress";
     let consumers: HTMLElement[] = [];
     const update = () => {
       frame = 0;

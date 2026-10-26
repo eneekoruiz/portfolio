@@ -1,0 +1,495 @@
+/* Display type that takes shockwaves: see ShockType.tsx. */
+.shock-type {
+  display: block;
+  font-family: "Materia Sans", var(--font-sans);
+  font-weight: 900;
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  font-kerning: normal;
+}
+.shock-line {
+  display: block;
+  width: max-content;
+  white-space: nowrap;
+  font-size: var(--fit-size, 14vw);
+  /* Past the widest cut, tracking opens to finish the measure. */
+  letter-spacing: var(--fit-track, 0px);
+  --fit-wdth: 100;
+}
+.shock-type [data-char] {
+  display: inline-block;
+  font-variation-settings:
+    "wdth" clamp(25, calc(var(--fit-wdth) + var(--s, 0) * 38), 151),
+    "wght" clamp(100, calc(900 + var(--s, 0) * 100), 1000);
+  transform: translate3d(calc(var(--sx, 0) * 1px), calc(var(--s, 0) * -0.045em), 0);
+}
+.shock-space {
+  display: inline-block;
+  width: 0.22em;
+}
+
+/* ── Hero: a poster. Hairline columns, the brief on top, the name as the base. */
+.hero-brutal {
+  --gutter: 1.25rem;
+  padding-inline: var(--gutter);
+}
+@media (min-width: 768px) {
+  .hero-brutal {
+    --gutter: 2.5rem;
+  }
+}
+.hero-rules {
+  position: absolute;
+  inset: 0 var(--gutter);
+  z-index: 1;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--ink) 9%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: calc(100% / 2) 100%;
+  border-right: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
+}
+@media (min-width: 768px) {
+  .hero-rules {
+    background-size: calc(100% / 4) 100%;
+  }
+}
+.hero-head {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 0.75rem;
+  padding-top: clamp(6.25rem, 15svh, 9rem);
+}
+.hero-role {
+  font-size: clamp(1.05rem, 1.55vw, 1.4rem);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.hero-role span {
+  display: block;
+}
+.hero-tagline {
+  max-width: 34ch;
+  font-size: clamp(0.92rem, 1.1vw, 1.08rem);
+  line-height: 1.5;
+  color: var(--lead);
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: clamp(0.5rem, 2svh, 1.5rem);
+}
+@media (min-width: 768px) {
+  .hero-head {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 0;
+  }
+  /* Content sits a hair inside each column rule. */
+  .hero-role {
+    grid-column: 1 / span 2;
+    padding-left: 0.9rem;
+  }
+  .hero-tagline {
+    grid-column: 3 / span 2;
+    padding-left: 0.9rem;
+  }
+  .hero-actions {
+    grid-column: 1 / -1;
+    padding-left: 0.9rem;
+  }
+}
+.hero-name {
+  margin: auto 0 0;
+  padding: clamp(1rem, 3svh, 2rem) 0 clamp(0.6rem, 2.2svh, 1.5rem);
+  color: var(--ink);
+  user-select: none;
+}
+.hero-name-wide {
+  display: block;
+}
+.hero-name-narrow {
+  display: none;
+}
+/* Portrait screens stack the name: two lines fill the height better. Landscape
+   phones keep one line, there is no height to spare. */
+@media (max-aspect-ratio: 4/5) {
+  .hero-name-wide {
+    display: none;
+  }
+  .hero-name-narrow {
+    display: block;
+  }
+}
+/* The full stop is the only colour on the poster. */
+.hero-name [data-shock-line]:nth-last-child(2) [data-char]:last-child {
+  color: var(--brand);
+}
+
+/* ── Overture: the welcome on its own screen, blown open into the hero. */
+.overture {
+  --gutter: 1.25rem;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-inline: var(--gutter);
+  background: var(--page);
+  color: var(--ink);
+  /* If the script never takes over, the page is not held hostage. */
+  animation: overture-failsafe 0.3s ease 12s forwards;
+}
+@media (min-width: 768px) {
+  .overture {
+    --gutter: 2.5rem;
+  }
+}
+.overture-word {
+  width: 100%;
+}
+.overture-word [data-char] {
+  opacity: 0;
+}
+.overture-foot {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: clamp(1rem, 3svh, 2rem);
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(1rem, 2vw, 2rem);
+}
+.overture-count {
+  display: block;
+  overflow: hidden;
+  font-family: "Materia Sans", var(--font-sans);
+  font-size: clamp(4.5rem, 19svh, 12rem);
+  font-weight: 900;
+  font-variation-settings: "wdth" 70, "wght" 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.78;
+  letter-spacing: -0.04em;
+}
+.overture-count > span {
+  display: block;
+}
+.overture-rule {
+  flex: 1;
+  height: 1px;
+  margin-bottom: 0.35rem;
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.overture-rule > span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.overture-blast {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.overture[data-blast] {
+  background: transparent;
+  pointer-events: none;
+}
+.overture[data-blast] .overture-word,
+.overture[data-blast] .overture-foot {
+  visibility: hidden;
+}
+@keyframes overture-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overture {
+    display: none;
+  }
+}
+.shock-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.shock-wrap {
+  width: auto;
+  white-space: normal;
+  font-size: inherit;
+}
+.shock-wrap .shock-space {
+  display: inline;
+  width: auto;
+}
+
+/* ── Chapters: every section is one screen, title on top, content under it. */
+.chapter {
+  --gutter: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100svh;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: clamp(5.25rem, 12svh, 7.5rem) var(--gutter) clamp(1.5rem, 6svh, 4rem);
+}
+@media (min-width: 768px) {
+  .chapter {
+    --gutter: 2.5rem;
+  }
+}
+.chapter-head {
+  margin-bottom: clamp(1.25rem, 4svh, 2.75rem);
+}
+.chapter-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(2.6rem, min(8.5vw, 11svh), 7.5rem);
+}
+.chapter-title .shock-type {
+  line-height: 0.86;
+}
+.chapter-title-fit {
+  font-size: inherit;
+}
+.chapter-body {
+  min-width: 0;
+}
+
+/* About: one paragraph in large type and the way to the CV. */
+.about-grid {
+  display: grid;
+  gap: clamp(1.25rem, 3svh, 2rem);
+}
+.about-copy {
+  max-width: 52rem;
+  font-size: clamp(1.15rem, min(2.1vw, 3.2svh), 1.9rem);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+@media (min-width: 1024px) {
+  .about-grid {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+    align-items: end;
+  }
+  .about-aside {
+    justify-self: end;
+  }
+}
+
+/* Contact: the closing chapter. */
+#contact .chapter-head {
+  margin-bottom: clamp(1rem, 3svh, 2rem);
+}
+.contact-line {
+  max-width: 34ch;
+  margin: 0 0 clamp(1.5rem, 4svh, 2.75rem);
+  font-size: clamp(1.35rem, min(2.6vw, 4svh), 2.4rem);
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.contact-doors {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  max-width: 54rem;
+}
+.contact-door {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3.5rem;
+  padding: 0 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--ink);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.contact-door span {
+  flex: 1;
+}
+.contact-door:hover {
+  border-color: var(--ink);
+}
+.contact-door:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+.contact-door-primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--page);
+}
+.contact-door-primary:hover {
+  background: var(--ember);
+  border-color: var(--ember);
+  color: #111317;
+}
+@media (max-width: 559px) {
+  .contact-doors {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* GitHub: the latest repositories, one screen. */
+.github-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.github-count {
+  padding-bottom: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--lead);
+  white-space: nowrap;
+}
+.github-offline {
+  padding: 1rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  color: var(--lead);
+}
+.github-offline a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.github-more {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: clamp(1.25rem, 3svh, 2rem);
+}
+
+/* ── Short screens: phones held sideways, small laptops' split windows. */
+@media (max-height: 700px) and (max-aspect-ratio: 4/5) {
+  .hero-head {
+    padding-top: 5.25rem;
+  }
+  .hero-tagline {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+  /* The CV is one tap away in "About"; the poster keeps two actions. */
+  .hero-actions [data-signature-link="cv"] {
+    display: none;
+  }
+}
+@media (max-height: 500px) {
+  .chapter-title {
+    font-size: clamp(1.7rem, 11svh, 2.4rem);
+  }
+  /* The CV is one tap away in "About"; a sideways phone keeps two actions. */
+  .hero-actions [data-signature-link="cv"] {
+    display: none;
+  }
+  .hero-role span {
+    display: inline;
+  }
+  .hero-role span + span::before {
+    content: " · ";
+  }
+  .hero-head {
+    padding-top: 4.5rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero-tagline {
+    display: none;
+  }
+  .hero-role,
+  .hero-actions {
+    grid-column: 1 / -1;
+  }
+  .hero-actions {
+    margin-top: 0.5rem;
+  }
+  .hero-actions .materia-button,
+  .hero-actions [data-signature-link] {
+    min-height: 40px;
+  }
+  .chapter {
+    padding-top: 4.5rem;
+    padding-bottom: 0.75rem;
+  }
+  .chapter-head {
+    margin-bottom: 0.75rem;
+  }
+  .about-copy {
+    max-width: none;
+    font-size: 0.86rem;
+    line-height: 1.36;
+  }
+  .about-grid {
+    gap: 0.75rem;
+  }
+  .contact-line {
+    margin-bottom: 0.9rem;
+    font-size: 1.1rem;
+  }
+  .contact-door {
+    min-height: 2.75rem;
+  }
+  /* Rows shrink to a name: the tags are on the repository itself. */
+  .github-chapter [data-repo-row] > div {
+    padding-block: 0.55rem;
+  }
+  .github-chapter [data-repo-row] .flex-wrap {
+    display: none;
+  }
+  .github-chapter [data-repo-row]:nth-child(n + 4) {
+    display: none;
+  }
+  .github-count {
+    display: none;
+  }
+  .github-more {
+    margin-top: 0.6rem;
+  }
+  .github-more .materia-button,
+  .github-more a,
+  .github-more button {
+    min-height: 40px;
+  }
+}
+.github-offline a {
+  min-height: 44px;
+}
+@media (max-height: 400px) {
+  .github-chapter [data-repo-row]:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+/* GitHub shows as many rows as the screen can hold without scrolling. */
+@media (max-height: 760px) {
+  .github-chapter [data-repo-row]:nth-child(n + 5) {
+    display: none;
+  }
+}
+@media (max-height: 600px) and (max-width: 767px) {
+  .github-chapter [data-repo-row]:nth-child(n + 4) {
+    display: none;
+  }
+}

@@ -3,71 +3,66 @@ import { useEffect, useRef, type ReactNode } from "react";
 import gsap from "gsap";
 import { SpringValue } from "../../lib/spring";
 import { useMotionEnabled } from "../../hooks/useMotionEnabled";
-import { KineticText } from "../motion/KineticText";
+import { ChapterTitle } from "./ChapterTitle";
 
+/**
+ * A chapter: one screen, a title and its content. The title lands (see
+ * ChapterTitle); the rest of the content settles in just after it.
+ */
 export function SectionFrame({
   id,
-  index,
-  label,
   title,
   children,
   className = "",
+  fitTitle = false,
 }: {
   id: string;
-  index: string;
-  label: string;
   title: string;
   children: ReactNode;
   className?: string;
+  /** Run the title edge to edge (the closing chapter). */
+  fitTitle?: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
   const motion = useMotionEnabled();
   useEffect(() => {
     const element = ref.current;
-    if (!element || !motion || matchMedia("(pointer: coarse)").matches) return;
+    if (!element || !motion) return;
     const items = Array.from(
       element.querySelectorAll<HTMLElement>("[data-section-reveal]"),
     );
     const springs = items.map(() => new SpringValue(0, 190, 24));
-    let started = false;
-    let start = 0;
+    let start = -1;
     const finish = () => {
       gsap.ticker.remove(tick);
       for (const item of items) {
         item.style.removeProperty("transform");
         item.style.removeProperty("opacity");
-        item.style.removeProperty("will-change");
       }
     };
     const tick = (time: number, delta: number) => {
       let settled = true;
       springs.forEach((spring, i) => {
-        if (time - start < i * 0.018) {
+        if (time - start < 0.12 + i * 0.05) {
           settled = false;
           return;
         }
         spring.target = 1;
         const value = spring.step(delta / 1000);
-        items[i].style.transform =
-          `perspective(1000px) translate3d(0,${(1 - value) * 26}px,0) rotateX(${(1 - value) * -8}deg)`;
-        items[i].style.opacity = String(Math.min(1, Math.max(0, value * 2)));
+        items[i].style.transform = `translate3d(0,${(1 - value) * 22}px,0)`;
+        items[i].style.opacity = String(Math.min(1, Math.max(0, value * 1.6)));
         if (!spring.settled) settled = false;
       });
       if (settled) finish();
     };
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          started = true;
-          start = gsap.ticker.time;
-          for (const item of items) {
-            item.style.opacity = "0";
-            item.style.willChange = "transform, opacity";
-          }
-          gsap.ticker.add(tick);
-        } else if (started && !entry.isIntersecting) finish();
+        if (!entry.isIntersecting || start >= 0) return;
+        start = gsap.ticker.time;
+        for (const item of items) item.style.opacity = "0";
+        gsap.ticker.add(tick);
       },
-      { threshold: 0.08 },
+      { threshold: 0.3 },
     );
     observer.observe(element);
     return () => {
@@ -80,22 +75,12 @@ export function SectionFrame({
       ref={ref}
       id={id}
       aria-labelledby={`${id}-heading`}
-      className={`editorial-section relative z-10 mx-auto max-w-[1440px] px-5 py-10 md:px-10 md:py-14 lg:py-16 ${className}`}
+      className={`chapter relative z-10 ${className}`}
     >
-      <header data-section-reveal className="mb-6 md:mb-8">
-        <div className="mb-4 flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.16em] text-lead">
-          <span className="text-brand">{index}</span>
-          <span className="h-px w-10 bg-ink/20" aria-hidden="true" />
-          <span>{label}</span>
-        </div>
-        <h2
-          id={`${id}-heading`}
-          className="max-w-5xl text-balance text-[clamp(2.25rem,5.6vw,5.5rem)] font-black leading-[0.98] tracking-[-0.035em] text-ink [overflow-wrap:anywhere] min-w-0"
-        >
-          <KineticText text={title} enabled={motion} wrap />
-        </h2>
+      <header className="chapter-head">
+        <ChapterTitle id={`${id}-heading`} title={title} fit={fitTitle} />
       </header>
-      {children}
+      <div className="chapter-body">{children}</div>
     </section>
   );
 }

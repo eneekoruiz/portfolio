@@ -775,19 +775,16 @@ body::after {
   }
 }
 
-/* Hero cinematic: hidden from the first paint until the opening shot runs.
-   The failsafe reveals everything if the script never takes over. */
-#hero[data-cinematic] h1 [data-kinetic-char],
-#hero[data-cinematic] [data-cine-ui] {
+/* Opening: the interface waits for the impact. The failsafe reveals it if the
+   script never takes over. */
+#hero[data-cinematic] [data-cine-ui],
+html[data-intro="play"] [data-site-nav] {
   opacity: 0;
-  animation: cine-failsafe 0.4s ease 9s forwards;
-}
-#hero [data-cine-welcome] {
-  opacity: 0;
-  letter-spacing: 0.12em;
+  animation: cine-failsafe 0.4s ease 10s forwards;
 }
 @keyframes cine-failsafe {
   to {
     opacity: 1;
   }
 }
+
