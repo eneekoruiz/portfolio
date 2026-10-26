@@ -23,8 +23,8 @@ self.onmessage = (event: MessageEvent<SandMessage>) => {
     case "impact":
       renderer.impact(message.x, message.y, message.amplitude);
       break;
-    case "crack":
-      renderer.crack(message.crack);
+    case "burst":
+      renderer.burst(message.x, message.y, message.power);
       break;
     case "state":
       renderer.state(message.enabled, message.visible);

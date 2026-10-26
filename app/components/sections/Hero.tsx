@@ -7,6 +7,7 @@ import { useMotionPolicy } from "../../hooks/useMotionEnabled";
 import { SignatureLink } from "../ui/SignatureLink";
 import { SandField } from "../motion/SandField";
 import { ShockType } from "../motion/ShockType";
+import { BurstLayer } from "../motion/BurstLayer";
 import { triggerTectonicImpact } from "../../lib/tectonic";
 import type { Tx } from "../../types";
 import { useHeroCinematic } from "../../hooks/useHeroCinematic";
@@ -104,6 +105,7 @@ export function Hero({ t, reduced, phase, onIntroComplete }: HeroProps) {
             lines={["Eneko Ruiz."]}
             maxSize={heightCap(WIDE_SHARE)}
             enabled={enabled}
+            revealOnBurst
             listen
             pressure
           />
@@ -113,10 +115,12 @@ export function Hero({ t, reduced, phase, onIntroComplete }: HeroProps) {
             lines={["Eneko", "Ruiz."]}
             maxSize={heightCap(NARROW_SHARE)}
             enabled={enabled}
+            revealOnBurst
             listen
           />
         </span>
       </h1>
+      {enabled && <BurstLayer />}
     </section>
   );
 }

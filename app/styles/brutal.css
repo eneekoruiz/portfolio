@@ -493,3 +493,38 @@
     display: none;
   }
 }
+
+/* ── The opening's explosions: the name is uncovered letter by letter by the
+   blasts. Until a blast reaches a letter it is not there; a letter the blast
+   reached snaps in out of focus and settles. The failsafe shows everything if
+   the script never runs. */
+.burst-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+#hero[data-cinematic] .shock-type [data-char] {
+  opacity: 0;
+  animation: cine-failsafe 0.4s ease 10s forwards;
+}
+#hero[data-cinematic] .shock-type [data-char][data-in] {
+  animation: shock-pop 0.55s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+@keyframes shock-pop {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    scale: 1.6;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    scale: 1;
+  }
+}

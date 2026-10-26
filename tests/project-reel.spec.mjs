@@ -33,7 +33,7 @@ async function reelState(page) {
 
 test("the title shows once and is not part of the held stage", async ({ page }) => {
   await openReel(page);
-  await expect(page.locator("#work h2")).toHaveAttribute("aria-label", "Mis proyectos.");
+  await expect(page.locator("#work-heading")).toContainText("Mis proyectos.");
   const inStage = await page.evaluate(
     () => !!document.querySelector(".projects-reel-stage h2"),
   );
@@ -73,39 +73,42 @@ test("the next arrow keeps going sideways once released", async ({ page }) => {
   expect(Math.abs(state.lefts[3])).toBeLessThan(3);
 });
 
-test("every card fits the screen, closed and with details open", async ({ page }) => {
+test("every card is one glance: it fits the screen and its text never runs under another element", async ({
+  page,
+}) => {
   await openReel(page);
   const { top } = await runway(page);
   await page.evaluate((y) => scrollTo(0, y), top);
   const viewportHeight = page.viewportSize().height;
-  const cards = page.locator(".projects-reel-item");
-  const fits = async () =>
-    cards.evaluateAll((items) =>
-      items.map((card) => {
-        const header = card.querySelector(".work-surface-header");
-        const story = card.querySelector(".work-story").getBoundingClientRect();
-        const actions = card
-          .querySelector(".work-project-action")
-          .getBoundingClientRect();
-        return {
-          height: card.getBoundingClientRect().height,
-          overflow: header.scrollHeight - header.clientHeight,
-          // The description never runs under the action buttons.
-          overlap: story.bottom - actions.top,
-        };
-      }),
-    );
-  const closed = await fits();
-  for (const card of closed) {
+  const cards = await page.locator(".work-card").evaluateAll((items) =>
+    items.map((card) => {
+      const box = card.getBoundingClientRect();
+      const copy = card.querySelector(".work-card-copy");
+      const preview = card.querySelector(".work-card-visual").getBoundingClientRect();
+      const action = card.querySelector(".work-card-action").getBoundingClientRect();
+      const tech = card.querySelector(".work-card-tech");
+      return {
+        height: box.height,
+        clipped: copy.scrollHeight - copy.clientHeight,
+        previewHeight: preview.height,
+        // Technologies are plain text, three at most.
+        techCount: tech.textContent.split("·").length,
+        links: card.querySelectorAll("a").length,
+        actionInside: action.bottom <= box.bottom + 1,
+      };
+    }),
+  );
+  expect(cards).toHaveLength(8);
+  for (const card of cards) {
     expect(card.height).toBeLessThanOrEqual(viewportHeight);
-    expect(card.overflow).toBeLessThanOrEqual(1);
-    expect(card.overlap).toBeLessThanOrEqual(1);
+    expect(card.clipped).toBeLessThanOrEqual(1);
+    expect(card.previewHeight).toBeGreaterThan(90);
+    expect(card.techCount).toBeLessThanOrEqual(3);
+    // The whole card is one link; there is no disclosure and no second action.
+    expect(card.links).toBe(1);
+    expect(card.actionInside).toBe(true);
   }
-  await cards.first().locator("button[aria-expanded]").click();
-  await page.waitForTimeout(600);
-  const open = await fits();
-  // Opening the details keeps the same footprint.
-  expect(Math.round(open[0].height)).toBe(Math.round(closed[0].height));
+  await expect(page.locator("button[aria-expanded]")).toHaveCount(0);
 });
 
 test("motion and the opening are on by default, even with stale stored state", async ({
@@ -120,15 +123,8 @@ test("motion and the opening are on by default, even with stale stored state", a
       JSON.stringify({ openIdx: 2, scrollY: 2400 }),
     );
   });
-  const welcomeShows = () =>
-    expect
-      .poll(() =>
-        page.evaluate(() => {
-          const el = document.querySelector("[data-cine-welcome]");
-          return el ? Number(getComputedStyle(el).opacity) : 0;
-        }),
-      )
-      .toBeGreaterThan(0.5);
+  // The welcome has its own screen, above everything, until it is blown open.
+  const welcomeShows = () => expect(page.locator(".overture")).toBeVisible();
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-motion", "on");
   await welcomeShows();

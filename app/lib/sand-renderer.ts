@@ -8,6 +8,9 @@
  */
 
 export const MAX_IMPACTS = 8;
+/** Bursts are the big events of the opening: cracks, collapse, soot and flash. */
+export const MAX_BURSTS = 4;
+const BURST_LIFE_S = 6.5;
 const SPEED = 950;
 const DRAG = 1.15;
 
@@ -42,13 +45,14 @@ uniform vec3 uAccent;
 uniform float uStrength;
 uniform float uGrain;
 uniform float uSpark;
-uniform vec4 uCrack; // centre x, y (px), half length (px), open 0..1
-uniform float uPour; // 0..1 grains still sliding down the walls
+uniform vec4 uBursts[${MAX_BURSTS}]; // x, y (px), start (s), power
 
 const float LIFE = ${LIFE_S.toFixed(1)};
 const float SPEED = ${SPEED.toFixed(1)};
 const float DRAG = ${DRAG.toFixed(2)};
 const float WIDTH = 22.0;
+const float BURST_LIFE = ${BURST_LIFE_S.toFixed(1)};
+const float TAU = 6.2831853;
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -100,31 +104,87 @@ float field(vec2 p, float warp, float rough, out float wave, out float blast) {
   return h;
 }
 
-// The sand splits: distance to a jagged centreline. side runs -1 (upper wall)
-// to 1 (lower wall); depth is 0 at the rim and 1 on the floor of the split.
-float breach(vec2 p, out float lip, out float side, out float depth) {
+// The ground gives way around a burst, in terraces, and its rim slumps up.
+float collapse(vec2 p, vec4 b) {
+  float t = uTime - b.z;
+  if (b.w <= 0.0 || t < 0.0 || t > BURST_LIFE) return 0.0;
+  float r = length(p - b.xy);
+  float R = (110.0 + 70.0 * b.w) * (1.0 - exp(-4.0 * t));
+  float x = r / max(R, 1.0);
+  if (x >= 1.25) return 0.0;
+  float steps = 4.0;
+  float s = x * steps;
+  float terrace = floor(s) + smoothstep(0.6, 1.0, fract(s));
+  float depth = 1.0 - clamp(terrace / steps, 0.0, 1.0);
+  float rim = exp(-pow((x - 1.04) / 0.1, 2.0));
+  // Over a few seconds the grains slide in and fill the hollow a little.
+  float settle = 1.0 - smoothstep(2.5, BURST_LIFE, t) * 0.6;
+  return (-depth * 1.5 + rim * 0.55) * settle * (1.0 - smoothstep(1.05, 1.25, x));
+}
+
+// How far a crack strays from its straight line at distance r. Low frequency
+// and small amplitude: a meander, never a bead chain.
+float wobble(float r, float idx, float seed) {
+  return (vnoise(vec2(r * 0.014 + idx * 5.7, seed * 9.0)) - 0.5) * 0.2
+       + (vnoise(vec2(r * 0.07 + idx * 2.3, seed * 4.0)) - 0.5) * 0.04;
+}
+
+// Radial cracks that run out of a burst and stop, thinning as they go and
+// forking part-way. lip is the raised, lit edge.
+float cracks(vec2 p, vec4 b, out float lip) {
   lip = 0.0;
-  side = 0.0;
-  depth = 0.0;
-  if (uCrack.w <= 0.001) return 0.0;
-  vec2 q = p - uCrack.xy;
-  float along = abs(q.x) / uCrack.z;
-  float reach = 1.0 - smoothstep(uCrack.w * 1.1 - 0.12, uCrack.w * 1.1, along);
-  if (reach <= 0.0) return 0.0;
-  float centre = (vnoise(vec2(q.x * 0.016, 3.1)) - 0.5) * 54.0
-               + (vnoise(vec2(q.x * 0.075, 7.7)) - 0.5) * 12.0;
-  float taper = pow(max(0.0, 1.0 - along), 0.6) * reach;
-  float width = uCrack.w * 28.0 * taper
-              + (vnoise(vec2(q.x * 0.22, 1.3)) - 0.5) * 5.0 * uCrack.w;
-  // Grain-sized crumbs on the rim, so the edge never reads as a drawn line.
-  float crumb = (hash(floor(p * 0.5) + 2.3) - 0.5) * 3.0 * uCrack.w;
-  float offset = q.y - centre;
-  float d = abs(offset);
-  float inside = 1.0 - smoothstep(width - 1.0, width + 1.0, d + crumb);
-  lip = exp(-pow((d - width - 8.0) / 9.0, 2.0)) * taper * uCrack.w;
-  side = clamp(offset / max(width, 0.001), -1.0, 1.0);
-  depth = clamp(1.0 - d / max(width, 0.001), 0.0, 1.0) * inside;
-  return inside;
+  float t = uTime - b.z;
+  if (b.w <= 0.0 || t < 0.03 || t > BURST_LIFE) return 0.0;
+  vec2 d = p - b.xy;
+  float r = length(d);
+  float reach = (140.0 + 130.0 * b.w) * (1.0 - exp(-3.4 * t));
+  if (r > reach || r < 6.0) return 0.0;
+  const float N = 8.0;
+  float seed = fract(b.x * 0.0131 + b.y * 0.0071);
+  float a = atan(d.y, d.x);
+  float sector = floor((a / TAU + 0.5) * N);
+  float mask = 0.0;
+  float widthScale = 0.5 + 0.17 * b.w;
+  for (int k = -1; k <= 1; k++) {
+    float idx = mod(sector + float(k) + N, N);
+    float h1 = hash(vec2(idx, seed * 31.0));
+    float h2 = hash(vec2(idx * 3.1, seed * 17.0));
+    float ang = ((idx + 0.5 + (h1 - 0.5) * 0.8) / N - 0.5) * TAU;
+    float len = reach * (0.45 + 0.55 * h2);
+    if (r <= len) {
+      float da = a - (ang + wobble(r, idx, seed));
+      da = atan(sin(da), cos(da));
+      float across = abs(r * sin(da));
+      float taper = clamp(r / len, 0.0, 1.0);
+      float w = mix(3.6, 0.45, pow(taper, 0.75)) * widthScale
+              * (0.8 + 0.4 * vnoise(vec2(r * 0.18, idx)));
+      float front = step(0.0, cos(da));
+      mask = max(mask, (1.0 - smoothstep(w * 0.45, w, across)) * front);
+      lip = max(lip, exp(-pow((across - w * 1.7) / (w * 0.9 + 0.8), 2.0)) * front);
+    }
+    // A branch leaves the ray part-way and runs off at an angle.
+    if (len > 70.0) {
+      float r0 = len * (0.32 + 0.25 * h1);
+      float side = h2 > 0.5 ? 1.0 : -1.0;
+      float a0 = ang + wobble(r0, idx, seed);
+      vec2 origin = b.xy + vec2(cos(a0), sin(a0)) * r0;
+      float ab = a0 + side * (0.5 + 0.3 * h1);
+      vec2 e = vec2(cos(ab), sin(ab));
+      vec2 q = p - origin;
+      float along = dot(q, e);
+      float blen = (len - r0) * 0.75;
+      if (along > 0.0 && along < blen) {
+        float bacross = abs(q.x * e.y - q.y * e.x);
+        bacross += (vnoise(vec2(along * 0.06 + idx * 3.0, seed * 5.0)) - 0.5) * 2.5;
+        float bw = mix(2.1, 0.4, along / blen) * widthScale;
+        mask = max(mask, 1.0 - smoothstep(bw * 0.45, bw, bacross));
+        lip = max(lip, exp(-pow((bacross - bw * 1.7) / (bw * 0.9 + 0.8), 2.0)));
+      }
+    }
+  }
+  float fade = 1.0 - smoothstep(3.5, BURST_LIFE, t);
+  lip *= fade;
+  return mask * fade;
 }
 
 void main() {
@@ -137,13 +197,7 @@ void main() {
   float wave;
   float blast;
   float h = field(p, warp, rough, wave, blast);
-  float lip;
-  float side;
-  float depth;
-  float inside = breach(p, lip, side, depth);
-  // Sand pushed up on both rims catches the grazing light like any ridge.
-  h += lip * (1.4 + rough);
-  wave += lip * 0.5;
+  for (int i = 0; i < ${MAX_BURSTS}; i++) h += collapse(p, uBursts[i]);
   // Slopes from screen derivatives: one field evaluation per pixel instead of three.
   vec2 slope = vec2(dFdx(h), -dFdy(h)) * uDpr;
   vec3 n = normalize(vec3(-slope * 6.0, 1.0));
@@ -155,8 +209,6 @@ void main() {
   g1 = mix(g1, jig, min(wave * 1.6, 1.0));
   float grain = (g1 - 0.5) * 0.65 + (hash(floor(p * 0.5) + 17.0) - 0.5) * 0.35;
   float dark = step(0.93, hash(cell + 5.7)) * 0.6;
-  // Grains thrown over the rims.
-  dark = max(dark, step(0.82, hash(cell + 9.1)) * min(lip, 1.0) * 0.7);
   float spark = step(0.9965, hash(cell + 3.1)) * max(shade + 0.08, 0.0);
   // Fade the bed into the flat page colour before the next section.
   float edge = smoothstep(uRes.y, uRes.y * 0.78, p.y);
@@ -165,16 +217,30 @@ void main() {
   col += spark * uSpark * edge;
   // The blast front reads as light on the sand, its wake as shade.
   col += vec3(1.0, 0.97, 0.92) * clamp(blast, -0.6, 1.4) * 0.07;
-  // Inside the split it is the same sand in its own shadow: the lower wall
-  // faces the light, the upper one and the floor fall away into shade.
-  float wall = smoothstep(-1.0, 1.0, side);
-  float shadow = mix(0.5, 0.84, wall) - depth * depth * 0.2;
-  vec3 pit = uBase * shadow * vec3(1.0, 0.95, 0.88)
-           + uTone * ((grain - dark) * uGrain * 1.4 + wall * uStrength * 0.3);
-  // While the split is fresh, grains keep sliding down the walls.
-  float pour = step(0.93, hash(vec2(cell.x, floor(cell.y * 0.3 - uTime * 20.0))));
-  pit += uBase * pour * (1.0 - depth) * uPour * 0.22;
-  col = mix(col, pit, inside);
+  // Bursts: soot, a white flash that dies quickly, cracks with a lit lip.
+  float crackMask = 0.0;
+  float crackLip = 0.0;
+  float flash = 0.0;
+  float soot = 0.0;
+  for (int i = 0; i < ${MAX_BURSTS}; i++) {
+    vec4 b = uBursts[i];
+    float lp;
+    crackMask = max(crackMask, cracks(p, b, lp));
+    crackLip = max(crackLip, lp);
+    float t = uTime - b.z;
+    if (b.w > 0.0 && t >= 0.0 && t < BURST_LIFE) {
+      float r = length(p - b.xy);
+      flash += exp(-r / (60.0 + 38.0 * b.w)) * exp(-t * 9.0) * b.w * 0.4;
+      float sr = 22.0 + 12.0 * b.w;
+      soot += exp(-r * r / (2.0 * sr * sr)) * smoothstep(0.04, 0.3, t) * (1.0 - smoothstep(0.5, 2.2, t));
+    }
+  }
+  float bedEdge = smoothstep(uRes.y, uRes.y * 0.97, p.y);
+  float lum = dot(uBase, vec3(0.3333));
+  col *= 1.0 - 0.17 * clamp(soot, 0.0, 1.0) * bedEdge;
+  col = mix(col, uBase * 0.2 * vec3(1.0, 0.92, 0.82), clamp(crackMask, 0.0, 1.0) * 0.94 * bedEdge);
+  col += vec3(1.0, 0.96, 0.9) * crackLip * (lum < 0.3 ? 0.14 : 0.07) * (1.0 - crackMask) * bedEdge;
+  col = mix(col, vec3(1.0, 0.97, 0.92), clamp(flash, 0.0, lum < 0.3 ? 0.45 : 0.8) * bedEdge);
   gl_FragColor = vec4(col, 1.0);
 }
 `;
@@ -190,14 +256,6 @@ export interface SandTheme {
   spark: number;
 }
 
-/** Fractions of the stage, see sandCrack in lib/tectonic. */
-export interface SandCrackState {
-  x: number;
-  y: number;
-  length: number;
-  open: number;
-  pour: number;
-}
 
 /** Messages the main thread sends to the sand worker. */
 export type SandMessage =
@@ -205,7 +263,7 @@ export type SandMessage =
   | { type: "resize"; width: number; height: number }
   | { type: "theme"; theme: SandTheme }
   | { type: "impact"; x: number; y: number; amplitude: number }
-  | { type: "crack"; crack: SandCrackState }
+  | { type: "burst"; x: number; y: number; power: number }
   | { type: "state"; enabled: boolean; visible: boolean }
   | { type: "dispose" };
 
@@ -213,7 +271,7 @@ export interface SandRenderer {
   resize(width: number, height: number): void;
   theme(theme: SandTheme): void;
   impact(x: number, y: number, amplitude: number): void;
-  crack(crack: SandCrackState): void;
+  burst(x: number, y: number, power: number): void;
   state(enabled: boolean, visible: boolean): void;
   dispose(): void;
 }
@@ -280,16 +338,14 @@ export function createSandRenderer(canvas: AnyCanvas): SandRenderer | null {
   const uStrength = u("uStrength");
   const uGrain = u("uGrain");
   const uSpark = u("uSpark");
-  const uCrack = u("uCrack");
-  const uPour = u("uPour");
+  const uBursts = u("uBursts");
 
   const [requestFrame, cancelFrame] = frameApi();
   // x, y (CSS px in the stage), start time (s), amplitude. Ring buffer.
   const impacts = new Float32Array(MAX_IMPACTS * 4);
-  const split: SandCrackState = { x: 0.5, y: 0.5, length: 0.46, open: 0, pour: 0 };
+  const bursts = new Float32Array(MAX_BURSTS * 4);
+  let nextBurst = 0;
   let nextSlot = 0;
-  let width = 1;
-  let height = 1;
   let frame = 0;
   let enabled = true;
   let visible = true;
@@ -297,7 +353,8 @@ export function createSandRenderer(canvas: AnyCanvas): SandRenderer | null {
   const now = () => performance.now() / 1000;
 
   const alive = (t: number) => {
-    if (split.open > 0.001) return true;
+    for (let i = 0; i < MAX_BURSTS; i++)
+      if (bursts[i * 4 + 3] > 0 && t - bursts[i * 4 + 2] < BURST_LIFE_S) return true;
     for (let i = 0; i < MAX_IMPACTS; i++) {
       const amp = impacts[i * 4 + 3];
       if (amp > 0 && t - impacts[i * 4 + 2] < LIFE_S) return true;
@@ -311,8 +368,7 @@ export function createSandRenderer(canvas: AnyCanvas): SandRenderer | null {
     const t = now();
     gl.uniform1f(uTime, t);
     gl.uniform4fv(uImpacts, impacts);
-    gl.uniform4f(uCrack, split.x * width, split.y * height, split.length * width, split.open);
-    gl.uniform1f(uPour, split.pour);
+    gl.uniform4fv(uBursts, bursts);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     if (enabled && visible && alive(t)) frame = requestFrame(draw);
   };
@@ -330,8 +386,6 @@ export function createSandRenderer(canvas: AnyCanvas): SandRenderer | null {
 
   return {
     resize(w, h) {
-      width = w;
-      height = h;
       canvas.width = Math.max(1, Math.round(w * RENDER_SCALE));
       canvas.height = Math.max(1, Math.round(h * RENDER_SCALE));
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -358,8 +412,13 @@ export function createSandRenderer(canvas: AnyCanvas): SandRenderer | null {
       nextSlot = (nextSlot + 1) % MAX_IMPACTS;
       wake();
     },
-    crack(next) {
-      Object.assign(split, next);
+    burst(x, y, power) {
+      const o = nextBurst * 4;
+      bursts[o] = x;
+      bursts[o + 1] = y;
+      bursts[o + 2] = now();
+      bursts[o + 3] = power;
+      nextBurst = (nextBurst + 1) % MAX_BURSTS;
       wake();
     },
     state(nextEnabled, nextVisible) {

@@ -39,6 +39,8 @@ function arrival(distance: number, amplitude: number) {
 export interface ShockTypeHandle {
   /** Sends a front from (x, y) in client px; `delay` in seconds. */
   shock(x: number, y: number, amplitude: number, delay?: number): void;
+  /** Lets a blast uncover the letters it reaches (needs `revealOnBurst`). */
+  reveal(x: number, y: number, power: number, delay?: number): void;
   element(): HTMLElement | null;
 }
 
@@ -54,6 +56,8 @@ interface ShockTypeProps {
   listen?: boolean;
   /** Letters lean towards the pointer as it moves over the container. */
   pressure?: boolean;
+  /** Letters stay hidden until a `hero-burst` blast reaches them. */
+  revealOnBurst?: boolean;
   /** Joined scripts (Arabic, Devanagari) lose their shaping when split. */
   whole?: boolean;
   /** Lines may wrap between words (headings); implies no fitting. */
@@ -77,6 +81,8 @@ interface Letter {
   push: number;
   pending: { at: number; impulse: number; push: number }[];
   last: string;
+  revealAt: number;
+  revealed: boolean;
 }
 
 export const ShockType = forwardRef<ShockTypeHandle, ShockTypeProps>(
@@ -90,6 +96,7 @@ export const ShockType = forwardRef<ShockTypeHandle, ShockTypeProps>(
       listen = false,
       pressure = false,
       whole = false,
+      revealOnBurst = false,
       wrap = false,
       enabled,
     },
@@ -183,6 +190,8 @@ export const ShockType = forwardRef<ShockTypeHandle, ShockTypeProps>(
           push: 0,
           pending: [],
           last: "",
+          revealAt: Infinity,
+          revealed: false,
         }),
       );
       lettersRef.current = letters;
@@ -196,6 +205,16 @@ export const ShockType = forwardRef<ShockTypeHandle, ShockTypeProps>(
         const dt = deltaMs / 1000;
         let busy = false;
         for (const letter of letters) {
+          if (!letter.revealed && letter.revealAt !== Infinity) {
+            busy = true;
+            if (letter.revealAt <= now) {
+              // Uncovered by the blast: it snaps in and rings like a struck bell.
+              letter.revealed = true;
+              letter.element.setAttribute("data-in", "");
+              letter.spring.velocity += 11;
+              letter.push = Math.sign(letter.push) * Math.min(18, Math.abs(letter.push) + 6);
+            }
+          }
           if (letter.pending.length) {
             busy = true;
             letter.pending = letter.pending.filter((hit) => {
@@ -244,6 +263,19 @@ export const ShockType = forwardRef<ShockTypeHandle, ShockTypeProps>(
         window.addEventListener("tectonic-impact", onImpact);
         cleanups.push(() => window.removeEventListener("tectonic-impact", onImpact));
       }
+      if (revealOnBurst) {
+        const onBurst = (event: Event) => {
+          const { x, y, power = 2, reveal } = (event as CustomEvent<{
+            x: number;
+            y: number;
+            power?: number;
+            reveal?: boolean;
+          }>).detail;
+          if (reveal) handle.reveal(x, y, power);
+        };
+        window.addEventListener("hero-burst", onBurst);
+        cleanups.push(() => window.removeEventListener("hero-burst", onBurst));
+      }
       if (pressure && matchMedia("(hover: hover) and (pointer: fine)").matches) {
         const area = root.closest("section") ?? root;
         let boxes: DOMRect[] = [];
@@ -289,7 +321,7 @@ export const ShockType = forwardRef<ShockTypeHandle, ShockTypeProps>(
       };
       // handle is stable for the lifetime of the letters.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [key, enabled, listen, pressure]);
+    }, [key, enabled, listen, pressure, revealOnBurst]);
 
     const handle: ShockTypeHandle = {
       shock(x, y, amplitude, delay = 0) {
@@ -313,6 +345,26 @@ export const ShockType = forwardRef<ShockTypeHandle, ShockTypeProps>(
             impulse: 9 * energy,
             push: Math.sign(cx - x) * Math.min(14, 4 + energy * 4),
           });
+        });
+        wakeRef.current();
+      },
+      reveal(x, y, power, delay = 0) {
+        const letters = lettersRef.current;
+        if (!letters.length || !rootRef.current?.offsetParent) return;
+        const now = performance.now() / 1000 + delay;
+        letters.forEach((letter) => {
+          if (letter.revealed) return;
+          const box = letter.element.getBoundingClientRect();
+          const cx = box.left + box.width / 2;
+          const cy = box.top + box.height / 2;
+          // A slightly slower front than the sand's: the letters follow the ring.
+          const t = arrival(Math.hypot(cx - x, cy - y), power * 0.75);
+          if (!Number.isFinite(t)) return;
+          const at = now + 0.03 + t * 1.25;
+          if (at < letter.revealAt) {
+            letter.revealAt = at;
+            letter.push = Math.sign(cx - x) * 6;
+          }
         });
         wakeRef.current();
       },

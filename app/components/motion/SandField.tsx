@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { sandCrack, triggerTectonicImpact } from "../../lib/tectonic";
+import { triggerTectonicImpact } from "../../lib/tectonic";
 import {
   createSandRenderer,
   type SandMessage,
@@ -56,8 +56,8 @@ function localLink(renderer: SandRenderer): SandLink {
           return renderer.theme(message.theme);
         case "impact":
           return renderer.impact(message.x, message.y, message.amplitude);
-        case "crack":
-          return renderer.crack(message.crack);
+        case "burst":
+          return renderer.burst(message.x, message.y, message.power);
         case "state":
           return renderer.state(message.enabled, message.visible);
       }
@@ -152,18 +152,19 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
     };
     const resize = () =>
       link.send({ type: "resize", width: stage.clientWidth, height: stage.clientHeight });
-    // Only the numbers: GSAP keeps its own bookkeeping on the tweened object,
-    // and functions cannot cross to the worker.
-    const sendCrack = () => {
-      const { x, y, length, open, pour } = sandCrack;
-      link.send({ type: "crack", crack: { x, y, length, open, pour } });
-    };
-
     const onPointerDown = (e: PointerEvent) => {
       // Links and buttons dispatch their own tectonic impact.
       if ((e.target as HTMLElement | null)?.closest("a, button")) return;
       // Through the shared event, so the type on the stage takes the front too.
       triggerTectonicImpact(e.clientX, e.clientY, 1.3);
+    };
+    // Opening bursts: the ground cracks and collapses where they land.
+    const onBurst = (e: Event) => {
+      const { x, y, power = 2 } =
+        (e as CustomEvent<{ x: number; y: number; power?: number }>).detail ?? {};
+      const rect = stage.getBoundingClientRect();
+      link.send({ type: "burst", x: x - rect.left, y: y - rect.top, power });
+      link.send({ type: "impact", x: x - rect.left, y: y - rect.top, amplitude: power });
     };
     const onTectonic = (e: Event) => {
       const { x, y, intensity = 1 } =
@@ -173,7 +174,6 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
 
     link.send({ type: "theme", theme: readTheme() });
     resize();
-    sendCrack();
     sendState();
 
     const resizeObserver = new ResizeObserver(resize);
@@ -192,7 +192,7 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
     visibilityObserver.observe(stage);
     stage.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("tectonic-impact", onTectonic);
-    window.addEventListener("sand-wake", sendCrack);
+    window.addEventListener("hero-burst", onBurst);
     document.addEventListener("visibilitychange", sendState);
 
     const owned = entry;
@@ -202,7 +202,7 @@ export function SandField({ stageRef, enabled }: SandFieldProps) {
       visibilityObserver.disconnect();
       stage.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("tectonic-impact", onTectonic);
-      window.removeEventListener("sand-wake", sendCrack);
+      window.removeEventListener("hero-burst", onBurst);
       document.removeEventListener("visibilitychange", sendState);
       linkRef.current = null;
       owned.closing = setTimeout(() => {
