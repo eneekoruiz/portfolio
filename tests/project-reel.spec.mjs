@@ -68,9 +68,9 @@ test("the next arrow keeps going sideways once released", async ({ page }) => {
   await page.evaluate((y) => scrollTo(0, y), end);
   await page.waitForTimeout(800);
   await page.locator("[data-reel-next]").click();
-  await page.waitForTimeout(900);
-  const state = await reelState(page);
-  expect(Math.abs(state.lefts[3])).toBeLessThan(3);
+  await expect
+    .poll(async () => Math.abs((await reelState(page)).lefts[3]), { timeout: 8000 })
+    .toBeLessThan(3);
 });
 
 test("every card is one glance: it fits the screen and its text never runs under another element", async ({

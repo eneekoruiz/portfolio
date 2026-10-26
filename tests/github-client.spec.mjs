@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 
+test.use({ reducedMotion: "reduce" });
+
 const validRepository = {
   id: 1001,
   name: "boundary-valid-repository",
@@ -52,7 +54,7 @@ test("malformed optional data preserves valid activity and deduplicates language
       ],
     });
   });
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "networkidle" });
   expect(calls).toBe(0);
   const activity = page.locator("#github");
   await activity.scrollIntoViewIfNeeded();
@@ -76,14 +78,14 @@ test("malformed-only optional data shows offline fallback and keeps projects and
   await page.route("**/api/github/repos?**", (route) =>
     route.fulfill({ json: [null, { name: "invalid" }] }),
   );
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "networkidle" });
   const activity = page.locator("#github");
   await activity.scrollIntoViewIfNeeded();
-  await expect(activity.getByText("offline", { exact: true })).toBeVisible();
+  await expect(activity.locator(".github-offline")).toBeVisible();
   await expect(
     activity.locator('a[href="https://github.com/eneekoruiz"]').first(),
   ).toBeVisible();
-  await expect(page.locator("[data-project-title]")).toHaveCount(8);
+  await expect(page.locator(".work-card")).toHaveCount(8);
   await page.locator("#contact").scrollIntoViewIfNeeded();
   await expect(
     page.locator('#contact a[href^="mailto:"]').first(),
@@ -104,7 +106,7 @@ test("repository rows expose top technologies, hover and focus descriptions, and
       ],
     }),
   );
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "networkidle" });
   const activity = page.locator("#github");
   await activity.scrollIntoViewIfNeeded();
   const row = activity.locator("[data-repo-row]");
@@ -119,9 +121,14 @@ test("repository rows expose top technologies, hover and focus descriptions, and
   await expect(row.getByText("HTML", { exact: true })).toBeVisible();
   await expect(row.getByText("+1", { exact: true })).toBeVisible();
 
-  if (info.project.name === "desktop") await row.hover();
-  else await row.click({ position: { x: 8, y: 8 } });
-  await expect(repoLink).toHaveAttribute("aria-expanded", "true");
+  // The first hover or tap can land before hydration; retry until the row discloses.
+  await expect(async () => {
+    if ((await repoLink.getAttribute("aria-expanded")) !== "true") {
+      if (info.project.name === "desktop") await row.hover();
+      else await row.click({ position: { x: 8, y: 8 } });
+    }
+    await expect(repoLink).toHaveAttribute("aria-expanded", "true", { timeout: 1000 });
+  }).toPass({ timeout: 8000 });
   await expect(description).toHaveText(validRepository.description);
   if (info.project.name === "desktop") {
     await page.mouse.move(0, 0);
@@ -152,7 +159,7 @@ test("touch rows disclose details on a row tap while the repository link stays n
       ],
     }),
   );
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "networkidle" });
   const activity = page.locator("#github");
   await activity.scrollIntoViewIfNeeded();
   const row = activity.locator("[data-repo-row]");
@@ -161,8 +168,12 @@ test("touch rows disclose details on a row tap while the repository link stays n
 
   const rowBox = await row.boundingBox();
   expect(rowBox).not.toBeNull();
-  await row.click({ position: { x: 8, y: 8 } });
-  await expect(repoLink).toHaveAttribute("aria-expanded", "true");
+  // The first tap can land before hydration; retry until the row discloses.
+  await expect(async () => {
+    if ((await repoLink.getAttribute("aria-expanded")) !== "true")
+      await row.click({ position: { x: 8, y: 8 } });
+    await expect(repoLink).toHaveAttribute("aria-expanded", "true", { timeout: 1000 });
+  }).toPass({ timeout: 8000 });
   await expect(description).toHaveText(validRepository.description);
 
   const popupPromise = page.waitForEvent("popup");

@@ -49,6 +49,12 @@ Cada sección es **una pantalla** (`.chapter`, `min-height: 100svh`) con su tít
 
 ## Cómo se comprueba
 
-- `tests/opening.spec.mjs`: la bienvenida cubre la pantalla, el nombre no existe en el instante del estallido, la apertura termina sola, una tecla la salta, el nombre ocupa todo el ancho y movimiento reducido no la reproduce.
-- `tests/project-reel.spec.mjs`: título una sola vez, retención de 3 tarjetas, flecha, tarjeta de un vistazo, estado antiguo guardado.
-- Auditoría responsive (28 combinaciones de ancho × alto, idiomas largos, modo oscuro, repositorios simulados): sin solapes, sin desbordes, cada capítulo en una pantalla.
+Los tests comprueban **comportamiento**, no aspecto: así un retoque de diseño no los rompe.
+
+- `npm run test:fast`: humo + apertura + carrusel (~30 s).
+- `npm run test:changed`: solo los specs que cambian respecto a `origin/main`.
+- `npm run test:e2e`: todo (~1 min con 4 workers; 1 reintento por test).
+
+Specs: `smoke` (carga sin errores, abrir proyecto y volver con Atrás, cada capítulo cabe en una pantalla, sin desbordes), `opening` (bienvenida, estallido, salto con tecla, nombre a ancho completo, movimiento reducido), `project-reel` (título una vez, retención de 3 tarjetas, flechas, movimiento activo por defecto), más GitHub, idioma/navegación y superposiciones.
+
+Se retiraron los specs que fijaban píxeles o interfaz ya eliminada (acordeón, lente de decisión, ADN en portada, retrato).
