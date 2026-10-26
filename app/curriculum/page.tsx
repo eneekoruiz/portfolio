@@ -46,6 +46,10 @@ export default function CurriculumPage() {
       }
     };
     window.addEventListener("message", handleMessage);
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "request-cv-ready" },
+      "https://eneko-ruiz-curriculum.vercel.app",
+    );
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
