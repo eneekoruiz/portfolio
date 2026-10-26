@@ -171,6 +171,7 @@ export default function CurriculumPage() {
             href="https://eneko-ruiz-curriculum.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={t.openDirect}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-page text-[11px] font-bold uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-lg"
           >
             <ExternalLink size={14} />
