@@ -188,8 +188,10 @@ export function createBurstFX(canvas: HTMLCanvasElement, density = 1): BurstFX |
     }
   };
 
+  // Read the theme colours once per run of the effect, not on every frame.
+  let cached: ReturnType<typeof palette> | null = null;
   const draw = (dt: number) => {
-    const pal = palette();
+    const pal = (cached ??= palette());
     ctx.clearRect(0, 0, width, height);
 
     // Dust sits under everything else.
@@ -340,6 +342,7 @@ export function createBurstFX(canvas: HTMLCanvasElement, density = 1): BurstFX |
     else {
       frame = 0;
       last = 0;
+      cached = null;
       ctx.clearRect(0, 0, width, height);
     }
   };

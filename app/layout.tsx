@@ -86,7 +86,7 @@ export default async function RootLayout({
                 .preloader-container, .splash-container, .identity-splash, #preloader, #splash, .cinematic-overture, .overture {
                   display: none !important;
                 }
-                #hero [data-kinetic-char], #hero [data-cine-ui],
+                #hero [data-char], #hero [data-cine-ui],
                 .title-char, .word-inner, .about-reveal, .animate-char {
                   opacity: 1 !important;
                   transform: none !important;

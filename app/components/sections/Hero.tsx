@@ -66,7 +66,7 @@ export function Hero({ t, reduced, phase, onIntroComplete }: HeroProps) {
       id="hero"
       aria-label="Eneko Ruiz"
       data-cinematic={intro ? "" : undefined}
-      className="hero-brutal materia-hero relative flex min-h-[100svh] flex-col overflow-hidden"
+      className="hero-brutal relative flex min-h-[100svh] flex-col overflow-hidden"
     >
       <SandField stageRef={heroRef} enabled={enabled} />
       <div className="hero-rules" aria-hidden="true" />
