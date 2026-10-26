@@ -4,10 +4,10 @@ import { SkipLink } from "./components/ui/SkipLink";
 import "./styles/globals.css";
 import "./styles/materia.css";
 import "./styles/editorial.css";
-import "./styles/compact-sections.css";
 import "./styles/project-preview.css";
 import "./styles/project-reel.css";
-import "./styles/contact-expression.css";
+import "./styles/brutal.css";
+import "./styles/stack-cards.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";
@@ -56,13 +56,9 @@ export default async function RootLayout({
               (function() {
                 try {
                   var q = new URLSearchParams(location.search);
-                  if (q.get('lite') === '1') {
-                    window.__LITE = true;
-                    localStorage.setItem('lite', '1');
-                    document.documentElement.setAttribute('data-lite', '1');
-                    return;
-                  }
-                  if (localStorage.getItem('lite') === '1') {
+                  localStorage.removeItem('lite');
+                  if (q.get('lite') === '1') sessionStorage.setItem('lite', '1');
+                  if (sessionStorage.getItem('lite') === '1') {
                     window.__LITE = true;
                     document.documentElement.setAttribute('data-lite', '1');
                     return;
@@ -87,10 +83,10 @@ export default async function RootLayout({
                   visibility: visible !important;
                   opacity: 1 !important;
                 }
-                .preloader-container, .splash-container, .identity-splash, #preloader, #splash, .cinematic-overture {
+                .preloader-container, .splash-container, .identity-splash, #preloader, #splash, .cinematic-overture, .overture {
                   display: none !important;
                 }
-                #hero [data-kinetic-char], #hero [data-cine-ui],
+                #hero [data-char], #hero [data-cine-ui],
                 .title-char, .word-inner, .about-reveal, .animate-char {
                   opacity: 1 !important;
                   transform: none !important;

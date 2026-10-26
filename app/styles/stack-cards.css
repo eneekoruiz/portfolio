@@ -1,0 +1,232 @@
+/* The Stack cards: the original look, kept as it was. */
+
+#skills .skills-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.15rem;
+}
+#skills .skill-orbit-card {
+  min-width: 0;
+  border-radius: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#skills .skill-orbit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 60px -25px color-mix(in srgb, var(--surface-color) 70%, transparent);
+}
+#skills .skill-orbit-header {
+  gap: 0.85rem;
+}
+#skills .skill-orbit-header h3 {
+  min-width: 0;
+  font-size: clamp(0.9375rem, 1.35vw, 1.125rem);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+#skills .skill-orbit {
+  margin-top: 0.85rem;
+  min-height: 110px;
+  gap: 0.5rem;
+}
+#skills .skill-orbit[data-orbit-active] {
+  height: 140px;
+}
+#skills .skill-orbit-pill {
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.25;
+  background: color-mix(in srgb, var(--page) 90%, var(--surface-color));
+  border: 1px solid color-mix(in srgb, var(--surface-color) 40%, var(--ink) 15%);
+  box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--surface-color) 25%, transparent);
+  letter-spacing: 0.02em;
+}
+#skills .skill-orbit-pill > span {
+  width: 6px;
+  height: 6px;
+  margin-inline-end: 6px;
+  border-radius: 50%;
+  color: var(--surface-color);
+}
+#skills .skill-orbit-help {
+  margin-top: 0.6rem;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  #skills .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.15rem;
+  }
+  #skills .skills-grid > :nth-child(5):last-child {
+    grid-column: 1 / -1;
+    max-width: 480px;
+    justify-self: center;
+    width: 100%;
+  }
+}
+@media (min-width: 1024px) {
+  #skills .skills-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  #skills .skills-grid > :nth-child(-n+3) {
+    grid-column: span 2;
+  }
+  #skills .skills-grid > :nth-child(4) {
+    grid-column: 2 / span 2;
+  }
+  #skills .skills-grid > :nth-child(5) {
+    grid-column: 4 / span 2;
+  }
+}
+
+/* ── Sized to one screen. The cards keep their look; they only get shorter. */
+#skills .skill-orbit-card {
+  padding: clamp(0.85rem, 2.2svh, 1.5rem);
+}
+#skills .skill-orbit-icon {
+  width: clamp(2.25rem, 5svh, 3rem);
+  height: clamp(2.25rem, 5svh, 3rem);
+}
+#skills .skill-orbit {
+  min-height: clamp(76px, 15svh, 110px);
+}
+#skills .skill-orbit[data-orbit-active] {
+  height: clamp(76px, 17svh, 140px);
+}
+#skills .skills-grid {
+  gap: clamp(0.6rem, 1.8svh, 1.25rem);
+}
+
+#values .philosophy-card {
+  min-height: 0;
+  padding: clamp(0.8rem, 2.2svh, 1.5rem);
+}
+#values .philosophy-card [data-bento-visual] > div:first-child {
+  margin-bottom: clamp(0.35rem, 1.6svh, 1.5rem);
+}
+#values .philosophy-card h3 {
+  margin-bottom: clamp(0.15rem, 0.8svh, 0.75rem);
+  font-size: clamp(1.05rem, 2.4svh, 1.5rem);
+}
+#values .philosophy-card p {
+  font-size: clamp(0.8rem, 1.8svh, 0.9rem);
+  line-height: 1.45;
+}
+#values .chapter-body > div {
+  gap: clamp(0.6rem, 1.8svh, 1rem);
+}
+
+/* Phones: a swipeable row, one card at a time (the page stays on one screen). */
+@media (max-width: 767px), (max-height: 500px) {
+  #skills .skills-grid,
+  #values .chapter-body > div {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-auto-columns: min(84%, 22rem);
+    gap: 0.75rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0.25rem var(--gutter) 0.5rem;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  #skills .skills-grid::-webkit-scrollbar,
+  #values .chapter-body > div::-webkit-scrollbar {
+    display: none;
+  }
+  #skills .skills-grid > *,
+  #values .chapter-body > div > * {
+    scroll-snap-align: start;
+    grid-column: auto !important;
+    max-width: none !important;
+  }
+  /* The row owns horizontal swipes; the orbit keeps turning on its own. */
+  #skills .skill-orbit {
+    touch-action: pan-x pan-y;
+  }
+  #skills .skill-orbit-card,
+  #values .philosophy-card {
+    min-height: min(52svh, 22rem);
+    padding: 1.25rem;
+  }
+  #skills .skill-orbit,
+  #skills .skill-orbit[data-orbit-active] {
+    height: clamp(120px, 24svh, 190px);
+    min-height: 0;
+  }
+  #skills .skills-grid > .skill-orbit-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  #values .philosophy-card {
+    justify-content: center;
+  }
+  #values .philosophy-card h3 {
+    font-size: 1.35rem;
+  }
+  #values .philosophy-card p {
+    font-size: 0.95rem;
+  }
+}
+@media (max-height: 500px) {
+  #skills .skill-orbit-card,
+  #values .philosophy-card {
+    min-height: 0;
+    padding: 0.8rem 1rem;
+  }
+  #skills .skill-orbit,
+  #skills .skill-orbit[data-orbit-active] {
+    height: 84px;
+  }
+}
+
+/* Tablets in portrait: narrower columns, so the cards give back some height. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  #skills .skill-orbit {
+    min-height: clamp(70px, 10svh, 100px);
+  }
+  #skills .skill-orbit[data-orbit-active] {
+    height: clamp(70px, 11svh, 110px);
+  }
+  #skills .skill-orbit-card {
+    padding: 0.85rem 1rem;
+  }
+  #values .philosophy-card {
+    padding: 0.85rem 1rem;
+  }
+  #values .philosophy-card [data-bento-visual] > div:first-child {
+    margin-bottom: 0.4rem;
+  }
+  #values .philosophy-card p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
+
+/* Short desktop windows: the chapter gives back its air, the cards stay as they are. */
+@media (min-width: 768px) and (max-height: 780px) {
+  .chapter {
+    padding-top: 4.75rem;
+    padding-bottom: 1rem;
+  }
+  .chapter-head {
+    margin-bottom: 0.75rem;
+  }
+  .chapter-title {
+    font-size: clamp(2rem, 9svh, 4.5rem);
+  }
+  #values .philosophy-card {
+    padding: 0.6rem 0.9rem;
+  }
+  #skills .skill-orbit-card {
+    padding: 0.6rem 0.9rem;
+  }
+}

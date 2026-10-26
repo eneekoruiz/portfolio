@@ -47,7 +47,7 @@ export function Philosophy({ t }: { t: Tx }) {
   const motion = useMotionEnabled();
 
   return (
-    <SectionFrame id="values" index="04" label={t.valLb} title={t.valH}>
+    <SectionFrame id="values" title={t.valH}>
       <span id="philosophy" className="absolute top-0" aria-hidden="true" />
 
       <div className="relative z-10 grid gap-4 md:grid-cols-3">

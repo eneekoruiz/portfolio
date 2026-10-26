@@ -23,13 +23,17 @@ export function triggerTectonicImpact(
 }
 
 /**
- * The breach the hero cinematic opens in the sand. Fractions of the stage size;
- * `open` 0..1 drives width and propagation, `glow` the ember light inside it.
- * Mutated by GSAP; call wakeSand() after each change so the field redraws.
+ * A burst of the opening: the sand cracks and collapses, sparks and earth fly,
+ * and the name takes the letters the blast reaches. See useHeroCinematic.
  */
-export const sandCrack = { x: 0.5, y: 0.5, length: 0.46, open: 0, glow: 0 };
-
-export function wakeSand() {
-  if (typeof window !== "undefined")
-    window.dispatchEvent(new Event("sand-wake"));
+export function triggerHeroBurst(
+  x: number,
+  y: number,
+  power: number,
+  options: { tint?: "ember" | "brand"; reveal?: boolean } = {},
+) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent("hero-burst", { detail: { x, y, power, ...options } }),
+  );
 }

@@ -3,7 +3,6 @@
 import { GithubIcon, LinkedinIcon } from "lucide-react";
 import { useMagnetic } from "../../hooks/useMagnetic";
 import { useSound } from "../../hooks/useSound";
-import { LiveStatus } from "../ui/LiveStatus";
 import { PortalWarpBtn } from "../ui/Buttons";
 import type { Tx } from "../../types";
 
@@ -16,13 +15,12 @@ export function SiteFooter({ t }: { t: Tx }) {
 
   return (
     <footer
-      className="border-t border-black/10 dark:border-white/10 py-8 px-6 md:px-8 max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4"
+      className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-6 border-t border-black/10 px-5 py-8 dark:border-white/10 md:flex-row md:gap-4 md:px-10"
       data-noprint
     >
-      {/* Izquierda — Status (Centrado en móvil, a la izquierda en PC) */}
-      <div className="w-full md:w-auto flex justify-center md:justify-start">
-        <LiveStatus label={t.status} />
-      </div>
+      <p className="w-full md:w-auto text-center md:text-left text-xs text-lead">
+        © {new Date().getFullYear()} Eneko Ruiz · Donostia
+      </p>
 
       {/* Centro — Tech + Source (Oculto en móvil, visible en PC) */}
       <div className="hidden md:flex items-center gap-6">

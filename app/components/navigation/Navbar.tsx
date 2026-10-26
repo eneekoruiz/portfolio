@@ -86,6 +86,7 @@ export function Navbar({
   }, [lang, navInnerRef, logoRef]);
   return (
     <header
+      data-site-nav
       className="fixed top-3 left-1/2 z-[100] -translate-x-1/2 w-[calc(100dvw-2rem)] max-w-[940px]"
       data-noprint
     >

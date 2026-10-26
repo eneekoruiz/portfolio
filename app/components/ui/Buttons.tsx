@@ -376,7 +376,6 @@ export function BranchMergeBtn({
         <>
           <GithubIcon size={15} aria-hidden="true" />
           <span>{label}</span>
-          <span className="font-mono opacity-40 text-[11px]">_</span>
         </>
       )}
       {state === "animating" && (

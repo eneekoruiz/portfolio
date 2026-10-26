@@ -30,13 +30,18 @@ export function subscribeMotion(listener: () => void) {
       deviceMemory?: number;
       connection?: Connection;
     };
+    // Motion is on by default on every load. The pause button only lasts for
+    // the page it was pressed on: a stale stored "paused" used to survive every
+    // refresh and hide the whole site from people who never asked for it.
+    // sessionStorage stays readable as an override for tests and debugging.
     let preference: boolean | null = null;
-    // A click can opt into light motion for this visit. A stored preference
-    // alone never overrides the operating system's reduced-motion setting.
+    // A click can opt into light motion for this visit. The operating system's
+    // reduced-motion setting is still honoured until the visitor asks otherwise.
     let explicitOptIn = false;
     const readPreference = () => {
       try {
-        const value = localStorage.getItem("portfolio-motion-enabled");
+        localStorage.removeItem("portfolio-motion-enabled");
+        const value = sessionStorage.getItem("portfolio-motion-enabled");
         preference = value === null ? null : value === "true";
       } catch {
         preference = null;
