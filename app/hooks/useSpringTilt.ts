@@ -16,7 +16,7 @@ export function useSpringTilt(
       visual = visualRef.current;
     if (!host || !visual || !enabled) return;
     const pointer = matchMedia(
-      "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)",
+      "(hover: hover) and (pointer: fine)",
     );
     const x = new SpringValue(0, 150, 20),
       y = new SpringValue(0, 150, 20),

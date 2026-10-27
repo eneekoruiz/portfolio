@@ -72,9 +72,20 @@ test("the name spans the whole measure at this size", async ({ page }) => {
   }
 });
 
-test("reduced motion gets the poster at once, without the opening", async ({ browser }) => {
+test("the OS reduced-motion flag still plays the opening", async ({ browser }) => {
+  // Windows' "best performance" profile reports reduce; it must not pause the site.
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const page = await context.newPage();
+  await page.goto("/");
+  await expect(page.locator(".overture")).toBeVisible();
+  await expect(page.locator("[data-motion-toggle]")).toHaveAttribute("aria-pressed", "true");
+  await context.close();
+});
+
+test("motion paused for the visit gets the poster at once, without the opening", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.addInitScript(() => sessionStorage.setItem("portfolio-motion-enabled", "false"));
   await page.goto("/");
   await expect(page.locator(".overture")).toBeHidden();
   await expect(page.locator("#hero")).not.toHaveAttribute("data-cinematic", "", { timeout: 5000 });

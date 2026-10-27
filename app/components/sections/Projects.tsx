@@ -81,7 +81,6 @@ export function Projects({
   const sectionRef = useRef<HTMLElement>(null);
   const runwayRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const counterRef = useRef<HTMLSpanElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
 
   // 1. Mobile view detection
@@ -109,9 +108,6 @@ export function Projects({
     const show = () => {
       frame = 0;
       const max = track.scrollWidth - track.clientWidth;
-      const index = Math.min(count - 1, Math.round(track.scrollLeft / step()));
-      if (counterRef.current)
-        counterRef.current.textContent = String(index + 1).padStart(2, "0");
       if (progressRef.current)
         progressRef.current.style.transform = `scaleX(${max > 0 ? track.scrollLeft / max : 0})`;
       const atStart = String(track.scrollLeft < 4);
@@ -175,6 +171,9 @@ export function Projects({
         if (!rewind?.isActive()) track.scrollLeft = self.progress * distance();
       },
       onLeave: () => release(true),
+      // While the reel holds the screen the top bar steps aside for the work.
+      onToggle: (self) =>
+        document.documentElement.toggleAttribute("data-reel-stage", self.isActive),
       // Settle on a card, in the direction of travel, never between two.
       snap:
         held > 1
@@ -191,6 +190,7 @@ export function Projects({
       cancelAnimationFrame(frame);
       rewind?.kill();
       trigger.kill();
+      document.documentElement.removeAttribute("data-reel-stage");
       triggerRef.current = null;
       track.removeEventListener("scroll", onScroll);
       runway.style.removeProperty("--reel-runway");
@@ -272,14 +272,6 @@ export function Projects({
               <div className="projects-reel-progress" aria-hidden="true">
                 <div ref={progressRef} />
               </div>
-              <span
-                className="font-mono text-[11px] font-bold tabular-nums tracking-[0.18em] text-lead"
-                aria-hidden="true"
-              >
-                <span ref={counterRef} className="text-ink">01</span>
-                <span className="opacity-40"> / </span>
-                {String(Math.max(count, 1)).padStart(2, "0")}
-              </span>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -335,10 +327,11 @@ export function Projects({
           {load ? (
             <div className="py-4">
               {[0, 1, 2, 3].map((i) => (
+                // Static: the fetch waits until the chapter is near, and a pulse
+                // kept the compositor busy off-screen for the whole visit.
                 <div
                   key={i}
-                  className="border-b border-black/7 dark:border-white/10 py-5 flex items-center gap-5 animate-pulse"
-                  style={{ animationDelay: `${i * 0.07}s` }}
+                  className="border-b border-black/7 dark:border-white/10 py-5 flex items-center gap-5"
                 >
                   <span className="w-5 h-3 rounded bg-black/8 dark:bg-white/8 shrink-0" />
                   <span className="h-4 flex-1 max-w-[220px] rounded bg-black/8 dark:bg-white/8" />

@@ -89,6 +89,18 @@
 .umbral-surface[hidden] {
   display: none;
 }
+.umbral-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 45%,
+    color-mix(in srgb, var(--wash) 26%, transparent),
+    color-mix(in srgb, var(--wash) 8%, transparent) 60%,
+    transparent
+  );
+}
 [data-umbral-clone] {
   border: 0;
   border-radius: 0;
@@ -255,7 +267,13 @@ html[data-lite="1"] .materia-surface {
   background: var(--page);
   box-shadow: 0 24px 44px -24px
     color-mix(in srgb, var(--surface-color, var(--brand)) 38%, transparent);
-  transform: translateZ(var(--preview-depth, 0px));
+}
+/* Depth only while the card is being moved; flat at rest. */
+.project-visual-frame[style*="--preview-depth"] {
+  transform: translateZ(var(--preview-depth));
+}
+.project-visual-glint[style*="--preview-depth"] {
+  transform: translateZ(calc(var(--preview-depth) + 1px));
 }
 .project-visual-chrome {
   height: 28px;
@@ -318,7 +336,6 @@ html[data-lite="1"] .materia-surface {
     transparent 70%,
     #ffffff15
   );
-  transform: translateZ(calc(var(--preview-depth, 0px) + 1px));
 }
 .project-hero-art {
   transform: perspective(1600px) rotateY(-14deg) rotateZ(6deg);
@@ -356,7 +373,7 @@ html[dir="rtl"] .text-left {
     opacity: 0.12;
   }
 }
-@media (prefers-reduced-motion: reduce) {
+:root[data-paused] {
   .project-visual,
   .project-visual-frame {
     transform: none !important;
@@ -442,7 +459,7 @@ html[data-motion="off"] *::after {
   transition-duration: 0s !important;
   scroll-behavior: auto !important;
 }
-@media (prefers-reduced-motion: reduce) {
+:root[data-paused] {
   *,
   *::before,
   *::after {

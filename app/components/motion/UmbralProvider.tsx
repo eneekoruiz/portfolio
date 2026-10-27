@@ -112,8 +112,21 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
       const content = contentRef.current;
       if (content) {
         content.inert = true;
-        gsap.to(content, { opacity: 0, duration: 0.18, overwrite: true });
+        // The page sinks back behind the card instead of blinking out.
+        gsap.to(content, {
+          opacity: 0,
+          scale: 0.94,
+          transformOrigin: `50% ${scrollY + innerHeight / 2}px`,
+          duration: 0.55,
+          ease: "power3.in",
+          overwrite: true,
+        });
       }
+      // The project's colour floods out from the card as it opens.
+      const wash = document.createElement("div");
+      wash.className = "umbral-wash";
+      wash.style.setProperty("--wash", color);
+      shell.appendChild(wash);
       let disposed = false;
       let handingOff = false;
       let transition: ViewTransition | undefined;
@@ -133,6 +146,7 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
         if (content) {
           gsap.killTweensOf(content);
           content.style.removeProperty("opacity");
+          content.style.removeProperty("transform");
           content.inert = false;
         }
         gsap.killTweensOf(clone.querySelectorAll("[data-project-body]"));
@@ -188,7 +202,11 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
           try {
             const vt = document.startViewTransition(() => {
               shell.hidden = true;
-              if (content) content.style.opacity = "1";
+              if (content) {
+                gsap.killTweensOf(content);
+                content.style.removeProperty("transform");
+                content.style.opacity = "1";
+              }
               if (destination)
                 destination.style.viewTransitionName = "project-surface";
               if (destinationTitle)
@@ -204,7 +222,11 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
             finishFocus();
           }
         } else {
-          if (content) content.style.opacity = "1";
+          if (content) {
+            gsap.killTweensOf(content);
+            content.style.removeProperty("transform");
+            content.style.opacity = "1";
+          }
           gsap.to(shell, {
             opacity: 0,
             duration: 0.2,
@@ -257,25 +279,46 @@ export function UmbralProvider({ children }: { children: ReactNode }) {
           margin: "0",
           textAlign: "center",
           fontSize: "clamp(3rem, 11vw, 9rem)",
-          lineHeight: "0.85",
-          letterSpacing: "-0.05em",
+          fontWeight: "900",
+          lineHeight: "0.9",
+          letterSpacing: "-0.045em",
           color,
         });
-      animation = Flip.from(state, {
-        duration: 0.72,
-        ease: "expo.inOut",
-        scale: true,
-        nested: true,
-        onComplete: () => {
-          journey.expanded = true;
-          complete();
-        },
-      });
-      gsap.to(clone.querySelectorAll("[data-project-body]"), {
-        opacity: 0,
-        duration: 0.18,
-        overwrite: true,
-      });
+      // Three beats: the card's small print leaves, the surface opens to the
+      // screen while the colour floods out from where the card was, and the
+      // title travels to the centre a breath behind it.
+      const originX = ((rect.left + rect.width / 2) / innerWidth) * 100;
+      const originY = ((rect.top + rect.height / 2) / innerHeight) * 100;
+      animation = gsap
+        .timeline({
+          onComplete: () => {
+            journey.expanded = true;
+            complete();
+          },
+        })
+        .to(
+          clone.querySelectorAll(
+            "[data-project-body], .work-card-pitch, .work-card-tech, .work-card-actions, .work-card-story",
+          ),
+          { opacity: 0, y: -14, duration: 0.28, ease: "power2.in", stagger: 0.04 },
+          0,
+        )
+        .add(
+          Flip.from(state, {
+            duration: 0.95,
+            ease: "expo.inOut",
+            scale: true,
+            nested: true,
+          }),
+          0.08,
+        )
+        .fromTo(
+          wash,
+          { clipPath: `circle(0% at ${originX}% ${originY}%)`, opacity: 1 },
+          { clipPath: `circle(150% at ${originX}% ${originY}%)`, duration: 1, ease: "power3.inOut" },
+          0.12,
+        )
+        .to(wash, { opacity: 0, duration: 0.35, ease: "power1.out" }, 0.85);
       // Next navigates during the expansion, rather than waiting behind a loading screen.
       frame = requestAnimationFrame(() => router.push(url, { scroll: false }));
       timeout = setTimeout(dispose, 8000);
