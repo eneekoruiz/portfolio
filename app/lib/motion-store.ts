@@ -35,9 +35,6 @@ export function subscribeMotion(listener: () => void) {
     // refresh and hide the whole site from people who never asked for it.
     // sessionStorage stays readable as an override for tests and debugging.
     let preference: boolean | null = null;
-    // A click can opt into light motion for this visit. The operating system's
-    // reduced-motion setting is still honoured until the visitor asks otherwise.
-    let explicitOptIn = false;
     const readPreference = () => {
       try {
         localStorage.removeItem("portfolio-motion-enabled");
@@ -57,12 +54,16 @@ export function subscribeMotion(listener: () => void) {
         (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) ||
         (nav.hardwareConcurrency > 0 && nav.hardwareConcurrency <= 4);
       const visible = document.visibilityState === "visible";
-      const reducedMotion = reduced.matches && !explicitOptIn;
+      // The OS reduced-motion flag only lightens the scene. Windows sets it for
+      // anyone on the "best performance" profile, and pausing on it hid the
+      // opening from visitors who never asked; the pause button is the opt-out.
       const allowed =
-        !reducedMotion &&
-        (preference ?? (window.__LITE !== true && !nav.connection?.saveData));
+        preference ?? (window.__LITE !== true && !nav.connection?.saveData);
+      const reducedMotion = !allowed;
       const enabled = visible && allowed && !isBodyScrollLocked();
-      document.documentElement.dataset.motion = enabled ? "on" : "off";
+      const root = document.documentElement;
+      root.dataset.motion = enabled ? "on" : "off";
+      root.toggleAttribute("data-paused", !allowed);
       if (
         snapshot.allowed === allowed &&
         snapshot.enabled === enabled &&
@@ -82,25 +83,13 @@ export function subscribeMotion(listener: () => void) {
     };
     const change = (event: Event) => {
       const detail = (
-        event as CustomEvent<{
-          enabled?: boolean;
-          userInitiated?: boolean;
-        }>
+        event as CustomEvent<{ enabled?: boolean }>
       ).detail;
-      if (typeof detail?.enabled === "boolean") {
-        preference = detail.enabled;
-        explicitOptIn = detail.enabled && detail.userInitiated === true;
-      } else {
-        explicitOptIn = false;
-        readPreference();
-      }
+      if (typeof detail?.enabled === "boolean") preference = detail.enabled;
+      else readPreference();
       update();
     };
-    const systemPreferenceChanged = () => {
-      explicitOptIn = false;
-      update();
-    };
-    reduced.addEventListener("change", systemPreferenceChanged);
+    reduced.addEventListener("change", update);
     touch.addEventListener("change", update);
     nav.connection?.addEventListener("change", update);
     document.addEventListener("visibilitychange", update);
@@ -108,7 +97,7 @@ export function subscribeMotion(listener: () => void) {
     window.addEventListener("portfolio-motion-changed", change);
     window.addEventListener("storage", change);
     dispose = () => {
-      reduced.removeEventListener("change", systemPreferenceChanged);
+      reduced.removeEventListener("change", update);
       touch.removeEventListener("change", update);
       nav.connection?.removeEventListener("change", update);
       document.removeEventListener("visibilitychange", update);

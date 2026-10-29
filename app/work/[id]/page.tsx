@@ -564,9 +564,6 @@ export default function ProjectPage() {
   // ── Loading states ───────────────────────────────────────────────────────
   if (!content || !summary) return notFound();
 
-  // Calculate project index for numbering
-  const projectIndex = Object.keys(PROJECT_SUMMARIES).indexOf(safeId) + 1;
-
   return (
     <div
       ref={main}
@@ -629,7 +626,6 @@ export default function ProjectPage() {
         label={theme.label}
         langs={summary?.langs ?? []}
         darkMode={darkMode}
-        index={projectIndex}
         isReady={isReadyToAnimate}
         lang={lang}
       />

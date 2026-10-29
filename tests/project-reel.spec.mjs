@@ -104,11 +104,28 @@ test("every card is one glance: it fits the screen and its text never runs under
     expect(card.clipped).toBeLessThanOrEqual(1);
     expect(card.previewHeight).toBeGreaterThan(90);
     expect(card.techCount).toBeLessThanOrEqual(3);
-    // The whole card is one link; there is no disclosure and no second action.
+    // The whole card is one link; "Details" is the only other control.
     expect(card.links).toBe(1);
     expect(card.actionInside).toBe(true);
   }
-  await expect(page.locator(".work-card button")).toHaveCount(0);
+  await expect(page.locator(".work-card button")).toHaveCount(8);
+});
+
+test("details fold the preview away and show the story in the same space", async ({ page }) => {
+  await openReel(page);
+  const { top } = await runway(page);
+  await page.evaluate((y) => scrollTo(0, y), top);
+  const card = page.locator(".work-card").first();
+  const before = await card.boundingBox();
+  const toggle = card.locator(".work-card-details");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(card.locator(".work-card-story")).not.toHaveAttribute("inert", "");
+  await expect(card.locator(".work-card-story h4, .work-card-story p").first()).toBeVisible();
+  expect((await card.boundingBox()).height).toBeCloseTo(before.height, 0);
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
 
 test("motion and the opening are on by default, even with stale stored state", async ({

@@ -288,7 +288,7 @@ html.reveal-cursor .cur-ring {
 }
 
 /* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
+:root[data-paused] {
   .btn-aura::before,
   .btn-aura:hover::before {
     transition: none !important;
@@ -718,7 +718,7 @@ html {
 }
 
 /* ── 16. REDUCED MOTION ── */
-@media (prefers-reduced-motion: reduce) {
+:root[data-paused] {
   .helix-group,
   .helix-strand-a,
   .helix-strand-b,
@@ -1071,7 +1071,7 @@ a[role="button"]:active,
   transition: transform 0.08s ease-out;
 }
 
-@media (prefers-reduced-motion: reduce) {
+:root[data-paused] {
   .portal-scan-field,
   .preloader-signal-mask {
     opacity: 0.12 !important;

@@ -3,6 +3,10 @@ import { UI_COPY } from "../app/data/interface-translations.ts";
 import { COMMAND_COPY } from "../app/data/command-translations.ts";
 
 test.use({ reducedMotion: "reduce" });
+// Motion paused for the visit: these specs check content, not the opening.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("portfolio-motion-enabled", "false"));
+});
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("portfolio_lang", "es"));
 });
