@@ -26,7 +26,7 @@ export const SKILLS: readonly SkillCategory[] = [
     rgb: "66, 140, 235",
     tint: "from-blue-500/10",
     border: "border-blue-500/20",
-    techs: ["Python", "Java", "C/C++", "Node.js", "Express", "Spring", "Rust"],
+    techs: ["C#", ".NET", "Node.js", "Express", "Python", "Java", "C/C++", "Spring"],
   },
   {
     g: "Frontend",
@@ -44,7 +44,7 @@ export const SKILLS: readonly SkillCategory[] = [
     rgb: "201, 117, 6",
     tint: "from-orange-500/10",
     border: "border-orange-500/20",
-    techs: ["Linux", "Docker", "Git", "Bash", "SSH", "Make", "CI/CD"],
+    techs: ["Linux", "Docker", "Azure", "AWS", "Git", "Bash", "SSH", "CI/CD"],
   },
   {
     g: "DB",
@@ -53,7 +53,7 @@ export const SKILLS: readonly SkillCategory[] = [
     rgb: "173, 107, 209",
     tint: "from-purple-500/10",
     border: "border-purple-500/20",
-    techs: ["PostgreSQL", "MySQL", "SQLite", "MongoDB", "Redis", "Prisma"],
+    techs: ["PostgreSQL", "SQL Server", "MySQL", "SQLite", "MongoDB", "Redis", "Prisma"],
   },
   {
     g: "AI & LLM",
@@ -111,6 +111,11 @@ export const LANG_COLORS: Record<string, string> = {
   Rust: "#DEA584",
   Makefile: "#427819",
   "Node.js": "#339933",
+  "C#": "#239120",
+  ".NET": "#512BD4",
+  Azure: "#0078D4",
+  AWS: "#FF9900",
+  "SQL Server": "#CC292B",
   Express: "#353535",
   Spring: "#6DB33F",
   React: "#61DAFB",
