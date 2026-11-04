@@ -38,7 +38,7 @@ function shouldPlayIntro(): boolean {
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
     window.__lenis?.scrollTo(0, { immediate: true, force: true });
-    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return true;
   } catch {
     return false;
   }

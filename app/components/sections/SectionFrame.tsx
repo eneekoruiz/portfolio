@@ -14,14 +14,11 @@ export function SectionFrame({
   title,
   children,
   className = "",
-  fitTitle = false,
 }: {
   id: string;
   title: string;
   children: ReactNode;
   className?: string;
-  /** Run the title edge to edge (the closing chapter). */
-  fitTitle?: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
   const motion = useMotionEnabled();
@@ -78,7 +75,7 @@ export function SectionFrame({
       className={`chapter relative z-10 ${className}`}
     >
       <header className="chapter-head">
-        <ChapterTitle id={`${id}-heading`} title={title} fit={fitTitle} />
+        <ChapterTitle id={`${id}-heading`} title={title} />
       </header>
       <div className="chapter-body">{children}</div>
     </section>

@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 
 test.use({ reducedMotion: "reduce" });
+// Motion paused for the visit: these specs check content, not the opening.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("portfolio-motion-enabled", "false"));
+});
 test.beforeEach(async ({ page }, info) => {
   if (info.project.name === "desktop")
     await page.setViewportSize({ width: 780, height: 900 });

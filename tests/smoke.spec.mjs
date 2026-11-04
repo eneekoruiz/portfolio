@@ -2,6 +2,10 @@ import { test, expect } from "@playwright/test";
 
 // Behaviour only: nothing here depends on how the page looks.
 test.use({ reducedMotion: "reduce" });
+// Motion paused for the visit: these specs check content, not the opening.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("portfolio-motion-enabled", "false"));
+});
 
 test("home loads without errors and every chapter exists", async ({ page }) => {
   const errors = [];
