@@ -42,7 +42,7 @@ export const HeroScrollHUD = forwardRef<HTMLDivElement, HeroScrollHUDProps>(
           <div className="w-5 h-8 rounded-full border border-white/20 flex justify-center pt-1.5 relative overflow-hidden bg-white/[0.02]">
             <div className="w-1 h-1.5 rounded-full bg-white/70 animate-scroll-dot" />
           </div>
-          <p className="font-mono text-[8px] uppercase tracking-[0.4em] text-white/50 text-center leading-relaxed">
+          <p className="text-[12px] text-white/50 text-center leading-relaxed">
             {s.deepScroll}
           </p>
         </div>
@@ -52,7 +52,7 @@ export const HeroScrollHUD = forwardRef<HTMLDivElement, HeroScrollHUDProps>(
           ref={scrollHintProgressRef}
           className="hidden flex-col items-center gap-2.5 w-full"
         >
-          <div className="flex items-center justify-between w-full font-mono text-[8px] uppercase tracking-[0.3em] text-white/60 font-black">
+          <div className="flex items-center justify-between w-full text-[12px] text-white/60 font-semibold">
             <span>{s.initializing}</span>
             <span ref={scrollTextRef} className="text-white">
               0%

@@ -58,7 +58,6 @@ interface ProjectHeroProps {
   label: string;
   langs: string[];
   darkMode: boolean;
-  index?: number;
   isReady?: boolean;
   lang?: Lang;
 }
@@ -76,7 +75,6 @@ export function ProjectHero({
   label,
   langs,
   darkMode,
-  index = 1,
   isReady = true,
   lang = "es",
 }: ProjectHeroProps) {
@@ -649,7 +647,7 @@ export function ProjectHero({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 pr-6 border-r border-white/10">
                 <div className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse shadow-[0_0_10px_var(--brand)]" />
-                <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/90 truncate max-w-[120px] md:max-w-none">
+                <span className="text-[12px] font-semibold text-white/90 truncate max-w-[120px] md:max-w-none">
                   {title}
                 </span>
               </div>
@@ -666,7 +664,7 @@ export function ProjectHero({
                   title={s.sourceCode}
                 >
                   <GithubIcon size={16} className="group-hover:scale-110" />
-                  <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
+                  <span className="text-[12px] hidden md:inline text-white/40 group-hover:text-white">
                     {s.sourceCode}
                   </span>
                 </a>
@@ -691,7 +689,7 @@ export function ProjectHero({
                 className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all group shrink-0"
               >
                 <X size={16} className="font-bold" />
-                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest hidden xs:block">
+                <span className="text-[12px] md:text-[13px] font-semibold hidden xs:block">
                   {s.closeSession}
                 </span>
               </button>
@@ -734,10 +732,10 @@ export function ProjectHero({
                     />
                   </div>
                   <div className="flex flex-col items-center gap-2 text-center">
-                    <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
+                    <span className="text-[12px] font-semibold text-white">
                       {s.enterStudio}
                     </span>
-                    <span className="text-[10px] text-white/40 uppercase tracking-widest">
+                    <span className="text-[12px] text-white/50">
                       {s.clickToInteract}
                     </span>
                   </div>
@@ -809,7 +807,7 @@ export function ProjectHero({
                   </button>
 
                   <div className="flex flex-col items-center gap-1 text-center px-4">
-                    <span className="font-mono text-[12px] font-black uppercase tracking-[0.2em] text-white">
+                    <span className="text-[12px] font-semibold text-white">
                       {s.enterStudio}
                     </span>
                     <span className="text-[11px] text-white/50 leading-snug max-w-[220px]">
@@ -838,7 +836,7 @@ export function ProjectHero({
                 <ProjectVisual id={projectId} className="!h-full !w-full" />
               </div>
               <div className="flex min-h-0 flex-col items-center justify-center gap-3 px-4 py-4 text-center sm:gap-5 sm:px-6">
-                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/60">
+                <span className="text-[12px] text-white/60">
                   {ui.preview}
                 </span>
                 <p className="text-xl font-semibold tracking-tight sm:text-2xl">
@@ -876,7 +874,7 @@ export function ProjectHero({
                     </div>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/80">
+                    <span className="text-[12px] font-bold text-white/80">
                       {s.preparing}
                     </span>
                   </div>
@@ -933,7 +931,7 @@ export function ProjectHero({
                 <div className="absolute inset-0 blur-2xl bg-white/5 animate-pulse" />
               </div>
               <div className="flex flex-col items-center gap-3">
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/60">
+                <span className="text-[12px] font-semibold text-white/60">
                   {projectId === "pke-web"
                     ? ui.previewUnavailable
                     : staticStudioLayout && (liveUrl || videoUrl)
@@ -945,7 +943,7 @@ export function ProjectHero({
                           : s.comingSoon}
                 </span>
                 <div className="w-12 h-px bg-white/10" />
-                <span className="font-mono text-[8px] uppercase tracking-widest text-white/20 max-w-xs leading-relaxed">
+                <span className="text-[12px] text-white/20 max-w-xs leading-relaxed">
                   {liveUrl || videoUrl ? s.scrollDownInit : s.auditDesc}
                 </span>
               </div>
@@ -965,11 +963,11 @@ export function ProjectHero({
         {/* Studio HUD - Bottom Status Bar */}
         {isInteracting && (
           <footer className="w-full bg-[#121212] border-t border-white/10 px-6 py-3 flex items-center justify-between shrink-0 z-[10000]">
-            <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
+            <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/60">
               {title}
             </div>
 
-            <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-mono text-[8px] text-white/60 uppercase tracking-widest">
+            <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/60">
               <span>{s.enterStudio}</span>
             </div>
           </footer>
@@ -1031,15 +1029,9 @@ export function ProjectHero({
               ref={titleRef}
               className="relative flex flex-col items-center justify-center will-change-transform pointer-events-none"
             >
-              <span
-                className="font-mono text-[clamp(0.65rem,1vw,0.8rem)] opacity-75 mb-2 tracking-[0.32em]"
-                style={{ color: accent }}
-              >
-                PROJECT // {index.toString().padStart(2, "0")}
-              </span>
 
               <h1
-                className="font-black uppercase italic tracking-[-0.05em] leading-[0.85] text-center max-w-[1200px]"
+                className="font-black tracking-[-0.045em] leading-[0.9] text-center text-balance max-w-[1200px]"
                 style={{
                   fontSize: "clamp(3rem, 11vw, 9rem)",
                   color: accent,
@@ -1062,7 +1054,7 @@ export function ProjectHero({
             {langs.slice(0, 3).map((lang) => (
               <div
                 key={lang}
-                className="font-mono text-[9px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border bg-black/5 backdrop-blur-sm"
+                className="text-[12px] px-3 py-1.5 rounded-full border bg-black/5 backdrop-blur-sm"
                 style={{ borderColor: `${accent}40`, color: accent }}
               >
                 {lang}
@@ -1134,7 +1126,7 @@ export function ProjectHero({
               <div className="w-3 h-5 rounded-full border border-white/25 flex justify-center pt-1 relative overflow-hidden bg-white/[0.02]">
                 <div className="w-1 h-1 rounded-full bg-white/75 animate-scroll-dot" />
               </div>
-              <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/65 text-center leading-relaxed">
+              <p className="text-[12px] text-white/65 text-center leading-relaxed">
                 {s.deepScroll}
               </p>
             </div>

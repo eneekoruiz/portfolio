@@ -14,7 +14,7 @@ export function useSpringHover<T extends HTMLElement>(
     const element = ref.current;
     if (!element || !enabled) return;
     const pointer = matchMedia(
-      "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)",
+      "(hover: hover) and (pointer: fine)",
     );
     const x = new SpringValue();
     const y = new SpringValue();
