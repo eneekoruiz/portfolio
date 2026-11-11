@@ -41,7 +41,7 @@ export const HeroTitleBlock = forwardRef<HTMLDivElement, HeroTitleBlockProps>(
             className="relative flex flex-col items-center justify-center will-change-transform pointer-events-none"
           >
             <span
-              className="font-mono text-[clamp(0.9rem,1.5vw,1.2rem)] opacity-40 mb-3 tracking-[0.4em]"
+              className="font-mono text-[clamp(0.9rem,1.5vw,1.2rem)] opacity-70 mb-3 tracking-[0.4em]"
               style={{ color: accent }}
             >
               PROJECT // {index.toString().padStart(2, "0")}
@@ -67,7 +67,7 @@ export const HeroTitleBlock = forwardRef<HTMLDivElement, HeroTitleBlockProps>(
           {subtitle}
         </p>
 
-        <div className="flex items-center gap-6 flex-wrap justify-center opacity-40">
+        <div className="flex items-center gap-6 flex-wrap justify-center opacity-70">
           {langs.slice(0, 3).map((lang) => (
             <div
               key={lang}

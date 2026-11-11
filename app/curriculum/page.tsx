@@ -55,10 +55,8 @@ export default function CurriculumPage() {
   }, []);
 
   useEffect(() => {
-    document.title = `${t.ctaCv} | Eneko Ruiz`;
-    return () => {
-      document.title = "Eneko Ruiz — Portfolio";
-    };
+    // The route's own title comes from layout.tsx; this only localises it.
+    document.title = `${t.ctaCv} · Eneko Ruiz`;
   }, [t.ctaCv]);
 
   useEffect(() => {
@@ -166,7 +164,7 @@ export default function CurriculumPage() {
           <span>{t.back}</span>
         </button>
 
-        <h1 className="font-mono text-[10px] uppercase tracking-[0.4em] opacity-40 text-ink hidden md:block">
+        <h1 className="font-mono text-[10px] uppercase tracking-[0.4em] opacity-70 text-ink hidden md:block">
           {t.ctaCv.toUpperCase()}
         </h1>
 
