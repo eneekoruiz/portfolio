@@ -215,7 +215,7 @@ export function BinaryStreamBtn({
     ghost:
       "bg-transparent text-lead border border-lead/20 hover:border-brand hover:text-brand hover:bg-brand/5 shadow-none",
     light:
-      "bg-brand text-white shadow-[0_10px_32px_rgba(var(--brand-rgb),.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(var(--brand-rgb),.45)]",
+      "bg-brand text-white dark:text-[#0b0d10] shadow-[0_10px_32px_rgba(var(--brand-rgb),.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(var(--brand-rgb),.45)]",
   };
 
   const baseIdle = variantClasses[variant];
@@ -468,7 +468,7 @@ export function PortalWarpBtn({ className }: { className?: string }) {
       aria-label="The Lab — Physics Playground"
       className={[
         "relative flex items-center gap-1.5 px-[1.2rem] py-[.65rem] rounded-[12px] overflow-hidden",
-        "bg-brand text-white shadow-lg",
+        "bg-brand text-white dark:text-[#0b0d10] shadow-lg",
         "text-[11px] font-black tracking-[.15em]",
         "transition-all duration-300",
         state === "idle"

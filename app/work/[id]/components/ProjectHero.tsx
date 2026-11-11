@@ -666,7 +666,7 @@ export function ProjectHero({
                   title={s.sourceCode}
                 >
                   <GithubIcon size={16} className="group-hover:scale-110" />
-                  <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/40 group-hover:text-white">
+                  <span className="text-[10px] uppercase tracking-widest hidden md:inline font-mono text-white/70 group-hover:text-white">
                     {s.sourceCode}
                   </span>
                 </a>
@@ -737,7 +737,7 @@ export function ProjectHero({
                     <span className="font-mono text-[12px] font-black uppercase tracking-[0.4em] text-white">
                       {s.enterStudio}
                     </span>
-                    <span className="text-[10px] text-white/40 uppercase tracking-widest">
+                    <span className="text-[10px] text-white/70 uppercase tracking-widest">
                       {s.clickToInteract}
                     </span>
                   </div>

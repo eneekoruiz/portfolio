@@ -638,7 +638,7 @@ export default function ProjectPage() {
         {/* ── OBJECTIVE & STACK ── */}
         <section className="reveal-sec grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-10 md:gap-16 mb-24 md:mb-40 items-start">
           <div className="space-y-6">
-            <h2 className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] opacity-40 border-b border-black/10 dark:border-white/10 pb-4 text-ink">
+            <h2 className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] opacity-70 border-b border-black/10 dark:border-white/10 pb-4 text-ink">
               El Desafío
             </h2>
             <p className="text-2xl md:text-3xl font-light leading-relaxed tracking-tight text-ink/90">
@@ -646,7 +646,7 @@ export default function ProjectPage() {
             </p>
           </div>
           <GlareCard accent={theme.accent} className="p-8 group">
-            <h3 className="text-xs font-mono uppercase tracking-[0.3em] opacity-40 mb-8 text-ink">
+            <h3 className="text-xs font-mono uppercase tracking-[0.3em] opacity-70 mb-8 text-ink">
               Stack Tecnológico
             </h3>
             <div className="flex flex-col gap-4 text-ink">
@@ -668,7 +668,7 @@ export default function ProjectPage() {
                       {l}
                     </span>
                     <div className="flex-1 h-px bg-black/5 dark:bg-white/5 group-hover:bg-black/10 dark:group-hover:bg-white/10 transition-colors" />
-                    <span className="font-mono text-[9px] opacity-30">
+                    <span className="font-mono text-[9px] opacity-60">
                       0{i + 1}
                     </span>
                   </div>
@@ -732,8 +732,8 @@ export default function ProjectPage() {
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               <div className="h-10 md:h-12 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/5 flex items-center justify-between px-4 md:px-6">
                 <div className="flex items-center gap-2 md:gap-3 text-ink">
-                  <Terminal size={12} className="opacity-40" />
-                  <span className="text-[9px] md:text-[10px] font-mono opacity-40 uppercase tracking-widest">
+                  <Terminal size={12} className="opacity-70" />
+                  <span className="text-[9px] md:text-[10px] font-mono opacity-70 uppercase tracking-widest">
                     {content?.codeSpotlight}
                   </span>
                 </div>
@@ -743,7 +743,7 @@ export default function ProjectPage() {
                   className="opacity-50"
                 />
               </div>
-              <pre className="p-5 md:p-8 overflow-x-auto bg-black/[0.02] dark:bg-transparent">
+              <pre tabIndex={0} className="p-5 md:p-8 overflow-x-auto bg-black/[0.02] dark:bg-transparent">
                 <code
                   className="font-mono text-[11px] md:text-[13px] leading-loose"
                   style={{ color: theme.accent }}
@@ -757,7 +757,7 @@ export default function ProjectPage() {
 
         {/* ── OUTCOME ── */}
         <section className="reveal-sec text-center pt-32 pb-16 border-t border-black/10 dark:border-white/5">
-          <p className="text-[10px] font-mono uppercase tracking-[0.4em] opacity-40 mb-10 text-ink">
+          <p className="text-[10px] font-mono uppercase tracking-[0.4em] opacity-70 mb-10 text-ink">
             Conclusión del Proyecto
           </p>
           <h2
