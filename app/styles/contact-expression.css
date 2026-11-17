@@ -1,0 +1,302 @@
+/* Contact signatures: recognizable marks, each with its own optical weight. */
+#contact .contact-tile .contact-flip-face {
+  min-height: 140px;
+  gap: 10px;
+  border-top-color: color-mix(in srgb, var(--surface-color) 38%, var(--page));
+}
+#contact .contact-tile .contact-tile-icon {
+  width: 48px;
+  height: 48px;
+  border-color: color-mix(in srgb, var(--surface-color) 28%, var(--page));
+  background: color-mix(in srgb, var(--surface-color) 10%, var(--page));
+  box-shadow:
+    0 8px 12px -10px var(--surface-color),
+    inset 0 1px 0 #ffffff60;
+}
+#contact .contact-tile .contact-tile-icon svg {
+  width: 26px;
+  height: 26px;
+}
+#contact [data-contact-service="gmail"] .contact-tile-icon {
+  border-radius: 14px 6px 14px 6px;
+  transform: rotate(-4deg);
+}
+#contact [data-contact-service="github"] .contact-tile-icon {
+  border-radius: 50%;
+}
+#contact [data-contact-service="linkedin"] .contact-tile-icon {
+  border-radius: 12px;
+  transform: rotate(4deg);
+}
+#contact .contact-tile .contact-tile-label {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+#contact .contact-tile .contact-flip-back .contact-tile-icon {
+  width: 52px;
+  height: 52px;
+}
+#contact .contact-tile .contact-flip-back .contact-tile-icon svg {
+  width: 28px;
+  height: 28px;
+}
+@keyframes contact-mark-lift {
+  0%,
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+  40% {
+    translate: 0 -8px;
+    scale: 1.12;
+  }
+  70% {
+    translate: 0 2px;
+    scale: 0.97;
+  }
+}
+:root:not([data-paused]) {
+  #contact [data-contact-motion="on"]:focus-within .contact-tile-icon {
+    animation: contact-mark-lift 650ms ease-out 1;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  #contact [data-contact-motion="on"]:hover .contact-tile-icon {
+    animation: contact-mark-lift 650ms ease-out 1;
+  }
+}
+@media (max-width: 639px) {
+  #contact .contact-tile .contact-flip-face {
+    min-height: 124px;
+    gap: 8px;
+  }
+  #contact .contact-tile .contact-tile-icon {
+    width: 38px;
+    height: 38px;
+  }
+  #contact .contact-tile .contact-tile-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  #contact .contact-tile .contact-tile-label {
+    font-size: 15px;
+  }
+  #contact .contact-tile .contact-flip-back .contact-tile-icon {
+    width: 42px;
+    height: 42px;
+  }
+  #contact .contact-tile .contact-flip-back .contact-tile-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* The contact climax uses the ember end of the chapter arc. */
+.contact-primary {
+  background: var(--ember);
+  color: #111317; /* 5.6:1 on ember; white is only 3.3:1 */
+  box-shadow: 0 14px 34px -14px color-mix(in srgb, var(--ember) 70%, transparent);
+}
+.contact-primary:hover {
+  background: color-mix(in srgb, var(--ember) 88%, var(--ink));
+}
+/* The ring grows with transform and opacity only: compositor work, no repaint. */
+.contact-pulse {
+  position: relative;
+}
+.contact-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(16, 185, 129, 0.5);
+  animation: contact-pulse 2.4s var(--ease-drift) infinite;
+}
+@keyframes contact-pulse {
+  70%,
+  100% {
+    transform: scale(4.5);
+    opacity: 0;
+  }
+}
+:root[data-paused] .contact-pulse::after {
+  animation: none;
+}
+
+#contact .contact-intro {
+  padding: clamp(1.25rem, 2.5vw, 2.25rem);
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--ink) 12%);
+  background:
+    radial-gradient(
+      ellipse at 85% 0%,
+      color-mix(in srgb, var(--brand) 12%, transparent),
+      transparent 70%
+    ),
+    color-mix(in srgb, var(--page) 75%, transparent);
+  box-shadow:
+    0 18px 45px -25px color-mix(in srgb, var(--brand) 35%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+#contact .contact-intro-heading {
+  padding-bottom: 1rem;
+}
+#contact .contact-intro-heading > p {
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+}
+#contact .contact-email {
+  font-size: clamp(1.5rem, 3.8vw, 3.2rem);
+  line-height: 1.1;
+}
+#contact .contact-copy-status {
+  min-height: 1.25rem;
+}
+#contact .contact-intro .materia-button {
+  min-height: 42px;
+  padding: 10px 18px;
+  gap: 8px;
+  font-size: 12px;
+}
+#contact .contact-tiles {
+  margin-top: 1.25rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+#contact .contact-tile {
+  min-width: 0;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--surface-color) 25%, var(--ink) 12%);
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      color-mix(in srgb, var(--surface-color) 14%, transparent),
+      transparent 65%
+    ),
+    color-mix(in srgb, var(--page) 80%, transparent);
+  box-shadow:
+    0 14px 35px -22px color-mix(in srgb, var(--surface-color) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
+}
+#contact .contact-tile:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--surface-color) 48%, var(--ink) 22%);
+  box-shadow:
+    0 20px 50px -22px color-mix(in srgb, var(--surface-color) 60%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+#contact .contact-flip-face {
+  border: 0;
+  background: transparent;
+}
+#contact .contact-tile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--surface-color) 30%, transparent);
+  background: color-mix(in srgb, var(--surface-color) 12%, var(--page));
+  transform-origin: 50% 75%;
+}
+#contact .contact-tile-label {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+#contact .contact-tile-value {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  line-height: 1.4;
+}
+#contact .contact-tile-action {
+  padding-top: 0.25rem;
+}
+#contact .contact-flip-back {
+  gap: 0.75rem;
+}
+
+@keyframes contact-icon-greet {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-4px) rotate(-10deg);
+  }
+  60% {
+    transform: translateY(-2px) rotate(8deg);
+  }
+  80% {
+    transform: translateY(-1px) rotate(-3deg);
+  }
+}
+:root:not([data-paused]) {
+  #contact [data-contact-motion="on"]:focus-within .contact-tile-icon {
+    animation: contact-icon-greet 600ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  #contact [data-contact-motion="on"]:hover .contact-tile-icon {
+    animation: contact-icon-greet 600ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+  }
+}
+@media (min-width: 640px) {
+  #contact .contact-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 639px) {
+  /* The closing chapter still fits one phone screen. */
+  #contact .contact-offer {
+    font-size: 1.4rem;
+  }
+  #contact .contact-intro .mt-7 {
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+  }
+  #contact .contact-flip-visual,
+  #contact .contact-flip-face {
+    min-height: 108px;
+  }
+  #contact .contact-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  #contact .contact-flip-face:not(.contact-flip-back) {
+    display: flex;
+    padding: 12px 4px;
+    gap: 0.5rem;
+  }
+  #contact .contact-tile-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+  #contact .contact-tile-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  #contact .contact-tile-label {
+    font-size: 14px;
+  }
+  #contact .contact-tile-value {
+    display: none;
+  }
+  #contact .contact-tile-action {
+    margin-top: auto;
+    gap: 4px;
+    font-size: 10px;
+  }
+  #contact .contact-flip-back {
+    display: flex;
+    padding: 12px 4px;
+    gap: 0.5rem;
+  }
+  #contact .contact-flip-back > span:last-child {
+    display: none;
+  }
+}

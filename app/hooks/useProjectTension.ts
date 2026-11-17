@@ -43,7 +43,14 @@ export function useProjectTension(
         glow = energy.step(dt);
       const moving =
         !wave.settled || !x.settled || !y.settled || !energy.settled;
-      if (title) {
+      // At rest everything goes flat: no 3D transform, so no compositor layers.
+      const atRest =
+        !moving &&
+        Math.max(Math.abs(px), Math.abs(py), Math.abs(flow), glow) < 0.002;
+      if (title && atRest) {
+        if (title.style.transform)
+          title.style.transform = title.style.willChange = "";
+      } else if (title) {
         title.style.transform = `perspective(900px) translate3d(${px * 5}px,${flow * -7}px,${glow * 12}px) rotateX(${flow * 6 - py * 3}deg) rotateY(${px * 5}deg) skewY(${flow * 0.8}deg)`;
         title.style.willChange = moving ? "transform" : "";
       }
@@ -52,7 +59,14 @@ export function useProjectTension(
         lastEnergy = energyValue;
         glint.style.setProperty("--work-energy", energyValue);
       }
-      if (visual) {
+      if (visual && atRest) {
+        if (visual.style.transform) {
+          visual.style.transform = visual.style.willChange = "";
+          frame?.style.removeProperty("--preview-depth");
+          glint?.style.removeProperty("--preview-depth");
+          lastDepth = "";
+        }
+      } else if (visual) {
         visual.style.transform = `perspective(1000px) translate3d(${px * -5}px,${py * -5}px,${glow * 14}px) rotateX(${py * -5 + flow * 2}deg) rotateY(${px * 7}deg)`;
         visual.style.willChange = moving ? "transform" : "";
         const depth = `${(glow * 12).toFixed(2)}px`;

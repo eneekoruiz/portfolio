@@ -19,8 +19,8 @@ interface HeroProps {
   onIntroComplete: () => void;
 }
 
-// The name sits in the lower part of the poster: on wide screens one line takes
-// at most this share of the hero height, on phones each of the two lines does.
+// The name heads the poster: on wide screens one line takes at most this share
+// of the hero height, on phones each of the two lines does.
 const WIDE_SHARE = 0.34;
 // Sideways phones have almost no height: the name takes a smaller share.
 const SHORT_SHARE = 0.28;
@@ -71,6 +71,27 @@ export function Hero({ t, reduced, phase, onIntroComplete }: HeroProps) {
       <SandField stageRef={heroRef} enabled={enabled} />
       <div className="hero-rules" aria-hidden="true" />
 
+      <h1 dir="ltr" className="hero-name relative z-10">
+        <span className="hero-name-wide">
+          <ShockType
+            lines={["Eneko Ruiz."]}
+            maxSize={heightCap(WIDE_SHARE)}
+            enabled={enabled}
+            revealOnBurst
+            listen
+            pressure
+          />
+        </span>
+        <span className="hero-name-narrow">
+          <ShockType
+            lines={["Eneko", "Ruiz."]}
+            maxSize={heightCap(NARROW_SHARE)}
+            enabled={enabled}
+            revealOnBurst
+            listen
+          />
+        </span>
+      </h1>
       <div className="hero-head relative z-10">
         <p data-cine-ui className="hero-role">
           <span>{firstRole}</span>
@@ -99,27 +120,6 @@ export function Hero({ t, reduced, phase, onIntroComplete }: HeroProps) {
         </div>
       </div>
 
-      <h1 dir="ltr" className="hero-name relative z-10">
-        <span className="hero-name-wide">
-          <ShockType
-            lines={["Eneko Ruiz."]}
-            maxSize={heightCap(WIDE_SHARE)}
-            enabled={enabled}
-            revealOnBurst
-            listen
-            pressure
-          />
-        </span>
-        <span className="hero-name-narrow">
-          <ShockType
-            lines={["Eneko", "Ruiz."]}
-            maxSize={heightCap(NARROW_SHARE)}
-            enabled={enabled}
-            revealOnBurst
-            listen
-          />
-        </span>
-      </h1>
       {enabled && <BurstLayer />}
     </section>
   );

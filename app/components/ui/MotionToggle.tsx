@@ -32,7 +32,7 @@ export function MotionToggle() {
       // Not persisted: a reload always starts with motion on.
       window.dispatchEvent(
         new CustomEvent("portfolio-motion-changed", {
-          detail: { enabled: nextState, userInitiated: true },
+          detail: { enabled: nextState },
         }),
       );
     }

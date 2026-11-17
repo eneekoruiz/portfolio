@@ -5,6 +5,10 @@ import { TX } from "../app/data/translations.ts";
 import { PROJECTS_CONTENT } from "../app/data/projects.ts";
 
 test.use({ reducedMotion: "reduce" });
+// Motion paused for the visit: these specs check content, not the opening.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("portfolio-motion-enabled", "false"));
+});
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (window.top !== window) return;
