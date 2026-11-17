@@ -628,7 +628,7 @@ export const MVCTerminal = ({ accent }: { accent: string }) => {
           <span style={{ color: accent }}>❯</span>
           <span className="opacity-70">GET /api/v1/players</span>
         </div>
-        <div className="flex items-center gap-2 opacity-40">
+        <div className="flex items-center gap-2 opacity-70">
           <span>[Router]</span>
           <span>Executing aggregation pipeline...</span>
         </div>
@@ -745,7 +745,7 @@ export const WCAGVisualizer = ({ accent }: { accent: string }) => {
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="space-y-1">
-          <div className="text-[10px] font-mono opacity-40 uppercase tracking-widest text-ink">
+          <div className="text-[10px] font-mono opacity-70 uppercase tracking-widest text-ink">
             Contrast
           </div>
           <div

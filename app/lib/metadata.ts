@@ -5,11 +5,11 @@ const DOMAIN = "https://eneko-ruiz.vercel.app";
 export const baseMetadata: Metadata = {
   metadataBase: new URL(DOMAIN),
   title: {
-    default: "Eneko Ruiz — Ingeniero Informático & Full Stack Developer",
+    default: "Eneko Ruiz — Ingeniero de Software · Full Stack",
     template: "%s · Eneko Ruiz",
   },
   description:
-    "Portfolio de Eneko Ruiz, ingeniero informático y desarrollador full stack.",
+    "Portfolio de Eneko Ruiz, ingeniero de software full stack: proyectos, stack, forma de trabajar y contacto.",
   keywords: [
     "Eneko Ruiz",
     "Software Engineer",
@@ -80,7 +80,7 @@ export const jsonLd = {
       name: "Eneko Ruiz",
       url: DOMAIN,
       email: "eneekoruiz@gmail.com",
-      jobTitle: "Ingeniero Informático · Full Stack Developer",
+      jobTitle: "Ingeniero de Software · Full Stack",
       description:
         "Ingeniero informático y desarrollador full stack con experiencia en aplicaciones web.",
       image: `${DOMAIN}/og.png`,

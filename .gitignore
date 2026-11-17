@@ -44,3 +44,7 @@ next-env.d.ts
 # internal
 scratch/
 test-npm/
+
+# agent config and local docs
+.claude/
+*.pdf

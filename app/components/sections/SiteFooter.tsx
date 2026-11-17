@@ -55,7 +55,7 @@ export function SiteFooter({ t }: { t: Tx }) {
           className="no-underline text-lead transition-colors duration-200 hover:text-brand"
           onClick={handleClick}
         >
-          <p className="font-mono text-[10px] leading-none opacity-80">
+          <p className="font-mono text-[10px] leading-none">
             {t.footerTech}
           </p>
         </a>

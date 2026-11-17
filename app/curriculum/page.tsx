@@ -10,18 +10,15 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ChevronLeft, ExternalLink, Download } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
 import { useTranslations } from "../hooks/useTranslations";
 
 export default function CurriculumPage() {
   const { t, ui } = useTranslations();
   const router = useRouter();
-  const { theme, resolvedTheme } = useTheme();
   const [loading, setLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -30,6 +27,13 @@ export default function CurriculumPage() {
 
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
+      if (
+        e.origin !== "https://eneko-ruiz-curriculum.vercel.app" ||
+        e.source !== iframeRef.current?.contentWindow ||
+        !e.data
+      ) {
+        return;
+      }
       if (e.data.type === "trigger-cv-print") {
         const iframe = iframeRef.current;
         if (iframe && iframe.contentWindow) {
@@ -39,7 +43,6 @@ export default function CurriculumPage() {
       }
       if (e.data.type === "set-cv-height") {
         setLoading(false);
-        setHasError(false);
         setShowFallback(false);
       }
     };
@@ -52,16 +55,13 @@ export default function CurriculumPage() {
   }, []);
 
   useEffect(() => {
-    document.title = `${t.ctaCv} | Eneko Ruiz`;
-    return () => {
-      document.title = "Eneko Ruiz — Portfolio";
-    };
+    // The route's own title comes from layout.tsx; this only localises it.
+    document.title = `${t.ctaCv} · Eneko Ruiz`;
   }, [t.ctaCv]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       if (loading) {
-        setHasError(true);
         setShowFallback(true);
         setLoading(false);
       }
@@ -164,7 +164,7 @@ export default function CurriculumPage() {
           <span>{t.back}</span>
         </button>
 
-        <h1 className="font-mono text-[10px] uppercase tracking-[0.4em] opacity-40 text-ink hidden md:block">
+        <h1 className="font-mono text-[10px] uppercase tracking-[0.4em] opacity-70 text-ink hidden md:block">
           {t.ctaCv.toUpperCase()}
         </h1>
 
@@ -219,12 +219,10 @@ export default function CurriculumPage() {
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
             onLoad={() => {
               setLoading(false);
-              setHasError(false);
               setShowFallback(false);
             }}
             onError={() => {
               setLoading(false);
-              setHasError(true);
               setShowFallback(true);
             }}
           />
@@ -255,17 +253,6 @@ export default function CurriculumPage() {
           </div>
         )}
       </main>
-
-      {/* Mobile-friendly back button for easier navigation */}
-      <div className="sm:hidden fixed bottom-6 left-6 z-40">
-        <button
-          onClick={handleReturn}
-          className="flex items-center justify-center w-12 h-12 rounded-full bg-brand text-white shadow-lg active:scale-95 transition-transform"
-          aria-label={t.back}
-        >
-          <ChevronLeft size={20} />
-        </button>
-      </div>
     </div>
   );
 }
