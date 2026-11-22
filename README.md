@@ -1,52 +1,44 @@
-# Eneko Ruiz | Software Engineer
+# Portfolio Personal · Eneko Ruiz
 
-Personal portfolio built with Next.js, React, TypeScript, GSAP, and Three.js.
+Sitio web personal y portfolio de ingeniería de software desarrollado con Next.js (App Router), TypeScript, animaciones GSAP, renderizado 3D con Three.js y desplazamiento inercial.
 
-## What is here
+- **Demo en vivo:** [eneekoruiz.dev](https://eneekoruiz.dev)
+- **Documentación de arquitectura:** [DeepWiki - portfolio](https://deepwiki.com/eneekoruiz/portfolio)
 
-- Selected work from my main projects
-- Short project summaries
-- Links to the repositories behind each project
-- A compact contact section
+## Arquitectura y Decisiones de Diseño
 
-## Notes
+- **Server Components & Client Boundaries:** Arquitectura de Next.js App Router donde el contenido estructural y metadatos SEO se renderizan en servidor, limitando los componentes cliente a interactividad gestual y animaciones.
+- **Micro-interacciones y Scroll Cinemático:** Integración de Lenis para scroll inercial sincronizado con timelines de GSAP ScrollTrigger y shaders de Three.js.
+- **Soporte de Tema y Accesibilidad:** Modo oscuro nativo implementado con `next-themes`, variables CSS semánticas y contrastes verificados mediante tests automáticos con Playwright.
+- **Internacionalización y Rutas Dinámicas:** Páginas de detalle de proyecto (`/work/[id]`) con renderizado estático incremental y validación de enlaces externos.
 
-- Featured projects render immediately from local content. Optional GitHub activity loads through a server-side API when its section approaches the viewport.
-- Motion is kept minimal so the content stays readable.
-- Accessibility and reduced-motion support are part of the design.
+## Stack Técnico
 
-## Local development
+- **Core:** Next.js 15+, React 19, TypeScript, Tailwind CSS
+- **Animaciones & Gráficos:** GSAP, `@gsap/react`, Lenis, Three.js, `@react-three/fiber`, `@react-three/drei`, Framer Motion
+- **Iconos & Temas:** Lucide Icons, `next-themes`
+- **Testing:** Playwright (pruebas E2E, smoke tests y regresión visual)
+
+## Puesta en Marcha Local
+
+### Prerrequisitos
+
+- Node.js 18+
+
+### Instalación y Ejecución
 
 ```bash
+git clone https://github.com/eneekoruiz/portfolio.git
+cd portfolio
 npm install
+
+# Servidor de desarrollo (puerto 3000)
 npm run dev
-npm run build
-```
 
-## Architecture
-
-The site uses the Next.js App Router. Page sections and shared components render the portfolio content, while a server-side GitHub API route retrieves repository data without exposing credentials to the browser.
-
-Native scrolling schedules presentation updates only when needed. A shared motion policy respects reduced motion, data saving, device capabilities, and tab visibility. Touch and modest devices start with static decoration; desktop WebGL is loaded lazily, capped at 30 frames per second, and paused outside the project hero. Skills start as readable chips and require explicit activation to orbit. Embedded demos load only when the visitor enters the studio and unload when it closes.
-
-Metadata, featured work, and contact links remain available through the server-rendered route, including when JavaScript enhancements are unavailable.
-
-## Validation
-
-```bash
-npm ci
+# Verificación de tipos y linter
 npm run typecheck
-npm run build
 npm run lint
-npm run test:motion
-npx playwright test --config playwright.performance.config.mjs
-npm run test:e2e
+
+# Pruebas End-to-End
+npm run test:fast
 ```
-
-The performance configuration covers 1440×900 desktop, 768×1024 tablet, and 375×667 mobile. It verifies deferred requests, offscreen pausing, cursor fallback, reduced motion, navigation, JavaScript-disabled content, and all 20 supported languages. It also captures the editorial sections in both themes and checks heading overflow, RTL, keyboard-operated project panels, and browser/asset errors. Browser measurements are local diagnostics, not field Core Web Vitals.
-
-## Links
-
-- DeepWiki: https://deepwiki.com/eneekoruiz/portfolio
-
-© 2026 Eneko Ruiz
