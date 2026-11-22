@@ -373,14 +373,14 @@ export default function ProjectPage() {
   };
 
   const GITHUB_URLS: Record<string, string | null> = {
-    "ana-peluquera": "https://github.com/eneekoruiz/ana-peluquera",
+    "ana-peluquera": null,
     recordatorios: "https://github.com/eneekoruiz/recordatorios",
     passwordmanager: "https://github.com/eneekoruiz/passwordmanager",
     regla: "https://github.com/eneekoruiz/regla",
     "who-are-ya-backend": "https://github.com/eneekoruiz/who-are-ya-backend",
-    "pke-web": "https://github.com/eneekoruiz/pke-web",
-    rides24ofiziala: "https://github.com/eneekoruiz/rides24ofiziala",
-    "spotshare-parking": "https://github.com/eneekoruiz/spotshare-parking",
+    "pke-web": null,
+    rides24ofiziala: "https://github.com/eneekoruiz/Rides24ofiziala",
+    "spotshare-parking": null,
   };
 
   const liveUrl = LIVE_URLS[safeId] ?? null;
