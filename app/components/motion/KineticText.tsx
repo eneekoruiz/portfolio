@@ -1,0 +1,239 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { materia } from "../../lib/materia";
+import { SpringValue } from "../../lib/spring";
+import { kineticGroups } from "../../lib/kinetic-segmentation";
+
+export function KineticText({
+  text,
+  enabled,
+  className = "",
+  interactive = false,
+  delay = 0,
+  wrap = false,
+  entrance = true,
+}: {
+  text: string;
+  enabled: boolean;
+  className?: string;
+  interactive?: boolean;
+  delay?: number;
+  wrap?: boolean;
+  /** False when another sequence already revealed the letters. */
+  entrance?: boolean;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !enabled) return;
+    const characters = Array.from(
+      element.querySelectorAll<HTMLElement>("[data-kinetic-char]"),
+    );
+    const letters = characters.map(
+      () => new SpringValue(entrance ? 0 : 1, 135, 17),
+    );
+    const waves = characters.map(() => new SpringValue(0, 170, 18));
+    const tiltX = new SpringValue(0, 130, 20);
+    const tiltY = new SpringValue(0, 130, 20);
+    const tension = new SpringValue(0, 150, 22);
+    const light = new SpringValue(0, 150, 22);
+    const release = gsap.parseEase("expo.out");
+    let visible = false;
+    let enteredAt = -1;
+    let releaseAt = -1;
+    let releaseFrom = 0;
+    let previousVelocity = 0;
+    let hasLightCoordinates = false;
+    const wake = () => {
+      if (visible && document.visibilityState === "visible")
+        gsap.ticker.add(tick);
+    };
+    const tick = (time: number, delta: number) => {
+      if (!visible) return;
+      const velocity = Math.max(-1, Math.min(1, materia.velocity / 32));
+      if (Math.abs(velocity) < 0.025 && Math.abs(previousVelocity) >= 0.025) {
+        releaseAt = time;
+        releaseFrom = tension.target;
+      }
+      tension.target =
+        Math.abs(velocity) >= 0.025
+          ? velocity
+          : releaseAt >= 0
+            ? releaseFrom *
+              (1 - release(Math.min(1, (time - releaseAt) / 0.45)))
+            : 0;
+      previousVelocity = velocity;
+      const value = tension.step(delta / 1000);
+      const rx = tiltX.step(delta / 1000);
+      const ry = tiltY.step(delta / 1000);
+      if (!light.settled) {
+        element.style.setProperty(
+          "--type-light",
+          String(light.step(delta / 1000)),
+        );
+      }
+      // A pointer may enter and leave before the spring advances a frame.
+      if (hasLightCoordinates && light.settled && light.value === 0) {
+        for (const char of characters) {
+          char.style.removeProperty("--glyph-light-x");
+          char.style.removeProperty("--glyph-light-y");
+        }
+        hasLightCoordinates = false;
+      }
+      const changing =
+        !tension.settled ||
+        !tiltX.settled ||
+        !tiltY.settled ||
+        Math.abs(value) > 0.001;
+      if (changing) {
+        element.style.setProperty(
+          "--type-width",
+          String(100 - Math.abs(value) * 13),
+        );
+        element.style.setProperty(
+          "--type-weight",
+          String(850 + Math.abs(value) * 80),
+        );
+        element.style.transform = `perspective(1100px) rotateX(${rx}deg) rotateY(${ry}deg) skew(${value * -5}deg,${value * 2}deg) scale3d(${1 + Math.abs(value) * 0.035},${1 - Math.abs(value) * 0.045},1)`;
+        element.style.willChange = "transform";
+      } else if (element.style.willChange) {
+        // Back at rest the word drops its 3D transform: a settled title must
+        // not stay a compositor layer for the rest of the visit.
+        element.style.transform = element.style.willChange = "";
+        element.style.removeProperty("--type-width");
+        element.style.removeProperty("--type-weight");
+      }
+      let settled = true;
+      for (let i = 0; i < letters.length; i++) {
+        const letter = letters[i];
+        if (time - enteredAt < delay + i * (interactive ? 0.025 : 0.01)) {
+          settled = false;
+          continue;
+        }
+        const wave = waves[i];
+        if (letter.target === 1 && letter.settled && wave.settled) {
+          if (characters[i].style.transform) characters[i].removeAttribute("style");
+          continue;
+        }
+        settled = false;
+        letter.target = 1;
+        const progress = letter.step(delta / 1000);
+        const lift = wave.step(delta / 1000);
+        characters[i].style.transform =
+          `translate3d(0,calc(${(1 - progress) * 100}% - ${lift * 0.075}em),${(1 - progress) * -240 + lift * 35}px) rotateX(${(1 - progress) * -100 + lift * 8}deg) rotateY(${lift * (i % 2 ? 6 : -6)}deg)`;
+        characters[i].style.opacity = String(
+          Math.max(0, Math.min(1, progress * 2)),
+        );
+        characters[i].style.willChange =
+          letter.settled && wave.settled ? "" : "transform, opacity";
+      }
+      if (
+        settled &&
+        !changing &&
+        light.settled &&
+        Math.abs(materia.velocity) < 0.01
+      )
+        gsap.ticker.remove(tick);
+    };
+    const move = (event: PointerEvent) => {
+      wake();
+      if (!interactive || event.pointerType === "touch") return;
+      const bounds = element.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) / Math.max(1, bounds.width);
+      const y = (event.clientY - bounds.top) / Math.max(1, bounds.height);
+      tiltX.target = (0.5 - y) * 7;
+      tiltY.target = (x - 0.5) * 9;
+      light.target = 1;
+      const rectangles = characters.map((char) => char.getBoundingClientRect());
+      characters.forEach((char, i) => {
+        char.style.setProperty(
+          "--glyph-light-x",
+          `${event.clientX - rectangles[i].left}px`,
+        );
+        char.style.setProperty(
+          "--glyph-light-y",
+          `${event.clientY - rectangles[i].top}px`,
+        );
+      });
+      hasLightCoordinates = true;
+      for (let i = 0; i < waves.length; i++) {
+        const distance = x - (i + 0.5) / waves.length;
+        waves[i].target = Math.exp(-distance * distance * 32);
+      }
+    };
+    const leave = () => {
+      wake();
+      tiltX.target = tiltY.target = 0;
+      light.target = 0;
+      for (const wave of waves) wave.target = 0;
+    };
+    window.addEventListener("scroll", wake, { passive: true });
+    element.addEventListener("pointermove", move);
+    element.addEventListener("pointerleave", leave);
+    element.addEventListener("pointercancel", leave);
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) {
+        if (enteredAt < 0) {
+          enteredAt = gsap.ticker.time;
+          if (entrance)
+            for (const char of characters) char.style.opacity = "0";
+        }
+        gsap.ticker.add(tick);
+      } else {
+        leave();
+        gsap.ticker.remove(tick);
+        element.style.willChange = "";
+      }
+    });
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", wake);
+      element.removeEventListener("pointermove", move);
+      element.removeEventListener("pointerleave", leave);
+      element.removeEventListener("pointercancel", leave);
+      gsap.ticker.remove(tick);
+      element.style.transform = element.style.willChange = "";
+      element.style.removeProperty("--type-width");
+      element.style.removeProperty("--type-weight");
+      element.style.removeProperty("--type-light");
+      for (const char of characters) char.removeAttribute("style");
+    };
+  }, [text, enabled, interactive, delay, wrap, entrance]);
+  return (
+    <span
+      ref={ref}
+      data-kinetic-interactive={interactive || undefined}
+      className={`kinetic-type block origin-left ${wrap ? "kinetic-wrap" : ""} ${className}`}
+    >
+      {kineticGroups(text, wrap).map((group, index) =>
+        /^\s+$/u.test(group.join("")) ? (
+          <span key={index} aria-hidden="true">
+            {" "}
+          </span>
+        ) : (
+          <span
+            key={index}
+            className="inline-block max-w-full"
+            aria-hidden="true"
+          >
+            {group.map((unit, i) => (
+              <span
+                key={i}
+                data-kinetic-char
+                data-glyph={interactive ? unit : undefined}
+                className="inline-block origin-bottom"
+              >
+                {unit}
+              </span>
+            ))}
+          </span>
+        ),
+      )}
+      <span className="sr-only">{text}</span>
+    </span>
+  );
+}

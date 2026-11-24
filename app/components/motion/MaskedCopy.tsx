@@ -13,12 +13,7 @@ export function MaskedCopy({
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const element = ref.current;
-    if (
-      !element ||
-      !enabled ||
-      matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
+    if (!element || !enabled) return;
     const words = Array.from(
       element.querySelectorAll<HTMLElement>("[data-masked-word]"),
     );

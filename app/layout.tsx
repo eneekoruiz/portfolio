@@ -8,6 +8,7 @@ import "./styles/project-preview.css";
 import "./styles/project-reel.css";
 import "./styles/brutal.css";
 import "./styles/stack-cards.css";
+import "./styles/contact-expression.css";
 import { IntroProvider } from "./components/IntroProvider";
 import { EasterEgg } from "./components/ui/EasterEgg";
 import { SmoothScroll } from "./components/motion/SmoothScroll";

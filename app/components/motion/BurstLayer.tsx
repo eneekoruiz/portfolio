@@ -25,6 +25,8 @@ export function BurstLayer() {
         tint?: "ember" | "brand";
         delay?: number;
       }>).detail;
+      // A late cue after the visitor scrolled away would simulate unseen sparks.
+      if (y < -innerHeight * 0.5 || y > innerHeight * 1.5) return;
       fx.burst(x, y, { power, tint, delay });
     };
     const onClear = () => fx.clear();

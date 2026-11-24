@@ -11,7 +11,7 @@ import { ShockType, type ShockTypeHandle } from "./ShockType";
 /**
  * Overture — the welcome gets its own screen, then is blown open.
  *
- * 1 · Load: a real counter (fonts and page) from 00 to 100 with a hairline.
+ * 1 · Load: one hairline fills with real readiness (fonts and page); no numbers.
  * 2 · Welcome: the word lands full width; its own weight sends a small shock.
  * 3 · Implosion: the letters are pulled into the centre, narrower and heavier,
  *     until the word is a point.
@@ -41,7 +41,6 @@ function readColor(name: string, fallback: string) {
 
 export function Overture({ lang, onCleared }: { lang: Lang; onCleared: () => void }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const countRef = useRef<HTMLSpanElement>(null);
   const ruleRef = useRef<HTMLSpanElement>(null);
   const wordRef = useRef<ShockTypeHandle>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -70,7 +69,6 @@ export function Overture({ lang, onCleared }: { lang: Lang; onCleared: () => voi
     let loading = 0;
     const paintCount = () => {
       const v = Math.min(100, Math.round(counter.value));
-      if (countRef.current) countRef.current.textContent = String(v).padStart(2, "0");
       if (ruleRef.current) ruleRef.current.style.transform = `scaleX(${v / 100})`;
     };
     const tl = gsap.timeline({ paused: true });
@@ -91,8 +89,7 @@ export function Overture({ lang, onCleared }: { lang: Lang; onCleared: () => voi
     const landed = 0.3 + 0.42 + 0.035 * Math.floor(chars.length / 2);
     gsap.set(chars, { yPercent: -110, opacity: 1 });
     if (line) gsap.set(line, { clipPath: "inset(-4% -6% -30% -6%)" });
-    tl.to(countRef.current, { yPercent: 105, duration: 0.42, ease: "power3.in" }, 0.12)
-      .to(ruleRef.current, { scaleX: 0, transformOrigin: "50% 50%", duration: 0.42, ease: "power3.in" }, 0.12)
+    tl.to(ruleRef.current, { scaleX: 0, transformOrigin: "50% 50%", duration: 0.42, ease: "power3.in" }, 0.12)
       .to(ruleRef.current?.parentElement ?? [], { opacity: 0, duration: 0.42 }, 0.12)
       .to(chars, {
         yPercent: 0,
@@ -273,9 +270,6 @@ export function Overture({ lang, onCleared }: { lang: Lang; onCleared: () => voi
         />
       </div>
       <div className="overture-foot" aria-hidden="true">
-        <span className="overture-count">
-          <span ref={countRef}>00</span>
-        </span>
         <span className="overture-rule">
           <span ref={ruleRef} />
         </span>

@@ -81,13 +81,20 @@ function SkillOrbit({
           !displacement.y.settled ||
           !displacement.z.settled;
         if (moving) settled = false;
-        const zPos = (depth - 0.5) * 80 + oz;
+        // 2D on purpose: scale carries the depth, and 32 pills in 3D stayed
+        // compositor layers for the whole visit.
+        const scale = 0.68 + depth * 0.36 + oz * 0.004;
         items[i].style.transform =
-          `translate(-50%,-50%) translate3d(${(x + ox).toFixed(1)}px,${(y + oy).toFixed(1)}px,${zPos.toFixed(1)}px) rotateY(${(Math.sin(theta) * -12).toFixed(1)}deg) scale(${(0.68 + depth * 0.36).toFixed(3)})`;
-        items[i].style.setProperty("--pill-light", String(oz / 18));
+          `translate(-50%,-50%) translate(${(x + ox).toFixed(1)}px,${(y + oy).toFixed(1)}px) scale(${scale.toFixed(3)})`;
+        // Only write what changed: a custom property or z-index rewritten on
+        // every frame restyles and repaints all the pills.
+        const light = (oz / 18).toFixed(2);
+        if (items[i].style.getPropertyValue("--pill-light") !== light)
+          items[i].style.setProperty("--pill-light", light);
         items[i].style.willChange = moving || dragging ? "transform" : "";
-        items[i].style.opacity = String((0.36 + depth * 0.64).toFixed(3));
-        items[i].style.zIndex = String(Math.round(depth * 100));
+        items[i].style.opacity = String((0.36 + depth * 0.64).toFixed(2));
+        const layer = String(Math.round(depth * 10));
+        if (items[i].style.zIndex !== layer) items[i].style.zIndex = layer;
       }
       return settled;
     };
